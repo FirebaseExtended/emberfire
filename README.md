@@ -13,7 +13,14 @@ to learn more about how to use the library.
 
 Usage
 -----
-Spark introduces the `FB` namespace, that provides two objects.
+Spark introduces the `FB` namespace, that provides two objects. Include
+the library first, along with Firebase and Ember:
+
+```html
+<script src="https://cdn.firebase.com/v0/firebase.js"/>
+<script src="http://builds.emberjs.com/ember-latest.js"/>
+<script src="http://firebase.github.io/spark/spark-latest.js"/>
+```
 
 ### FB.Array
 
