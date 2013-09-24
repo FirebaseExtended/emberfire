@@ -96,7 +96,9 @@ FB.Array = Ember.ArrayProxy.extend({
     }, this);
 
     this.ref.on("child_changed", function(snapshot) {
-      // TODO: implement
+      if (snapshot.name() == "_type") return;
+      var idx = this._index.indexOf(snapshot.name());
+      array.replace(idx, 1, [snapshot.val()]);
     }, this);
 
     this._super();
