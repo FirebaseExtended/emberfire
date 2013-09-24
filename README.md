@@ -64,6 +64,7 @@ to save changes to Firebase. For example, to add a new object to the list:
     }
   });
 </script>
+```
 
 This works because we previously associated an `FB.Array` instance as the model
 for the `IndexController`.
