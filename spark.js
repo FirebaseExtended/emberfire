@@ -29,6 +29,8 @@ FB.Object = Ember.ObjectProxy.extend({
       }, this);
     }
 
+    this.ref.child("_type").set("object");
+
     this.ref.on("child_added", applyChange, this);
 
     this.ref.on("child_changed", applyChange, this);
@@ -71,10 +73,12 @@ FB.Object = Ember.ObjectProxy.extend({
 
 FB.Array = Ember.ArrayProxy.extend({
   init: function() {
-    var array = [];
+    var array = Ember.A([]);
+    this._index = Ember.A([]);
 
     this.set("content", array);
-    this._index = [];
+
+    this.ref.child("_type").set("array");
 
     this.ref.on("child_added", function(snapshot) {
       if (snapshot.name() == "_type") return;
@@ -85,21 +89,31 @@ FB.Array = Ember.ArrayProxy.extend({
     }, this);
 
     this.ref.on("child_removed", function(snapshot) {
+      if (snapshot.name() == "_type") return;
       var idx = this._index.indexOf(snapshot.name());
-      this.replace(idx, 1, []);
+      this._index.removeAt(idx);
+      array.removeAt(idx);
     }, this);
 
     this.ref.on("child_changed", function(snapshot) {
       // TODO: implement
     }, this);
+
+    this._super();
   },
 
-  replace: function(idx, amt, objects) {
-    var refs = objects.map(function(object) {
-      return this.ref.push(object.toJSON()).name();
-    });
-    this._index.splice(idx, amt, refs);
-    this._super(idx, amt, objects);
+  replaceContent: function(idx, amt, objects) {
+    for (var i = 0; i < amt; i++) {
+      var key = this._index[idx+i];
+      this.ref.child(key).remove();
+    }
+    objects.forEach(function(object) {
+      var val = object;
+      if (object.toJSON) {
+        val = object.toJSON();
+      }
+      return this.ref.push(val).name();
+    }, this);
   },
 
   toJSON: function() {
@@ -112,5 +126,5 @@ FB.Array = Ember.ArrayProxy.extend({
 
     json._type = "array";
     return json;
-  },
+  }
 });
