@@ -4,6 +4,18 @@
   <meta charset="utf-8">
   <title>Spark Test chat</title>
   <link rel="stylesheet" type="text/css" href="https://www.firebase.com/css/example.css">
+  <style>
+    button {
+      width: 15%;
+      font-size: 24px;
+    }
+    #nameInput {
+      width: 20%;
+    }
+    #messageInput {
+      width: 60%;
+    }
+  </style>
 </head>
 <body>
 
@@ -19,8 +31,8 @@
       {{/each}}
     </div>
     <form {{action "sendMessage" on="submit"}}>
-      {{input value=from placeholder="Name"}}
-      {{input value=msg placeholder="Message..."}}
+      {{input id="nameInput" value=from placeholder="Name"}}
+      {{input id="messageInput" value=msg placeholder="Message..."}}
       <button type=submit>Send</button>
     </form>
   </script>
