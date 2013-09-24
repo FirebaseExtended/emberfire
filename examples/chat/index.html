@@ -25,16 +25,20 @@
   </script>
 
   <script type="text/x-handlebars" data-template-name="index">
-    <div id="messagesDiv">
+    {{#scrolling-div id="messagesDiv" update-when=this}}
       {{#each}}
         <div><em>{{from}}</em>: {{msg}}</div>
       {{/each}}
-    </div>
+    {{/scrolling-div}}
     <form {{action "sendMessage" on="submit"}}>
       {{input id="nameInput" value=from placeholder="Name"}}
       {{input id="messageInput" value=msg placeholder="Message..."}}
       <button type=submit>Send</button>
     </form>
+  </script>
+
+  <script type="text/x-handlebars" id="components/scrolling-div">
+    {{yield}}
   </script>
 
   <script src="https://cdn.firebase.com/v0/firebase.js"></script>
