@@ -1,3 +1,4 @@
+"use strict";
 
 FB = Ember.Namespace.create();
 
@@ -6,14 +7,14 @@ FB._checkType = function(snapshot, cb, binding) {
   var type = obj._type;
 
   switch (type) {
-    case "object":
-      cb.call(binding, FB.Object.create({ ref: snapshot.ref() }));
-      break;
-    case "array":
-      cb.call(binding, FB.Array.create({ ref: snapshot.ref() }));
-      break;
-    default:
-      cb.call(binding, obj);
+  case "object":
+    cb.call(binding, FB.Object.create({ ref: snapshot.ref() }));
+    break;
+  case "array":
+    cb.call(binding, FB.Array.create({ ref: snapshot.ref() }));
+    break;
+  default:
+    cb.call(binding, obj);
   }
 };
 
@@ -24,6 +25,7 @@ FB.Object = Ember.ObjectProxy.extend({
 
     function applyChange(snapshot) {
       var key = snapshot.name();
+      /*jshint validthis:true */
       FB._checkType(snapshot, function(val) {
         Ember.set(object, key, val);
       }, this);
@@ -81,7 +83,9 @@ FB.Array = Ember.ArrayProxy.extend({
     this.ref.child("_type").set("array");
 
     this.ref.on("child_added", function(snapshot) {
-      if (snapshot.name() == "_type") return;
+      if (snapshot.name() == "_type") {
+        return;
+      }
       FB._checkType(snapshot, function(val) {
         this._index.pushObject(snapshot.name());
         array.pushObject(val);
@@ -89,14 +93,18 @@ FB.Array = Ember.ArrayProxy.extend({
     }, this);
 
     this.ref.on("child_removed", function(snapshot) {
-      if (snapshot.name() == "_type") return;
+      if (snapshot.name() == "_type") {
+        return;
+      }
       var idx = this._index.indexOf(snapshot.name());
       this._index.removeAt(idx);
       array.removeAt(idx);
     }, this);
 
     this.ref.on("child_changed", function(snapshot) {
-      if (snapshot.name() == "_type") return;
+      if (snapshot.name() == "_type") {
+        return;
+      }
       var idx = this._index.indexOf(snapshot.name());
       array.replace(idx, 1, [snapshot.val()]);
     }, this);
