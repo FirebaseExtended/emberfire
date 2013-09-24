@@ -1,6 +1,6 @@
 "use strict";
 
-FB = Ember.Namespace.create();
+var FB = Ember.Namespace.create();
 
 FB._checkType = function(snapshot, cb, binding) {
   var obj = snapshot.val();
