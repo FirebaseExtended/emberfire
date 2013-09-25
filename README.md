@@ -1,8 +1,9 @@
 Spark
 =====
-Spark is an officially supported [EmberJS](http://emberjs.com/) binding
-for [Firebase](http://www.firebase.com/?utm_medium=web&utm_source=spark).
-Firebase is a full backend so you don't need servers to build your Ember app!
+Spark is an **experimental**, officially supported [EmberJS](http://emberjs.com/)
+binding for [Firebase](http://www.firebase.com/?utm_medium=web&utm_source=spark).
+Spark lets you bind Firebase data as models in EmberJS, and will automatically
+synchronize changes to and from Firebase.
 
 Example
 -------
@@ -13,24 +14,27 @@ to learn more about how to use the library.
 
 Usage
 -----
-Spark introduces the `FB` namespace, that provides two objects. Include
+Spark introduces the `Spark` namespace, that provides two objects. Include
 the library first, along with Firebase and Ember:
 
 ```html
-<script src="https://cdn.firebase.com/v0/firebase.js"/>
-<script src="http://builds.emberjs.com/ember-latest.js"/>
-<script src="http://firebase.github.io/spark/spark-latest.js"/>
+<script src="https://cdn.firebase.com/v0/firebase.js"></script>
+<script src="http://builds.emberjs.com/ember-latest.js"></script>
+<script src="http://firebase.github.io/spark/spark-latest.js"></script>
 ```
 
-### FB.Array
+Note that the `spark-latest.js` library served from Github is **subject to
+breaking changes**, so please use it with caution.
 
-A collection of objects, best suited to maintain lists of items. `FB.Array`
+### Spark.Array
+
+A collection of objects, best suited to maintain lists of items. `Spark.Array`
 is intended to be used directly as a model, for example:
 
 ```js
 App.IndexRoute = Ember.Route.extend({
   model: function() {
-    return FB.Array.create({
+    return Spark.Array.create({
       ref: new Firebase("https://<my-firebase>.firebaseio.com/list")
     });
   }
@@ -73,19 +77,19 @@ to save changes to Firebase. For example, to add a new object to the list:
 </script>
 ```
 
-This works because we previously associated an `FB.Array` instance as the model
+This works because we previously associated an `Spark.Array` instance as the model
 for the `IndexController`.
 
-### FB.Object
+### Spark.Object
 
-`FB.Object` works similarly to `FB.Array` and is more suited to store primitive
-values or key-value pairs. Nested arrays and objects are supported. `FB.Object`
+`Spark.Object` works similarly to `Spark.Array` and is more suited to store primitive
+values or key-value pairs. Nested arrays and objects are supported. `Spark.Object`
 is also intended to be used directly as a model:
 
 ```js
 App.IndexRoute = Ember.Route.extend({
   model: function() {
-    return FB.Object.create({
+    return Spark.Object.create({
       ref: new Firebase("https://<my-firebase>.firebaseio.com/foo")
     });
   }

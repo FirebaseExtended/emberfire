@@ -22,7 +22,7 @@ module.exports = function(grunt) {
         'devel'   : true,
         'eqnull'  : true,
         'globals' : {
-          'FB'                  : true,
+          'Spark'               : true,
           'Ember'               : false,
           'Firebase'            : false
         },

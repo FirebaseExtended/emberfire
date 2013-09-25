@@ -1,24 +1,24 @@
 "use strict";
 
-var FB = Ember.Namespace.create();
+var Spark = Ember.Namespace.create();
 
-FB._checkType = function(snapshot, cb, binding) {
+Spark._checkType = function(snapshot, cb, binding) {
   var obj = snapshot.val();
   var type = obj._type;
 
   switch (type) {
   case "object":
-    cb.call(binding, FB.Object.create({ ref: snapshot.ref() }));
+    cb.call(binding, Spark.Object.create({ ref: snapshot.ref() }));
     break;
   case "array":
-    cb.call(binding, FB.Array.create({ ref: snapshot.ref() }));
+    cb.call(binding, Spark.Array.create({ ref: snapshot.ref() }));
     break;
   default:
     cb.call(binding, obj);
   }
 };
 
-FB.Object = Ember.ObjectProxy.extend({
+Spark.Object = Ember.ObjectProxy.extend({
   init: function() {
     var object = {};
     this.set("content", object);
@@ -26,7 +26,7 @@ FB.Object = Ember.ObjectProxy.extend({
     function applyChange(snapshot) {
       var key = snapshot.name();
       /*jshint validthis:true */
-      FB._checkType(snapshot, function(val) {
+      Spark._checkType(snapshot, function(val) {
         Ember.set(object, key, val);
       }, this);
     }
@@ -61,7 +61,7 @@ FB.Object = Ember.ObjectProxy.extend({
   },
 
   setUnknownProperty: function(key, value) {
-    if (value instanceof FB.Object || value instanceof FB.Array) {
+    if (value instanceof Spark.Object || value instanceof Spark.Array) {
       value.ref = this.ref.child(key);
       value.ref.set(value.toJSON());
     } else {
@@ -73,7 +73,7 @@ FB.Object = Ember.ObjectProxy.extend({
   ref: null
 });
 
-FB.Array = Ember.ArrayProxy.extend({
+Spark.Array = Ember.ArrayProxy.extend({
   init: function() {
     var array = Ember.A([]);
     this._index = Ember.A([]);
@@ -86,7 +86,7 @@ FB.Array = Ember.ArrayProxy.extend({
       if (snapshot.name() == "_type") {
         return;
       }
-      FB._checkType(snapshot, function(val) {
+      Spark._checkType(snapshot, function(val) {
         this._index.pushObject(snapshot.name());
         array.pushObject(val);
       }, this);
