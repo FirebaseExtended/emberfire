@@ -8,7 +8,7 @@ module.exports = function(grunt) {
     uglify : {
       app : {
         files : {
-          'spark-latest.min.js' : ['spark-latest.js']
+          'emberfire-latest.min.js' : ['emberfire-latest.js']
         }
       }
     },
@@ -22,9 +22,9 @@ module.exports = function(grunt) {
         'devel'   : true,
         'eqnull'  : true,
         'globals' : {
-          'Spark'               : true,
           'Ember'               : false,
-          'Firebase'            : false
+          'Firebase'            : false,
+          'EmberFire'           : true
         },
         'globalstrict' : true,
         'indent'       : 2,
@@ -36,12 +36,12 @@ module.exports = function(grunt) {
         'unused'       : true,
         'trailing'     : true
       },
-      all : ['spark-latest.js']
+      all : ['emberfire-latest.js']
     },
 
     watch : {
       scripts : {
-        files : 'spark-latest.js',
+        files : 'emberfire-latest.js',
         tasks : ['default', 'notify:watch'],
         options : {
           interrupt : true

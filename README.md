@@ -1,40 +1,40 @@
-Spark
-=====
-Spark is an **experimental**, officially supported [EmberJS](http://emberjs.com/)
-binding for [Firebase](http://www.firebase.com/?utm_medium=web&utm_source=spark).
-Spark lets you bind Firebase data as models in EmberJS, and will automatically
+EmberFire
+=========
+EmberFire is an **experimental**, officially supported [EmberJS](http://emberjs.com/)
+binding for [Firebase](http://www.firebase.com/?utm_medium=web&utm_source=emberFire).
+EmberFire lets you bind Firebase data as models in EmberJS, and will automatically
 synchronize changes to and from Firebase.
 
 Example
 -------
-Check out the [live chat example](http://firebase.github.io/spark/examples/chat)
-built with Spark, and
-[read the source code](https://github.com/firebase/spark/blob/gh-pages/examples/chat/app.js)
+Check out the [live chat example](http://firebase.github.io/emberFire/examples/chat)
+built with EmberFire, and
+[read the source code](https://github.com/firebase/emberFire/blob/gh-pages/examples/chat/app.js)
 to learn more about how to use the library.
 
 Usage
 -----
-Spark introduces the `Spark` namespace, that provides two objects. Include
-the library first, along with Firebase and Ember:
+EmberFire introduces the `EmberFire` namespace, that provides two objects.
+Include the library first, along with Firebase and Ember:
 
 ```html
 <script src="https://cdn.firebase.com/v0/firebase.js"></script>
 <script src="http://builds.emberjs.com/ember-latest.js"></script>
-<script src="http://firebase.github.io/spark/spark-latest.js"></script>
+<script src="http://firebase.github.io/emberFire/emberfire-latest.js"></script>
 ```
 
-Note that the `spark-latest.js` library served from Github is **subject to
+Note that the `emberfire-latest.js` library served from Github is **subject to
 breaking changes**, so please use it with caution.
 
-### Spark.Array
+### EmberFire.Array
 
-A collection of objects, best suited to maintain lists of items. `Spark.Array`
-is intended to be used directly as a model, for example:
+A collection of objects, best suited to maintain lists of items.
+`EmberFire.Array` is intended to be used directly as a model, for example:
 
 ```js
 App.IndexRoute = Ember.Route.extend({
   model: function() {
-    return Spark.Array.create({
+    return EmberFire.Array.create({
       ref: new Firebase("https://<my-firebase>.firebaseio.com/list")
     });
   }
@@ -77,19 +77,19 @@ to save changes to Firebase. For example, to add a new object to the list:
 </script>
 ```
 
-This works because we previously associated an `Spark.Array` instance as the model
-for the `IndexController`.
+This works because we previously associated an `EmberFire.Array` instance as
+the model for the `IndexController`.
 
-### Spark.Object
+### EmberFire.Object
 
-`Spark.Object` works similarly to `Spark.Array` and is more suited to store primitive
-values or key-value pairs. Nested arrays and objects are supported. `Spark.Object`
-is also intended to be used directly as a model:
+`EmberFire.Object` works similarly to `EmberFire.Array` and is more suited to
+store primitive values or key-value pairs. Nested arrays and objects are
+supported. `EmberFire.Object` is also intended to be used directly as a model:
 
 ```js
 App.IndexRoute = Ember.Route.extend({
   model: function() {
-    return Spark.Object.create({
+    return EmberFire.Object.create({
       ref: new Firebase("https://<my-firebase>.firebaseio.com/foo")
     });
   }
@@ -97,7 +97,7 @@ App.IndexRoute = Ember.Route.extend({
 ```
 
 You can manipulate any child of the object directly and changes will
-automatically be synchronized with Firebae, both to and from the server.
+automatically be synchronized with Firebase, both to and from the server.
 For example, the following template:
 
 ```html

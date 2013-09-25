@@ -1,24 +1,24 @@
 "use strict";
 
-var Spark = Ember.Namespace.create();
+var EmberFire = Ember.Namespace.create();
 
-Spark._checkType = function(snapshot, cb, binding) {
+EmberFire._checkType = function(snapshot, cb, binding) {
   var obj = snapshot.val();
   var type = obj._type;
 
   switch (type) {
   case "object":
-    cb.call(binding, Spark.Object.create({ ref: snapshot.ref() }));
+    cb.call(binding, EmberFire.Object.create({ ref: snapshot.ref() }));
     break;
   case "array":
-    cb.call(binding, Spark.Array.create({ ref: snapshot.ref() }));
+    cb.call(binding, EmberFire.Array.create({ ref: snapshot.ref() }));
     break;
   default:
     cb.call(binding, obj);
   }
 };
 
-Spark.Object = Ember.ObjectProxy.extend({
+EmberFire.Object = Ember.ObjectProxy.extend({
   init: function() {
     var object = {};
     this.set("content", object);
@@ -26,7 +26,7 @@ Spark.Object = Ember.ObjectProxy.extend({
     function applyChange(snapshot) {
       var key = snapshot.name();
       /*jshint validthis:true */
-      Spark._checkType(snapshot, function(val) {
+      EmberFire._checkType(snapshot, function(val) {
         Ember.set(object, key, val);
       }, this);
     }
@@ -61,7 +61,7 @@ Spark.Object = Ember.ObjectProxy.extend({
   },
 
   setUnknownProperty: function(key, value) {
-    if (value instanceof Spark.Object || value instanceof Spark.Array) {
+    if (value instanceof EmberFire.Object || value instanceof EmberFire.Array) {
       value.ref = this.ref.child(key);
       value.ref.set(value.toJSON());
     } else {
@@ -73,7 +73,7 @@ Spark.Object = Ember.ObjectProxy.extend({
   ref: null
 });
 
-Spark.Array = Ember.ArrayProxy.extend({
+EmberFire.Array = Ember.ArrayProxy.extend({
   init: function() {
     var array = Ember.A([]);
     this._index = Ember.A([]);
@@ -86,7 +86,7 @@ Spark.Array = Ember.ArrayProxy.extend({
       if (snapshot.name() == "_type") {
         return;
       }
-      Spark._checkType(snapshot, function(val) {
+      EmberFire._checkType(snapshot, function(val) {
         this._index.pushObject(snapshot.name());
         array.pushObject(val);
       }, this);

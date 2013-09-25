@@ -2,7 +2,7 @@ App = Ember.Application.create();
 
 App.IndexRoute = Ember.Route.extend({
   model: function() {
-    return Spark.Array.create({
+    return EmberFire.Array.create({
       ref: new Firebase("https://ember-chat.firebaseio-demo.com/")
     });
   }

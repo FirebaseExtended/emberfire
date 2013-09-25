@@ -1,14 +1,14 @@
 {
-  "name": "spark",
+  "name": "EmberFire",
   "version": "0.1.0",
   "description": "An officially supported Ember binding for Firebase.",
-  "main": "spark-latest.js",
+  "main": "emberfire-latest.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/firebase/spark.git"
+    "url": "https://github.com/firebase/emberFire.git"
   },
   "bugs": {
-    "url": "https://github.com/firebase/spark/issues"
+    "url": "https://github.com/firebase/emberFire/issues"
   },
   "devDependencies": {
     "grunt": "~0.4.1",
