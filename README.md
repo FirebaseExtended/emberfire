@@ -115,6 +115,9 @@ Development
 Use grunt to build and lint the code:
 
 ```bash
+# Install Grunt and development dependencies
+npm install 
+
 # Default task - validates with jshint and minifies source
 grunt
 
