@@ -41,8 +41,8 @@ App.IndexRoute = Ember.Route.extend({
 });
 ```
 
-All data stored at the provided Firebase URL will automatically appear in
-the model. You can iterate over the stored objects as you normally would.
+**All data stored at the provided Firebase URL will automatically appear in
+the model**. You can iterate over the stored objects as you normally would.
 For example:
 
 ```html
@@ -55,9 +55,9 @@ For example:
 will iterate over each object in the array and print out the `contents`
 property.
 
-You can manipulate the model using the regular
+**You can manipulate the model using the regular
 [MutableArray](http://emberjs.com/api/classes/Ember.MutableArray.html) methods
-to save changes to Firebase. For example, to add a new object to the list:
+to save changes to Firebase.** For example, to add a new object to the list:
 
 ```html
 <script type="text/x-handlebars" data-template-name="index">
@@ -96,8 +96,8 @@ App.IndexRoute = Ember.Route.extend({
 });
 ```
 
-You can manipulate any child of the object directly and changes will
-automatically be synchronized with Firebase, both to and from the server.
+**You can manipulate any child of the object directly and changes will
+automatically be synchronized with Firebase, both to and from the server.**
 For example, the following template:
 
 ```html
