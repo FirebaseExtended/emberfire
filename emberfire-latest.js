@@ -18,6 +18,10 @@ EmberFire._checkType = function(snapshot, cb, binding) {
   }
 };
 
+EmberFire._isEmberFireObject = function(value) {
+  return (value instanceof EmberFire.Object || value instanceof EmberFire.Array);
+};
+
 EmberFire.Object = Ember.ObjectProxy.extend({
   init: function() {
     var object = {};
@@ -61,7 +65,7 @@ EmberFire.Object = Ember.ObjectProxy.extend({
   },
 
   setUnknownProperty: function(key, value) {
-    if (value instanceof EmberFire.Object || value instanceof EmberFire.Array) {
+    if (EmberFire._isEmberFireObject(value)) {
       value.ref = this.ref.child(key);
       value.ref.set(value.toJSON());
     } else {
