@@ -111,7 +111,10 @@ EmberFire.Array = Ember.ArrayProxy.extend({
       }
       EmberFire._checkType(snapshot, function(val) {
         var idx = this._index.indexOf(snapshot.name());
-        array.replace(idx, 1, [val]);
+        // EmberFire Objects handle updates themselves
+        if (!EmberFire._isEmberFireObject(val)) {
+          array.replace(idx, 1, [val]);
+        }
       }, this);
     }, this);
 
