@@ -105,8 +105,10 @@ EmberFire.Array = Ember.ArrayProxy.extend({
       if (snapshot.name() == "_type") {
         return;
       }
-      var idx = this._index.indexOf(snapshot.name());
-      array.replace(idx, 1, [snapshot.val()]);
+      EmberFire._checkType(snapshot, function(val) {
+        var idx = this._index.indexOf(snapshot.name());
+        array.replace(idx, 1, [val]);
+      }, this);
     }, this);
 
     this._super();
