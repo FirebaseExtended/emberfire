@@ -138,3 +138,68 @@ EmberFire.Array = Ember.ArrayProxy.extend({
     return json;
   }
 });
+
+EmberFire.ObjectArray = Ember.ArrayProxy.extend({
+  init: function() {
+    this._array = Ember.A([]);
+    this._index = Ember.A([]);
+
+    this.set("content", this._array);
+
+    this.ref.child("_type").set("objectArray");
+
+    this.ref.on("child_added", function(snapshot) {
+      if (snapshot.name() != "_type") {
+        this.childAdded(snapshot);
+      }
+    }, this);
+
+    this.ref.on("child_removed", function(snapshot) {
+      if (snapshot.name() != "_type") {
+        this.childRemoved(snapshot);
+      }
+    }, this);
+
+    this.ref.on("child_changed", function(snapshot) {
+      if (snapshot.name() != "_type") {
+        this.childChanged(snapshot);
+      }
+    }, this);
+
+    this._super();
+  },
+
+  childAdded: function(snapshot) {
+    var ref = snapshot.ref(),
+        name = snapshot.name(),
+        object = EmberFire.Object.create({ ref: ref });
+
+    this._index.pushObject(name);
+    this._array.pushObject(object);
+  },
+
+  childRemoved: function(snapshot) {
+    var idx = this._index.indexOf(snapshot.name());
+    this._index.removeAt(idx);
+    this._array.removeAt(idx);
+  },
+
+  childChanged: function() {
+    // the child in an EmberFire.Object
+    // no need to do anything
+  },
+
+  replaceContent: function(idx, amt, objects) {
+    for (var i = 0; i < amt; i++) {
+      var key = this._index[idx+i];
+      this.ref.child(key).remove();
+    }
+    objects.forEach(function(object) {
+      var val = object;
+      if (object.toJSON) {
+        val = object.toJSON();
+      }
+      return this.ref.push(val).name();
+    }, this);
+  }
+});
