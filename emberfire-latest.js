@@ -18,6 +18,10 @@ EmberFire._checkType = function(snapshot, cb, binding) {
   }
 };
 
+EmberFire._isEmberFireObject = function(value) {
+  return (value instanceof EmberFire.Object || value instanceof EmberFire.Array);
+};
+
 EmberFire.Object = Ember.ObjectProxy.extend({
   init: function() {
     var object = {};
@@ -61,7 +65,7 @@ EmberFire.Object = Ember.ObjectProxy.extend({
   },
 
   setUnknownProperty: function(key, value) {
-    if (value instanceof EmberFire.Object || value instanceof EmberFire.Array) {
+    if (EmberFire._isEmberFireObject(value)) {
       value.ref = this.ref.child(key);
       value.ref.set(value.toJSON());
     } else {
@@ -105,8 +109,13 @@ EmberFire.Array = Ember.ArrayProxy.extend({
       if (snapshot.name() == "_type") {
         return;
       }
-      var idx = this._index.indexOf(snapshot.name());
-      array.replace(idx, 1, [snapshot.val()]);
+      EmberFire._checkType(snapshot, function(val) {
+        var idx = this._index.indexOf(snapshot.name());
+        // EmberFire Objects handle updates themselves
+        if (!EmberFire._isEmberFireObject(val)) {
+          array.replace(idx, 1, [val]);
+        }
+      }, this);
     }, this);
 
     this._super();
