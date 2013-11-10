@@ -74,42 +74,53 @@ EmberFire.Object = Ember.ObjectProxy.extend({
 });
 
 EmberFire.Array = Ember.ArrayProxy.extend({
+  type: "array",
+
   init: function() {
-    var array = Ember.A([]);
+    this._array = Ember.A([]);
     this._index = Ember.A([]);
 
-    this.set("content", array);
+    this.set("content", this._array);
 
-    this.ref.child("_type").set("array");
+    this.ref.child("_type").set(this.type);
 
     this.ref.on("child_added", function(snapshot) {
-      if (snapshot.name() == "_type") {
-        return;
+      if (snapshot.name() != "_type") {
+        this.childAdded(snapshot);
       }
-      EmberFire._checkType(snapshot, function(val) {
-        this._index.pushObject(snapshot.name());
-        array.pushObject(val);
-      }, this);
     }, this);
 
     this.ref.on("child_removed", function(snapshot) {
-      if (snapshot.name() == "_type") {
-        return;
+      if (snapshot.name() != "_type") {
+        this.childRemoved(snapshot);
       }
-      var idx = this._index.indexOf(snapshot.name());
-      this._index.removeAt(idx);
-      array.removeAt(idx);
     }, this);
 
     this.ref.on("child_changed", function(snapshot) {
-      if (snapshot.name() == "_type") {
-        return;
+      if (snapshot.name() != "_type") {
+        this.childChanged(snapshot);
       }
-      var idx = this._index.indexOf(snapshot.name());
-      array.replace(idx, 1, [snapshot.val()]);
     }, this);
 
     this._super();
+  },
+
+  childAdded: function(snapshot) {
+    EmberFire._checkType(snapshot, function(val) {
+      this._index.pushObject(snapshot.name());
+      this._array.pushObject(val);
+    }, this);
+  },
+
+  childRemoved: function(snapshot) {
+    var idx = this._index.indexOf(snapshot.name());
+    this._index.removeAt(idx);
+    this._array.removeAt(idx);
+  },
+
+  childChanged: function(snapshot) {
+    var idx = this._index.indexOf(snapshot.name());
+    this._array.replace(idx, 1, [snapshot.val()]);
   },
 
   replaceContent: function(idx, amt, objects) {
@@ -134,7 +145,25 @@ EmberFire.Array = Ember.ArrayProxy.extend({
       json[this._index[i]] = values[i];
     }
 
-    json._type = "array";
+    json._type = this.type;
     return json;
+  }
+});
+
+EmberFire.ObjectArray = EmberFire.Array.extend({
+  type: "objectArray",
+
+  childAdded: function(snapshot) {
+    var ref = snapshot.ref(),
+        name = snapshot.name(),
+        object = EmberFire.Object.create({ ref: ref });
+
+    this._index.pushObject(name);
+    this._array.pushObject(object);
+  },
+
+  childChanged: function() {
+    // the child in an EmberFire.Object
+    // no need to do anything
   }
 });
