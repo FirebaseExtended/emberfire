@@ -5,6 +5,20 @@ module.exports = function(grunt) {
 
   grunt.initConfig({
 
+    concat: {
+      dist: {
+        src: ['src/*.js'],
+        dest: 'emberfire-latest.js',
+        options: {
+          banner: "'use strict';\n",
+          process: function(src, filePath) {
+            return '\n// Source: ' + filePath + '\n' +
+              src.replace(/(^|\n)[ \t]*('use strict'|"use strict");?\s*/g, '$1');
+          }
+        }
+      }
+    },
+
     uglify : {
       app : {
         files : {
@@ -22,6 +36,7 @@ module.exports = function(grunt) {
         'devel'   : true,
         'eqnull'  : true,
         'globals' : {
+          'DS'                  : false,
           'Ember'               : false,
           'Firebase'            : false,
           'EmberFire'           : true
@@ -36,12 +51,12 @@ module.exports = function(grunt) {
         'unused'       : true,
         'trailing'     : true
       },
-      all : ['emberfire-latest.js']
+      all : ['src/*.js']
     },
 
     watch : {
       scripts : {
-        files : 'emberfire-latest.js',
+        files : 'src/*.js',
         tasks : ['default', 'notify:watch'],
         options : {
           interrupt : true
@@ -60,13 +75,14 @@ module.exports = function(grunt) {
 
   });
 
+  grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-exec');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-notify');
 
-  grunt.registerTask('build', ['jshint', 'uglify']);
+  grunt.registerTask('build', ['jshint', 'concat', 'uglify']);
 
   grunt.registerTask('default', ['build']);
 };
