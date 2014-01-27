@@ -130,24 +130,6 @@ DS.FirebaseAdapter = DS.Adapter.extend(Ember.Evented, {
     }, "DS: FirebaseAdapter#findAll " + type + " to " + ref.toString());
   },
 
-  /* TODO: Implement.
-  findMany: function(store, type, ids) {
-
-  },
-
-  findHasMany: function(store, record, url) {
-
-  },
-
-  findBelongsTo: function(store, record, url) {
-
-  },
-
-  findQuery: function(store, type, query, recordArray) {
-
-  },
-  */
-
   /**
     Called by the store when a newly created record is saved via the `save`
     method on a model record instance.
