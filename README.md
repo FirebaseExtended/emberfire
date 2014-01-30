@@ -5,12 +5,18 @@ binding for [Firebase](http://www.firebase.com/?utm_medium=web&utm_source=emberF
 EmberFire lets you bind Firebase data as models in EmberJS, and will automatically
 synchronize changes to and from Firebase.
 
+EmberFire also supports [Ember Data](https://github.com/emberjs/data) and
+provides an adapter for use with Firebase.
+
 Example
 -------
 Check out the [live chat example](http://firebase.github.io/emberFire/examples/chat)
 built with EmberFire, and
 [read the source code](https://github.com/firebase/emberFire/blob/gh-pages/examples/chat/app.js)
 to learn more about how to use the library.
+
+Check out the port of [TODOMVC](http://firebase.github.io/emberFire/examples/todomvc)
+which showcases how EmberFire works with Ember Data.
 
 Usage
 -----
@@ -110,13 +116,33 @@ For example, the following template:
 will synchronize the text value at `https://<my-firebase>.firbaseio.com/foo/bar`
 to the text field and vice-versa.
 
+### Ember Data
+
+The EmberFire library also provides an adapter for use with Ember Data. If
+you're usng Ember Data in your framework, simply create an instance of the
+Firebase adapter in your app, like so:
+
+```js
+MyApp.ApplicationAdapter = DS.FirebaseAdapter.extend({
+  firebase: new Firebase("https://<my-firebase>.firebaseio.com/")
+});
+```
+
+You can now interact with the data store as you normally would. For example,
+calling `find()` with a specific ID will retrieve that record from Firebase.
+Additionally, from that point on, every time that record is updated in Firebase,
+it will automatically be updated in the local data store.
+
+See the [Ember documentation](http://emberjs.com/guides/models/) for a full
+list of methods, including ways to create, find, delete and query records.
+
 Development
 -----------
 Use grunt to build and lint the code:
 
 ```bash
 # Install Grunt and development dependencies
-npm install 
+npm install
 
 # Default task - validates with jshint and minifies source
 grunt
