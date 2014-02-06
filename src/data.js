@@ -61,14 +61,14 @@
       var ref = this._getRef(type, id);
       return new Ember.RSVP.Promise(function(resolve, reject) {
         ref.on("value", function(snapshot) {
+          var obj = snapshot.val();
+          obj.id = snapshot.name();
           if (!resolved) {
             // If this is the first event, resolve the promise.
             resolved = true;
-            Ember.run(null, resolve, snapshot.val());
+            Ember.run(null, resolve, obj);
           } else {
             // Otherwise, update the store.
-            var obj = snapshot.val();
-            obj.id = snapshot.name();
             store.push(type, obj);
           }
         }, function(err) {
