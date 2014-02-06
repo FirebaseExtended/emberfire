@@ -62,7 +62,9 @@
       return new Ember.RSVP.Promise(function(resolve, reject) {
         ref.on("value", function(snapshot) {
           var obj = snapshot.val();
-          obj.id = snapshot.name();
+          if (obj) {
+            obj.id = snapshot.name();
+          }
           if (!resolved) {
             // If this is the first event, resolve the promise.
             resolved = true;
