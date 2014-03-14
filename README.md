@@ -119,7 +119,7 @@ to the text field and vice-versa.
 ### Ember Data
 
 The EmberFire library also provides an adapter for use with Ember Data. If
-you're usng Ember Data in your framework, simply create an instance of the
+you're using Ember Data in your framework, simply create an instance of the
 Firebase adapter in your app, like so:
 
 ```js
