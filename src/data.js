@@ -263,7 +263,6 @@
         });
         // Wait for the record and any relationships to resolve
         Ember.RSVP.allSettled(promises).then(function(settledPromised) {
-          var fulfilled = settledPromised.filterBy('state', 'fulfilled');
           var rejected = settledPromised.filterBy('state', 'rejected');
           // There were no errors
           if (rejected.get('length') === 0)  {
@@ -328,13 +327,6 @@
         ref = ref.child(id);
       }
       return ref;
-    },
-
-    /**
-      _saveHasMany
-    */
-    _saveHasMany: function(store, type, record) {
-
     }
 
   });

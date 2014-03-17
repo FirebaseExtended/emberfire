@@ -16,6 +16,9 @@
   "trailing": true,
   "scripturl": true,
   "smarttabs": true,
+  "maxlen": false,
+  "unused": true,
+  "trailing": true,
   "globals": {
     "Firebase": false,
     "DS": false,
