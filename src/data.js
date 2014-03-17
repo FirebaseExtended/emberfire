@@ -8,14 +8,15 @@
   }
 
   /**
-    Something about the serializer
+    The Firebase serializer helps normalize relationships and can be extended on
+    a per model basis.
   */
   DS.FirebaseSerializer = DS.JSONSerializer.extend(Ember.Evented, {
 
     /**
       Called after `extractSingle()`. This method checks the model
-      for `hasMany` relationships and makes sure the value is an array.
-      If the value is an object, return the keys as an array.
+      for `hasMany` relationships and makes sure the value is an object.
+      The object is then converted to an Array using `Ember.keys`
     */
     normalize: function(type, hash) {
       var relationshipsByName = Ember.get(type, 'relationshipsByName');
@@ -52,22 +53,7 @@
       return payload.map(function(item) {
         return this.extractSingle(store, type, item);
       }.bind(this));
-    },
-
-    /**
-      serializeHasMany
-    */
-    /*serializeHasMany: function(record, json, relationship) {
-      record.eachRelationship(function(key, relationship) {
-        if (relationship.kind === 'hasMany') {
-          json[key] = record.get(key).reduce(function(obj, item, idx) {
-            obj[item.get('id')] = true;
-            return obj;
-          }, {});
-        }
-      });
-      this._super.apply(this, arguments);
-    }*/
+    }
 
   });
 
@@ -135,7 +121,12 @@
           if (!resolved) {
             // If this is the first event, resolve the promise.
             resolved = true;
-            Ember.run(null, resolve, obj);
+            if (obj === null) {
+              Ember.run(null, reject);
+            }
+            else {
+              Ember.run(null, resolve, obj);
+            }
           } else {
             // If the snapshot is null, delete the record from the store
             if (obj === null && store.hasRecordForId(type, snapshot.name())) {
@@ -232,6 +223,7 @@
     updateRecord: function(store, type, record) {
       var json = record.serialize({ includeId: false });
       var ref = this._getRef(type, record.id);
+
       return new Ember.RSVP.Promise(function(resolve, reject) {
         var promises = [];
         // Update relationships
