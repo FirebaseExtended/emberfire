@@ -19,6 +19,8 @@
   "globals": {
     "Firebase": false,
     "DS": false,
-    "Ember": false
+    "Ember": false,
+    "moment": false,
+    "md5": false
   }
 }
