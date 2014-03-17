@@ -147,8 +147,6 @@
       },
       actions: {
         publishPost: function () {
-          var store = this.get('store');
-          var post = this.get('post');
           Ember.RSVP.hash({
             user: this.get('util').getUserByUsername(this.get('post.username'))
           })

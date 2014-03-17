@@ -17,7 +17,7 @@
   "scripturl": true,
   "smarttabs": true,
   "maxlen": false,
-  "unused": true,
+  "unused": "var",
   "trailing": true,
   "globals": {
     "Firebase": false,
