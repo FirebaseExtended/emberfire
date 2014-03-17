@@ -24,20 +24,12 @@
       if (Ember.isArray(relationshipNames.hasMany)) {
         relationshipNames.hasMany.forEach(function (key) {
           var relationship = relationshipsByName.get(key);
-          relationship.options.serializeAs = 'object';
           // Return the keys as an array
           if (typeof hash[key] === 'object' && !Ember.isArray(hash[key])) {
             hash[key] = Ember.keys(hash[key]);
-            /*if (relationship.options && typeof relationship.options.serializeAs === 'undefined') {
-              relationship.options.serializeAs = 'object';
-            }*/
           }
           else if (Ember.isArray(hash[key])) {
-            /*if (relationship.options && typeof relationship.options.serializeAs === 'undefined') {
-              relationship.options.serializeAs = 'array';
-            }*/
-            Ember.warn('%@ relationship %@(\'%@\') will scale better if represented as a key/value map in Firebase. Example: {"%@":{"%@_id":true}`}'.fmt(type.toString(), relationship.kind, relationship.type.typeKey, relationship.key, relationship.type.typeKey));
-            //throw new Error('%@ relationship %@(\'%@\') must be a key/value map in Firebase. Example: { "%@": { "%@_id": true } }'.fmt(type.toString(), relationship.kind, relationship.type.typeKey, relationship.key, relationship.type.typeKey));
+            throw new Error('%@ relationship %@(\'%@\') must be a key/value map in Firebase. Example: { "%@": { "%@_id": true } }'.fmt(type.toString(), relationship.kind, relationship.type.typeKey, relationship.key, relationship.type.typeKey));
           }
         });
       }
@@ -69,23 +61,14 @@
       var key = relationship.key;
       var relationshipType = DS.RelationshipChange.determineRelationshipType(record.constructor, relationship);
 
+      // See if the relationship has any records to serialize
       if (record.get(key).get('length') === 0) { return; }
 
       if (relationship.kind === 'hasMany') {
-        if (relationship.options) {
-          relationship.options.serializeAs = relationship.options.serializeAs || 'array';
-          switch (relationship.options.serializeAs) {
-            case 'array':
-              json[key] = record.get(key).mapBy('id');
-              break;
-            case 'object':
-              json[key] = record.get(key).reduce(function(obj, item, idx) {
-                obj[item.get('id')] = true;
-                return obj;
-              }, {});
-              break;
-          }
-        }
+        json[key] = record.get(key).reduce(function(obj, item, idx) {
+          obj[item.get('id')] = true;
+          return obj;
+        }, {});
       }
     }
 
