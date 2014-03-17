@@ -22,7 +22,7 @@
       var relationshipNames = Ember.get(type, 'relationshipNames');
       // Check if the model contains any 'hasMany' relationships
       if (Ember.isArray(relationshipNames.hasMany)) {
-        relationshipNames.hasMany.forEach(function (key) {
+        relationshipNames.hasMany.forEach(function(key) {
           var relationship = relationshipsByName.get(key);
           // Return the keys as an array
           if (typeof hash[key] === 'object' && !Ember.isArray(hash[key])) {
@@ -57,20 +57,17 @@
     /**
       serializeHasMany
     */
-    serializeHasMany: function(record, json, relationship) {
-      var key = relationship.key;
-      var relationshipType = DS.RelationshipChange.determineRelationshipType(record.constructor, relationship);
-
-      // See if the relationship has any records to serialize
-      if (record.get(key).get('length') === 0) { return; }
-
-      if (relationship.kind === 'hasMany') {
-        json[key] = record.get(key).reduce(function(obj, item, idx) {
-          obj[item.get('id')] = true;
-          return obj;
-        }, {});
-      }
-    }
+    /*serializeHasMany: function(record, json, relationship) {
+      record.eachRelationship(function(key, relationship) {
+        if (relationship.kind === 'hasMany') {
+          json[key] = record.get(key).reduce(function(obj, item, idx) {
+            obj[item.get('id')] = true;
+            return obj;
+          }, {});
+        }
+      });
+      this._super.apply(this, arguments);
+    }*/
 
   });
 
@@ -216,40 +213,72 @@
     },
 
     /**
-      Called by the store when a newly created record is saved via the `save`
-      method on a model record instance.
-
-      The `createRecord` method serializes the record and send it to Firebase.
-      The method will return a promise which will be resolved when the data has
-      been successfully saved to Firebase.
+      `createRecord` is the same as `updateRecord` because calling `ref.set()`
+      would wipe out any relationships that may have been added
     */
     createRecord: function(store, type, record) {
-      var data = record.serialize({ includeId: false });
-      var ref = this._getRef(type, record.id);
-      return new Ember.RSVP.Promise(function(resolve, reject) {
-        ref.set(data, function(err) {
-          if (err) {
-            Ember.run(null, reject, err);
-          } else {
-            Ember.run(null, resolve);
-          }
-        });
-      }, 'DS: FirebaseAdapter#createRecord ' + type + ' to ' + ref.toString());
+      return this.updateRecord(store, type, record);
     },
 
     /**
-      Update is the same as create for this adapter, since the number of
-      attributes for a given model don't change.
+      Called by the store when a record is created/updated via the `save`
+      method on a model record instance.
+
+      The `updateRecord` method serializes the record and performs an `update()`
+      at the the Firebase location and a `.set()` at any relationship locations
+      The method will return a promise which will be resolved when the data has
+      been successfully saved to Firebase.
     */
     updateRecord: function(store, type, record) {
-      var data = record.serialize({ includeId: false });
+      var json = record.serialize({ includeId: false });
       var ref = this._getRef(type, record.id);
       return new Ember.RSVP.Promise(function(resolve, reject) {
-        ref.update(data, function(err) {
-          if (err) {
-            Ember.run(null, reject, err);
+        var promises = [];
+        // Update relationships
+        record.eachRelationship(function(key, relationship) {
+          if (relationship.kind === 'hasMany') {
+            var ids = json[key];
+            if (Ember.isArray(ids)) {
+              ids.forEach(function(id) {
+                var relationshipRef = ref.child(key).child(id);
+                var deferred = Ember.RSVP.defer();
+                promises.push(deferred.promise);
+                relationshipRef.set(true, function(error) {
+                  if (error) {
+                    if (typeof error === 'object') {
+                      error.location = relationshipRef.toString();
+                    }
+                    deferred.reject(error);
+                  } else {
+                    deferred.resolve();
+                  }
+                });
+              });
+            }
+            // Remove the relationship from the json payload
+            delete json[key];
+          }
+        });
+        // Update the main record
+        var updateDeferred = Ember.RSVP.defer();
+        promises.push(updateDeferred.promise);
+        ref.update(json, function(error) {
+          if (error) {
+            updateDeferred.reject(error);
           } else {
+            updateDeferred.resolve();
+          }
+        });
+        // Wait for the record and any relationships to resolve
+        Ember.RSVP.allSettled(promises).then(function(settledPromised) {
+          var fulfilled = settledPromised.filterBy('state', 'fulfilled');
+          var rejected = settledPromised.filterBy('state', 'rejected');
+          // There were no errors
+          if (rejected.get('length') === 0)  {
             Ember.run(null, resolve);
+          }
+          else {
+            Ember.run(null, reject, { message: 'Some errors were encountered while saving', errors: rejected.mapBy('reason') });
           }
         });
       }, 'DS: FirebaseAdapter#updateRecord ' + type + ' to ' + ref.toString());
@@ -307,6 +336,13 @@
         ref = ref.child(id);
       }
       return ref;
+    },
+
+    /**
+      _saveHasMany
+    */
+    _saveHasMany: function(store, type, record) {
+
     }
 
   });
