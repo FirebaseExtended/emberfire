@@ -115,7 +115,7 @@
       return new Ember.RSVP.Promise(function(resolve, reject) {
         ref.on('value', function(snapshot) {
           var obj = snapshot.val();
-          if (obj) {
+          if (obj !== null && typeof obj === 'object') {
             obj.id = snapshot.name();
           }
           if (!resolved) {
@@ -184,9 +184,8 @@
           if (!resolved) {
             return;
           }
-          var record = store.getById(type, snapshot.name());
-          if (record !== null) {
-            store.deleteRecord(record);
+          if (store.hasRecordForId(type, snapshot.name())) {
+            store.deleteRecord(store.getById(type, snapshot.name()));
           }
         }, _handleError);
 
