@@ -1,6 +1,5 @@
-"use strict";
-
 (function() {
+  "use strict";
 
   /* Only enable if Ember Data is included */
   if (window.DS === undefined) {
@@ -52,7 +51,7 @@
     extractArray: function(store, type, payload) {
       return payload.map(function(item) {
         return this.extractSingle(store, type, item);
-      }.bind(this));
+      }, this);
     }
 
   });

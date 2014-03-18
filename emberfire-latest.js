@@ -2,8 +2,7 @@
 
 // Source: src/data.js
 (function() {
-
-  /* Only enable if Ember Data is included */
+/* Only enable if Ember Data is included */
   if (window.DS === undefined) {
     return;
   }
@@ -53,7 +52,7 @@
     extractArray: function(store, type, payload) {
       return payload.map(function(item) {
         return this.extractSingle(store, type, item);
-      }.bind(this));
+      }, this);
     }
 
   });
