@@ -8,11 +8,6 @@ synchronize changes to and from Firebase.
 EmberFire also supports [Ember Data](https://github.com/emberjs/data) and
 provides an adapter for use with Firebase.
 
-Example
--------
-Check out the [live chat example](https://github.com/firebase/emberFire/blob/gh-pages/examples/chat/app.js)
-built with EmberFire to learn more about how to use the library.
-
 Usage
 -----
 EmberFire introduces the `EmberFire` namespace, that provides two objects.
