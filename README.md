@@ -4,10 +4,15 @@ EmberFire is an officially supported adapter for using
 [Firebase](http://www.firebase.com/?utm_medium=web&utm_source=emberFire) with
 [Ember Data](https://github.com/emberjs/data).
 
-## Setup
+The `DS.FirebaseAdapter` provides all of the standard `DS.Adapter` methods and will automatically synchronize the store with Firebase
+
+#### Depreciated Methods
+As of version 0.2.0, `EmberFire.Object` and `EmberFire.Array` have been depreciated, but can still be downloaded in the [v0.1.0 release](https://github.com/firebase/emberFire/releases/tag/v0.1.0)
+
+## Usage
 
 To get started, simply create an instance of the
-`FirebaseAdapter` and `FirebaseSerializer` in your app, like this:
+`DS.FirebaseAdapter` and `DS.FirebaseSerializer` in your app, like this:
 
 ```js
 App.ApplicationAdapter = DS.FirebaseAdapter.extend({
