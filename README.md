@@ -10,13 +10,8 @@ provides an adapter for use with Firebase.
 
 Example
 -------
-Check out the [live chat example](http://firebase.github.io/emberFire/examples/chat)
-built with EmberFire, and
-[read the source code](https://github.com/firebase/emberFire/blob/gh-pages/examples/chat/app.js)
-to learn more about how to use the library.
-
-Check out the port of [TODOMVC](http://firebase.github.io/emberFire/examples/todomvc)
-which showcases how EmberFire works with Ember Data.
+Check out the [live chat example](https://github.com/firebase/emberFire/blob/gh-pages/examples/chat/app.js)
+built with EmberFire to learn more about how to use the library.
 
 Usage
 -----
@@ -26,11 +21,8 @@ Include the library first, along with Firebase and Ember:
 ```html
 <script src="https://cdn.firebase.com/v0/firebase.js"></script>
 <script src="http://builds.emberjs.com/ember-latest.js"></script>
-<script src="http://firebase.github.io/emberFire/emberfire-latest.js"></script>
+<script src="emberfire-latest.js"></script>
 ```
-
-Note that the `emberfire-latest.js` library served from Github is **subject to
-breaking changes**, so please use it with caution.
 
 ### EmberFire.Array
 
