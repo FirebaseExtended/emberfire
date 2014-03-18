@@ -1,5 +1,5 @@
 {
-  "node": true,
+  "node": false,
   "browser": true,
   "esnext": true,
   "bitwise": false,
@@ -21,9 +21,12 @@
   "trailing": true,
   "globals": {
     "Firebase": false,
+    "MockFirebase": false,
     "DS": false,
     "Ember": false,
     "moment": false,
-    "md5": false
+    "md5": false,
+    "_": false,
+    "sinon": false
   }
 }

@@ -29,7 +29,8 @@ module.exports = function(grunt) {
 
     jshint : {
       options: {
-        jshintrc: '.jshintrc'
+        jshintrc: '.jshintrc',
+        ignores: ['test.js']
       },
       all : ['src/*.js']
     },
@@ -51,18 +52,41 @@ module.exports = function(grunt) {
           message: 'Build Finished'
         }
       }
+    },
+
+    qunit: {
+      all: {
+        options: {
+          urls: [
+            'http://localhost:8002/test/test.html',
+          ]
+        }
+      }
+    },
+
+    connect: {
+      server: {
+        options: {
+          port: 8002,
+          base: '.',
+          keepalive: false
+        }
+      }
     }
 
   });
 
   grunt.loadNpmTasks('grunt-contrib-concat');
-  grunt.loadNpmTasks('grunt-contrib-uglify');
+  grunt.loadNpmTasks('grunt-contrib-connect');
   grunt.loadNpmTasks('grunt-contrib-jshint');
-  grunt.loadNpmTasks('grunt-exec');
+  grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-watch');
+  grunt.loadNpmTasks('grunt-contrib-qunit');
+  grunt.loadNpmTasks('grunt-exec');
   grunt.loadNpmTasks('grunt-notify');
 
   grunt.registerTask('build', ['jshint', 'concat', 'uglify']);
+  grunt.registerTask('test', ['connect', 'qunit']);
 
-  grunt.registerTask('default', ['build']);
+  grunt.registerTask('default', ['build', 'test']);
 };
