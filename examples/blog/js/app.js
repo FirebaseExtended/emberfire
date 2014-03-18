@@ -160,7 +160,7 @@
           Ember.RSVP.hash({
             user: this.get('util').getUserByUsername(this.get('post.username'))
           })
-          .then(function(promises){
+          .then(function(promises) {
             var newPost = this.store.createRecord('post', {
               title: this.get('post.title'),
               body: this.get('post.body'),
@@ -168,6 +168,11 @@
               user: promises.user
             });
             newPost.save();
+            this.setProperties({
+              'post.title': '',
+              'post.username': '',
+              'post.body': ''
+            });
             this.transitionToRoute('post', newPost);
           }.bind(this));
         }
