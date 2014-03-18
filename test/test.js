@@ -28,20 +28,6 @@ module("FirebaseSerializer", {
 
     ok(typeof DS.FirebaseSerializer !== 'undefined');
 
-    var postsPayload = [{
-      title: "Hello World",
-      comments: {
-        "comment_1": true,
-        "comment_2": true
-      }
-    },{
-      title: "Hello World",
-      comments: {
-        "comment_1": true,
-        "comment_2": true
-      }
-    }];
-
     test("Valid payload", function() {
       var postPayload = {
         title: "Hello World",
