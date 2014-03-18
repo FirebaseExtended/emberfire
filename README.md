@@ -116,26 +116,6 @@ For example, the following template:
 will synchronize the text value at `https://<my-firebase>.firbaseio.com/foo/bar`
 to the text field and vice-versa.
 
-### Ember Data
-
-The EmberFire library also provides an adapter for use with Ember Data. If
-you're usng Ember Data in your framework, simply create an instance of the
-Firebase adapter in your app, like so:
-
-```js
-MyApp.ApplicationAdapter = DS.FirebaseAdapter.extend({
-  firebase: new Firebase("https://<my-firebase>.firebaseio.com/")
-});
-```
-
-You can now interact with the data store as you normally would. For example,
-calling `find()` with a specific ID will retrieve that record from Firebase.
-Additionally, from that point on, every time that record is updated in Firebase,
-it will automatically be updated in the local data store.
-
-See the [Ember documentation](http://emberjs.com/guides/models/) for a full
-list of methods, including ways to create, find, delete and query records.
-
 Development
 -----------
 Use grunt to build and lint the code:
