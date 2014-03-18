@@ -9,6 +9,17 @@ The `DS.FirebaseAdapter` provides all of the standard `DS.Adapter` methods and w
 #### Depreciated Methods
 As of version 0.2.0, `EmberFire.Object` and `EmberFire.Array` have been depreciated, but can still be downloaded in the [v0.1.0 release](https://github.com/firebase/emberFire/releases/tag/v0.1.0)
 
+## Installation
+
+```html
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/1.0.0/handlebars.min.js"></script>
+<script src="http://builds.emberjs.com/canary/ember.js"></script>
+<script src="http://builds.emberjs.com/canary/ember-data.js"></script>
+<script src="https://cdn.firebase.com/v0/firebase.js"></script>
+<script src="emberfire-latest.js"></script>
+```
+
 ## Usage
 
 To get started, simply create an instance of the
@@ -31,7 +42,7 @@ list of methods, including ways to create, find, delete and query records.
 
 ## Development
 
-Use grunt to build and lint the code:
+If you would like to build EmberFire from the source, use grunt to build and lint the code:
 
 ```bash
 # Install Grunt and development dependencies
