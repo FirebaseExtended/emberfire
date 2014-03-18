@@ -5,9 +5,6 @@ binding for [Firebase](http://www.firebase.com/?utm_medium=web&utm_source=emberF
 EmberFire lets you bind Firebase data as models in EmberJS, and will automatically
 synchronize changes to and from Firebase.
 
-EmberFire also supports [Ember Data](https://github.com/emberjs/data) and
-provides an adapter for use with Firebase.
-
 Usage
 -----
 EmberFire introduces the `EmberFire` namespace, that provides two objects.
