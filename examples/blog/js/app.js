@@ -24,7 +24,7 @@
         // A user couldn't be found, so create a new user
         var user = store.createRecord('user', {
           id: username,
-          created: Firebase.ServerValue.TIMESTAMP
+          created: new Date().getTime()
         });
         // Save the user
         user.save();
@@ -42,11 +42,11 @@
     ready: function () {
       // Util
       this.register('utility:main', Utility, { singleton: true, instantiate: true });
-      ['controller', 'route', 'component', 'adapter', 'transform', 'model', 'serializer'].forEach(function (type) {
+      ['controller', 'route', 'component', 'adapter', 'transform', 'model', 'serializer'].forEach(function(type) {
         this.inject(type, 'util', 'utility:main');
       }, this);
       // Store
-      ['component', 'utility:main'].forEach(function (type) {
+      ['component', 'utility:main'].forEach(function(type) {
         this.inject(type, 'store', 'store:main');
       }, this);
     }
@@ -65,8 +65,8 @@
   App.Post = DS.Model.extend({
     title: DS.attr('string'),
     body: DS.attr('string'),
-    published: DS.attr('raw'),
-    publishedDate: function () {
+    published: DS.attr('number'),
+    publishedDate: function() {
       return moment(this.get('published')).format('MMMM Do, YYYY');
     }.property('published'),
     user: DS.belongsTo('user', { async: true }),
@@ -75,8 +75,8 @@
 
   App.Comment = DS.Model.extend({
     body: DS.attr('string'),
-    published: DS.attr('raw'),
-    publishedDate: function () {
+    published: DS.attr('number'),
+    publishedDate: function() {
       var m = moment(this.get('published'));
       return '%@ at %@'.fmt(m.format('MMMM Do, YYYY'), m.format('h:mm:ss a'));
     }.property('published'),
@@ -84,7 +84,7 @@
   });
 
   App.User = DS.Model.extend({
-    created: DS.attr('raw'),
+    created: DS.attr('number'),
     username: function() {
       return this.get('id');
     }.property(),
@@ -108,7 +108,7 @@
   ////////////////////////////////////////////////////////////
 
   App.Router.map(function() {
-    this.resource('posts', { path: '/posts' }, function () {
+    this.resource('posts', { path: '/posts' }, function() {
       this.route('new');
     });
     this.resource('post', { path: '/post/:post_id' });
@@ -121,7 +121,7 @@
     /////////////////////////////////////////////
 
     App.IndexRoute = Ember.Route.extend({
-      redirect: function () {
+      redirect: function() {
         this.transitionTo('posts');
       }
     });
@@ -142,11 +142,21 @@
     });
 
     App.PostsNewController = Ember.ObjectController.extend({
-      init: function () {
+      init: function() {
         this.set('post',  Ember.Object.create());
       },
+      postIsValid: function() {
+        var isValid = true;
+        ['post.title', 'post.username', 'post.body'].forEach(function(field) {
+          if (this.get(field) === '') {
+            isValid = false;
+          }
+        }, this);
+        return isValid;
+      },
       actions: {
-        publishPost: function () {
+        publishPost: function() {
+          if (!this.postIsValid()) { return; }
           Ember.RSVP.hash({
             user: this.get('util').getUserByUsername(this.get('post.username'))
           })
@@ -154,7 +164,7 @@
             var newPost = this.store.createRecord('post', {
               title: this.get('post.title'),
               body: this.get('post.body'),
-              published: Firebase.ServerValue.TIMESTAMP,
+              published: new Date().getTime(),
               user: promises.user
             });
             newPost.save();
@@ -177,7 +187,7 @@
 
     App.PostController = Ember.ObjectController.extend({
       actions: {
-        publishComment: function (post, comment) {
+        publishComment: function(post, comment) {
           // Save the comment
           comment.save();
           // Add the new comment to the post and save it
@@ -185,7 +195,7 @@
           // Save the post
           post.save().then(function() {
             // Success
-          }, function (error) {
+          }, function(error) {
             //console.log(error);
           });
         }
@@ -230,10 +240,20 @@
     App.FirePostComponent = Ember.Component.extend({
       classNames: ['post'],
       classNameBindings: ['isExpanded:post-expanded', 'isSingle:post-single'],
-      commentEmail: '',
+      commentUsername: '',
       commentBody: '',
+      commentIsValid: function() {
+        var isValid = true;
+        ['commentUsername', 'commentBody'].forEach(function(field) {
+          if (this.get(field) === '') {
+            isValid = false;
+          }
+        }, this);
+        return isValid;
+      },
       actions: {
-        publishComment: function () {
+        publishComment: function() {
+          if (!this.commentIsValid()) { return; }
           var store = this.get('store');
           Ember.RSVP.hash({
             user: this.get('util').getUserByUsername(this.get('commentUsername'))
@@ -241,7 +261,7 @@
             // Create a new comment
             var comment = store.createRecord('comment', {
               body: this.get('commentBody'),
-              published: Firebase.ServerValue.TIMESTAMP,
+              published: new Date().getTime(),
               user: promises.user
             });
             // Tell the post about the comment
@@ -258,11 +278,11 @@
 
     App.FirePostSlugComponent = Ember.Component.extend({
       classNames: ['post-slug'],
-      publishedMonth: function () {
-        return moment(this.get('published')).format('MMM');
+      publishedMonth: function() {
+        return moment(this.get('post.published')).format('MMM');
       }.property('post.published'),
-      publishedDay: function () {
-        return moment(this.get('published')).format('D');
+      publishedDay: function() {
+        return moment(this.get('post.published')).format('D');
       }.property('post.published')
     });
 

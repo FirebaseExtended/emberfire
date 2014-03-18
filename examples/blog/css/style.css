@@ -275,6 +275,8 @@ button:hover {
       }
 
     .post-slug-title {
+      display: flex;
+      align-items: stretch;
       flex: 1;
       margin: 0;
     }
@@ -284,8 +286,12 @@ button:hover {
       padding: 0.25em 0.45em;
       background-color: transparent;
       transition: all 300ms;
+      max-width: 100%;
 
       text-decoration: none;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .post-slug-title a:hover {
