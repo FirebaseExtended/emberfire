@@ -2,20 +2,6 @@
 
 var store, adapter, serializer;
 
-var postsPayload = [{
-  title: "Hello World",
-  comments: {
-    "comment_1": true,
-    "comment_2": true
-  }
-},{
-  title: "Hello World",
-  comments: {
-    "comment_1": true,
-    "comment_2": true
-  }
-}];
-
 module("FirebaseSerializer", {
   setup: function() {
     App.reset();
