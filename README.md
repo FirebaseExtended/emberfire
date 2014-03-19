@@ -7,17 +7,15 @@ EmberFire is an officially supported adapter for using
 The `DS.FirebaseAdapter` provides all of the standard `DS.Adapter` methods and will automatically synchronize the store with Firebase
 
 #### Note
-As of version 0.2.0, `EmberFire.Object` and `EmberFire.Array` have been depreciated, but can still be downloaded in the [v0.1.0 release](https://github.com/firebase/emberFire/releases/tag/v0.1.0)
+As of version 0.2.0, `EmberFire.Object` and `EmberFire.Array` have been removed, but can still be downloaded in the [v0.1.0 release](https://github.com/firebase/emberFire/releases/tag/v0.1.0)
 
 ## Installation
 
 ```html
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/1.0.0/handlebars.min.js"></script>
-<script src="http://builds.emberjs.com/canary/ember.js"></script>
+<!-- Don't forget to include Ember and it's dependencies -->
 <script src="http://builds.emberjs.com/canary/ember-data.js"></script>
-<script src="https://cdn.firebase.com/v0/firebase.js"></script>
-<script src="emberfire-latest.js"></script>
+<script src="https://cdn.firebase.com/js/client/1.0.6/firebase.js"></script>
+<script src="emberfire.js"></script>
 ```
 
 ## Usage

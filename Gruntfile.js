@@ -8,7 +8,7 @@ module.exports = function(grunt) {
     concat: {
       dist: {
         src: ['src/*.js'],
-        dest: 'emberfire-latest.js',
+        dest: 'dist/emberfire.js',
         options: {
           banner: "'use strict';\n",
           process: function(src, filePath) {
@@ -22,7 +22,7 @@ module.exports = function(grunt) {
     uglify : {
       app : {
         files : {
-          'emberfire-latest.min.js' : ['emberfire-latest.js']
+          'dist/emberfire.min.js' : ['dist/emberfire.js']
         }
       }
     },
