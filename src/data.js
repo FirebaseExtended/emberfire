@@ -193,11 +193,11 @@
         ref.once('value', function(snapshot) {
           var results = [];
           snapshot.forEach(function(child) {
-            var record = child.val();
-            if (record !== null && typeof obj === 'object') {
-              record.id = snapshot.name();
+            var obj = child.val();
+            if (obj !== null && typeof obj === 'object') {
+              obj.id = snapshot.name();
             }
-            results.push(record);
+            results.push(obj);
           });
           resolved = true;
           Ember.run(null, resolve, results);
