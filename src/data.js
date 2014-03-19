@@ -165,7 +165,9 @@
           return;
         }
         var obj = snapshot.val();
-        obj.id = snapshot.name();
+        if (obj !== null && typeof obj === 'object') {
+          obj.id = snapshot.name();
+        }
         store.push(type, serializer.extractSingle(store, type, obj));
       }
 
@@ -192,7 +194,9 @@
           var results = [];
           snapshot.forEach(function(child) {
             var record = child.val();
-            record.id = child.name();
+            if (record !== null && typeof obj === 'object') {
+              record.id = snapshot.name();
+            }
             results.push(record);
           });
           resolved = true;
