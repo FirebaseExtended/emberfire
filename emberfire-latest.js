@@ -92,6 +92,8 @@
       }
       // If provided Firebase reference was a query (eg: limits), make it a ref.
       this._ref = this.firebase.ref();
+      // Keep track of what types `.findAll()` has been called for
+      this._findAllMapForType = {};
     },
 
     // Uses push() to generate chronologically ordered unique IDs.
@@ -156,6 +158,7 @@
       store.
     */
     findAll: function(store, type) {
+      var self = this;
       var resolved = false;
       var ref = this._getRef(type);
       var serializer = store.serializerFor(type);
@@ -180,16 +183,20 @@
           }
         };
 
-        ref.on('child_added', _gotChildValue, _handleError);
-        ref.on('child_changed', _gotChildValue, _handleError);
-        ref.on('child_removed', function(snapshot) {
-          if (!resolved) {
-            return;
-          }
-          if (store.hasRecordForId(type, snapshot.name())) {
-            store.deleteRecord(store.getById(type, snapshot.name()));
-          }
-        }, _handleError);
+        // Only add listeners to a type once
+        if (Ember.isNone(self._findAllMapForType[type])) {
+          self._findAllMapForType[type] = true;
+          ref.on('child_added', _gotChildValue, _handleError);
+          ref.on('child_changed', _gotChildValue, _handleError);
+          ref.on('child_removed', function(snapshot) {
+            if (!resolved) {
+              return;
+            }
+            if (store.hasRecordForId(type, snapshot.name())) {
+              store.deleteRecord(store.getById(type, snapshot.name()));
+            }
+          }, _handleError);
+        }
 
         ref.once('value', function(snapshot) {
           var results = [];
@@ -330,7 +337,13 @@
         ref = ref.child(id);
       }
       return ref;
-    }
+    },
+
+    /**
+      Keep track of what types `.findAll()` has been called for
+      so duplicate listeners aren't added
+    */
+    _findAllMapForType: undefined
 
   });
 
