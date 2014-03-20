@@ -200,10 +200,10 @@
 
         ref.once('value', function(snapshot) {
           var results = [];
-          snapshot.forEach(function(child) {
-            var obj = child.val();
+          snapshot.forEach(function(childSnapshot) {
+            var obj = childSnapshot.val();
             if (obj !== null && typeof obj === 'object') {
-              obj.id = snapshot.name();
+              obj.id = childSnapshot.name();
             }
             results.push(obj);
           });
