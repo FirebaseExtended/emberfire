@@ -12,7 +12,7 @@ As of version 0.2.0, `EmberFire.Object` and `EmberFire.Array` have been removed,
 ## Installation
 
 ```html
-<!-- Don't forget to include Ember and it's dependencies -->
+<!-- Don't forget to include Ember and its dependencies -->
 <script src="http://builds.emberjs.com/canary/ember-data.js"></script>
 <script src="https://cdn.firebase.com/js/client/1.0.6/firebase.js"></script>
 <script src="emberfire.js"></script>
