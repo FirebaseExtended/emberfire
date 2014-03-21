@@ -137,7 +137,7 @@
     });
 
     App.PostsIndexController = Ember.ArrayController.extend({
-      sortProperties: ['id'],
+      sortProperties: ['published'],
       sortAscending: false
     });
 
