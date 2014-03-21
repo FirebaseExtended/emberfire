@@ -171,6 +171,14 @@ button:hover {
     line-height: 1.5;
   }
 
+  .post-content a {
+    color: #118CD9;
+  }
+
+  .post-content a:hover {
+    color: #08428C;
+  }
+
   .post-comments {
     margin: 0;
     padding: 0;
@@ -210,6 +218,14 @@ button:hover {
       padding: 0 0 0 1em;
 
       font-size: 0.9em;
+    }
+
+    .post-comment-body a {
+      color: #118CD9;
+    }
+
+    .post-comment-body a:hover {
+      color: #08428C;
     }
 
     .post-comment-meta {
