@@ -81,6 +81,7 @@ header nav {
  */
 
 .main-content {
+  margin: 0 auto;
   padding: 1em;
 }
 
@@ -123,10 +124,16 @@ button:hover {
  */
 
 .post {
+  margin: 0 auto;
   padding: 1em;
   width: 40em;
-  margin: 0 auto;
 }
+
+  @media screen and (max-width: 39em) {
+    .post  {
+      width: auto;
+    }
+  }
 
   .post-header {
     margin: 0.5em 0;
