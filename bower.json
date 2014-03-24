@@ -17,7 +17,7 @@
     ".jshintrc",
     "README.md",
     "Gruntfile.js",
-    "package.js",
+    "package.json",
     "examples/",
     "node_modules",
     "src/",
