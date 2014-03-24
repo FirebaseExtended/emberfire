@@ -1,0 +1,26 @@
+{
+  "name": "emberfire",
+  "version": "1.0.0",
+  "description": "Firebase bindings for Ember Data",
+  "main": ["./dist/emberfire.js"],
+  "dependencies": {
+    "ember": "~1.4.0",
+    "ember-data": "~1.0.0-beta.7",
+    "firebase": "~1.0.6"
+  },
+  "keywords": [
+    "Firebase",
+    "real-time",
+    "websocket"
+  ],
+  "ignore": [
+    ".jshintrc",
+    "README.md",
+    "Gruntfile.js",
+    "package.js",
+    "examples/",
+    "node_modules",
+    "src/",
+    "tests/"
+  ]
+}
