@@ -39,7 +39,7 @@
       var normalizedPayload = this.normalize(type, payload);
       // Check for embedded records
       type.eachRelationship(function(key, relationship) {
-        if (relationship.options.embedded === true) {
+        if (!Ember.isNone(payload[key]) && relationship.options.embedded === true) {
           var embeddedKey;
           var embeddedPayload = normalizedPayload[key];
           var records = [];
