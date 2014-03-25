@@ -177,18 +177,6 @@
       var ref = this._getRef(type);
       var serializer = store.serializerFor(type);
 
-      function _gotChildValue(snapshot) {
-        // Update store, only if the promise is already resolved.
-        if (!resolved) {
-          return;
-        }
-        var obj = snapshot.val();
-        if (obj !== null && typeof obj === 'object') {
-          obj.id = snapshot.name();
-        }
-        store.push(type, serializer.extractSingle(store, type, obj));
-      }
-
       return new Ember.RSVP.Promise(function(resolve, reject) {
         var _handleError = function(err) {
           if (!resolved) {
@@ -196,16 +184,19 @@
             Ember.run(null, reject, err);
           }
         };
-
         // Only add listeners to a type once
         if (Ember.isNone(self._findAllMapForType[type])) {
           self._findAllMapForType[type] = true;
-          ref.on('child_added', _gotChildValue, _handleError);
-          ref.on('child_changed', _gotChildValue, _handleError);
+          ref.on('child_added', function(snapshot) {
+            if (!resolved) { return; }
+            self._handleChildValue(store, type, serializer, snapshot);
+          }, _handleError);
+          ref.on('child_changed', function(snapshot) {
+            if (!resolved) { return; }
+            self._handleChildValue(store, type, serializer, snapshot);
+          }, _handleError);
           ref.on('child_removed', function(snapshot) {
-            if (!resolved) {
-              return;
-            }
+            if (!resolved) { return; }
             if (store.hasRecordForId(type, snapshot.name())) {
               store.deleteRecord(store.getById(type, snapshot.name()));
             }
@@ -368,6 +359,25 @@
         ref = ref.child(id);
       }
       return ref;
+    },
+
+    /**
+      Push a new child record into the store
+
+      @method _handleChildValue
+      @private
+      @param {Object} store
+      @param {Object} type
+      @param {Object} serializer
+      @param {Object} snapshot
+    */
+    _handleChildValue: function(store, type, serializer, snapshot) {
+      var obj = snapshot.val();
+      // Only add an id if the item is an object
+      if (obj !== null && typeof obj === 'object') {
+        obj.id = snapshot.name();
+      }
+      store.push(type, serializer.extractSingle(store, type, obj));
     },
 
     /**
