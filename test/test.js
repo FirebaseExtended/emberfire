@@ -1,6 +1,12 @@
 /*jshint -W117 */
 
+QUnit.config.reorder = false;
+
 var store, serializer, adapter;
+
+///////////////////////////////////////////////////////////////////////
+// Utility
+///////////////////////////////////////////////////////////////////////
 
 var getPosts = function(snapshot) {
   var posts = [];
@@ -9,6 +15,10 @@ var getPosts = function(snapshot) {
   });
   return posts;
 };
+
+///////////////////////////////////////////////////////////////////////
+// DS.FirebaseSerializer
+///////////////////////////////////////////////////////////////////////
 
 module("FirebaseSerializer", {
   setup: function() {
@@ -145,33 +155,83 @@ module("FirebaseSerializer", {
       });
   });
 
+///////////////////////////////////////////////////////////////////////
+// DS.FirebaseAdapter
+///////////////////////////////////////////////////////////////////////
+
 module("FirebaseAdapter", {
   setup: function() {
     App.reset();
+
+    App.ApplicationAdapter = DS.FirebaseAdapter.extend({
+      firebase: FirebaseTestRef.child("blogs/denormalized")
+    });
+
+    App.Post = App.Post_.extend({
+      comments: DS.hasMany('comment', { async: true })
+    });
+
     store = App.__container__.lookup('store:main');
     serializer = App.__container__.lookup('serializer:application');
     adapter = App.__container__.lookup('adapter:application');
   }
 });
 
-  test("#init()", function() {
+  asyncTest("#init()", function() {
+    expect(2);
     var ref = adapter._ref;
     // TEST
     ok(ref !== undefined, "The adapter has a Firebase ref");
-    strictEqual(ref.toString(), "Mock://", "The adaper's Firebase ref is set to the correct path");
+    strictEqual(ref.toString(), "Mock://blogs/denormalized", "The adaper's Firebase ref is set to the correct path");
+    start();
+  });
+
+  asyncTest("#getRef()", function() {
+    expect(2);
+    var findRef = adapter._getRef(store.modelFor("post"), "post_1");
+    var findAllRef = adapter._getRef(store.modelFor("post"));
+    // TEST
+    strictEqual(findRef.toString(), "Mock://blogs/denormalized/posts/post_1");
+    strictEqual(findAllRef.toString(), "Mock://blogs/denormalized/posts");
+    // START
+    start();
   });
 
   asyncTest("#find()", function() {
-    expect(3);
-    adapter._ref = adapter._ref.child("blogs/denormalized");
+    expect(5);
+    var getRefSpy = sinon.spy(adapter, "_getRef");
     var find = adapter.find(store, store.modelFor("post"), "post_1");
+    var getRefCall = getRefSpy.getCall(0);
+    var findRef = getRefCall.returnValue;
     // TEST
-    strictEqual(typeof find, "object", "find() returned an an object");
+    ok(getRefSpy.calledOnce, "find() created a single Firebase ref");
+    strictEqual(findRef.toString(), "Mock://blogs/denormalized/posts/post_1", "the correct ref was created");
+    strictEqual(typeof find, "object", "find() returned a object");
     strictEqual(typeof find.then, "function", "find() returned a promise");
     find.then(function(payload) {
-      console.log(payload);
       strictEqual(payload.id, "post_1", "The correct payload was returned");
       // START
       start();
+      getRefSpy.restore();
+    });
+  });
+
+  asyncTest("#findAll()", function() {
+    expect(6);
+    var getRefSpy = sinon.spy(adapter, "_getRef");
+    var findAll = adapter.findAll(store, store.modelFor("post"));
+    var getRefCall = getRefSpy.getCall(0);
+    var findAllRef = getRefCall.returnValue;
+    // TEST
+    ok(getRefSpy.calledOnce, "findAll() created a single Firebase ref");
+    strictEqual(findAllRef.toString(), "Mock://blogs/denormalized/posts", "the correct ref was created");
+    strictEqual(typeof findAll, "object", "findAll() returned a object");
+    strictEqual(typeof findAll.then, "function", "findAll() returned a promise");
+    findAll.then(function(payload) {
+      ok(Ember.isArray(payload), "The payload returned was an array");
+      strictEqual(payload.get("length"), 2, "The payload contains the correct number of items");
+      // START
+      start();
+      getRefSpy.restore();
     });
   });
