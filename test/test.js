@@ -168,12 +168,12 @@ module("FirebaseAdapter", {
     });
 
     App.Post = App.Post_.extend({
-      comments: DS.hasMany('comment', { async: true })
+      comments: DS.hasMany("comment", { async: true })
     });
 
-    store = App.__container__.lookup('store:main');
-    serializer = App.__container__.lookup('serializer:application');
-    adapter = App.__container__.lookup('adapter:application');
+    store = App.__container__.lookup("store:main");
+    serializer = App.__container__.lookup("serializer:application");
+    adapter = App.__container__.lookup("adapter:application");
   }
 });
 
@@ -217,21 +217,43 @@ module("FirebaseAdapter", {
   });
 
   asyncTest("#findAll()", function() {
-    expect(6);
-    var getRefSpy = sinon.spy(adapter, "_getRef");
+    expect(14);
+    var refSpy = sinon.spy(adapter, "_getRef");
+    var handleChildValueSpy = sinon.spy(adapter, "_handleChildValue");
     var findAll = adapter.findAll(store, store.modelFor("post"));
-    var getRefCall = getRefSpy.getCall(0);
-    var findAllRef = getRefCall.returnValue;
+    var refCall = refSpy.getCall(0);
+    var findAllRef = refCall.returnValue;
     // TEST
-    ok(getRefSpy.calledOnce, "findAll() created a single Firebase ref");
+    ok(refSpy.calledOnce, "findAll() created a single Firebase ref");
     strictEqual(findAllRef.toString(), "Mock://blogs/denormalized/posts", "the correct ref was created");
-    strictEqual(typeof findAll, "object", "findAll() returned a object");
-    strictEqual(typeof findAll.then, "function", "findAll() returned a promise");
+    strictEqual(findAllRef._events.child_added.length, 1, "child_added event was added");
+    strictEqual(findAllRef._events.child_removed.length, 1, "child_removed event was added");
+    strictEqual(findAllRef._events.child_changed.length, 1, "child_changed event was added");
+    strictEqual(typeof findAll, "object", "it returned a object");
+    strictEqual(typeof findAll.then, "function", "it returned returned a promise");
     findAll.then(function(payload) {
-      ok(Ember.isArray(payload), "The payload returned was an array");
+      ok(Ember.isArray(payload), "it resolved with an array");
       strictEqual(payload.get("length"), 2, "The payload contains the correct number of items");
+    });
+    adapter.findAll(store, store.modelFor("post")).then(function(payload) {
+      ok(Ember.isArray(payload), "it made resolved with an array");
+      strictEqual(findAllRef._events.child_added.length, 1, "additional events were NOT added");
+      strictEqual(findAllRef._events.child_removed.length, 1, "additional events were NOT added");
+      strictEqual(findAllRef._events.child_changed.length, 1, "additional events were NOT added");
+      // Add a new post
+      findAllRef.flushDelay = false;
+      findAllRef.child('post_3').set({
+        "published": 1395162147646,
+        "user": "aputinski",
+        "body": "This is the first FireBlog post!",
+        "title": "Post 3"
+      });
+      findAllRef.flush();
+      findAllRef.flushDelay = 200;
+      strictEqual(handleChildValueSpy.callCount, 1, "it added a new child to he store");
       // START
       start();
-      getRefSpy.restore();
+      refSpy.restore();
+      handleChildValueSpy.restore();
     });
   });
