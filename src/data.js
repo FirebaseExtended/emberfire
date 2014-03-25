@@ -18,21 +18,17 @@
       The object is then converted to an Array using `Ember.keys`
     */
     normalize: function(type, hash) {
-      var relationshipsByName = Ember.get(type, 'relationshipsByName');
-      var relationshipNames = Ember.get(type, 'relationshipNames');
       // Check if the model contains any 'hasMany' relationships
-      if (Ember.isArray(relationshipNames.hasMany)) {
-        relationshipNames.hasMany.forEach(function(key) {
-          var relationship = relationshipsByName.get(key);
-          // Return the keys as an array
-          if (typeof hash[key] === 'object' && !Ember.isArray(hash[key])) {
+      type.eachRelationship(function(key, relationship) {
+        if (relationship.kind === 'hasMany') {
+          if (typeof hash[key] === 'object' && !Ember.isArray(hash[key]) && relationship.options.embedded !== true) {
             hash[key] = Ember.keys(hash[key]);
           }
           else if (Ember.isArray(hash[key])) {
             throw new Error('%@ relationship %@(\'%@\') must be a key/value map in Firebase. Example: { "%@": { "%@_id": true } }'.fmt(type.toString(), relationship.kind, relationship.type.typeKey, relationship.key, relationship.type.typeKey));
           }
-        });
-      }
+        }
+      });
       return this._super.apply(this, arguments);
     },
 
@@ -40,7 +36,26 @@
       extractSingle
     */
     extractSingle: function(store, type, payload) {
-      return this.normalize(type, payload);
+      var normalizedPayload = this.normalize(type, payload);
+      // Check for embedded records
+      type.eachRelationship(function(key, relationship) {
+        if (relationship.options.embedded === true) {
+          var embeddedKey;
+          var embeddedPayload = normalizedPayload[key];
+          var records = [];
+          var record;
+          for (embeddedKey in embeddedPayload) {
+            record = embeddedPayload[embeddedKey];
+            if (record !== null && typeof record === 'object') {
+              record.id = embeddedKey;
+            }
+            records.push(record);
+          }
+          normalizedPayload[key] = Ember.keys(normalizedPayload[key]);
+          store.pushMany(relationship.type, records);
+        }
+      });
+      return normalizedPayload;
     },
 
     /**
@@ -243,17 +258,34 @@
               ids.forEach(function(id) {
                 var relationshipRef = ref.child(key).child(id);
                 var deferred = Ember.RSVP.defer();
-                promises.push(deferred.promise);
-                relationshipRef.set(true, function(error) {
-                  if (error) {
-                    if (typeof error === 'object') {
-                      error.location = relationshipRef.toString();
+                var relatedRecord;
+                if (store.hasRecordForId(relationship.type, id)) {
+                  relatedRecord = store.getById(relationship.type, id);
+                }
+                if (relatedRecord && relatedRecord.get('isDirty') === true) {
+                  relationshipRef.update(relatedRecord.serialize(), function(error) {
+                    if (error) {
+                      if (typeof error === 'object') {
+                        error.location = relationshipRef.toString();
+                      }
+                      deferred.reject(error);
+                    } else {
+                      deferred.resolve();
                     }
-                    deferred.reject(error);
-                  } else {
-                    deferred.resolve();
-                  }
-                });
+                  });
+                }
+                else {
+                  relationshipRef.set(true, function(error) {
+                    if (error) {
+                      if (typeof error === 'object') {
+                        error.location = relationshipRef.toString();
+                      }
+                      deferred.reject(error);
+                    } else {
+                      deferred.resolve();
+                    }
+                  });
+                }
               });
             }
             // Remove the relationship from the json payload
