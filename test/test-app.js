@@ -1,30 +1,10 @@
 (function (window) {
 
   ////////////////////////////////////////////////////////////
-  // Utility
-  ////////////////////////////////////////////////////////////
-
-  var Utility = Ember.Object.extend({
-
-  });
-
-  ////////////////////////////////////////////////////////////
   // App
   ////////////////////////////////////////////////////////////
 
-  var App = window.App = Ember.Application.create({
-    ready: function () {
-      // Util
-      this.register('utility:main', Utility, { singleton: true, instantiate: true });
-      ['controller', 'route', 'component', 'adapter', 'transform', 'model', 'serializer'].forEach(function(type) {
-        this.inject(type, 'util', 'utility:main');
-      }, this);
-      // Store
-      ['component', 'utility:main'].forEach(function(type) {
-        this.inject(type, 'store', 'store:main');
-      }, this);
-    }
-  });
+  var App = window.App = Ember.Application.create();
 
   App.rootElement = '#test-fixture';
   App.setupForTesting();
@@ -35,47 +15,127 @@
   ////////////////////////////////////////////////////////////
 
   var FIREBASE_FIXTURE_DATA = {
-    "users" : {
-      "aputinski" : {
-        "created" : 1395162147634
-      }
-    },
-    "posts" : {
-      "-JIL8DiB9q4f2W_b2puS" : {
-        "published" : 1395162147646,
-        "user" : "aputinski",
-        "body" : "This is the first FireBlog post!",
-        "comments" : {
-          "-JILy5_47CTdlohy7s7t" : true
+    "blogs": {
+      "denormalized": {
+        "users": {
+          "aputinski": {
+            "created": 1395162147634
+          }
         },
-        "title" : "Hello World"
+        "posts": {
+          "post_1": {
+            "published": 1395162147646,
+            "user": "aputinski",
+            "body": "This is the first FireBlog post!",
+            "comments": {
+              "comment_1": true,
+              "comment_2": true
+            },
+            "title": "Post 1"
+          },
+          "post_2": {
+            "published": 1395162147646,
+            "user": "aputinski",
+            "body": "This is the second FireBlog post!",
+            "comments": {
+              "comment_3": true,
+              "comment_4": true
+            },
+            "title": "Post 2"
+          }
+        },
+        "comments": {
+          "comment_1": {
+            "published": 1395176007623,
+            "user": "aputinski",
+            "body": "This is a comment"
+          },
+          "comment_2": {
+            "published": 1395176007624,
+            "user": "aputinski",
+            "body": "This is a second comment"
+          },
+          "comment_3": {
+            "published": 1395176007625,
+            "user": "aputinski",
+            "body": "This is a third comment"
+          },
+          "comment_4": {
+            "published": 1395176007626,
+            "user": "aputinski",
+            "body": "This is a fourth comment"
+          }
+        }
       },
-      "-JIMLLcpIYQJxpMR4mOq" : {
-        "published" : 1395162147646,
-        "user" : "aputinski",
-        "body" : "This is the second FireBlog post!",
-        "comments" : {
-          "-JILy5_47CTdlohy7s7t" : true
-        },
-        "title" : "Hello World"
-      }
-    },
-    "comments" : {
-      "-JILy5_47CTdlohy7s7t" : {
-        "published" : 1395176007623,
-        "user" : "aputinski",
-        "body" : "This is a comment"
+      "embedded": {
+        "posts": {
+          "post_1": {
+            "published": 1395162147646,
+            "user": "aputinski",
+            "body": "This is the first FireBlog post!",
+            "comments": {
+              "comment_1": {
+                "published": 1395176007623,
+                "user": "aputinski",
+                "body": "This is a comment"
+              },
+              "comment_2": {
+                "published": 1395176007624,
+                "user": "aputinski",
+                "body": "This is a second comment"
+              }
+            },
+            "title": "Post 1"
+          },
+          "post_2": {
+            "published": 1395162147646,
+            "user": "aputinski",
+            "body": "This is the second FireBlog post!",
+            "comments": {
+              "comment_3": {
+                "published": 1395176007625,
+                "user": "aputinski",
+                "body": "This is a third comment"
+              },
+              "comment_4": {
+                "published": 1395176007626,
+                "user": "aputinski",
+                "body": "This is a fourth comment"
+              }
+            },
+            "title": "Post 2"
+          }
+        }
+      },
+      "invalid": {
+        "posts": {
+          "post_1": {
+            "published": 1395162147646,
+            "user": "aputinski",
+            "body": "This is the first FireBlog post!",
+            "comments": ["comment_1", "comment_2"],
+            "title": "Post 1"
+          },
+          "post_2": {
+            "published": 1395162147646,
+            "user": "aputinski",
+            "body": "This is the second FireBlog post!",
+            "comments": ["comment_3", "comment_4"],
+            "title": "Post 2"
+          }
+        }
       }
     }
   };
 
-  App.ApplicationAdapter = DS.FirebaseAdapter.extend({
-    firebase: new MockFirebase('Mock://', FIREBASE_FIXTURE_DATA).autoFlush(200)
-  });
+  var FirebaseTestRef = window.FirebaseTestRef = new MockFirebase('Mock://', FIREBASE_FIXTURE_DATA).autoFlush(200);
 
+  App.ApplicationAdapter = DS.FirebaseAdapter.extend({
+    firebase: FirebaseTestRef
+  });
   App.ApplicationSerializer = DS.FirebaseSerializer.extend();
 
-  App.Post = DS.Model.extend({
+  App.Post_ = DS.Model.extend({
     title: DS.attr('string'),
     body: DS.attr('string'),
     published: DS.attr('number'),
@@ -119,7 +179,7 @@
   // Routes
   ////////////////////////////////////////////////////////////
 
-  App.Router.map(function() {
+  /*App.Router.map(function() {
     this.resource('posts', { path: '/posts' }, function() {
       this.route('new');
     });
@@ -311,6 +371,6 @@
     var escaped = Ember.Handlebars.Utils.escapeExpression(value);
         escaped = escaped.replace(/(\r\n|\n|\r)/gm, '<br>');
     return new Ember.Handlebars.SafeString(escaped);
-  });
+  });*/
 
 })(window);
