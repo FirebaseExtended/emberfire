@@ -144,3 +144,34 @@ module("FirebaseSerializer", {
         spy.restore();
       });
   });
+
+module("FirebaseAdapter", {
+  setup: function() {
+    App.reset();
+    store = App.__container__.lookup('store:main');
+    serializer = App.__container__.lookup('serializer:application');
+    adapter = App.__container__.lookup('adapter:application');
+  }
+});
+
+  test("#init()", function() {
+    var ref = adapter._ref;
+    // TEST
+    ok(ref !== undefined, "The adapter has a Firebase ref");
+    strictEqual(ref.toString(), "Mock://", "The adaper's Firebase ref is set to the correct path");
+  });
+
+  asyncTest("#find()", function() {
+    expect(3);
+    adapter._ref = adapter._ref.child("blogs/denormalized");
+    var find = adapter.find(store, store.modelFor("post"), "post_1");
+    // TEST
+    strictEqual(typeof find, "object", "find() returned an an object");
+    strictEqual(typeof find.then, "function", "find() returned a promise");
+    find.then(function(payload) {
+      console.log(payload);
+      strictEqual(payload.id, "post_1", "The correct payload was returned");
+      // START
+      start();
+    });
+  });
