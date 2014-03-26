@@ -80,10 +80,10 @@
       // turn all our public methods into spies so they can be monitored for calls and return values
       // see jasmine spies: https://github.com/pivotal/jasmine/wiki/Spies
       // the Firebase constructor can be spied on using spyOn(window, 'Firebase') from within the test unit
-      if( typeof spyOn === 'function' ) {
+      if( typeof sinon.spy === 'function' ) {
          for(var key in this) {
             if( !key.match(/^_/) && typeof(this[key]) === 'function' ) {
-               //sinon.spy(this[key]);
+              sinon.spy(this, key);
             }
          }
       }
@@ -195,6 +195,19 @@
          return this;
       },
 
+      update: function(data, callback) {
+         var self = this;
+         var err = this._nextErr('update');
+         data = _.cloneDeep(data);
+         this._defer(function() {
+            if( err === null ) {
+               self._dataChanged(data);
+            }
+            callback && callback(err);
+         });
+         return this;
+      },
+
       name: function() {
          return this.myName;
       },
@@ -291,6 +304,11 @@
          //todo
       },
 
+      push: function() {
+        var id = "_" + new Date().getTime();
+        return makeSnap(this.child(id), {});
+      },
+
       /*****************************************************
        * Private/internal methods
        *****************************************************/
@@ -371,7 +389,7 @@
    }
 
    function extractChildData(childName, data) {
-      if( !_.isObject(data) || !_.hasKey(data, childName) ) {
+      if( !_.isObject(data) || !_.has(data, childName) ) {
          return null;
       }
       else {
