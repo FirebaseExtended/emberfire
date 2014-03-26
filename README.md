@@ -21,13 +21,12 @@ As of version 0.2.0, `EmberFire.Object` and `EmberFire.Array` have been removed,
 ## Usage
 
 To get started, simply create an instance of the
-`DS.FirebaseAdapter` and `DS.FirebaseSerializer` in your app, like this:
+`DS.FirebaseAdapter` in your app:
 
 ```js
 App.ApplicationAdapter = DS.FirebaseAdapter.extend({
   firebase: new Firebase('https://<my-firebase>.firebaseio.com')
 });
-App.ApplicationSerializer = DS.FirebaseSerializer.extend();
 ```
 
 You can now interact with the data store as you normally would. For example,

@@ -60,7 +60,7 @@
     firebase: new Firebase('https://emberfire-demo.firebaseio.com')
   });
 
-  App.ApplicationSerializer = DS.FirebaseSerializer.extend();
+  //App.ApplicationSerializer = DS.FirebaseSerializer.extend();
 
   App.Post = DS.Model.extend({
     title: DS.attr('string'),
@@ -302,7 +302,7 @@
   });
 
   Ember.Handlebars.helper('markdown', function(value, options) {
-    return new Ember.Handlebars.SafeString(markdown.toHTML(value));
+    return new Ember.Handlebars.SafeString(window.markdown.toHTML(value));
   });
 
 })(window);
