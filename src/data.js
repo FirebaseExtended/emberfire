@@ -248,7 +248,7 @@
             var ids = json[key];
             if (Ember.isArray(ids)) {
               ids.forEach(function(id) {
-                var relationshipRef = self._getRelationshiptRef(ref, key, id);
+                var relationshipRef = self._getRelationshipRef(ref, key, id);
                 var deferred = Ember.RSVP.defer();
                 var relatedRecord;
                 if (store.hasRecordForId(relationship.type, id)) {
@@ -260,10 +260,8 @@
                       if (typeof error === 'object') {
                         error.location = relationshipRef.toString();
                       }
-                      //deferred.reject(error);
                       Ember.run(null, deferred.reject, error);
                     } else {
-                      //deferred.resolve();
                       Ember.run(null, deferred.resolve, error);
                     }
                   });
@@ -274,10 +272,8 @@
                       if (typeof error === 'object') {
                         error.location = relationshipRef.toString();
                       }
-                      //deferred.reject(error);
                       Ember.run(null, deferred.reject, error);
                     } else {
-                      //deferred.resolve();
                       Ember.run(null, deferred.resolve, error);
                     }
                   });
@@ -360,7 +356,7 @@
     /**
       Return a Firebase ref based on a relationship key and record id
     */
-    _getRelationshiptRef: function(ref, key, id) {
+    _getRelationshipRef: function(ref, key, id) {
       return ref.child(key).child(id);
     },
 

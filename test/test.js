@@ -261,7 +261,7 @@ module("FirebaseAdapter", {
     });
     var newPost, newComment;
     var refSpy = sinon.spy(adapter, "_getRef");
-    var relationshiptRefSpy = sinon.spy(adapter, "_getRelationshiptRef");
+    var RelationshipRefSpy = sinon.spy(adapter, "_getRelationshipRef");
     var updateRecordSpy = sinon.spy(adapter, "updateRecord");
     Ember.run(function() {
       newComment = store.createRecord("comment", {
@@ -277,8 +277,8 @@ module("FirebaseAdapter", {
         newPost.save().then(function() {
           var refCall = refSpy.getCall(0);
           var ref = refCall.returnValue;
-          var relationshiptRefCall = relationshiptRefSpy.getCall(0);
-          var relationshipRef = relationshiptRefCall.returnValue;
+          var RelationshipRefCall = RelationshipRefSpy.getCall(0);
+          var relationshipRef = RelationshipRefCall.returnValue;
           var serializedRecord = updateRecordSpy.getCall(0).args[2].serialize();
           var finalPayload = ref.update.getCall(0).args[0];
           // TEST
@@ -307,7 +307,7 @@ module("FirebaseAdapter", {
     });
     var newPost, newComment;
     var refSpy = sinon.spy(adapter, "_getRef");
-    var relationshiptRefSpy = sinon.spy(adapter, "_getRelationshiptRef");
+    var RelationshipRefSpy = sinon.spy(adapter, "_getRelationshipRef");
     var updateRecordSpy = sinon.spy(adapter, "updateRecord");
     Ember.run(function() {
       newComment = store.createRecord("comment", {
@@ -321,8 +321,8 @@ module("FirebaseAdapter", {
       newPost.save().then(function() {
         var refCall = refSpy.getCall(0);
         var ref = refCall.returnValue;
-        var relationshiptRefCall = relationshiptRefSpy.getCall(0);
-        var relationshipRef = relationshiptRefCall.returnValue;
+        var RelationshipRefCall = RelationshipRefSpy.getCall(0);
+        var relationshipRef = RelationshipRefCall.returnValue;
         var serializedRecord = updateRecordSpy.getCall(0).args[2].serialize();
         var finalPayload = ref.update.getCall(0).args[0];
         // TEST
