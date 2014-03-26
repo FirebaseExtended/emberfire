@@ -199,12 +199,12 @@ module("FirebaseAdapter", {
 
   asyncTest("#find()", function() {
     expect(5);
-    var getRefSpy = sinon.spy(adapter, "_getRef");
+    var refSpy = sinon.spy(adapter, "_getRef");
     var find = adapter.find(store, store.modelFor("post"), "post_1");
-    var getRefCall = getRefSpy.getCall(0);
-    var findRef = getRefCall.returnValue;
+    var refCall = refSpy.getCall(0);
+    var findRef = refCall.returnValue;
     // TEST
-    ok(getRefSpy.calledOnce, "find() created a single Firebase ref");
+    ok(refSpy.calledOnce, "find() created a single Firebase ref");
     strictEqual(findRef.toString(), "Mock://blogs/denormalized/posts/post_1", "the correct ref was created");
     strictEqual(typeof find, "object", "find() returned a object");
     strictEqual(typeof find.then, "function", "find() returned a promise");
@@ -212,7 +212,7 @@ module("FirebaseAdapter", {
       strictEqual(payload.id, "post_1", "The correct payload was returned");
       // START
       start();
-      getRefSpy.restore();
+      refSpy.restore();
     });
   });
 
@@ -224,7 +224,7 @@ module("FirebaseAdapter", {
     var refCall = refSpy.getCall(0);
     var findAllRef = refCall.returnValue;
     // TEST
-    ok(refSpy.calledOnce, "findAll() created a single Firebase ref");
+    ok(refSpy.calledOnce, "it creates a single Firebase ref");
     strictEqual(findAllRef.toString(), "Mock://blogs/denormalized/posts", "the correct ref was created");
     strictEqual(findAllRef._events.child_added.length, 1, "child_added event was added");
     strictEqual(findAllRef._events.child_removed.length, 1, "child_removed event was added");
@@ -255,5 +255,48 @@ module("FirebaseAdapter", {
       start();
       refSpy.restore();
       handleChildValueSpy.restore();
+    });
+  });
+
+  asyncTest("#updateRecord()", function() {
+    expect(7);
+    var newPost, newComment;
+    var refSpy = sinon.spy(adapter, "_getRef");
+    var relationshiptRefSpy = sinon.spy(adapter, "_getRelationshiptRef");
+    var updateRecordSpy = sinon.spy(adapter, "updateRecord");
+    Ember.run(function() {
+      newComment = store.createRecord("comment", {
+        body: "This is a new comment"
+      });
+      newPost = store.createRecord("post", {
+        title: "New Post"
+      });
+
+      newPost.get('comments').then(function(comments) {
+        comments.addObject(newComment);
+      }).then(function() {
+        FirebaseTestRef.flushDelay = false;
+        newPost.save().then(function() {
+          var refCall = refSpy.getCall(0);
+          var ref = refCall.returnValue;
+          var relationshiptRefCall = relationshiptRefSpy.getCall(0);
+          var relationshipRef = relationshiptRefCall.returnValue;
+          var serializedRecord = updateRecordSpy.getCall(0).args[2].serialize();
+          var finalPayload = ref.update.getCall(0).args[0];
+          // TEST
+          ok(refSpy.calledOnce, "it creates a single Firebase ref");
+          strictEqual(ref.toString(), "Mock://blogs/denormalized/posts/" + newPost.id, "the correct ref was created");
+          ok(Ember.isArray(serializedRecord.comments), "the record has a hasMany relationship");
+          ok(serializedRecord.comments.contains(newComment.id), "the hasMany relationship contains the correct id");
+          ok(Ember.isNone(finalPayload.comments), "the hasMany relationship was removed from the final payload");
+          strictEqual(relationshipRef.toString(), "Mock://blogs/denormalized/posts/" + newPost.id + "/comments/" + newComment.id, "the correct relationshipt ref was created");
+          strictEqual(relationshipRef.set.callCount, 1, "set was called on each relationship ref");
+          // START
+          start();
+          refSpy.restore();
+          updateRecordSpy.restore();
+        });
+      });
+
     });
   });
