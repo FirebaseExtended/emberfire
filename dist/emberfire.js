@@ -85,6 +85,8 @@
   */
   DS.FirebaseAdapter = DS.Adapter.extend(Ember.Evented, {
 
+    defaultSerializer: '-firebase',
+
     /**
       Endpoint paths can be customized by setting the Firebase property on the
       adapter:
@@ -386,6 +388,16 @@
     */
     _findAllMapForType: undefined
 
+  });
+
+  Ember.onLoad('Ember.Application', function(Application) {
+    Application.initializer({
+      name: 'firebase',
+      after: 'store',
+      initialize: function(container, application) {
+        application.register('serializer:-firebase', DS.FirebaseSerializer);
+      }
+    });
   });
 
 })();
