@@ -269,7 +269,7 @@
                   });
                 }
                 else if (relationship.options.embedded !== true && ((relatedRecord && relatedRecord.get('isDirty') === true) || !relatedRecord)) {
-                  relationshipRef.set(true, function(error) {
+                  relationshipRef.update(true, function(error) {
                     if (error) {
                       if (typeof error === 'object') {
                         error.location = relationshipRef.toString();
