@@ -236,6 +236,7 @@
       been successfully saved to Firebase.
     */
     updateRecord: function(store, type, record) {
+      var self = this;
       var json = record.serialize({ includeId: false });
       var ref = this._getRef(type, record.id);
 
@@ -247,33 +248,37 @@
             var ids = json[key];
             if (Ember.isArray(ids)) {
               ids.forEach(function(id) {
-                var relationshipRef = ref.child(key).child(id);
+                var relationshipRef = self._getRelationshiptRef(ref, key, id);
                 var deferred = Ember.RSVP.defer();
                 var relatedRecord;
                 if (store.hasRecordForId(relationship.type, id)) {
                   relatedRecord = store.getById(relationship.type, id);
                 }
-                if (relatedRecord && relatedRecord.get('isDirty') === true) {
+                if (relationship.options.embedded === true && relatedRecord && relatedRecord.get('isDirty') === true) {
                   relationshipRef.update(relatedRecord.serialize(), function(error) {
                     if (error) {
                       if (typeof error === 'object') {
                         error.location = relationshipRef.toString();
                       }
-                      deferred.reject(error);
+                      //deferred.reject(error);
+                      Ember.run(null, deferred.reject, error);
                     } else {
-                      deferred.resolve();
+                      //deferred.resolve();
+                      Ember.run(null, deferred.resolve, error);
                     }
                   });
                 }
-                else {
+                else if (relationship.options.embedded !== true && ((relatedRecord && relatedRecord.get('isDirty') === true) || !relatedRecord)) {
                   relationshipRef.set(true, function(error) {
                     if (error) {
                       if (typeof error === 'object') {
                         error.location = relationshipRef.toString();
                       }
-                      deferred.reject(error);
+                      //deferred.reject(error);
+                      Ember.run(null, deferred.reject, error);
                     } else {
-                      deferred.resolve();
+                      //deferred.resolve();
+                      Ember.run(null, deferred.resolve, error);
                     }
                   });
                 }
@@ -288,9 +293,9 @@
         promises.push(updateDeferred.promise);
         ref.update(json, function(error) {
           if (error) {
-            updateDeferred.reject(error);
+            Ember.run(null, updateDeferred.reject, error);
           } else {
-            updateDeferred.resolve();
+            Ember.run(null, updateDeferred.resolve);
           }
         });
         // Wait for the record and any relationships to resolve
@@ -322,16 +327,7 @@
     },
 
     /**
-      Determines a path fo a given type. To customize, override the method:
-
-      ```js
-      DS.FirebaseAdapter.reopen({
-        pathForType: function(type) {
-          var decamelized = Ember.String.decamelize(type);
-          return Ember.String.pluralize(decamelized);
-        }
-      });
-      ```
+      Determines a path fo a given type
     */
     pathForType: function(type) {
       var camelized = Ember.String.camelize(type);
@@ -359,6 +355,13 @@
         ref = ref.child(id);
       }
       return ref;
+    },
+
+    /**
+      Return a Firebase ref based on a relationship key and record id
+    */
+    _getRelationshiptRef: function(ref, key, id) {
+      return ref.child(key).child(id);
     },
 
     /**
