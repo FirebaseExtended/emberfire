@@ -41,11 +41,11 @@
       type.eachRelationship(function(key, relationship) {
         if (!Ember.isNone(payload[key]) && relationship.options.embedded === true) {
           var embeddedKey;
-          var embeddedPayload = normalizedPayload[key];
+          var embeddedRecordPayload = normalizedPayload[key];
           var records = [];
           var record;
-          for (embeddedKey in embeddedPayload) {
-            record = embeddedPayload[embeddedKey];
+          for (embeddedKey in embeddedRecordPayload) {
+            record = embeddedRecordPayload[embeddedKey];
             if (record !== null && typeof record === 'object') {
               record.id = embeddedKey;
             }
