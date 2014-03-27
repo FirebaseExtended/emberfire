@@ -6,9 +6,6 @@ EmberFire is an officially supported adapter for using
 
 The `DS.FirebaseAdapter` provides all of the standard `DS.Adapter` methods and will automatically synchronize the store with Firebase
 
-#### Note
-As of version 0.2.0, `EmberFire.Object` and `EmberFire.Array` have been removed, but can still be downloaded in the [v0.1.0 release](https://github.com/firebase/emberFire/releases/tag/v0.1.0)
-
 ## Installation
 
 ```html
