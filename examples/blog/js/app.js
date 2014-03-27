@@ -57,10 +57,8 @@
   ////////////////////////////////////////////////////////////
 
   App.ApplicationAdapter = DS.FirebaseAdapter.extend({
-    firebase: new Firebase('https://emberfire-demo.firebaseio.com')
+    firebase: new Firebase('https://emberfire-demo.firebaseio.com/blogs/my-blog')
   });
-
-  //App.ApplicationSerializer = DS.FirebaseSerializer.extend();
 
   App.Post = DS.Model.extend({
     title: DS.attr('string'),
@@ -196,12 +194,14 @@
           // Save the comment
           comment.save();
           // Add the new comment to the post and save it
-          post.get('comments').addObject(comment);
-          // Save the post
-          post.save().then(function() {
-            // Success
-          }, function(error) {
-            //console.log(error);
+          post.get('comments').then(function(comments) {
+            comments.addObject(comment);
+            // Save the post
+            post.save({foo:'bar'}).then(function() {
+              // Success
+            }, function(error) {
+              //console.log(error);
+            });
           });
         }
       }

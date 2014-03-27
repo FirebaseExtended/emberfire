@@ -110,6 +110,8 @@
       this._ref = this.firebase.ref();
       // Keep track of what types `.findAll()` has been called for
       this._findAllMapForType = {};
+      // Used to batch records into the store
+      this._queue = [];
     },
 
     // Uses push() to generate chronologically ordered unique IDs.
@@ -126,6 +128,7 @@
       also be automatically updated whenever the remote value changes.
     */
     find: function(store, type, id) {
+      var _this = this;
       var resolved = false;
       var ref = this._getRef(type, id);
       var serializer = store.serializerFor(type);
@@ -133,32 +136,38 @@
       return new Ember.RSVP.Promise(function(resolve, reject) {
         ref.on('value', function(snapshot) {
           var obj = snapshot.val();
+          // Set id to the snapshot name
           if (obj !== null && typeof obj === 'object') {
             obj.id = snapshot.name();
           }
           if (!resolved) {
-            // If this is the first event, resolve the promise.
             resolved = true;
+            // If this is the first event, resolve the promise.
             if (obj === null) {
-              Ember.run(null, reject);
+              _this._queuePush(reject);
             }
             else {
-              Ember.run(null, resolve, obj);
+              _this._queuePush(resolve, [obj]);
             }
           } else {
             // If the snapshot is null, delete the record from the store
             if (obj === null && store.hasRecordForId(type, snapshot.name())) {
-              store.getById(type, snapshot.name()).destroyRecord();
+              _this._queuePush(function() {
+                store.getById(type, snapshot.name()).destroyRecord();
+              });
             }
             // Otherwise push it into the store
             else {
-              store.push(type, serializer.extractSingle(store, type, obj));
+              _this._queuePush(function() {
+                store.push(type, serializer.extractSingle(store, type, obj));
+              });
             }
           }
-        }, function(err) {
+        },
+        function(err) {
           // Only called in cases of permission related errors.
           if (!resolved) {
-            Ember.run(null, reject, err);
+            _this._queuePush(reject, [err]);
           }
         });
       }, 'DS: FirebaseAdapter#find ' + type + ' to ' + ref.toString());
@@ -174,7 +183,7 @@
       store.
     */
     findAll: function(store, type) {
-      var self = this;
+      var _this = this;
       var resolved = false;
       var ref = this._getRef(type);
       var serializer = store.serializerFor(type);
@@ -183,29 +192,31 @@
         var _handleError = function(err) {
           if (!resolved) {
             resolved = true;
-            Ember.run(null, reject, err);
+            _this._queuePush(reject, [err]);
           }
         };
-        // Only add listeners to a type once
-        if (Ember.isNone(self._findAllMapForType[type])) {
-          self._findAllMapForType[type] = true;
+
+        var _addListeners = function() {
+          var hasEvents = !Ember.isNone(_this._findAllMapForType[type]);
+          if (hasEvents) { return; }
+          _this._findAllMapForType[type] = true;
           ref.on('child_added', function(snapshot) {
-            if (!resolved) { return; }
-            self._handleChildValue(store, type, serializer, snapshot);
+            _this._handleChildValue(store, type, serializer, snapshot);
           }, _handleError);
           ref.on('child_changed', function(snapshot) {
-            if (!resolved) { return; }
-            self._handleChildValue(store, type, serializer, snapshot);
+            _this._handleChildValue(store, type, serializer, snapshot);
           }, _handleError);
           ref.on('child_removed', function(snapshot) {
-            if (!resolved) { return; }
             if (store.hasRecordForId(type, snapshot.name())) {
-              store.deleteRecord(store.getById(type, snapshot.name()));
+              this._queuePush(function() {
+                store.deleteRecord(store.getById(type, snapshot.name()));
+              });
             }
           }, _handleError);
-        }
+        };
 
         ref.once('value', function(snapshot) {
+          resolved = true;
           var results = [];
           snapshot.forEach(function(childSnapshot) {
             var obj = childSnapshot.val();
@@ -214,8 +225,8 @@
             }
             results.push(obj);
           });
-          resolved = true;
-          Ember.run(null, resolve, results);
+          _this._queuePush(resolve, [results]);
+          _addListeners();
         });
       }, 'DS: FirebaseAdapter#findAll ' + type + ' to ' + ref.toString());
     },
@@ -238,87 +249,54 @@
       been successfully saved to Firebase.
     */
     updateRecord: function(store, type, record) {
-      var self = this;
-      var json = record.serialize({ includeId: false });
-      var ref = this._getRef(type, record.id);
+      var _this = this;
+      var serializedRecord = record.serialize({
+        includeId: false
+      });
+      var recordRef = this._getRef(type, record.id);
 
       return new Ember.RSVP.Promise(function(resolve, reject) {
-        var promises = [];
-        // Update relationships
+        var savedRelationships = [];
         record.eachRelationship(function(key, relationship) {
-          if (relationship.kind === 'hasMany') {
-            var ids = json[key];
-            if (Ember.isArray(ids)) {
-              ids.forEach(function(id) {
-                var relationshipRef = self._getRelationshipRef(ref, key, id);
-                var deferred = Ember.RSVP.defer();
-                var relatedRecord;
-                if (store.hasRecordForId(relationship.type, id)) {
-                  relatedRecord = store.getById(relationship.type, id);
-                }
-                if (relationship.options.embedded === true && relatedRecord && relatedRecord.get('isDirty') === true) {
-                  relationshipRef.update(relatedRecord.serialize(), function(error) {
-                    if (error) {
-                      if (typeof error === 'object') {
-                        error.location = relationshipRef.toString();
-                      }
-                      Ember.run(null, deferred.reject, error);
-                    } else {
-                      Ember.run(null, deferred.resolve, error);
-                    }
-                  });
-                }
-                else if (relationship.options.embedded !== true && ((relatedRecord && relatedRecord.get('isDirty') === true) || !relatedRecord)) {
-                  relationshipRef.update(true, function(error) {
-                    if (error) {
-                      if (typeof error === 'object') {
-                        error.location = relationshipRef.toString();
-                      }
-                      Ember.run(null, deferred.reject, error);
-                    } else {
-                      Ember.run(null, deferred.resolve, error);
-                    }
-                  });
+          switch (relationship.kind) {
+            case 'hasMany':
+              if (Ember.isArray(serializedRecord[key])) {
+                var save = _this._saveHasManyRelationship(store, relationship, serializedRecord[key] ,recordRef);
+                savedRelationships.push(save);
+                // Remove the relationship from the serializedRecord
+                delete serializedRecord[key];
+              }
+              break;
+            default:
+              break;
+          }
+          // Save the record once all the relationships have saved
+          return Ember.RSVP.allSettled(savedRelationships).then(function() {
+            return new Ember.RSVP.Promise(function(resolve, reject) {
+              recordRef.update(serializedRecord, function(error) {
+                if (error) {
+                  reject(error);
+                } else {
+                  resolve();
                 }
               });
-            }
-            // Remove the relationship from the json payload
-            delete json[key];
-          }
+            });
+          });
         });
-        // Update the main record
-        var updateDeferred = Ember.RSVP.defer();
-        promises.push(updateDeferred.promise);
-        ref.update(json, function(error) {
-          if (error) {
-            Ember.run(null, updateDeferred.reject, error);
-          } else {
-            Ember.run(null, updateDeferred.resolve);
-          }
-        });
-        // Wait for the record and any relationships to resolve
-        Ember.RSVP.allSettled(promises).then(function(settledPromised) {
-          var rejected = settledPromised.filterBy('state', 'rejected');
-          // There were no errors
-          if (rejected.get('length') === 0)  {
-            Ember.run(null, resolve);
-          }
-          else {
-            Ember.run(null, reject, { message: 'Some errors were encountered while saving', errors: rejected.mapBy('reason') });
-          }
-        });
-      }, 'DS: FirebaseAdapter#updateRecord ' + type + ' to ' + ref.toString());
+      }, 'DS: FirebaseAdapter#updateRecord %@ to %@'.fmt(type, recordRef.toString()));
     },
 
     // Called by the store when a record is deleted.
     deleteRecord: function(store, type, record) {
+      var _this = this;
       var ref = this._getRef(type, record.id);
+
       return new Ember.RSVP.Promise(function(resolve, reject) {
         ref.remove(function(err) {
           if (err) {
-            Ember.run(null, reject, err);
+            _this._queuePush(reject, [err]);
           } else {
-            Ember.run(null, resolve);
+            _this._queuePush(resolve);
           }
         });
       }, 'DS: FirebaseAdapter#deleteRecord ' + type + ' to ' + ref.toString());
@@ -363,6 +341,103 @@
     },
 
     /**
+      _queueScheduleFlush
+    */
+    _queueScheduleFlush: function() {
+      var _this = this;
+      setTimeout(function() {
+        _this._queueFlush();
+      }, 50);
+    },
+
+    /**
+      _queueFlush
+    */
+    _queueFlush: function() {
+      var _this = this;
+      Ember.run(function() {
+        console.log('FLUSH');
+        _this._queue.forEach(function(queueItem) {
+          var fn = queueItem[0];
+          var args = queueItem[1];
+          fn.apply(null, args);
+        });
+        _this._queue = [];
+      });
+    },
+
+    /**
+      _queuePush
+    */
+    _queuePush: function(callback, args) {
+      var length = this._queue.push([callback, args]);
+      if (length === 1) {
+        this._queueScheduleFlush();
+      }
+    },
+
+    /**
+      _saveHasManyRelationship
+    */
+    _saveHasManyRelationship: function(store, relationship, ids, parentRef) {
+      if (!Ember.isArray(ids)) {
+        throw new Error('hasMany relationships must must be an array');
+      }
+      // Save each record in the relationship
+      var savedRecords = ids.map(function(id) {
+        return this._saveHasManyRelationshipRecord(store, relationship, parentRef, id);
+      }, this);
+      // Wait for all the updates to finish
+      return Ember.RSVP.allSettled(savedRecords).then(function(savedRecords) {
+        var rejected = savedRecords.filterBy('state', 'rejected');
+        if (rejected.get('length') === 0) {
+          return savedRecords;
+        }
+        else {
+          return Ember.RSVP.reject({
+            message: 'Some errors were encountered while saving %@ relationship'.fmt(relationship.type),
+            errors: rejected.mapBy('reason')
+          });
+        }
+      });
+    },
+
+    /**
+      _saveHasManyRelationshipRecord
+    */
+    _saveHasManyRelationshipRecord: function(store, relationship, parentRef, id) {
+      // Create a reference to the related record
+      var ref = this._getRelationshipRef(parentRef, relationship.key, id);
+      // Get the local version of the related record
+      var relatedRecord = store.hasRecordForId(relationship.type, id) ? store.getById(relationship.type, id) : false;
+      return new Ember.RSVP.Promise(function(resolve, reject) {
+        var isEmbedded = relationship.options.embedded === true;
+        var isDirty = relatedRecord ? relatedRecord.get('isDirty') : false;
+        var valueToSave = isEmbedded ? relatedRecord.serialize({ includeId: false }) : true;
+        // If the relationship is embedded and a record was found and the and there are changes
+        // If the relationship is embedded and a related record was found and its dirty or there is no related record
+        if ((isEmbedded && relatedRecord && isDirty) || (!isEmbedded && ((relatedRecord && isDirty) || !relatedRecord))) {
+          var _saveHandler = function(error) {
+            if (error) {
+              if (typeof error === 'object') {
+                error.location = ref.toString();
+              }
+              reject(error);
+            } else {
+              resolve();
+            }
+          };
+          if (isEmbedded) {
+            ref.update(valueToSave, _saveHandler);
+          }
+          else {
+            ref.set(valueToSave, _saveHandler);
+          }
+        }
+      });
+    },
+
+    /**
       Push a new child record into the store
 
       @method _handleChildValue
@@ -378,7 +453,9 @@
       if (obj !== null && typeof obj === 'object') {
         obj.id = snapshot.name();
       }
-      store.push(type, serializer.extractSingle(store, type, obj));
+      this._queuePush(function() {
+        store.push(type, serializer.extractSingle(store, type, obj));
+      });
     },
 
     /**
