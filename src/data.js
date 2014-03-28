@@ -389,10 +389,9 @@
           return savedRecords;
         }
         else {
-          return Ember.RSVP.reject({
-            message: 'Some errors were encountered while saving %@ relationship'.fmt(relationship.type),
-            errors: rejected.mapBy('reason')
-          });
+          var error = new Error('Some errors were encountered while saving %@ relationship'.fmt(relationship.type));
+              error.errors = rejected.mapBy('reason');
+          throw error;
         }
       });
     },
