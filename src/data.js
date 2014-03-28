@@ -128,7 +128,7 @@
       also be automatically updated whenever the remote value changes.
     */
     find: function(store, type, id) {
-      var _this = this;
+      var adapter = this;
       var resolved = false;
       var ref = this._getRef(type, id);
       var serializer = store.serializerFor(type);
@@ -144,21 +144,21 @@
             resolved = true;
             // If this is the first event, resolve the promise.
             if (obj === null) {
-              _this._queuePush(reject);
+              adapter._enqueue(reject);
             }
             else {
-              _this._queuePush(resolve, [obj]);
+              adapter._enqueue(resolve, [obj]);
             }
           } else {
             // If the snapshot is null, delete the record from the store
             if (obj === null && store.hasRecordForId(type, snapshot.name())) {
-              _this._queuePush(function() {
+              adapter._enqueue(function() {
                 store.getById(type, snapshot.name()).destroyRecord();
               });
             }
             // Otherwise push it into the store
             else {
-              _this._queuePush(function() {
+              adapter._enqueue(function() {
                 store.push(type, serializer.extractSingle(store, type, obj));
               });
             }
@@ -167,7 +167,7 @@
         function(err) {
           // Only called in cases of permission related errors.
           if (!resolved) {
-            _this._queuePush(reject, [err]);
+            adapter._enqueue(reject, [err]);
           }
         });
       }, 'DS: FirebaseAdapter#find ' + type + ' to ' + ref.toString());
@@ -183,7 +183,7 @@
       store.
     */
     findAll: function(store, type) {
-      var _this = this;
+      var adapter = this;
       var resolved = false;
       var ref = this._getRef(type);
       var serializer = store.serializerFor(type);
@@ -192,23 +192,25 @@
         var _handleError = function(err) {
           if (!resolved) {
             resolved = true;
-            _this._queuePush(reject, [err]);
+            adapter._enqueue(reject, [err]);
           }
         };
 
         var _addListeners = function() {
-          var hasEvents = !Ember.isNone(_this._findAllMapForType[type]);
+          // See if events have been added to the type
+          var hasEvents = !Ember.isNone(adapter._findAllMapForType[type]);
           if (hasEvents) { return; }
-          _this._findAllMapForType[type] = true;
+          adapter._findAllMapForType[type] = true;
+          // Add Firebase listeners
           ref.on('child_added', function(snapshot) {
-            _this._handleChildValue(store, type, serializer, snapshot);
+            adapter._handleChildValue(store, type, serializer, snapshot);
           }, _handleError);
           ref.on('child_changed', function(snapshot) {
-            _this._handleChildValue(store, type, serializer, snapshot);
+            adapter._handleChildValue(store, type, serializer, snapshot);
           }, _handleError);
           ref.on('child_removed', function(snapshot) {
             if (store.hasRecordForId(type, snapshot.name())) {
-              this._queuePush(function() {
+              this._enqueue(function() {
                 store.deleteRecord(store.getById(type, snapshot.name()));
               });
             }
@@ -225,10 +227,10 @@
             }
             results.push(obj);
           });
-          _this._queuePush(resolve, [results]);
+          adapter._enqueue(resolve, [results]);
           _addListeners();
         });
-      }, 'DS: FirebaseAdapter#findAll ' + type + ' to ' + ref.toString());
+      }, 'DS: FirebaseAdapter#findAll %@ to %@'.fmt(type, ref.toString()));
     },
 
     /**
@@ -249,7 +251,7 @@
       been successfully saved to Firebase.
     */
     updateRecord: function(store, type, record) {
-      var _this = this;
+      var adapter = this;
       var serializedRecord = record.serialize({
         includeId: false
       });
@@ -261,7 +263,7 @@
           switch (relationship.kind) {
             case 'hasMany':
               if (Ember.isArray(serializedRecord[key])) {
-                var save = _this._saveHasManyRelationship(store, relationship, serializedRecord[key] ,recordRef);
+                var save = adapter._saveHasManyRelationship(store, relationship, serializedRecord[key] ,recordRef);
                 savedRelationships.push(save);
                 // Remove the relationship from the serializedRecord
                 delete serializedRecord[key];
@@ -270,17 +272,15 @@
             default:
               break;
           }
-          // Save the record once all the relationships have saved
-          return Ember.RSVP.allSettled(savedRelationships).then(function() {
-            return new Ember.RSVP.Promise(function(resolve, reject) {
-              recordRef.update(serializedRecord, function(error) {
-                if (error) {
-                  reject(error);
-                } else {
-                  resolve();
-                }
-              });
-            });
+        });
+        // Save the record once all the relationships have saved
+        Ember.RSVP.allSettled(savedRelationships).then(function() {
+          recordRef.update(serializedRecord, function(error) {
+            if (error) {
+              reject(error);
+            } else {
+              resolve();
+            }
           });
         });
       }, 'DS: FirebaseAdapter#updateRecord %@ to %@'.fmt(type, recordRef.toString()));
@@ -288,15 +288,17 @@
 
     // Called by the store when a record is deleted.
     deleteRecord: function(store, type, record) {
-      var _this = this;
+      console.log('deleteRecord');
+      var adapter = this;
       var ref = this._getRef(type, record.id);
+      console.log(ref.toString());
 
       return new Ember.RSVP.Promise(function(resolve, reject) {
         ref.remove(function(err) {
           if (err) {
-            _this._queuePush(reject, [err]);
+            adapter._enqueue(reject, [err]);
           } else {
-            _this._queuePush(resolve);
+            adapter._enqueue(resolve);
           }
         });
       }, 'DS: FirebaseAdapter#deleteRecord ' + type + ' to ' + ref.toString());
@@ -344,32 +346,25 @@
       _queueScheduleFlush
     */
     _queueScheduleFlush: function() {
-      var _this = this;
-      setTimeout(function() {
-        _this._queueFlush();
-      }, 50);
+      Ember.run.later(this, this._queueFlush, 50);
     },
 
     /**
       _queueFlush
     */
     _queueFlush: function() {
-      var _this = this;
-      Ember.run(function() {
-        console.log('FLUSH');
-        _this._queue.forEach(function(queueItem) {
-          var fn = queueItem[0];
-          var args = queueItem[1];
-          fn.apply(null, args);
-        });
-        _this._queue = [];
+      this._queue.forEach(function(queueItem) {
+        var fn = queueItem[0];
+        var args = queueItem[1];
+        fn.apply(null, args);
       });
+      this._queue.length = 0;
     },
 
     /**
-      _queuePush
+      _enqueue
     */
-    _queuePush: function(callback, args) {
+    _enqueue: function(callback, args) {
       var length = this._queue.push([callback, args]);
       if (length === 1) {
         this._queueScheduleFlush();
@@ -453,7 +448,7 @@
       if (obj !== null && typeof obj === 'object') {
         obj.id = snapshot.name();
       }
-      this._queuePush(function() {
+      this._enqueue(function() {
         store.push(type, serializer.extractSingle(store, type, obj));
       });
     },
