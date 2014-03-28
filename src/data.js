@@ -6,6 +6,8 @@
     return;
   }
 
+  var Promise = Ember.RSVP.Promise;
+
   /**
     The Firebase serializer helps normalize relationships and can be extended on
     a per model basis.
@@ -133,7 +135,7 @@
       var ref = this._getRef(type, id);
       var serializer = store.serializerFor(type);
 
-      return new Ember.RSVP.Promise(function(resolve, reject) {
+      return new Promise(function(resolve, reject) {
         ref.on('value', function(snapshot) {
           var obj = snapshot.val();
           // Set id to the snapshot name
@@ -188,7 +190,7 @@
       var ref = this._getRef(type);
       var serializer = store.serializerFor(type);
 
-      return new Ember.RSVP.Promise(function(resolve, reject) {
+      return new Promise(function(resolve, reject) {
         var _handleError = function(err) {
           if (!resolved) {
             resolved = true;
@@ -257,7 +259,7 @@
       });
       var recordRef = this._getRef(type, record.id);
 
-      return new Ember.RSVP.Promise(function(resolve, reject) {
+      return new Promise(function(resolve, reject) {
         var savedRelationships = [];
         record.eachRelationship(function(key, relationship) {
           switch (relationship.kind) {
@@ -288,12 +290,10 @@
 
     // Called by the store when a record is deleted.
     deleteRecord: function(store, type, record) {
-      console.log('deleteRecord');
       var adapter = this;
       var ref = this._getRef(type, record.id);
-      console.log(ref.toString());
 
-      return new Ember.RSVP.Promise(function(resolve, reject) {
+      return new Promise(function(resolve, reject) {
         ref.remove(function(err) {
           if (err) {
             adapter._enqueue(reject, [err]);
@@ -405,7 +405,7 @@
       var ref = this._getRelationshipRef(parentRef, relationship.key, id);
       // Get the local version of the related record
       var relatedRecord = store.hasRecordForId(relationship.type, id) ? store.getById(relationship.type, id) : false;
-      return new Ember.RSVP.Promise(function(resolve, reject) {
+      return new Promise(function(resolve, reject) {
         var isEmbedded = relationship.options.embedded === true;
         var isDirty = relatedRecord ? relatedRecord.get('isDirty') : false;
         var valueToSave = isEmbedded ? relatedRecord.serialize({ includeId: false }) : true;
