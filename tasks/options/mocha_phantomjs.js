@@ -1,7 +1,7 @@
 module.exports = {
   phantom: {
     options: {
-      urls: ['test-mocha/index.html']
+      urls: ['test/index.html']
     }
   }
 };

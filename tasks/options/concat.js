@@ -2,7 +2,7 @@ module.exports = {
   test: {
     src: [
       'vendor/loader.js',
-      'test-mocha/tests/**/*.js'
+      'test/tests/**/*.js'
     ],
     dest: 'tmp/tests.js'
   },
