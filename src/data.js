@@ -116,9 +116,20 @@
       this._queue = [];
     },
 
-    // Uses push() to generate chronologically ordered unique IDs.
+    /**
+      Uses push() to generate chronologically ordered unique IDs.
+    */
     generateIdForRecord: function() {
       return this._ref.push().name();
+    },
+
+    /**
+      _assignIdToPayload
+    */
+    _assignIdToPayload: function(snapshot, payload) {
+      if (payload !== null && typeof payload === 'object') {
+        payload.id = snapshot.name();
+      }
     },
 
     /**
@@ -137,23 +148,22 @@
 
       return new Promise(function(resolve, reject) {
         ref.on('value', function(snapshot) {
-          var obj = snapshot.val();
-          // Set id to the snapshot name
-          if (obj !== null && typeof obj === 'object') {
-            obj.id = snapshot.name();
-          }
+          var payload = snapshot.val();
+          adapter._assignIdToPayload(snapshot, payload);
+
           if (!resolved) {
             resolved = true;
             // If this is the first event, resolve the promise.
-            if (obj === null) {
+            if (payload === null) {
               adapter._enqueue(reject);
             }
             else {
-              adapter._enqueue(resolve, [obj]);
+              adapter._enqueue(resolve, [payload]);
             }
-          } else {
+          }
+          else {
             // If the snapshot is null, delete the record from the store
-            if (obj === null && store.hasRecordForId(type, snapshot.name())) {
+            if (payload === null && store.hasRecordForId(type, snapshot.name())) {
               adapter._enqueue(function() {
                 store.getById(type, snapshot.name()).destroyRecord();
               });
@@ -161,7 +171,7 @@
             // Otherwise push it into the store
             else {
               adapter._enqueue(function() {
-                store.push(type, serializer.extractSingle(store, type, obj));
+                store.push(type, serializer.extractSingle(store, type, payload));
               });
             }
           }
@@ -186,53 +196,78 @@
     */
     findAll: function(store, type) {
       var adapter = this;
-      var resolved = false;
+      var ref = this._getRef(type);
+
+      return new Promise(function(resolve, reject) {
+        ref.once('value', function(snapshot) {
+          if (snapshot.val() === null) {
+            adapter._enqueue(reject);
+          }
+          else {
+            var results = [];
+            snapshot.forEach(function(childSnapshot) {
+              var payload = childSnapshot.val();
+              adapter._assignIdToPayload(childSnapshot, payload);
+              results.push(payload);
+            });
+            adapter._enqueue(resolve, [results]);
+            // Listen for child events on the type
+            adapter._findAllAddEventListeners(store, type);
+          }
+        });
+      }, 'DS: FirebaseAdapter#findAll %@ to %@'.fmt(type, ref.toString()));
+    },
+
+    /**
+      Keep track of what types `.findAll()` has been called for
+      so duplicate listeners aren't added
+    */
+    _findAllMapForType: undefined,
+
+    /**
+      _findAllAddEventListeners
+    */
+    _findAllAddEventListeners: function(store, type) {
+      var hasEvents = !Ember.isNone(this._findAllMapForType[type]);
+
+      if (hasEvents) {
+        return;
+      }
+      else {
+        this._findAllMapForType[type] = true;
+      }
+
+      var adapter = this;
       var ref = this._getRef(type);
       var serializer = store.serializerFor(type);
 
-      return new Promise(function(resolve, reject) {
-        var _handleError = function(err) {
-          if (!resolved) {
-            resolved = true;
-            adapter._enqueue(reject, [err]);
-          }
-        };
+      ref.on('child_added', function(snapshot) {
+        adapter._handleChildValue(store, type, serializer, snapshot);
+      });
 
-        var _addListeners = function() {
-          // See if events have been added to the type
-          var hasEvents = !Ember.isNone(adapter._findAllMapForType[type]);
-          if (hasEvents) { return; }
-          adapter._findAllMapForType[type] = true;
-          // Add Firebase listeners
-          ref.on('child_added', function(snapshot) {
-            adapter._handleChildValue(store, type, serializer, snapshot);
-          }, _handleError);
-          ref.on('child_changed', function(snapshot) {
-            adapter._handleChildValue(store, type, serializer, snapshot);
-          }, _handleError);
-          ref.on('child_removed', function(snapshot) {
-            if (store.hasRecordForId(type, snapshot.name())) {
-              this._enqueue(function() {
-                store.deleteRecord(store.getById(type, snapshot.name()));
-              });
-            }
-          }, _handleError);
-        };
+      ref.on('child_changed', function(snapshot) {
+        adapter._handleChildValue(store, type, serializer, snapshot);
+      });
 
-        ref.once('value', function(snapshot) {
-          resolved = true;
-          var results = [];
-          snapshot.forEach(function(childSnapshot) {
-            var obj = childSnapshot.val();
-            if (obj !== null && typeof obj === 'object') {
-              obj.id = childSnapshot.name();
-            }
-            results.push(obj);
+      ref.on('child_removed', function(snapshot) {
+        if (store.hasRecordForId(type, snapshot.name())) {
+          this._enqueue(function() {
+            store.deleteRecord(store.getById(type, snapshot.name()));
           });
-          adapter._enqueue(resolve, [results]);
-          _addListeners();
-        });
-      }, 'DS: FirebaseAdapter#findAll %@ to %@'.fmt(type, ref.toString()));
+        }
+      });
+    },
+
+    /**
+      Push a new child record into the store
+    */
+    _handleChildValue: function(store, type, serializer, snapshot) {
+      var payload = snapshot.val();
+      this._assignIdToPayload(snapshot, payload);
+
+      this._enqueue(function() {
+        store.push(type, serializer.extractSingle(store, type, payload));
+      });
     },
 
     /**
@@ -286,89 +321,6 @@
           });
         });
       }, 'DS: FirebaseAdapter#updateRecord %@ to %@'.fmt(type, recordRef.toString()));
-    },
-
-    // Called by the store when a record is deleted.
-    deleteRecord: function(store, type, record) {
-      var adapter = this;
-      var ref = this._getRef(type, record.id);
-
-      return new Promise(function(resolve, reject) {
-        ref.remove(function(err) {
-          if (err) {
-            adapter._enqueue(reject, [err]);
-          } else {
-            adapter._enqueue(resolve);
-          }
-        });
-      }, 'DS: FirebaseAdapter#deleteRecord ' + type + ' to ' + ref.toString());
-    },
-
-    /**
-      Determines a path fo a given type
-    */
-    pathForType: function(type) {
-      var camelized = Ember.String.camelize(type);
-      return Ember.String.pluralize(camelized);
-    },
-
-    /**
-      Returns a Firebase reference for a given type and optional ID.
-
-      By default, it pluralizes the type's name ('post' becomes 'posts'). To
-      override the pluralization, see [pathForType](#method_pathForType).
-
-      @method _getRef
-      @private
-      @param {String} type
-      @param {String} id
-      @returns {Firebase} ref
-    */
-    _getRef: function(type, id) {
-      var ref = this._ref;
-      if (type) {
-        ref = ref.child(this.pathForType(type.typeKey));
-      }
-      if (id) {
-        ref = ref.child(id);
-      }
-      return ref;
-    },
-
-    /**
-      Return a Firebase ref based on a relationship key and record id
-    */
-    _getRelationshipRef: function(ref, key, id) {
-      return ref.child(key).child(id);
-    },
-
-    /**
-      _queueScheduleFlush
-    */
-    _queueScheduleFlush: function() {
-      Ember.run.later(this, this._queueFlush, 50);
-    },
-
-    /**
-      _queueFlush
-    */
-    _queueFlush: function() {
-      this._queue.forEach(function(queueItem) {
-        var fn = queueItem[0];
-        var args = queueItem[1];
-        fn.apply(null, args);
-      });
-      this._queue.length = 0;
-    },
-
-    /**
-      _enqueue
-    */
-    _enqueue: function(callback, args) {
-      var length = this._queue.push([callback, args]);
-      if (length === 1) {
-        this._queueScheduleFlush();
-      }
     },
 
     /**
@@ -432,31 +384,85 @@
     },
 
     /**
-      Push a new child record into the store
-
-      @method _handleChildValue
-      @private
-      @param {Object} store
-      @param {Object} type
-      @param {Object} serializer
-      @param {Object} snapshot
+      Called by the store when a record is deleted.
     */
-    _handleChildValue: function(store, type, serializer, snapshot) {
-      var obj = snapshot.val();
-      // Only add an id if the item is an object
-      if (obj !== null && typeof obj === 'object') {
-        obj.id = snapshot.name();
-      }
-      this._enqueue(function() {
-        store.push(type, serializer.extractSingle(store, type, obj));
-      });
+    deleteRecord: function(store, type, record) {
+      var adapter = this;
+      var ref = this._getRef(type, record.id);
+
+      return new Promise(function(resolve, reject) {
+        ref.remove(function(err) {
+          if (err) {
+            adapter._enqueue(reject, [err]);
+          } else {
+            adapter._enqueue(resolve);
+          }
+        });
+      }, 'DS: FirebaseAdapter#deleteRecord ' + type + ' to ' + ref.toString());
     },
 
     /**
-      Keep track of what types `.findAll()` has been called for
-      so duplicate listeners aren't added
+      Determines a path fo a given type
     */
-    _findAllMapForType: undefined
+    pathForType: function(type) {
+      var camelized = Ember.String.camelize(type);
+      return Ember.String.pluralize(camelized);
+    },
+
+    /**
+      Return a Firebase reference for a given type and optional ID.
+    */
+    _getRef: function(type, id) {
+      var ref = this._ref;
+      if (type) {
+        ref = ref.child(this.pathForType(type.typeKey));
+      }
+      if (id) {
+        ref = ref.child(id);
+      }
+      return ref;
+    },
+
+    /**
+      Return a Firebase reference based on a relationship key and record id
+    */
+    _getRelationshipRef: function(ref, key, id) {
+      return ref.child(key).child(id);
+    },
+
+    /**
+      _queueFlushDelay
+    */
+    _queueFlushDelay: 50,
+
+    /**
+      _queueScheduleFlush
+    */
+    _queueScheduleFlush: function() {
+      Ember.run.later(this, this._queueFlush, this._queueFlushDelay);
+    },
+
+    /**
+      _queueFlush
+    */
+    _queueFlush: function() {
+      this._queue.forEach(function(queueItem) {
+        var fn = queueItem[0];
+        var args = queueItem[1];
+        fn.apply(null, args);
+      });
+      this._queue.length = 0;
+    },
+
+    /**
+      _enqueue
+    */
+    _enqueue: function(callback, args) {
+      var length = this._queue.push([callback, args]);
+      if (length === 1) {
+        this._queueScheduleFlush();
+      }
+    }
 
   });
 
