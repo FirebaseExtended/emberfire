@@ -155,7 +155,7 @@
             resolved = true;
             // If this is the first event, resolve the promise.
             if (payload === null) {
-              adapter._enqueue(reject);
+              adapter._enqueue(reject, [{ message: 'no record was found at %@'.fmt(ref.toString()), recordId: id }]);
             }
             else {
               adapter._enqueue(resolve, [payload]);
@@ -182,7 +182,28 @@
             adapter._enqueue(reject, [err]);
           }
         });
-      }, 'DS: FirebaseAdapter#find ' + type + ' to ' + ref.toString());
+      }, 'DS: FirebaseAdapter#find %@ to %@'.fmt(type, ref.toString()));
+    },
+
+    /**
+     findMany
+    */
+    findMany: function(store, type, ids) {
+      var promises = ids.map(function(id) {
+        return this.find(store, type, id);
+      }, this);
+      return Ember.RSVP.allSettled(promises).then(function(promises) {
+        // Remove any records that couldn't be fetched
+        promises.filterBy('state', 'rejected').forEach(function(promise) {
+          var recordId = promise.reason.recordId;
+          if(store.hasRecordForId(type, recordId)) {
+            var record = store.getById(type, recordId);
+            record.transitionTo('loaded.created.uncommitted');
+            store.deleteRecord(record);
+          }
+        });
+        return promises.filterBy('state', 'fulfilled').mapBy('value');
+      });
     },
 
     /**
@@ -327,12 +348,18 @@
           }
         });
         // Save the record once all the relationships have saved
-        Ember.RSVP.allSettled(savedRelationships).then(function() {
+        Ember.RSVP.allSettled(savedRelationships).then(function(savedRelationships) {
+          var rejected = savedRelationships.filterBy('state', 'rejected');
+          if (rejected.get('length') !== 0) {
+            var error = new Error('Some errors were encountered while saving %@ %@'.fmt(type, record.id));
+                error.errors = rejected.mapBy('reason');
+            adapter._enqueue(reject, [error]);
+          }
           recordRef.update(serializedRecord, function(error) {
             if (error) {
-              reject(error);
+              adapter._enqueue(reject, [error]);
             } else {
-              resolve();
+              adapter._enqueue(resolve);
             }
           });
         });
@@ -357,7 +384,7 @@
           return savedRecords;
         }
         else {
-          var error = new Error('Some errors were encountered while saving %@ relationship'.fmt(relationship.type));
+          var error = new Error('Some errors were encountered while saving a hasMany relationship %@ -> %@'.fmt(relationship.parentType, relationship.type));
               error.errors = rejected.mapBy('reason');
           throw error;
         }
@@ -368,14 +395,15 @@
       _saveHasManyRelationshipRecord
     */
     _saveHasManyRelationshipRecord: function(store, relationship, parentRef, id) {
+      var adapter = this;
       // Create a reference to the related record
       var ref = this._getRelationshipRef(parentRef, relationship.key, id);
       // Get the local version of the related record
       var relatedRecord = store.hasRecordForId(relationship.type, id) ? store.getById(relationship.type, id) : false;
+      var isEmbedded = relationship.options.embedded === true;
+      var isDirty = relatedRecord ? relatedRecord.get('isDirty') : false;
+      var valueToSave = isEmbedded ? relatedRecord.serialize({ includeId: false }) : true;
       return new Promise(function(resolve, reject) {
-        var isEmbedded = relationship.options.embedded === true;
-        var isDirty = relatedRecord ? relatedRecord.get('isDirty') : false;
-        var valueToSave = isEmbedded ? relatedRecord.serialize({ includeId: false }) : true;
         // If the relationship is embedded and a record was found and the and there are changes
         // If the relationship is embedded and a related record was found and its dirty or there is no related record
         if ((isEmbedded && relatedRecord && isDirty) || (!isEmbedded && ((relatedRecord && isDirty) || !relatedRecord))) {
@@ -384,9 +412,9 @@
               if (typeof error === 'object') {
                 error.location = ref.toString();
               }
-              reject(error);
+              adapter._enqueue(reject, [error]);
             } else {
-              resolve();
+              adapter._enqueue(resolve);
             }
           };
           if (isEmbedded) {
