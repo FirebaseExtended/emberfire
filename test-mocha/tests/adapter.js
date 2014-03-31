@@ -141,4 +141,80 @@ describe("FirebaseAdapter", function() {
 
   });
 
+  describe("#findAll()", function() {
+
+    var getRefSpy, findAllAddEventListenersSpy, handleChildValueSpy, findAll, findAllRef;
+
+    before(function(done) {
+      getRefSpy = sinon.spy(adapter, "_getRef");
+      findAllAddEventListenersSpy = sinon.spy(adapter, "_findAllAddEventListeners");
+      handleChildValueSpy = sinon.spy(adapter, "_handleChildValue");
+      Ember.run(function() {
+        findAll = adapter.findAll(store, store.modelFor("post"));
+        findAllRef = getRefSpy.getCall(0).returnValue;
+        done();
+      });
+    });
+
+    it("creates a single Firebase reference", function() {
+      assert(getRefSpy.calledOnce);
+    });
+
+    it("creates the correct Firebase reference", function() {
+      assert.equal(findAllRef.toString(), "Mock://blogs/denormalized/posts");
+    });
+
+    it("returns an object", function() {
+      assert.equal(typeof findAll, "object");
+    });
+
+    it("returns a promise", function() {
+      assert.equal(typeof findAll.then, "function");
+    });
+
+    it("resolves with the correct payload", function(done) {
+      Ember.run(function() {
+        findAll.then(function(payload) {
+          assert(Ember.isArray(payload));
+          assert.equal(payload.length, 2);
+          done();
+        });
+      });
+    });
+
+    it("adds the correct event listeners", function() {
+      assert.equal(findAllRef._events.child_added.length, 1, "child_added event was added");
+      assert.equal(findAllRef._events.child_removed.length, 1, "child_removed event was added");
+      assert.equal(findAllRef._events.child_changed.length, 1, "child_changed event was added");
+    });
+
+    it("only adds event listeners once per type", function(done) {
+      adapter.findAll(store, store.modelFor("post")).then(function() {
+        assert.equal(findAllAddEventListenersSpy.callCount, 1);
+        done();
+      });
+    });
+
+    it("adds new child values to the store", function(done) {
+        findAllRef._trigger('child_added', {
+          "published": 1395162147646,
+          "user": "aputinski",
+          "body": "This is the third FireBlog post!",
+          "title": "Post 3"
+        }, findAllRef.child('post_3'));
+        Ember.run.later(this, function() {
+          assert(store.hasRecordForId('post', 'post_3'));
+          done();
+        }, adapter._queueFlushDelay * 2);
+    });
+
+    after(function() {
+      delete findAllRef.data["post_3"];
+      getRefSpy.restore();
+      findAllAddEventListenersSpy.restore();
+      handleChildValueSpy.restore();
+    });
+
+  });
+
 });
