@@ -199,7 +199,15 @@
       var ref = this._getRef(type);
 
       return new Promise(function(resolve, reject) {
+        // Listen for child events on the type
+        var valueEventTriggered;
+        if (!adapter._findAllHasEventsForType(type)) {
+          valueEventTriggered = adapter._findAllAddEventListeners(store, type, ref);
+        }
         ref.once('value', function(snapshot) {
+          if (valueEventTriggered) {
+            Ember.run(null, valueEventTriggered.resolve);
+          }
           if (snapshot.val() === null) {
             adapter._enqueue(reject);
           }
@@ -211,8 +219,6 @@
               results.push(payload);
             });
             adapter._enqueue(resolve, [results]);
-            // Listen for child events on the type
-            adapter._findAllAddEventListeners(store, type);
           }
         });
       }, 'DS: FirebaseAdapter#findAll %@ to %@'.fmt(type, ref.toString()));
@@ -225,37 +231,47 @@
     _findAllMapForType: undefined,
 
     /**
+      _findAllHasEventsForType
+    */
+    _findAllHasEventsForType: function(type) {
+      return !Ember.isNone(this._findAllMapForType[type]);
+    },
+
+    /**
       _findAllAddEventListeners
     */
-    _findAllAddEventListeners: function(store, type) {
-      var hasEvents = !Ember.isNone(this._findAllMapForType[type]);
+    _findAllAddEventListeners: function(store, type, ref) {
+      this._findAllMapForType[type] = true;
 
-      if (hasEvents) {
-        return;
-      }
-      else {
-        this._findAllMapForType[type] = true;
-      }
-
+      var deferred = Ember.RSVP.defer();
       var adapter = this;
-      var ref = this._getRef(type);
       var serializer = store.serializerFor(type);
+      var valueEventTriggered = false;
+
+      deferred.promise.then(function() {
+        valueEventTriggered = true;
+      });
 
       ref.on('child_added', function(snapshot) {
+        if (!valueEventTriggered) { return; }
         adapter._handleChildValue(store, type, serializer, snapshot);
       });
 
       ref.on('child_changed', function(snapshot) {
+        if (!valueEventTriggered) { return; }
         adapter._handleChildValue(store, type, serializer, snapshot);
       });
 
       ref.on('child_removed', function(snapshot) {
+        if (!valueEventTriggered) { return; }
         if (store.hasRecordForId(type, snapshot.name())) {
           this._enqueue(function() {
             store.deleteRecord(store.getById(type, snapshot.name()));
           });
         }
       });
+
+      return deferred;
     },
 
     /**
