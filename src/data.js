@@ -465,6 +465,7 @@
       name: 'firebase',
       after: 'store',
       initialize: function(container, application) {
+        application.register('adapter:-firebase', DS.FirebaseAdapter);
         application.register('serializer:-firebase', DS.FirebaseSerializer);
       }
     });
