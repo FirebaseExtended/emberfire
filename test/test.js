@@ -216,41 +216,46 @@ module("FirebaseAdapter", {
     expect(14);
     var refSpy = sinon.spy(adapter, "_getRef");
     var handleChildValueSpy = sinon.spy(adapter, "_handleChildValue");
-    var findAll = adapter.findAll(store, store.modelFor("post"));
+    var findAll;
+    Ember.run(function() {
+      findAll = adapter.findAll(store, store.modelFor("post"));
+    });
     var refCall = refSpy.getCall(0);
     var findAllRef = refCall.returnValue;
     // TEST
     ok(refSpy.calledOnce, "it creates a single Firebase ref");
     strictEqual(findAllRef.toString(), "Mock://blogs/denormalized/posts", "it created the correct ref was created");
-    strictEqual(findAllRef._events.child_added.length, 1, "child_added event was added");
-    strictEqual(findAllRef._events.child_removed.length, 1, "child_removed event was added");
-    strictEqual(findAllRef._events.child_changed.length, 1, "child_changed event was added");
     strictEqual(typeof findAll, "object", "it returned a object");
     strictEqual(typeof findAll.then, "function", "it returned returned a promise");
     findAll.then(function(payload) {
       ok(Ember.isArray(payload), "it resolved with an array");
       strictEqual(payload.get("length"), 2, "the payload contains the correct number of items");
+      strictEqual(findAllRef._events.child_added.length, 1, "child_added event was added");
+      strictEqual(findAllRef._events.child_removed.length, 1, "child_removed event was added");
+      strictEqual(findAllRef._events.child_changed.length, 1, "child_changed event was added");
     });
-    adapter.findAll(store, store.modelFor("post")).then(function(payload) {
-      ok(Ember.isArray(payload), "it made resolved with an array");
-      strictEqual(findAllRef._events.child_added.length, 1, "additional events were NOT added");
-      strictEqual(findAllRef._events.child_removed.length, 1, "additional events were NOT added");
-      strictEqual(findAllRef._events.child_changed.length, 1, "additional events were NOT added");
-      // Add a new post
-      findAllRef.flushDelay = false;
-      findAllRef.child("post_3").set({
-        "published": 1395162147646,
-        "user": "aputinski",
-        "body": "This is the first FireBlog post!",
-        "title": "Post 3"
+    Ember.run(function() {
+      adapter.findAll(store, store.modelFor("post")).then(function(payload) {
+        ok(Ember.isArray(payload), "it made resolved with an array");
+        strictEqual(findAllRef._events.child_added.length, 1, "additional events were NOT added");
+        strictEqual(findAllRef._events.child_removed.length, 1, "additional events were NOT added");
+        strictEqual(findAllRef._events.child_changed.length, 1, "additional events were NOT added");
+        // Add a new post
+        findAllRef.flushDelay = false;
+        findAllRef.child("post_3").set({
+          "published": 1395162147646,
+          "user": "aputinski",
+          "body": "This is the first FireBlog post!",
+          "title": "Post 3"
+        });
+        findAllRef.flush();
+        findAllRef.flushDelay = 200;
+        strictEqual(handleChildValueSpy.callCount, 1, "it added a new child to he store");
+        // START
+        start();
+        refSpy.restore();
+        handleChildValueSpy.restore();
       });
-      findAllRef.flush();
-      findAllRef.flushDelay = 200;
-      strictEqual(handleChildValueSpy.callCount, 1, "it added a new child to he store");
-      // START
-      start();
-      refSpy.restore();
-      handleChildValueSpy.restore();
     });
   });
 
