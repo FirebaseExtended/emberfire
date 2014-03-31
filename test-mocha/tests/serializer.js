@@ -13,7 +13,7 @@ describe("FirebaseSerializer", function() {
     App.reset();
   });
 
-  describe("#normalize", function() {
+  describe("#normalize()", function() {
 
     describe("denormalized payload", function() {
 
@@ -85,7 +85,7 @@ describe("FirebaseSerializer", function() {
 
   });
 
-  describe("#extractSingle", function() {
+  describe("#extractSingle()", function() {
 
     describe("denormalized payload", function() {
 
@@ -155,7 +155,7 @@ describe("FirebaseSerializer", function() {
   });
 
 
-  describe("#extractArray", function() {
+  describe("#extractArray()", function() {
 
     describe("denormalized payload", function() {
 
