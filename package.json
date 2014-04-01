@@ -1,6 +1,6 @@
 {
   "name": "EmberFire",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "An officially supported Ember binding for Firebase.",
   "main": "dist/emberfire.js",
   "repository": {
