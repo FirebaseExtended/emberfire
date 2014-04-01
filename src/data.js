@@ -274,14 +274,15 @@
     _findAllMapForType: undefined,
 
     /**
-      _findAllHasEventsForType
+      Determine if the current type is already listening for children events
     */
     _findAllHasEventsForType: function(type) {
       return !Ember.isNone(this._findAllMapForType[type]);
     },
 
     /**
-      _findAllAddEventListeners
+      After `.findAll()` is called on a type, continue to listen for
+      `child_added`, `child_removed`, and `child_changed`
     */
     _findAllAddEventListeners: function(store, type, ref) {
       this._findAllMapForType[type] = true;
@@ -323,15 +324,14 @@
     */
     _handleChildValue: function(store, type, serializer, snapshot) {
       var payload = this._assignIdToPayload(snapshot);
-
       this._enqueue(function() {
         store.push(type, serializer.extractSingle(store, type, payload));
       });
     },
 
     /**
-      `createRecord` is the same as `updateRecord` because calling `ref.set()`
-      would wipe out any relationships that may have been added
+      `createRecord` is an alias for `updateRecord` because calling \
+      `ref.set()` would wipe out any existing relationships
     */
     createRecord: function(store, type, record) {
       return this.updateRecord(store, type, record);
@@ -343,8 +343,8 @@
 
       The `updateRecord` method serializes the record and performs an `update()`
       at the the Firebase location and a `.set()` at any relationship locations
-      The method will return a promise which will be resolved when the data has
-      been successfully saved to Firebase.
+      The method will return a promise which will be resolved when the data and
+      any relationships have been successfully saved to Firebase.
     */
     updateRecord: function(store, type, record) {
       var adapter = this;
@@ -371,7 +371,9 @@
         });
         // Save the record once all the relationships have saved
         Ember.RSVP.allSettled(savedRelationships).then(function(savedRelationships) {
+          savedRelationships = Ember.A(savedRelationships);
           var rejected = Ember.A(savedRelationships.filterBy('state', 'rejected'));
+          // Throw an error if any of the relationships failed to save
           if (rejected.get('length') !== 0) {
             var error = new Error(fmt('Some errors were encountered while saving %@ %@', [type, record.id]));
                 error.errors = rejected.mapBy('reason');
@@ -385,11 +387,12 @@
             }
           });
         });
-      }, fmt('DS: FirebaseAdapter#updateRecord %@ to %@', type, recordRef.toString()));
+      }, fmt('DS: FirebaseAdapter#updateRecord %@ to %@', [type, recordRef.toString()]));
     },
 
     /**
-      _saveHasManyRelationship
+      Call _saveHasManyRelationshipRecord on each record in the relationship
+      and then resolve once they have all settled
     */
     _saveHasManyRelationship: function(store, relationship, ids, parentRef) {
       if (!Ember.isArray(ids)) {
@@ -414,7 +417,12 @@
     },
 
     /**
-      _saveHasManyRelationshipRecord
+      If the relationship is `async: true`, create a child ref
+      named with the record id and set the value to false
+
+      If the relationship is `embedded: true`, create a child ref
+      named with the record id and update the value to the serialized
+      version of the record
     */
     _saveHasManyRelationshipRecord: function(store, relationship, parentRef, id) {
       var adapter = this;
@@ -428,6 +436,7 @@
       return new Promise(function(resolve, reject) {
         // If the relationship is embedded and a record was found and the and there are changes
         // If the relationship is embedded and a related record was found and its dirty or there is no related record
+        // TODO: use a state machine to manager these conditionals
         if ((isEmbedded && relatedRecord && isDirty) || (!isEmbedded && ((relatedRecord && isDirty) || !relatedRecord))) {
           var _saveHandler = function(error) {
             if (error) {
@@ -464,7 +473,7 @@
             adapter._enqueue(resolve);
           }
         });
-      }, 'DS: FirebaseAdapter#deleteRecord ' + type + ' to ' + ref.toString());
+      }, fmt('DS: FirebaseAdapter#deleteRecord %@ to %@', [type, ref.toString()]));
     },
 
     /**
@@ -497,19 +506,19 @@
     },
 
     /**
-      _queueFlushDelay
+      The amount of time (ms) before the _queue is flushed
     */
-    _queueFlushDelay: 50,
+    _queueFlushDelay: (1000/60), // 60fps
 
     /**
-      _queueScheduleFlush
+      Called after the first item is pushed into the _queue
     */
     _queueScheduleFlush: function() {
       Ember.run.later(this, this._queueFlush, this._queueFlushDelay);
     },
 
     /**
-      _queueFlush
+      Call each function in the _queue and the reset the _queue
     */
     _queueFlush: function() {
       forEach(this._queue, function(queueItem) {
@@ -521,7 +530,8 @@
     },
 
     /**
-      _enqueue
+      Push a new function into the _queue and then schedule a
+      flush if the item is the first to be pushed
     */
     _enqueue: function(callback, args) {
       var length = this._queue.push([callback, args]);
@@ -532,6 +542,9 @@
 
   });
 
+  /**
+    Register the serializer and adapter
+  */
   Ember.onLoad('Ember.Application', function(Application) {
     Application.initializer({
       name: 'firebase',
