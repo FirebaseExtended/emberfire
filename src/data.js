@@ -290,9 +290,10 @@
 
       ref.on('child_removed', function(snapshot) {
         if (!valueEventTriggered) { return; }
-        if (store.hasRecordForId(type, snapshot.name())) {
-          this._enqueue(function() {
-            store.deleteRecord(store.getById(type, snapshot.name()));
+        var record = store.getById(type, snapshot.name());
+        if (record && !record.get('isDeleted')) {
+          adapter._enqueue(function() {
+            store.deleteRecord(record);
           });
         }
       });
