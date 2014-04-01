@@ -115,7 +115,7 @@
       });
       ```
 
-      Requests for `App.Post` would now target `https://<my-firebase>.firebaseio.com/posts`.
+      Requests for `App.Post` now target `https://<my-firebase>.firebaseio.com/posts`.
 
       @property firebase
       @type {Firebase}
@@ -141,12 +141,18 @@
     },
 
     /**
-      _assignIdToPayload
+      Use the Firebase snapshot.name() as the record id
+
+      @param {Object} snapshot - A Firebase snapshot
+      @param {Object} payload - The payload that will be pushed into the store
+      @return {Object} payload
     */
-    _assignIdToPayload: function(snapshot, payload) {
-      if (payload !== null && typeof payload === 'object') {
+    _assignIdToPayload: function(snapshot) {
+      var payload = snapshot.val();
+      if (payload !== null && typeof payload === 'object' && typeof payload.id === 'undefined') {
         payload.id = snapshot.name();
       }
+      return payload;
     },
 
     /**
@@ -165,8 +171,7 @@
 
       return new Promise(function(resolve, reject) {
         ref.on('value', function(snapshot) {
-          var payload = snapshot.val();
-          adapter._assignIdToPayload(snapshot, payload);
+          var payload = adapter._assignIdToPayload(snapshot);
 
           if (!resolved) {
             resolved = true;
@@ -253,8 +258,7 @@
           else {
             var results = [];
             snapshot.forEach(function(childSnapshot) {
-              var payload = childSnapshot.val();
-              adapter._assignIdToPayload(childSnapshot, payload);
+              var payload = adapter._assignIdToPayload(childSnapshot);
               results.push(payload);
             });
             adapter._enqueue(resolve, [results]);
@@ -318,8 +322,7 @@
       Push a new child record into the store
     */
     _handleChildValue: function(store, type, serializer, snapshot) {
-      var payload = snapshot.val();
-      this._assignIdToPayload(snapshot, payload);
+      var payload = this._assignIdToPayload(snapshot);
 
       this._enqueue(function() {
         store.push(type, serializer.extractSingle(store, type, payload));
