@@ -1,92 +1,35 @@
-/* global module */
-
 module.exports = function(grunt) {
-  'use strict';
 
-  grunt.initConfig({
-
-    concat: {
-      dist: {
-        src: ['src/*.js'],
-        dest: 'dist/emberfire.js',
-        options: {
-          banner: "'use strict';\n",
-          process: function(src, filePath) {
-            return '\n// Source: ' + filePath + '\n' +
-              src.replace(/(^|\n)[ \t]*('use strict'|"use strict");?\s*/g, '$1');
-          }
-        }
-      }
-    },
-
-    uglify : {
-      app : {
-        files : {
-          'dist/emberfire.min.js' : ['dist/emberfire.js']
-        }
-      }
-    },
-
-    jshint : {
-      options: {
-        jshintrc: '.jshintrc',
-        ignores: ['test.js']
-      },
-      all : ['src/*.js']
-    },
-
-    watch : {
-      scripts : {
-        files : 'src/*.js',
-        tasks : ['default', 'notify:watch'],
-        options : {
-          interrupt : true
-        }
-      }
-    },
-
-    notify: {
-      watch: {
-        options: {
-          title: 'Grunt Watch',
-          message: 'Build Finished'
-        }
-      }
-    },
-
-    qunit: {
-      all: {
-        options: {
-          urls: [
-            'http://localhost:8002/test/test.html',
-          ]
-        }
-      }
-    },
-
-    connect: {
-      server: {
-        options: {
-          port: 8002,
-          base: '.',
-          keepalive: false
-        }
-      }
-    }
-
+  var config = require('load-grunt-config')(grunt, {
+    configPath: 'tasks/options',
+    init: false
   });
 
-  grunt.loadNpmTasks('grunt-contrib-concat');
-  grunt.loadNpmTasks('grunt-contrib-connect');
-  grunt.loadNpmTasks('grunt-contrib-jshint');
-  grunt.loadNpmTasks('grunt-contrib-uglify');
-  grunt.loadNpmTasks('grunt-contrib-watch');
-  grunt.loadNpmTasks('grunt-contrib-qunit');
-  grunt.loadNpmTasks('grunt-exec');
-  grunt.loadNpmTasks('grunt-notify');
+  grunt.loadTasks('tasks');
 
-  grunt.registerTask('build', ['jshint', 'concat', 'uglify']);
-  grunt.registerTask('test', ['connect', 'qunit']);
+  this.registerTask('default', ['build']);
 
-  grunt.registerTask('default', ['build', 'test']);
+  // Build a new version of the library
+  this.registerTask('build', 'Builds a distributable version of <%= cfg.name %>', [
+    'concat',
+    'jshint',
+    'uglify:dist'
+  ]);
+
+  // Run client-side tests on the command line.
+  this.registerTask('test', 'Runs tests through the command line using PhantomJS', [
+    'build',
+    'mocha_phantomjs'
+  ]);
+
+  config.env = process.env;
+  config.pkg = grunt.file.readJSON('package.json');
+
+  // Load custom tasks from NPM
+  grunt.loadNpmTasks('grunt-mocha-phantomjs');
+  grunt.loadNpmTasks('grunt-mocha-test');
+
+  // Merge config into emberConfig, overwriting existing settings
+  grunt.initConfig(config);
+
 };

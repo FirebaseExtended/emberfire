@@ -314,17 +314,25 @@
        *****************************************************/
 
       _childChanged: function(ref, data) {
-         if( !_.isObject(this.data) ) { this.data = {}; }
-         this.data[ref.name()] = _.cloneDeep(data);
-         this._trigger('child_changed', data, ref.name());
-         this._trigger('value', this.data);
+         if( !_.isObject(this.data) ) {
+          this.data = {};
+         }
+         if (this.data[ref.name()] === undefined) {
+          this.data[ref.name()] = _.cloneDeep(data);
+          this._trigger('child_added', this.data[ref.name()], this.child(ref.name()));
+         }
+         else {
+          this.data[ref.name()] = _.cloneDeep(data);
+          this._trigger('child_changed', data, this);
+         }
          this.parent && this.parent._childChanged(this, this.data);
+         this._trigger('value', this.data, this);
       },
 
       _dataChanged: function(data) {
          if( !_.isEqual(data, this.data) ) {
             this.data = _.cloneDeep(data);
-            this._trigger('value', this.data);
+            this._trigger('value', this.data, this);
             if( this.parent && _.isObject(this.parent.data) ) {
                this.parent._childChanged(this, this.data);
             }
@@ -341,11 +349,11 @@
          if( this.flushDelay !== false ) { this.flush(this.flushDelay); }
       },
 
-      _trigger: function(event, data, key) {
-         var snap = makeSnap(this, data), self = this;
+      _trigger: function(event, data, ref) {
+         var snap = makeSnap(ref, data), self = this;
          _.each(this._events[event], function(fn) {
             if(_.contains(['child_added', 'child_moved'], event)) {
-               fn(snap, getPrevChild(self.data, key));
+               fn(snap, getPrevChild(self.data, ref.name()));
             }
             else {
                //todo allow scope by changing fn to an array? for use with on() and once() which accept scope?
