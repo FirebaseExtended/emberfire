@@ -1,6 +1,6 @@
 {
   "name": "EmberFire",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "An officially supported Ember binding for Firebase.",
   "main": "dist/emberfire.js",
   "repository": {
@@ -12,6 +12,7 @@
   },
   "devDependencies": {
     "grunt": "~0.4.1",
+    "grunt-contrib-clean": "~0.5.0",
     "grunt-contrib-concat": "~0.3.0",
     "grunt-contrib-connect": "~0.7.1",
     "grunt-contrib-jshint": "~0.6.2",

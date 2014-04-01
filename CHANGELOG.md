@@ -1,5 +1,10 @@
 # EmberFire Changelog
 
+### EmberFire 1.0.3 (April 1, 2014)
+
+* Added conditional in `find()` to verify that a record can be deleted
+* Misc cleanup
+
 ### EmberFire 1.0.2 (April 1, 2014)
 
 * Added a `_queue` to batch realtime updates and decrease `Ember.run` calls
