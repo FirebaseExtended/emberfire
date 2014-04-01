@@ -172,6 +172,7 @@
       return new Promise(function(resolve, reject) {
         ref.on('value', function(snapshot) {
           var payload = adapter._assignIdToPayload(snapshot);
+          var record = store.getById(type, snapshot.name());
 
           if (!resolved) {
             resolved = true;
@@ -185,9 +186,10 @@
           }
           else {
             // If the snapshot is null, delete the record from the store
-            if (payload === null && store.hasRecordForId(type, snapshot.name())) {
+            var !record.get('isDeleted');
+            if (payload === null && record && !record.get('isDeleted')) {
               adapter._enqueue(function() {
-                store.getById(type, snapshot.name()).destroyRecord();
+                store.getById(type, snapshot.name()).deleteRecord();
               });
             }
             // Otherwise push it into the store
