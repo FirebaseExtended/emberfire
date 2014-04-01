@@ -7,13 +7,13 @@ module.exports = function(grunt) {
 
   grunt.loadTasks('tasks');
 
-  this.registerTask('default', ['build']);
+  this.registerTask('default', ['build', 'test', 'clean']);
 
   // Build a new version of the library
   this.registerTask('build', 'Builds a distributable version of <%= cfg.name %>', [
     'concat',
     'jshint',
-    'uglify:dist'
+    'uglify:dist',
   ]);
 
   // Run client-side tests on the command line.
