@@ -186,7 +186,6 @@
           }
           else {
             // If the snapshot is null, delete the record from the store
-            var !record.get('isDeleted');
             if (payload === null && record && !record.get('isDeleted')) {
               adapter._enqueue(function() {
                 store.getById(type, snapshot.name()).deleteRecord();
