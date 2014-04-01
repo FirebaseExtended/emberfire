@@ -191,16 +191,10 @@
     App.PostController = Ember.ObjectController.extend({
       actions: {
         publishComment: function(post, comment) {
-          // Save the comment
-          comment.save();
-          // Add the new comment to the post and save it
-          post.get('comments').then(function(comments) {
+          Ember.RSVP.Promise.cast(post.get('comments')).then(function(comments) {
             comments.addObject(comment);
-            // Save the post
-            post.save({foo:'bar'}).then(function() {
-              // Success
-            }, function(error) {
-              //console.log(error);
+            post.save().then(function() {}, function() {}).finally(function() {
+              comment.save();
             });
           });
         }
