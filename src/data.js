@@ -39,9 +39,15 @@
     },
 
     /**
-      extractSingle
+      Called on a records returned from `find()` and all records
+      returned from `findAll()`
+
+      This method also checkes for `embedded: true`, extracts the
+      embedded records, pushes them into the store, and then replaces
+      the records with an array of ids
     */
     extractSingle: function(store, type, payload) {
+      var adapter = store.adapterFor(type);
       var normalizedPayload = this.normalize(type, payload);
       // Check for embedded records
       type.eachRelationship(function(key, relationship) {
@@ -58,7 +64,14 @@
             records.push(record);
           }
           normalizedPayload[key] = Ember.keys(normalizedPayload[key]);
-          store.pushMany(relationship.type, records);
+          if (adapter._enqueue) {
+            adapter._enqueue(function() {
+              store.pushMany(relationship.type, records);
+            });
+          }
+          else {
+            store.pushMany(relationship.type, records);
+          }
         }
       });
       return normalizedPayload;
