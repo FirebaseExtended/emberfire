@@ -25,7 +25,7 @@ describe("FirebaseSerializer", function() {
           .on("value", function(snapshot) {
             posts = TestHelpers.getPosts(snapshot);
             normalizedPayload = serializer.normalize(store.modelFor('post'), posts[0]);
-            comments = normalizedPayload.comments;
+            comments = Ember.A(normalizedPayload.comments);
             done();
           });
       });
@@ -139,7 +139,7 @@ describe("FirebaseSerializer", function() {
 
       it("pushed the embedded records into the store", function() {
         var hasComments = function(ids) {
-          return ids.every(function(id) {
+          return Ember.A(ids).every(function(id) {
             return store.hasRecordForId(store.modelFor("comment"), id);
           });
         };

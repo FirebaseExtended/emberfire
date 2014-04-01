@@ -9,7 +9,7 @@ var TestHelpers = {
   },
 
   getModelName: function(modelName) {
-    return '%@%@'.fmt(modelName, new Date().getTime());
+    return Ember.String.fmt('%@%@', [modelName, new Date().getTime()]);
   }
 
 };

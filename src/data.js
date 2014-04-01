@@ -8,6 +8,10 @@
 
   var Promise = Ember.RSVP.Promise;
 
+  var map = Ember.EnumerableUtils.map;
+  var forEach = Ember.EnumerableUtils.forEach;
+  var fmt = Ember.String.fmt;
+
   /**
     The Firebase serializer helps normalize relationships and can be extended on
     a per model basis.
@@ -27,7 +31,7 @@
             hash[key] = Ember.keys(hash[key]);
           }
           else if (Ember.isArray(hash[key])) {
-            throw new Error('%@ relationship %@(\'%@\') must be a key/value map in Firebase. Example: { "%@": { "%@_id": true } }'.fmt(type.toString(), relationship.kind, relationship.type.typeKey, relationship.key, relationship.type.typeKey));
+            throw new Error(fmt('%@ relationship %@(\'%@\') must be a key/value map in Firebase. Example: { "%@": { "%@_id": true } }', [type.toString(), relationship.kind, relationship.type.typeKey, relationship.key, relationship.type.typeKey]));
           }
         }
       });
@@ -66,7 +70,7 @@
       will have `normalize()` called on it
     */
     extractArray: function(store, type, payload) {
-      return payload.map(function(item) {
+      return map(payload, function(item) {
         return this.extractSingle(store, type, item);
       }, this);
     }
@@ -155,7 +159,7 @@
             resolved = true;
             // If this is the first event, resolve the promise.
             if (payload === null) {
-              adapter._enqueue(reject, [{ message: 'no record was found at %@'.fmt(ref.toString()), recordId: id }]);
+              adapter._enqueue(reject, [{ message: fmt('no record was found at %@', ref.toString()), recordId: id }]);
             }
             else {
               adapter._enqueue(resolve, [payload]);
@@ -182,19 +186,20 @@
             adapter._enqueue(reject, [err]);
           }
         });
-      }, 'DS: FirebaseAdapter#find %@ to %@'.fmt(type, ref.toString()));
+      }, fmt('DS: FirebaseAdapter#find %@ to %@', [type, ref.toString()]));
     },
 
     /**
      findMany
     */
     findMany: function(store, type, ids) {
-      var promises = ids.map(function(id) {
+      var promises = map(ids, function(id) {
         return this.find(store, type, id);
       }, this);
       return Ember.RSVP.allSettled(promises).then(function(promises) {
         // Remove any records that couldn't be fetched
-        promises.filterBy('state', 'rejected').forEach(function(promise) {
+        promises = Ember.A(promises);
+        forEach(promises.filterBy('state', 'rejected'), function(promise) {
           var recordId = promise.reason.recordId;
           if(store.hasRecordForId(type, recordId)) {
             var record = store.getById(type, recordId);
@@ -202,7 +207,7 @@
             store.deleteRecord(record);
           }
         });
-        return promises.filterBy('state', 'fulfilled').mapBy('value');
+        return Ember.A(promises.filterBy('state', 'fulfilled')).mapBy('value');
       });
     },
 
@@ -242,7 +247,7 @@
             adapter._enqueue(resolve, [results]);
           }
         });
-      }, 'DS: FirebaseAdapter#findAll %@ to %@'.fmt(type, ref.toString()));
+      }, fmt('DS: FirebaseAdapter#findAll %@ to %@', [type, ref.toString()]));
     },
 
     /**
@@ -332,12 +337,12 @@
       var recordRef = this._getRef(type, record.id);
 
       return new Promise(function(resolve, reject) {
-        var savedRelationships = [];
+        var savedRelationships = Ember.A();
         record.eachRelationship(function(key, relationship) {
           switch (relationship.kind) {
             case 'hasMany':
               if (Ember.isArray(serializedRecord[key])) {
-                var save = adapter._saveHasManyRelationship(store, relationship, serializedRecord[key] ,recordRef);
+                var save = adapter._saveHasManyRelationship(store, relationship, serializedRecord[key], recordRef);
                 savedRelationships.push(save);
                 // Remove the relationship from the serializedRecord
                 delete serializedRecord[key];
@@ -349,9 +354,9 @@
         });
         // Save the record once all the relationships have saved
         Ember.RSVP.allSettled(savedRelationships).then(function(savedRelationships) {
-          var rejected = savedRelationships.filterBy('state', 'rejected');
+          var rejected = Ember.A(savedRelationships.filterBy('state', 'rejected'));
           if (rejected.get('length') !== 0) {
-            var error = new Error('Some errors were encountered while saving %@ %@'.fmt(type, record.id));
+            var error = new Error(fmt('Some errors were encountered while saving %@ %@', [type, record.id]));
                 error.errors = rejected.mapBy('reason');
             adapter._enqueue(reject, [error]);
           }
@@ -363,7 +368,7 @@
             }
           });
         });
-      }, 'DS: FirebaseAdapter#updateRecord %@ to %@'.fmt(type, recordRef.toString()));
+      }, fmt('DS: FirebaseAdapter#updateRecord %@ to %@', type, recordRef.toString()));
     },
 
     /**
@@ -374,18 +379,18 @@
         throw new Error('hasMany relationships must must be an array');
       }
       // Save each record in the relationship
-      var savedRecords = ids.map(function(id) {
+      var savedRecords = map(ids, function(id) {
         return this._saveHasManyRelationshipRecord(store, relationship, parentRef, id);
       }, this);
       // Wait for all the updates to finish
       return Ember.RSVP.allSettled(savedRecords).then(function(savedRecords) {
-        var rejected = savedRecords.filterBy('state', 'rejected');
+        var rejected = Ember.A(Ember.A(savedRecords).filterBy('state', 'rejected'));
         if (rejected.get('length') === 0) {
           return savedRecords;
         }
         else {
-          var error = new Error('Some errors were encountered while saving a hasMany relationship %@ -> %@'.fmt(relationship.parentType, relationship.type));
-              error.errors = rejected.mapBy('reason');
+          var error = new Error(fmt('Some errors were encountered while saving a hasMany relationship %@ -> %@', [relationship.parentType, relationship.type]));
+              error.errors = Ember.A(rejected).mapBy('reason');
           throw error;
         }
       });
@@ -490,7 +495,7 @@
       _queueFlush
     */
     _queueFlush: function() {
-      this._queue.forEach(function(queueItem) {
+      forEach(this._queue, function(queueItem) {
         var fn = queueItem[0];
         var args = queueItem[1];
         fn.apply(null, args);

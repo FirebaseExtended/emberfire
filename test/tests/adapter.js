@@ -227,7 +227,7 @@ describe("FirebaseAdapter", function() {
 
       before(function(done) {
         _ref = adapter._ref;
-        adapter._ref = FirebaseTestRef.child("blogs/tests/adapter/async/updaterecord");
+        adapter._ref = FirebaseTestRef.child("blogs/tests/adapter/updaterecord/async");
         getRefSpy = sinon.spy(adapter, "_getRef");
         getRelationshipRefSpy = sinon.spy(adapter, "_getRelationshipRef");
         updateRecordSpy = sinon.spy(adapter, "updateRecord");
@@ -254,12 +254,12 @@ describe("FirebaseAdapter", function() {
 
       it("created the correct Firebase reference", function() {
         assert(getRefSpy.calledOnce);
-        assert.equal(getRefSpy.getCall(0).returnValue.toString(), "Mock://blogs/tests/adapter/async/updaterecord/posts/" + newPost.id);
+        assert.equal(getRefSpy.getCall(0).returnValue.toString(), Ember.String.fmt("Mock://blogs/tests/adapter/updaterecord/async/posts/%@", [newPost.id]));
       });
 
       it("contains a hasMany relationship", function() {
         assert(Ember.isArray(serializedRecord.comments));
-        assert(serializedRecord.comments.contains(newComment.id));
+        assert(Ember.A(serializedRecord.comments).contains(newComment.id));
       });
 
       it("removed the hasMany relationship from the final payload", function() {
@@ -267,7 +267,7 @@ describe("FirebaseAdapter", function() {
       });
 
       it("created the correct relationship Firebase reference", function() {
-        assert.equal(relationshipRef.toString(), "Mock://blogs/tests/adapter/async/updaterecord/posts/" + newPost.id + "/comments/" + newComment.id);
+        assert.equal(relationshipRef.toString(), Ember.String.fmt("Mock://blogs/tests/adapter/updaterecord/async/posts/%@/comments/%@", [newPost.id, newComment.id]));
       });
 
       it("saved each related record", function() {
@@ -328,13 +328,12 @@ describe("FirebaseAdapter", function() {
 
       it("created the correct Firebase reference", function() {
         assert(getRefSpy.calledOnce);
-        console.log(getRefSpy.getCall(0).returnValue.toString());
-        assert.equal(getRefSpy.getCall(0).returnValue.toString(), "Mock://blogs/tests/adapter/updaterecord/embedded/%@s/%@".fmt(Post.toLowerCase(), newPost.id));
+        assert.equal(getRefSpy.getCall(0).returnValue.toString(), Ember.String.fmt("Mock://blogs/tests/adapter/updaterecord/embedded/%@s/%@", [Post.toLowerCase(), newPost.id]));
       });
 
       it("contains a hasMany relationship", function() {
         assert(Ember.isArray(serializedRecord.comments));
-        assert(serializedRecord.comments.contains(newComment.id));
+        assert(Ember.A(serializedRecord.comments).contains(newComment.id));
       });
 
       it("removed the hasMany relationship from the final payload", function() {
@@ -342,7 +341,7 @@ describe("FirebaseAdapter", function() {
       });
 
       it("created the correct relationship Firebase reference", function() {
-        assert.equal(relationshipRef.toString(), "Mock://blogs/tests/adapter/updaterecord/embedded/%@s/%@/comments/%@".fmt(Post.toLowerCase(), newPost.id, newComment.id));
+        assert.equal(relationshipRef.toString(), Ember.String.fmt("Mock://blogs/tests/adapter/updaterecord/embedded/%@s/%@/comments/%@", [Post.toLowerCase(), newPost.id, newComment.id]));
       });
 
       it("saved each related record", function() {
