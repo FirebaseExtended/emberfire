@@ -177,7 +177,7 @@
             resolved = true;
             // If this is the first event, resolve the promise.
             if (payload === null) {
-              adapter._enqueue(reject, [{ message: fmt('no record was found at %@', ref.toString()), recordId: id }]);
+              adapter._enqueue(reject, [{ message: fmt('no record was found at %@', [ref.toString()]), recordId: id }]);
             }
             else {
               adapter._enqueue(resolve, [payload]);
