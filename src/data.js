@@ -456,6 +456,10 @@
             ref.set(valueToSave, _saveHandler);
           }
         }
+        else {
+          // The related record didn't need to be save
+          adapter._enqueue(resolve);
+        }
       });
     },
 
