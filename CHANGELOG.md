@@ -1,5 +1,9 @@
 # EmberFire Changelog
 
+### EmberFire 1.0.4 (April 4, 2014)
+
+* _saveHasManyRelationshipRecord bug fix
+
 ### EmberFire 1.0.3 (April 1, 2014)
 
 * Added conditional in `find()` to verify that a record can be deleted
