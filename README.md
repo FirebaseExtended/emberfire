@@ -38,6 +38,57 @@ it will automatically be updated in the local data store.
 See the [Ember documentation](http://emberjs.com/guides/models/) for a full
 list of methods, including ways to create, find, delete and query records.
 
+#### Ember AppKit / CLI
+
+Include `emberfire.js` before your app is created and then create **"adapters/application.js"**
+
+```javascript
+export default DS.FirebaseAdapter.extend({
+  firebase: new Firebase('https://<my-firebase>.firebaseio.com')
+});
+```
+
+### Data Structure
+
+By default, EmberFire will try to determine the correct Firebase reference based on the model name
+
+```javascript
+// Define a Post model
+App.Post = DS.Model.extend();
+
+// Records will be fetched from to https://<my-firebase>.firebaseio.com/posts
+var posts = store.findAll('post');
+
+// The new record will be saved to https://<my-firebase>.firebaseio.com/posts/post_id
+var newPost = store.createRecord('post').save();
+```
+
+#### What if my data is named differently?
+
+If you would like to customize where a model will be fetched/saved, simply create a model-specific adapter:
+
+```javascript
+// Define a Post model
+App.Post = DS.Model.extend();
+
+// Define a Post adapter
+App.PostAdapter = App.ApplicationAdapter.extend({
+  pathForType: function(type) {
+    return 'custom-posts';
+  }
+});
+```
+
+Overriding the `pathForType` method will allow you to tell the adapter where it should fetch/save records of the specified type
+
+```javascript
+// Records will now be fetched from to https://<my-firebase>.firebaseio.com/custom-posts
+var posts = store.findAll('post');
+
+// The new record will now be saved to https://<my-firebase>.firebaseio.com/custom-posts/post_id
+var newPost = store.createRecord('post').save();
+```
+
 ### Relationships
 
 EmberFire can handle relationships in two different ways
@@ -54,28 +105,27 @@ App.Post = DS.Model.extend({
 ```
 
 In the `App.Post` example, comments will be fetched from
-`https://<my-firebase>.firebaseio.com/comments` 
+`https://<my-firebase>.firebaseio.com/comments`
 
 Here is what the data structure would look in Firebase:
 
 ```json
 {
   "posts": {
-    "-JIzst0Wbx-zjKKNtl8a": {
+    "post_id_1": {
       "comments": {
-        "-JIzsxCt35JEnay7AKY5": true
+        "comment_id_1": true
       }
     }
   },
+
   "comments": {
-    "-JIzsxCt35JEnay7AKY5": {
+    "comment_id_1": {
       "body": "This is a comment"
     }
   }
 }
 ```
-
-*\*The IDs used in the example are arbitrary*
 
 #### Embedded
 
@@ -96,9 +146,9 @@ Here is what the data structure would look like in Firebase:
 ```json
 {
   "posts": {
-    "-JIzst0Wbx-zjKKNtl8a": {
+    "post_id_1": {
       "comments": {
-        "-JIzsxCt35JEnay7AKY5": {
+        "comment_id_1": {
           "body": "This is a comment"
         }
       }
@@ -107,12 +157,11 @@ Here is what the data structure would look like in Firebase:
 }
 ```
 
-**NOTE**: When a modal has embedded relationships, the related model
-can't be saved on it's own.
+**NOTE**: When a modal has embedded relationships, the related model should not be saved on its own.
 
 ```js
 var comment = store.createRecords('comment');
-// This won't work because the adapter doesn't know
+// This WILL NOT save the comment inside of the post because the adapter doesn't know
 // where to save the comment without the context of the post
 comment.save();
 ```
@@ -123,7 +172,7 @@ and then the post can be saved
 ```js
 // Add the new comment to the post and save it
 post.get('comments').addObject(comment);
-// Saving the post will then save the embedded comments
+// Saving the post will save the embedded comments
 post.save()
 ```
 
@@ -134,13 +183,10 @@ If you would like to build EmberFire from the source, use grunt to build and lin
 ```bash
 # Install Grunt and development dependencies
 npm install
-
-# Default task - validates with jshint and minifies source
+# Default task - validates with jshint, minifies source, and runs tests
 grunt
-
 # Watch for changes and run unit test after each change
 grunt watch
-
 # Minify source
 grunt build
 ```
