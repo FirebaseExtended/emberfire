@@ -21,6 +21,8 @@
     "examples/",
     "node_modules",
     "src/",
-    "test/"
+    "test/",
+    "tasks/",
+    "CHANGELOG.md"
   ]
 }
