@@ -6,6 +6,8 @@ EmberFire is an officially supported adapter for using
 
 The `DS.FirebaseAdapter` provides all of the standard `DS.Adapter` methods and will automatically synchronize the store with Firebase.
 
+If you would like to use Firebase without Ember Data, we recommend this third-party binding: [ember-firebase](https://github.com/mjijackson/ember-firebase).
+
 **Join the [Firebase + Ember Google Group](https://groups.google.com/forum/#!forum/firebase-ember) to ask technical questions, share apps you've built, and chat with other developers in the community**
 
 ## Installation
