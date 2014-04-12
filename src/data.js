@@ -178,7 +178,12 @@
             resolved = true;
             // If this is the first event, resolve the promise.
             if (payload === null) {
-              adapter._enqueue(reject, [{ message: fmt('no record was found at %@', [ref.toString()]), recordId: id }]);
+              if (store.hasRecordForId(type, id)) {
+                store.dematerializeRecord(record);
+              }
+              var error = new Error(fmt('no record was found at %@', [ref.toString()]));
+                  error.recordId = id;
+              adapter._enqueue(reject, [error]);
             }
             else {
               adapter._enqueue(resolve, [payload]);
@@ -220,10 +225,9 @@
         promises = Ember.A(promises);
         forEach(promises.filterBy('state', 'rejected'), function(promise) {
           var recordId = promise.reason.recordId;
-          if(store.hasRecordForId(type, recordId)) {
+          if (store.hasRecordForId(type, recordId)) {
             var record = store.getById(type, recordId);
-            record.transitionTo('loaded.created.uncommitted');
-            store.deleteRecord(record);
+            store.dematerializeRecord(record);
           }
         });
         return Ember.A(promises.filterBy('state', 'fulfilled')).mapBy('value');
