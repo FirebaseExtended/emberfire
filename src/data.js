@@ -254,20 +254,22 @@
           valueEventTriggered = adapter._findAllAddEventListeners(store, type, ref);
         }
         ref.once('value', function(snapshot) {
+          var results = [];
           if (valueEventTriggered) {
             Ember.run(null, valueEventTriggered.resolve);
           }
           if (snapshot.val() === null) {
-            adapter._enqueue(reject);
+            adapter._enqueue(resolve, [results]);
           }
           else {
-            var results = [];
             snapshot.forEach(function(childSnapshot) {
               var payload = adapter._assignIdToPayload(childSnapshot);
               results.push(payload);
             });
             adapter._enqueue(resolve, [results]);
           }
+        }, function(error) {
+          adapter._enqueue(reject, [error]);
         });
       }, fmt('DS: FirebaseAdapter#findAll %@ to %@', [type, ref.toString()]));
     },
