@@ -6,8 +6,16 @@
     return;
   }
 
-  var Promise = Ember.RSVP.Promise;
+  var EmberFire = Ember.Namespace.create({
+    VERSION: '1.0.4'
+  });
 
+  if (Ember.libraries) {
+    Ember.libraries.registerCoreLibrary('EmberFire', EmberFire.VERSION);
+  }
+
+  // Shortcuts
+  var Promise = Ember.RSVP.Promise;
   var map = Ember.EnumerableUtils.map;
   var forEach = Ember.EnumerableUtils.forEach;
   var fmt = Ember.String.fmt;
