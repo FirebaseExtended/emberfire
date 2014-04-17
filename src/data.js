@@ -131,6 +131,8 @@
       this._ref = this.firebase.ref();
       // Keep track of what types `.findAll()` has been called for
       this._findAllMapForType = {};
+      // Keep a cache to check modified relationships against
+      this._recordCacheForType = {};
       // Used to batch records into the store
       this._queue = [];
     },
@@ -175,6 +177,8 @@
         ref.on('value', function(snapshot) {
           var payload = adapter._assignIdToPayload(snapshot);
           var record = store.getById(type, snapshot.name());
+
+          adapter._updateRecordCacheForType(type, payload);
 
           if (!resolved) {
             resolved = true;
@@ -266,6 +270,7 @@
           else {
             snapshot.forEach(function(childSnapshot) {
               var payload = adapter._assignIdToPayload(childSnapshot);
+              //adapter._updateRecordCacheForType(type, payload);
               results.push(payload);
             });
             adapter._enqueue(resolve, [results]);
@@ -361,6 +366,7 @@
         includeId: false
       });
       var recordRef = this._getRef(type, record.id);
+      var recordCache = Ember.get(adapter._recordCacheForType, fmt('%@.%@', [type.typeKey, record.get('id')]));
 
       return new Promise(function(resolve, reject) {
         var savedRelationships = Ember.A();
@@ -368,7 +374,7 @@
           switch (relationship.kind) {
             case 'hasMany':
               if (Ember.isArray(serializedRecord[key])) {
-                var save = adapter._saveHasManyRelationship(store, relationship, serializedRecord[key], recordRef);
+                var save = adapter._saveHasManyRelationship(store, type, relationship, serializedRecord[key], recordRef, recordCache);
                 savedRelationships.push(save);
                 // Remove the relationship from the serializedRecord
                 delete serializedRecord[key];
@@ -403,18 +409,39 @@
       Call _saveHasManyRelationshipRecord on each record in the relationship
       and then resolve once they have all settled
     */
-    _saveHasManyRelationship: function(store, relationship, ids, parentRef) {
+    _saveHasManyRelationship: function(store, type, relationship, ids, recordRef, recordCache) {
       if (!Ember.isArray(ids)) {
         throw new Error('hasMany relationships must must be an array');
       }
-      // Save each record in the relationship
-      var savedRecords = map(ids, function(id) {
-        return this._saveHasManyRelationshipRecord(store, relationship, parentRef, id);
-      }, this);
+      var adapter = this;
+      var idsCache = Ember.A(recordCache[relationship.key]);
+          ids = Ember.A(ids);
+      // Added
+      var addedRecords = ids.filter(function(id) {
+        return !idsCache.contains(id);
+      });
+      // Dirty
+      var dirtyRecords = ids.filter(function(id) {
+        var type = relationship.type;
+        return store.hasRecordForId(type, id) && store.getById(type, id).get('isDirty') === true;
+      });
+      dirtyRecords = Ember.A(dirtyRecords.concat(addedRecords)).map(function(id) {
+        return adapter._saveHasManyRecord(store, relationship, recordRef, id);
+      });
+      // Removed
+      var removedRecords = idsCache.filter(function(id) {
+        return !ids.contains(id);
+      }).map(function(id) {
+        return adapter._removeHasManyRecord(store, relationship, recordRef, id);
+      });
+      // Combine all the saved records
+      var savedRecords = dirtyRecords.concat(removedRecords);
       // Wait for all the updates to finish
       return Ember.RSVP.allSettled(savedRecords).then(function(savedRecords) {
         var rejected = Ember.A(Ember.A(savedRecords).filterBy('state', 'rejected'));
         if (rejected.get('length') === 0) {
+          // Update the cache
+          recordCache[relationship.key] = ids;
           return savedRecords;
         }
         else {
@@ -427,47 +454,56 @@
 
     /**
       If the relationship is `async: true`, create a child ref
-      named with the record id and set the value to false
+      named with the record id and set the value to true
 
       If the relationship is `embedded: true`, create a child ref
       named with the record id and update the value to the serialized
       version of the record
     */
-    _saveHasManyRelationshipRecord: function(store, relationship, parentRef, id) {
+    _saveHasManyRecord: function(store, relationship, parentRef, id) {
       var adapter = this;
-      // Create a reference to the related record
       var ref = this._getRelationshipRef(parentRef, relationship.key, id);
-      // Get the local version of the related record
-      var relatedRecord = store.hasRecordForId(relationship.type, id) ? store.getById(relationship.type, id) : false;
+      var record = store.getById(relationship.type, id);
       var isEmbedded = relationship.options.embedded === true;
-      var isDirty = relatedRecord ? relatedRecord.get('isDirty') : false;
-      var valueToSave = isEmbedded ? relatedRecord.serialize({ includeId: false }) : true;
+      var valueToSave = isEmbedded ? record.serialize({ includeId: false }) : true;
       return new Promise(function(resolve, reject) {
-        // If the relationship is embedded and a record was found and the and there are changes
-        // If the relationship is embedded and a related record was found and its dirty or there is no related record
-        // TODO: use a state machine to manager these conditionals
-        if ((isEmbedded && relatedRecord && isDirty) || (!isEmbedded && ((relatedRecord && isDirty) || !relatedRecord))) {
-          var _saveHandler = function(error) {
-            if (error) {
-              if (typeof error === 'object') {
-                error.location = ref.toString();
-              }
-              adapter._enqueue(reject, [error]);
-            } else {
-              adapter._enqueue(resolve);
+        var _saveHandler = function(error) {
+          if (error) {
+            if (typeof error === 'object') {
+              error.location = ref.toString();
             }
-          };
-          if (isEmbedded) {
-            ref.update(valueToSave, _saveHandler);
+            adapter._enqueue(reject, [error]);
+          } else {
+            adapter._enqueue(resolve);
           }
-          else {
-            ref.set(valueToSave, _saveHandler);
-          }
+        };
+        if (isEmbedded) {
+          ref.update(valueToSave, _saveHandler);
         }
         else {
-          // The related record didn't need to be save
-          adapter._enqueue(resolve);
+          ref.set(valueToSave, _saveHandler);
         }
+      });
+    },
+
+    /**
+      Remove a relationship
+    */
+    _removeHasManyRecord: function(store, relationship, parentRef, id) {
+      var adapter = this;
+      var ref = this._getRelationshipRef(parentRef, relationship.key, id);
+      return new Promise(function(resolve, reject) {
+        var _removeHandler = function(error) {
+          if (error) {
+            if (typeof error === 'object') {
+              error.location = ref.toString();
+            }
+            adapter._enqueue(reject, [error]);
+          } else {
+            adapter._enqueue(resolve);
+          }
+        };
+        ref.remove(_removeHandler);
       });
     },
 
@@ -551,6 +587,33 @@
       if (length === 1) {
         this._queueScheduleFlush();
       }
+    },
+
+    /**
+      A cache of hasMany relationships that can be used to
+      diff when a model is saved
+    */
+
+    _recordCacheForType: undefined,
+
+    /**
+      _updateHasManyCacheForType
+    */
+
+    _updateRecordCacheForType: function(type, payload) {
+      var adapter = this;
+      var id = payload.id;
+      var cache = adapter._recordCacheForType;
+      var typeKey = type.typeKey;
+      // Only cache relationships for now
+      type.eachRelationship(function(key, relationship) {
+        if (relationship.kind === 'hasMany') {
+          var ids = payload[key];
+          cache[typeKey] = cache[typeKey] || {};
+          cache[typeKey][id] = cache[typeKey][id] || {};
+          cache[typeKey][id][key] = !Ember.isNone(ids) ? Ember.A(Ember.keys(ids)) : Ember.A();
+        }
+      });
     }
 
   });
