@@ -72,14 +72,8 @@
             records.push(record);
           }
           normalizedPayload[key] = Ember.keys(normalizedPayload[key]);
-          if (adapter._enqueue) {
-            adapter._enqueue(function() {
-              store.pushMany(relationship.type, records);
-            });
-          }
-          else {
-            store.pushMany(relationship.type, records);
-          }
+          // Push the embedded records into the store
+          store.pushMany(relationship.type, records);
         }
       });
       return normalizedPayload;
