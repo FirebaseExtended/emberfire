@@ -55,6 +55,9 @@
                 <em class="post-comment-date">{{comment.publishedDate}}</em>
               </div>
               {{markdown comment.body}}
+              <div>
+                <button {{action "removeComment" comment}}>delete comment</button>
+              </div>
             </div>
           </li>
         {{/each}}
@@ -146,7 +149,7 @@
 
   <script src="js/libs/jquery-1.10.2.js"></script>
   <script src="js/libs/handlebars-1.1.2.js"></script>
-  <script src="js/libs/ember-1.4.0.js"></script>
+  <script src="js/libs/ember-1.5.0.js"></script>
   <script src="js/libs/ember-data.js"></script>
 
   <script src="js/libs/firebase.js"></script>
