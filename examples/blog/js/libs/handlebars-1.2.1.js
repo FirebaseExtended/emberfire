@@ -1,6 +1,6 @@
 /*!
 
- handlebars v1.1.2
+ handlebars v1.2.1
 
 Copyright (C) 2011 by Yehuda Katz
 
@@ -24,6 +24,7 @@ THE SOFTWARE.
 
 @license
 */
+/* exported Handlebars */
 var Handlebars = (function() {
 // handlebars/safe-string.js
 var __module4__ = (function() {
@@ -46,6 +47,7 @@ var __module4__ = (function() {
 var __module3__ = (function(__dependency1__) {
   "use strict";
   var __exports__ = {};
+  /*jshint -W004 */
   var SafeString = __dependency1__;
 
   var escape = {
@@ -66,7 +68,7 @@ var __module3__ = (function(__dependency1__) {
 
   function extend(obj, value) {
     for(var key in value) {
-      if(value.hasOwnProperty(key)) {
+      if(Object.prototype.hasOwnProperty.call(value, key)) {
         obj[key] = value[key];
       }
     }
@@ -149,11 +151,10 @@ var __module5__ = (function() {
 var __module2__ = (function(__dependency1__, __dependency2__) {
   "use strict";
   var __exports__ = {};
-  /*globals Exception, Utils */
   var Utils = __dependency1__;
   var Exception = __dependency2__;
 
-  var VERSION = "1.1.2";
+  var VERSION = "1.2.1";
   __exports__.VERSION = VERSION;var COMPILER_REVISION = 4;
   __exports__.COMPILER_REVISION = COMPILER_REVISION;
   var REVISION_CHANGES = {
@@ -244,7 +245,7 @@ var __module2__ = (function(__dependency1__, __dependency2__) {
           for(var j = context.length; i<j; i++) {
             if (data) {
               data.index = i;
-              data.first = (i === 0)
+              data.first = (i === 0);
               data.last  = (i === (context.length-1));
             }
             ret = ret + fn(context[i], { data: data });
@@ -252,7 +253,11 @@ var __module2__ = (function(__dependency1__, __dependency2__) {
         } else {
           for(var key in context) {
             if(context.hasOwnProperty(key)) {
-              if(data) { data.key = key; }
+              if(data) { 
+                data.key = key; 
+                data.index = i;
+                data.first = (i === 0);
+              }
               ret = ret + fn(context[key], {data: data});
               i++;
             }
@@ -332,7 +337,6 @@ var __module2__ = (function(__dependency1__, __dependency2__) {
 var __module6__ = (function(__dependency1__, __dependency2__, __dependency3__) {
   "use strict";
   var __exports__ = {};
-  /*global Utils */
   var Utils = __dependency1__;
   var Exception = __dependency2__;
   var COMPILER_REVISION = __dependency3__.COMPILER_REVISION;
@@ -356,32 +360,27 @@ var __module6__ = (function(__dependency1__, __dependency2__, __dependency3__) {
     }
   }
 
-  // TODO: Remove this line and break up compilePartial
+  __exports__.checkRevision = checkRevision;// TODO: Remove this line and break up compilePartial
 
   function template(templateSpec, env) {
     if (!env) {
       throw new Error("No environment passed to template");
     }
 
-    var invokePartialWrapper;
-    if (env.compile) {
-      invokePartialWrapper = function(partial, name, context, helpers, partials, data) {
-        // TODO : Check this for all inputs and the options handling (partial flag, etc). This feels
-        // like there should be a common exec path
-        var result = invokePartial.apply(this, arguments);
-        if (result) { return result; }
+    // Note: Using env.VM references rather than local var references throughout this section to allow
+    // for external users to override these as psuedo-supported APIs.
+    var invokePartialWrapper = function(partial, name, context, helpers, partials, data) {
+      var result = env.VM.invokePartial.apply(this, arguments);
+      if (result != null) { return result; }
 
+      if (env.compile) {
         var options = { helpers: helpers, partials: partials, data: data };
         partials[name] = env.compile(partial, { data: data !== undefined }, env);
         return partials[name](context, options);
-      };
-    } else {
-      invokePartialWrapper = function(partial, name /* , context, helpers, partials, data */) {
-        var result = invokePartial.apply(this, arguments);
-        if (result) { return result; }
+      } else {
         throw new Exception("The partial " + name + " could not be compiled when running in runtime-only mode");
-      };
-    }
+      }
+    };
 
     // Just add water
     var container = {
@@ -407,8 +406,8 @@ var __module6__ = (function(__dependency1__, __dependency2__, __dependency3__) {
         }
         return ret;
       },
-      programWithDepth: programWithDepth,
-      noop: noop,
+      programWithDepth: env.VM.programWithDepth,
+      noop: env.VM.noop,
       compilerInfo: null
     };
 
@@ -430,7 +429,7 @@ var __module6__ = (function(__dependency1__, __dependency2__, __dependency3__) {
             options.data);
 
       if (!options.partial) {
-        checkRevision(container.compilerInfo);
+        env.VM.checkRevision(container.compilerInfo);
       }
 
       return result;
@@ -481,6 +480,7 @@ var __module6__ = (function(__dependency1__, __dependency2__, __dependency3__) {
 var __module1__ = (function(__dependency1__, __dependency2__, __dependency3__, __dependency4__, __dependency5__) {
   "use strict";
   var __exports__;
+  /*globals Handlebars: true */
   var base = __dependency1__;
 
   // Each of these augment the Handlebars object. No need to setup here.
@@ -517,154 +517,164 @@ var __module1__ = (function(__dependency1__, __dependency2__, __dependency3__, _
 // handlebars/compiler/ast.js
 var __module7__ = (function(__dependency1__) {
   "use strict";
-  var __exports__ = {};
+  var __exports__;
   var Exception = __dependency1__;
 
-  function ProgramNode(statements, inverseStrip, inverse) {
-    this.type = "program";
-    this.statements = statements;
-    this.strip = {};
+  var AST = {
+    ProgramNode: function(statements, inverseStrip, inverse) {
+      this.type = "program";
+      this.statements = statements;
+      this.strip = {};
 
-    if(inverse) {
-      this.inverse = new ProgramNode(inverse, inverseStrip);
-      this.strip.right = inverseStrip.left;
-    } else if (inverseStrip) {
-      this.strip.left = inverseStrip.right;
-    }
-  }
-
-  __exports__.ProgramNode = ProgramNode;function MustacheNode(rawParams, hash, open, strip) {
-    this.type = "mustache";
-    this.hash = hash;
-    this.strip = strip;
-
-    var escapeFlag = open[3] || open[2];
-    this.escaped = escapeFlag !== '{' && escapeFlag !== '&';
-
-    var id = this.id = rawParams[0];
-    var params = this.params = rawParams.slice(1);
-
-    // a mustache is an eligible helper if:
-    // * its id is simple (a single part, not `this` or `..`)
-    var eligibleHelper = this.eligibleHelper = id.isSimple;
-
-    // a mustache is definitely a helper if:
-    // * it is an eligible helper, and
-    // * it has at least one parameter or hash segment
-    this.isHelper = eligibleHelper && (params.length || hash);
-
-    // if a mustache is an eligible helper but not a definite
-    // helper, it is ambiguous, and will be resolved in a later
-    // pass or at runtime.
-  }
-
-  __exports__.MustacheNode = MustacheNode;function PartialNode(partialName, context, strip) {
-    this.type         = "partial";
-    this.partialName  = partialName;
-    this.context      = context;
-    this.strip = strip;
-  }
-
-  __exports__.PartialNode = PartialNode;function BlockNode(mustache, program, inverse, close) {
-    if(mustache.id.original !== close.path.original) {
-      throw new Exception(mustache.id.original + " doesn't match " + close.path.original);
-    }
-
-    this.type = "block";
-    this.mustache = mustache;
-    this.program  = program;
-    this.inverse  = inverse;
-
-    this.strip = {
-      left: mustache.strip.left,
-      right: close.strip.right
-    };
-
-    (program || inverse).strip.left = mustache.strip.right;
-    (inverse || program).strip.right = close.strip.left;
-
-    if (inverse && !program) {
-      this.isInverse = true;
-    }
-  }
-
-  __exports__.BlockNode = BlockNode;function ContentNode(string) {
-    this.type = "content";
-    this.string = string;
-  }
-
-  __exports__.ContentNode = ContentNode;function HashNode(pairs) {
-    this.type = "hash";
-    this.pairs = pairs;
-  }
-
-  __exports__.HashNode = HashNode;function IdNode(parts) {
-    this.type = "ID";
-
-    var original = "",
-        dig = [],
-        depth = 0;
-
-    for(var i=0,l=parts.length; i<l; i++) {
-      var part = parts[i].part;
-      original += (parts[i].separator || '') + part;
-
-      if (part === ".." || part === "." || part === "this") {
-        if (dig.length > 0) { throw new Exception("Invalid path: " + original); }
-        else if (part === "..") { depth++; }
-        else { this.isScoped = true; }
+      if(inverse) {
+        this.inverse = new AST.ProgramNode(inverse, inverseStrip);
+        this.strip.right = inverseStrip.left;
+      } else if (inverseStrip) {
+        this.strip.left = inverseStrip.right;
       }
-      else { dig.push(part); }
+    },
+
+    MustacheNode: function(rawParams, hash, open, strip) {
+      this.type = "mustache";
+      this.hash = hash;
+      this.strip = strip;
+
+      // Open may be a string parsed from the parser or a passed boolean flag
+      if (open != null && open.charAt) {
+        // Must use charAt to support IE pre-10
+        var escapeFlag = open.charAt(3) || open.charAt(2);
+        this.escaped = escapeFlag !== '{' && escapeFlag !== '&';
+      } else {
+        this.escaped = !!open;
+      }
+
+      var id = this.id = rawParams[0];
+      var params = this.params = rawParams.slice(1);
+
+      // a mustache is an eligible helper if:
+      // * its id is simple (a single part, not `this` or `..`)
+      var eligibleHelper = this.eligibleHelper = id.isSimple;
+
+      // a mustache is definitely a helper if:
+      // * it is an eligible helper, and
+      // * it has at least one parameter or hash segment
+      this.isHelper = eligibleHelper && (params.length || hash);
+
+      // if a mustache is an eligible helper but not a definite
+      // helper, it is ambiguous, and will be resolved in a later
+      // pass or at runtime.
+    },
+
+    PartialNode: function(partialName, context, strip) {
+      this.type         = "partial";
+      this.partialName  = partialName;
+      this.context      = context;
+      this.strip = strip;
+    },
+
+    BlockNode: function(mustache, program, inverse, close) {
+      if(mustache.id.original !== close.path.original) {
+        throw new Exception(mustache.id.original + " doesn't match " + close.path.original);
+      }
+
+      this.type = "block";
+      this.mustache = mustache;
+      this.program  = program;
+      this.inverse  = inverse;
+
+      this.strip = {
+        left: mustache.strip.left,
+        right: close.strip.right
+      };
+
+      (program || inverse).strip.left = mustache.strip.right;
+      (inverse || program).strip.right = close.strip.left;
+
+      if (inverse && !program) {
+        this.isInverse = true;
+      }
+    },
+
+    ContentNode: function(string) {
+      this.type = "content";
+      this.string = string;
+    },
+
+    HashNode: function(pairs) {
+      this.type = "hash";
+      this.pairs = pairs;
+    },
+
+    IdNode: function(parts) {
+      this.type = "ID";
+
+      var original = "",
+          dig = [],
+          depth = 0;
+
+      for(var i=0,l=parts.length; i<l; i++) {
+        var part = parts[i].part;
+        original += (parts[i].separator || '') + part;
+
+        if (part === ".." || part === "." || part === "this") {
+          if (dig.length > 0) { throw new Exception("Invalid path: " + original); }
+          else if (part === "..") { depth++; }
+          else { this.isScoped = true; }
+        }
+        else { dig.push(part); }
+      }
+
+      this.original = original;
+      this.parts    = dig;
+      this.string   = dig.join('.');
+      this.depth    = depth;
+
+      // an ID is simple if it only has one part, and that part is not
+      // `..` or `this`.
+      this.isSimple = parts.length === 1 && !this.isScoped && depth === 0;
+
+      this.stringModeValue = this.string;
+    },
+
+    PartialNameNode: function(name) {
+      this.type = "PARTIAL_NAME";
+      this.name = name.original;
+    },
+
+    DataNode: function(id) {
+      this.type = "DATA";
+      this.id = id;
+    },
+
+    StringNode: function(string) {
+      this.type = "STRING";
+      this.original =
+        this.string =
+        this.stringModeValue = string;
+    },
+
+    IntegerNode: function(integer) {
+      this.type = "INTEGER";
+      this.original =
+        this.integer = integer;
+      this.stringModeValue = Number(integer);
+    },
+
+    BooleanNode: function(bool) {
+      this.type = "BOOLEAN";
+      this.bool = bool;
+      this.stringModeValue = bool === "true";
+    },
+
+    CommentNode: function(comment) {
+      this.type = "comment";
+      this.comment = comment;
     }
+  };
 
-    this.original = original;
-    this.parts    = dig;
-    this.string   = dig.join('.');
-    this.depth    = depth;
-
-    // an ID is simple if it only has one part, and that part is not
-    // `..` or `this`.
-    this.isSimple = parts.length === 1 && !this.isScoped && depth === 0;
-
-    this.stringModeValue = this.string;
-  }
-
-  __exports__.IdNode = IdNode;function PartialNameNode(name) {
-    this.type = "PARTIAL_NAME";
-    this.name = name.original;
-  }
-
-  __exports__.PartialNameNode = PartialNameNode;function DataNode(id) {
-    this.type = "DATA";
-    this.id = id;
-  }
-
-  __exports__.DataNode = DataNode;function StringNode(string) {
-    this.type = "STRING";
-    this.original =
-      this.string =
-      this.stringModeValue = string;
-  }
-
-  __exports__.StringNode = StringNode;function IntegerNode(integer) {
-    this.type = "INTEGER";
-    this.original =
-      this.integer = integer;
-    this.stringModeValue = Number(integer);
-  }
-
-  __exports__.IntegerNode = IntegerNode;function BooleanNode(bool) {
-    this.type = "BOOLEAN";
-    this.bool = bool;
-    this.stringModeValue = bool === "true";
-  }
-
-  __exports__.BooleanNode = BooleanNode;function CommentNode(comment) {
-    this.type = "comment";
-    this.comment = comment;
-  }
-
-  __exports__.CommentNode = CommentNode;
+  // Must be exported as an object rather than the root of the module as the jison lexer
+  // most modify the object to operate properly.
+  __exports__ = AST;
   return __exports__;
 })(__module5__);
 
@@ -672,6 +682,7 @@ var __module7__ = (function(__dependency1__) {
 var __module9__ = (function() {
   "use strict";
   var __exports__;
+  /* jshint ignore:start */
   /* Jison generated parser */
   var handlebars = (function(){
   var parser = {trace: function trace() { },
@@ -884,8 +895,8 @@ var __module9__ = (function() {
 
   function stripFlags(open, close) {
     return {
-      left: open[2] === '~',
-      right: close[0] === '~' || close[1] === '~'
+      left: open.charAt(2) === '~',
+      right: close.charAt(0) === '~' || close.charAt(1) === '~'
     };
   }
 
@@ -1084,8 +1095,7 @@ var __module9__ = (function() {
   case 1:return 14;
   break;
   case 2:
-                                     if(yy_.yytext.slice(-1) !== "\\") this.popState();
-                                     if(yy_.yytext.slice(-1) === "\\") strip(0,1);
+                                     this.popState();
                                      return 14;
                                    
   break;
@@ -1119,7 +1129,7 @@ var __module9__ = (function() {
   break;
   case 17:return 42;
   break;
-  case 18:/*ignore whitespace*/
+  case 18:// ignore whitespace
   break;
   case 19:this.popState(); return 24;
   break;
@@ -1147,13 +1157,14 @@ var __module9__ = (function() {
   break;
   }
   };
-  lexer.rules = [/^(?:[^\x00]*?(?=(\{\{)))/,/^(?:[^\x00]+)/,/^(?:[^\x00]{2,}?(?=(\{\{|$)))/,/^(?:[\s\S]*?--\}\})/,/^(?:\{\{(~)?>)/,/^(?:\{\{(~)?#)/,/^(?:\{\{(~)?\/)/,/^(?:\{\{(~)?\^)/,/^(?:\{\{(~)?\s*else\b)/,/^(?:\{\{(~)?\{)/,/^(?:\{\{(~)?&)/,/^(?:\{\{!--)/,/^(?:\{\{![\s\S]*?\}\})/,/^(?:\{\{(~)?)/,/^(?:=)/,/^(?:\.\.)/,/^(?:\.(?=([=~}\s\/.])))/,/^(?:[\/.])/,/^(?:\s+)/,/^(?:\}(~)?\}\})/,/^(?:(~)?\}\})/,/^(?:"(\\["]|[^"])*")/,/^(?:'(\\[']|[^'])*')/,/^(?:@)/,/^(?:true(?=([~}\s])))/,/^(?:false(?=([~}\s])))/,/^(?:-?[0-9]+(?=([~}\s])))/,/^(?:([^\s!"#%-,\.\/;->@\[-\^`\{-~]+(?=([=~}\s\/.]))))/,/^(?:\[[^\]]*\])/,/^(?:.)/,/^(?:$)/];
+  lexer.rules = [/^(?:[^\x00]*?(?=(\{\{)))/,/^(?:[^\x00]+)/,/^(?:[^\x00]{2,}?(?=(\{\{|\\\{\{|\\\\\{\{|$)))/,/^(?:[\s\S]*?--\}\})/,/^(?:\{\{(~)?>)/,/^(?:\{\{(~)?#)/,/^(?:\{\{(~)?\/)/,/^(?:\{\{(~)?\^)/,/^(?:\{\{(~)?\s*else\b)/,/^(?:\{\{(~)?\{)/,/^(?:\{\{(~)?&)/,/^(?:\{\{!--)/,/^(?:\{\{![\s\S]*?\}\})/,/^(?:\{\{(~)?)/,/^(?:=)/,/^(?:\.\.)/,/^(?:\.(?=([=~}\s\/.])))/,/^(?:[\/.])/,/^(?:\s+)/,/^(?:\}(~)?\}\})/,/^(?:(~)?\}\})/,/^(?:"(\\["]|[^"])*")/,/^(?:'(\\[']|[^'])*')/,/^(?:@)/,/^(?:true(?=([~}\s])))/,/^(?:false(?=([~}\s])))/,/^(?:-?[0-9]+(?=([~}\s])))/,/^(?:([^\s!"#%-,\.\/;->@\[-\^`\{-~]+(?=([=~}\s\/.]))))/,/^(?:\[[^\]]*\])/,/^(?:.)/,/^(?:$)/];
   lexer.conditions = {"mu":{"rules":[4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30],"inclusive":false},"emu":{"rules":[2],"inclusive":false},"com":{"rules":[3],"inclusive":false},"INITIAL":{"rules":[0,1,30],"inclusive":true}};
   return lexer;})()
   parser.lexer = lexer;
   function Parser () { this.yy = {}; }Parser.prototype = parser;parser.Parser = Parser;
   return new Parser;
   })();__exports__ = handlebars;
+  /* jshint ignore:end */
   return __exports__;
 })();
 
@@ -1216,6 +1227,12 @@ var __module11__ = (function(__dependency1__) {
       } else {
         return ret;
       }
+    },
+
+    compilerInfo: function() {
+      var revision = COMPILER_REVISION,
+          versions = REVISION_CHANGES[revision];
+      return "this.compilerInfo = ["+revision+",'"+versions+"'];\n";
     },
 
     appendToBuffer: function(string) {
@@ -1351,9 +1368,7 @@ var __module11__ = (function(__dependency1__) {
       var source = this.mergeSource();
 
       if (!this.isChild) {
-        var revision = COMPILER_REVISION,
-            versions = REVISION_CHANGES[revision];
-        source = "this.compilerInfo = ["+revision+",'"+versions+"'];\n"+source;
+        source = this.compilerInfo()+source;
       }
 
       if (asObject) {
@@ -2064,7 +2079,7 @@ var __module11__ = (function(__dependency1__) {
   }
 
   JavaScriptCompiler.isValidJavaScriptVariableName = function(name) {
-    if(!JavaScriptCompiler.RESERVED_WORDS[name] && /^[a-zA-Z_$][0-9a-zA-Z_$]+$/.test(name)) {
+    if(!JavaScriptCompiler.RESERVED_WORDS[name] && /^[a-zA-Z_$][0-9a-zA-Z_$]*$/.test(name)) {
       return true;
     }
     return false;
@@ -2555,6 +2570,7 @@ var __module10__ = (function(__dependency1__, __dependency2__, __dependency3__, 
 var __module0__ = (function(__dependency1__, __dependency2__, __dependency3__, __dependency4__, __dependency5__) {
   "use strict";
   var __exports__;
+  /*globals Handlebars: true */
   var Handlebars = __dependency1__;
 
   // Compiler imports
