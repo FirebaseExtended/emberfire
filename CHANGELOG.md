@@ -1,5 +1,13 @@
 # EmberFire Changelog
 
+### EmberFire 1.0.5 (April 17, 2014)
+
+* Adding/removing objects to a `hasMany` array now persists to Firebase after `save()`
+* Better error handling
+* Registed EmberFire with Ember.libraries
+* Removed `_enqueue` in `extractSingle` to prevent race condition with embedded records
+* `find()` calls `store.dematerializeRecord()` if the record can't be found
+
 ### EmberFire 1.0.4 (April 4, 2014)
 
 * _saveHasManyRelationshipRecord bug fix
