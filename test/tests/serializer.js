@@ -15,13 +15,13 @@ describe("FirebaseSerializer", function() {
 
   describe("#normalize()", function() {
 
-    describe("denormalized payload", function() {
+    describe("normalized payload", function() {
 
       var posts, normalizedPayload, comments;
 
       before(function(done) {
         FirebaseTestRef
-          .child("blogs/denormalized/posts")
+          .child("blogs/normalized/posts")
           .on("value", function(snapshot) {
             posts = TestHelpers.getPosts(snapshot);
             normalizedPayload = serializer.normalize(store.modelFor('post'), posts[0]);
@@ -37,7 +37,7 @@ describe("FirebaseSerializer", function() {
 
     });
 
-    describe("embedded payload", function() {
+    describe("denormalized payload", function() {
 
       var Post, posts, normalizedPayload, comments;
 
@@ -47,7 +47,7 @@ describe("FirebaseSerializer", function() {
           comments: DS.hasMany("comment", { embedded: true })
         });
         FirebaseTestRef
-          .child("blogs/embedded/posts")
+          .child("blogs/normalized/posts")
           .on("value", function(snapshot) {
             posts = TestHelpers.getPosts(snapshot);
             normalizedPayload = serializer.normalize(store.modelFor(Post), posts[0]);
@@ -87,13 +87,13 @@ describe("FirebaseSerializer", function() {
 
   describe("#extractSingle()", function() {
 
-    describe("denormalized payload", function() {
+    describe("normalized payload", function() {
 
       var posts, spy, extractedArray;
 
       before(function(done) {
         FirebaseTestRef
-          .child("blogs/denormalized/posts")
+          .child("blogs/normalized/posts")
           .on("value", function(snapshot) {
             posts = TestHelpers.getPosts(snapshot);
             spy = sinon.spy(serializer, "extractSingle");
@@ -103,7 +103,7 @@ describe("FirebaseSerializer", function() {
       });
 
       it("was called for each item in the payload", function() {
-        assert.equal(spy.callCount, 2);
+        assert.equal(spy.callCount, 3);
       });
 
       after(function() {
@@ -112,7 +112,7 @@ describe("FirebaseSerializer", function() {
 
     });
 
-    describe("embedded payload", function() {
+    describe("denormalized payload", function() {
 
       var Post, posts, spy, extractedArray;
 
@@ -122,7 +122,7 @@ describe("FirebaseSerializer", function() {
           comments: DS.hasMany("comment", { embedded: true })
         });
         FirebaseTestRef
-          .child("blogs/embedded/posts")
+          .child("blogs/denormalized/posts")
           .on("value", function(snapshot) {
             posts = TestHelpers.getPosts(snapshot);
             spy = sinon.spy(serializer, "extractSingle");
@@ -157,13 +157,13 @@ describe("FirebaseSerializer", function() {
 
   describe("#extractArray()", function() {
 
-    describe("denormalized payload", function() {
+    describe("normalized payload", function() {
 
       var posts, spy, extractedArray;
 
       before(function(done) {
         FirebaseTestRef
-          .child("blogs/denormalized/posts")
+          .child("blogs/normalized/posts")
           .on("value", function(snapshot) {
             posts = TestHelpers.getPosts(snapshot);
             spy = sinon.spy(serializer, "extractArray");

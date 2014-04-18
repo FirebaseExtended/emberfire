@@ -6,7 +6,7 @@ describe("FirebaseAdapter", function() {
 
   before(function() {
     App.ApplicationAdapter = DS.FirebaseAdapter.extend({
-      firebase: FirebaseTestRef.child("blogs/denormalized")
+      firebase: FirebaseTestRef.child("blogs/normalized")
     });
     store = App.__container__.lookup("store:main");
     serializer = App.__container__.lookup("serializer:-firebase");
@@ -21,7 +21,7 @@ describe("FirebaseAdapter", function() {
 
     it("has a Firebase ref", function() {
       assert(adapter._ref !== undefined);
-      assert.equal(adapter._ref.toString(), "Mock://blogs/denormalized");
+      assert(adapter._ref.toString().match(/^https\:\/\/emberfire\-demo\.firebaseio\.com/g));
     });
 
   });
@@ -30,12 +30,12 @@ describe("FirebaseAdapter", function() {
 
     it("returns the correct Firebase ref for a type", function() {
       var ref = adapter._getRef(store.modelFor("post"));
-      assert.equal(ref.toString(), "Mock://blogs/denormalized/posts");
+      assert(ref.toString().match(/blogs\/normalized\/posts$/g));
     });
 
     it("returns the correct Firebase ref for a type and id", function() {
       var ref = adapter._getRef(store.modelFor("post"), "post_1");
-      assert.equal(ref.toString(), "Mock://blogs/denormalized/posts/post_1");
+      assert(ref.toString().match(/blogs\/normalized\/posts\/post_1$/g));
     });
 
   });
@@ -115,7 +115,7 @@ describe("FirebaseAdapter", function() {
     });
 
     it("creates the correct Firebase reference", function() {
-      assert.equal(findRef.toString(), "Mock://blogs/denormalized/posts/post_1");
+      assert(findRef.toString().match(/blogs\/normalized\/posts\/post_1$/g));
     });
 
     it("returns an object", function() {
@@ -161,7 +161,7 @@ describe("FirebaseAdapter", function() {
     });
 
     it("creates the correct Firebase reference", function() {
-      assert.equal(findAllRef.toString(), "Mock://blogs/denormalized/posts");
+      assert(findAllRef.toString().match(/blogs\/normalized\/posts$/g));
     });
 
     it("returns an object", function() {
@@ -182,7 +182,7 @@ describe("FirebaseAdapter", function() {
       });
     });
 
-    it("adds the correct event listeners", function() {
+    /*it("adds the correct event listeners", function() {
       assert.equal(findAllRef._events.child_added.length, 1, "child_added event was added");
       assert.equal(findAllRef._events.child_removed.length, 1, "child_removed event was added");
       assert.equal(findAllRef._events.child_changed.length, 1, "child_changed event was added");
@@ -193,15 +193,14 @@ describe("FirebaseAdapter", function() {
         assert.equal(findAllAddEventListenersSpy.callCount, 1);
         done();
       });
-    });
+    });*/
 
     it("adds new child values to the store", function(done) {
-        findAllRef._trigger('child_added', {
+        findAllRef.child('post_3').set({
           "published": 1395162147646,
-          "user": "aputinski",
           "body": "This is the third FireBlog post!",
           "title": "Post 3"
-        }, findAllRef.child('post_3'));
+        });
         Ember.run.later(this, function() {
           assert(store.hasRecordForId('post', 'post_3'));
           done();
@@ -209,7 +208,6 @@ describe("FirebaseAdapter", function() {
     });
 
     after(function() {
-      delete findAllRef.data["post_3"];
       getRefSpy.restore();
       findAllAddEventListenersSpy.restore();
       handleChildValueSpy.restore();
@@ -219,18 +217,21 @@ describe("FirebaseAdapter", function() {
 
   describe("#updateRecord()", function() {
 
-    describe("async relationship", function() {
+    describe("normalized relationship", function() {
 
       var _ref, newPost, newComment;
-      var getRefSpy, getRelationshipRefSpy, updateRecordSpy;
+      var updateRecordSpy, getSerializedRecordSpy, getRefSpy, getRelationshipRefSpy;
+      var saveHasManyRelationshipSpy;
       var updateRef, relationshipRef, serializedRecord, finalPayload;
 
       before(function(done) {
         _ref = adapter._ref;
-        adapter._ref = FirebaseTestRef.child("blogs/tests/adapter/updaterecord/async");
+        adapter._ref = FirebaseTestRef.child("blogs/tests/adapter/updaterecord/normalized");
+        updateRecordSpy = sinon.spy(adapter, "updateRecord");
+        getSerializedRecordSpy = sinon.spy(adapter, "_getSerializedRecord");
         getRefSpy = sinon.spy(adapter, "_getRef");
         getRelationshipRefSpy = sinon.spy(adapter, "_getRelationshipRef");
-        updateRecordSpy = sinon.spy(adapter, "updateRecord");
+        saveHasManyRelationshipSpy =sinon.spy(adapter, "_saveHasManyRelationship");
         Ember.run(function() {
           newComment = store.createRecord("comment", {
             body: "This is a new comment"
@@ -238,14 +239,13 @@ describe("FirebaseAdapter", function() {
           newPost = store.createRecord("post", {
             title: "New Post"
           });
-          newPost.get("comments").then(function(comments) {
+          Ember.RSVP.Promise.cast(newPost.get("comments")).then(function(comments) {
             comments.addObject(newComment);
-          }).then(function() {
             newPost.save().then(function() {
               updateRef = getRefSpy.getCall(0).returnValue;
               relationshipRef = getRelationshipRefSpy.getCall(0).returnValue;
               serializedRecord = updateRecordSpy.getCall(0).args[2].serialize();
-              finalPayload = updateRef.update.getCall(0).args[0];
+              finalPayload = getSerializedRecordSpy.getCall(0).returnValue;
               done();
             });
           });
@@ -253,8 +253,9 @@ describe("FirebaseAdapter", function() {
       });
 
       it("created the correct Firebase reference", function() {
+        var re = new RegExp(Ember.String.fmt("blogs/tests/adapter/updaterecord/normalized/posts/%@$", [newPost.id]), 'g');
         assert(getRefSpy.calledOnce);
-        assert.equal(getRefSpy.getCall(0).returnValue.toString(), Ember.String.fmt("Mock://blogs/tests/adapter/updaterecord/async/posts/%@", [newPost.id]));
+        assert(updateRef.toString().match(re));
       });
 
       it("contains a hasMany relationship", function() {
@@ -267,21 +268,31 @@ describe("FirebaseAdapter", function() {
       });
 
       it("created the correct relationship Firebase reference", function() {
-        assert.equal(relationshipRef.toString(), Ember.String.fmt("Mock://blogs/tests/adapter/updaterecord/async/posts/%@/comments/%@", [newPost.id, newComment.id]));
+        var re = new RegExp(Ember.String.fmt("blogs/tests/adapter/updaterecord/normalized/posts/%@/comments/%@$", [newPost.id, newComment.id]), 'g');
+        assert(relationshipRef.toString().match(re));
       });
 
-      it("saved each related record", function() {
-        assert.equal(relationshipRef.set.callCount, 1);
+      it("saved each related record", function(done) {
+        var promise = saveHasManyRelationshipSpy.getCall(0).returnValue;
+        Ember.run(function() {
+          promise.then(function(savedRecords) {
+            var fulfilled = Ember.A(Ember.A(savedRecords).filterBy('state', 'fulfilled'));
+            assert.equal(fulfilled.get('length'), 1);
+            done();
+          }, function() {});
+        });
       });
 
-      it("saved the related record by reference", function() {
+      /*it("saved the related record by reference", function() {
         assert.equal(typeof relationshipRef.set.getCall(0).args[0], "boolean");
-      });
+      });*/
 
       after(function(done) {
+        updateRecordSpy.restore();
+        getSerializedRecordSpy.restore();
         getRefSpy.restore();
         getRelationshipRefSpy.restore();
-        updateRecordSpy.restore();
+        saveHasManyRelationshipSpy.restore();
         Ember.run(function() {
           newComment.deleteRecord();
           newPost.deleteRecord();
@@ -292,10 +303,11 @@ describe("FirebaseAdapter", function() {
 
     });
 
-    describe("embedded relationship", function() {
+    describe("denormalized relationship", function() {
 
       var _ref, Post, newPost, newComment;
-      var getRefSpy, getRelationshipRefSpy, updateRecordSpy;
+      var getRefSpy, getRelationshipRefSpy, getSerializedRecordSpy, updateRecordSpy;
+      var saveHasManyRelationshipSpy;
       var updateRef, relationshipRef, serializedRecord, finalPayload;
 
       before(function(done) {
@@ -304,10 +316,12 @@ describe("FirebaseAdapter", function() {
         App[Post] = App.Post.extend({
           comments: DS.hasMany("comment", { embedded: true })
         });
-        adapter._ref = FirebaseTestRef.child("blogs/tests/adapter/updaterecord/embedded");
+        adapter._ref = FirebaseTestRef.child("blogs/tests/adapter/updaterecord/denormalized");
+        updateRecordSpy = sinon.spy(adapter, "updateRecord");
+        getSerializedRecordSpy = sinon.spy(adapter, "_getSerializedRecord");
         getRefSpy = sinon.spy(adapter, "_getRef");
         getRelationshipRefSpy = sinon.spy(adapter, "_getRelationshipRef");
-        updateRecordSpy = sinon.spy(adapter, "updateRecord");
+        saveHasManyRelationshipSpy =sinon.spy(adapter, "_saveHasManyRelationship");
         Ember.run(function() {
           newComment = store.createRecord("comment", {
             body: "This is a new comment"
@@ -320,15 +334,16 @@ describe("FirebaseAdapter", function() {
             updateRef = getRefSpy.getCall(0).returnValue;
             relationshipRef = getRelationshipRefSpy.getCall(0).returnValue;
             serializedRecord = updateRecordSpy.getCall(0).args[2].serialize();
-            finalPayload = updateRef.update.getCall(0).args[0];
+            finalPayload = getSerializedRecordSpy.getCall(0).returnValue;
             done();
           });
         });
       });
 
       it("created the correct Firebase reference", function() {
+        var re = new RegExp(Ember.String.fmt("blogs/tests/adapter/updaterecord/denormalized/%@s/%@$", [Post.toLowerCase(), newPost.id]), 'g');
         assert(getRefSpy.calledOnce);
-        assert.equal(getRefSpy.getCall(0).returnValue.toString(), Ember.String.fmt("Mock://blogs/tests/adapter/updaterecord/embedded/%@s/%@", [Post.toLowerCase(), newPost.id]));
+        assert(updateRef.toString().match(re));
       });
 
       it("contains a hasMany relationship", function() {
@@ -341,11 +356,19 @@ describe("FirebaseAdapter", function() {
       });
 
       it("created the correct relationship Firebase reference", function() {
-        assert.equal(relationshipRef.toString(), Ember.String.fmt("Mock://blogs/tests/adapter/updaterecord/embedded/%@s/%@/comments/%@", [Post.toLowerCase(), newPost.id, newComment.id]));
+        var re = new RegExp(Ember.String.fmt("blogs/tests/adapter/updaterecord/denormalized/%@s/%@/comments/%@$", [Post.toLowerCase(), newPost.id, newComment.id]), 'g');
+        assert(relationshipRef.toString().match(re));
       });
 
-      it("saved each related record", function() {
-        assert.equal(relationshipRef.update.callCount, 1);
+      it("saved each related record", function(done) {
+        var promise = saveHasManyRelationshipSpy.getCall(0).returnValue;
+        Ember.run(function() {
+          promise.then(function(savedRecords) {
+            var fulfilled = Ember.A(Ember.A(savedRecords).filterBy('state', 'fulfilled'));
+            assert.equal(fulfilled.get('length'), 1);
+            done();
+          }, function() {});
+        });
       });
 
       it("saved the related record by serialization", function() {
@@ -353,9 +376,11 @@ describe("FirebaseAdapter", function() {
       });
 
       after(function(done) {
+        updateRecordSpy.restore();
+        getSerializedRecordSpy.restore();
         getRefSpy.restore();
         getRelationshipRefSpy.restore();
-        updateRecordSpy.restore();
+        saveHasManyRelationshipSpy.restore();
         Ember.run(function() {
           newComment.deleteRecord();
           newPost.deleteRecord();

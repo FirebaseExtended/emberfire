@@ -22,7 +22,7 @@
 
   var FIREBASE_FIXTURE_DATA = {
     "blogs": {
-      "denormalized": {
+      "normalized": {
         "users": {
           "aputinski": {
             "created": 1395162147634
@@ -73,7 +73,7 @@
           }
         }
       },
-      "embedded": {
+      "denormalized": {
         "posts": {
           "post_1": {
             "published": 1395162147646,
@@ -134,10 +134,32 @@
     }
   };
 
-  FirebaseTestRef = window.FirebaseTestRef = new MockFirebase('Mock://', FIREBASE_FIXTURE_DATA).autoFlush(100);
+  FirebaseTestRef = window.FirebaseTestRef = new Firebase('https://emberfire-demo.firebaseio.com');
+  Firebase.goOffline();
+  FirebaseTestRef.on('value', function() {});
+  FirebaseTestRef.off('value', function() {});
+
+  var FirebaseSet = Firebase.prototype.set;
+  var FirebaseUpdate = Firebase.prototype.update;
+
+  sinon.stub(Firebase.prototype, 'set', function(data, afterSet) {
+    FirebaseSet.call(this, data, afterSet);
+    if (typeof afterSet === 'function') {
+      afterSet();
+    }
+  });
+
+  sinon.stub(Firebase.prototype, 'update', function(data, afterUpdate) {
+    FirebaseUpdate.call(this, data, afterUpdate);
+    if (typeof afterUpdate === 'function') {
+      afterUpdate();
+    }
+  });
+
+  FirebaseTestRef.set(FIREBASE_FIXTURE_DATA);
 
   App.ApplicationAdapter = DS.FirebaseAdapter.extend({
-    firebase: FirebaseTestRef
+    firebase: FirebaseTestRef.child('blogs/normalized')
   });
 
   App.Post = DS.Model.extend({
@@ -170,5 +192,18 @@
     }),
     posts: DS.hasMany('post', { async: true })
   });
+
+  /*App.Router.map(function() {
+    this.route('index', { path: '/' });
+  });
+
+  App.IndexRoute = Ember.Route.extend({
+    model: function() {
+      return this.store.find('post');
+    },
+    setupController: function(controller, model) {
+      console.log(model);
+    }
+  });*/
 
 })(window);
