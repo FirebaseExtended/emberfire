@@ -1,5 +1,9 @@
 # EmberFire Changelog
 
+### EmberFire 1.0.7 (April 18, 2014)
+
+* Added _updateRecordCacheForType to findAll()
+
 ### EmberFire 1.0.6 (April 18, 2014)
 
 * Initializer is now compatable with new versions of Ember Data
