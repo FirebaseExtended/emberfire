@@ -6,7 +6,7 @@
   "dependencies": {
     "ember": ">=1.4.0 < 2.0.0",
     "ember-data": "~1.0.0-beta.7",
-    "firebase": "~1.0.6"
+    "firebase": "~1.0.11"
   },
   "keywords": [
     "Firebase",
