@@ -196,7 +196,7 @@
           comment.save().then(function() {
             Promise.cast(post.get('comments')).then(function(comments) {
               comments.addObject(comment);
-              post.save();
+              post.save().then(function() {}, function() {});
             });
           });
         }
