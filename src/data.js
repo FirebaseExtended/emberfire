@@ -362,11 +362,9 @@
     */
     updateRecord: function(store, type, record) {
       var adapter = this;
-      var serializedRecord = record.serialize({
-        includeId: false
-      });
+      var serializedRecord = this._getSerializedRecord(record);
       var recordRef = this._getRef(type, record.id);
-      var recordCache = Ember.get(adapter._recordCacheForType, fmt('%@.%@', [type.typeKey, record.get('id')]));
+      var recordCache = Ember.get(adapter._recordCacheForType, fmt('%@.%@', [type.typeKey, record.get('id')])) || {};
 
       return new Promise(function(resolve, reject) {
         var savedRelationships = Ember.A();
@@ -406,6 +404,15 @@
     },
 
     /**
+      Return a serialized version of the record
+    */
+    _getSerializedRecord: function(record) {
+      return record.serialize({
+        includeId: false
+      });
+    },
+
+    /**
       Call _saveHasManyRelationshipRecord on each record in the relationship
       and then resolve once they have all settled
     */
@@ -425,7 +432,7 @@
         var type = relationship.type;
         return store.hasRecordForId(type, id) && store.getById(type, id).get('isDirty') === true;
       });
-      dirtyRecords = Ember.A(dirtyRecords.concat(addedRecords)).map(function(id) {
+      dirtyRecords = Ember.A(dirtyRecords.concat(addedRecords)).uniq().map(function(id) {
         return adapter._saveHasManyRecord(store, relationship, recordRef, id);
       });
       // Removed
@@ -591,16 +598,17 @@
 
     /**
       A cache of hasMany relationships that can be used to
-      diff when a model is saved
+      diff against new relationships when a model is saved
     */
-
     _recordCacheForType: undefined,
 
     /**
       _updateHasManyCacheForType
     */
-
     _updateRecordCacheForType: function(type, payload) {
+      if (!payload) {
+        //return;
+      }
       var adapter = this;
       var id = payload.id;
       var cache = adapter._recordCacheForType;
