@@ -59,7 +59,7 @@
       var normalizedPayload = this.normalize(type, payload);
       // Check for embedded records
       type.eachRelationship(function(key, relationship) {
-        if (!Ember.isNone(payload[key]) && relationship.options.embedded === true) {
+        if (!Ember.isNone(payload) && !Ember.isNone(payload[key]) && relationship.options.embedded === true) {
           var embeddedKey;
           var embeddedRecordPayload = normalizedPayload[key];
           var records = [];
@@ -203,7 +203,7 @@
               });
             }
             // Otherwise push it into the store
-            else {
+            else if (payload !== null) {
               adapter._enqueue(function() {
                 store.push(type, serializer.extractSingle(store, type, payload));
               });
@@ -519,8 +519,7 @@
     */
     deleteRecord: function(store, type, record) {
       var adapter = this;
-      var ref = this._getRef(type, record.id);
-
+      var ref = this._getRef(type, record.get('id'));
       return new Promise(function(resolve, reject) {
         ref.remove(function(err) {
           if (err) {
