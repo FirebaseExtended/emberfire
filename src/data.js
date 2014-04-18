@@ -7,7 +7,7 @@
   }
 
   var EmberFire = Ember.Namespace.create({
-    VERSION: '1.0.6'
+    VERSION: '1.0.7'
   });
 
   if (Ember.libraries) {
@@ -270,7 +270,7 @@
           else {
             snapshot.forEach(function(childSnapshot) {
               var payload = adapter._assignIdToPayload(childSnapshot);
-              //adapter._updateRecordCacheForType(type, payload);
+              adapter._updateRecordCacheForType(type, payload);
               results.push(payload);
             });
             adapter._enqueue(resolve, [results]);
@@ -438,7 +438,8 @@
       // Removed
       var removedRecords = idsCache.filter(function(id) {
         return !ids.contains(id);
-      }).map(function(id) {
+      });
+      removedRecords = Ember.A(removedRecords).map(function(id) {
         return adapter._removeHasManyRecord(store, relationship, recordRef, id);
       });
       // Combine all the saved records
