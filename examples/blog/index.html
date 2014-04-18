@@ -55,9 +55,6 @@
                 <em class="post-comment-date">{{comment.publishedDate}}</em>
               </div>
               {{markdown comment.body}}
-              <div>
-                <button {{action "removeComment" comment}}>delete comment</button>
-              </div>
             </div>
           </li>
         {{/each}}

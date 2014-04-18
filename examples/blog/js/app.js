@@ -1,5 +1,7 @@
 (function (window) {
 
+  var Promise = Ember.RSVP.Promise;
+
   ////////////////////////////////////////////////////////////
   // Utility
   ////////////////////////////////////////////////////////////
@@ -19,8 +21,8 @@
       return this.get('store').find('user', username).then(function(user) {
         return user;
       }, function() {
-        // HACK: `find()` creates an empty record which prevents `createRecord()` from working
-        delete store.typeMapFor(App.User).idToRecord[username];
+        // HACK: `find()` creates an entry in store.typeMapFor().idToRecord which prevents `createRecord()` from working
+        delete store.typeMapFor(store.modelFor('user')).idToRecord[username];
         // A user couldn't be found, so create a new user
         var user = store.createRecord('user', {
           id: username,
@@ -191,10 +193,10 @@
     App.PostController = Ember.ObjectController.extend({
       actions: {
         publishComment: function(post, comment) {
-          Ember.RSVP.Promise.cast(post.get('comments')).then(function(comments) {
-            comments.addObject(comment);
-            post.save().then(function() {}, function() {}).finally(function() {
-              comment.save();
+          comment.save().then(function() {
+            Promise.cast(post.get('comments')).then(function(comments) {
+              comments.addObject(comment);
+              post.save();
             });
           });
         }
@@ -271,6 +273,14 @@
               commentBody: ''
             });
           }.bind(this));
+        },
+        removeComment: function(comment) {
+          var post = this.get('post');
+          Promise.cast(post.get('comments')).then(function(comments) {
+            comments.removeObject(comment);
+            comment.destroyRecord();
+            post.save();
+          });
         }
       },
     });
