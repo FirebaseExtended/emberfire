@@ -1,5 +1,9 @@
 # EmberFire Changelog
 
+### EmberFire 1.0.6 (April 18, 2014)
+
+* Initializer is now compatable with new versions of Ember Data
+
 ### EmberFire 1.0.5 (April 17, 2014)
 
 * Adding/removing objects to a `hasMany` array now persists to Firebase after `save()`

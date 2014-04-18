@@ -7,7 +7,7 @@
   }
 
   var EmberFire = Ember.Namespace.create({
-    VERSION: '1.0.5'
+    VERSION: '1.0.6'
   });
 
   if (Ember.libraries) {
@@ -629,7 +629,6 @@
   Ember.onLoad('Ember.Application', function(Application) {
     Application.initializer({
       name: 'firebase',
-      after: 'store',
       initialize: function(container, application) {
         application.register('adapter:-firebase', DS.FirebaseAdapter);
         application.register('serializer:-firebase', DS.FirebaseSerializer);
