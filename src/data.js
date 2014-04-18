@@ -606,9 +606,7 @@
       _updateHasManyCacheForType
     */
     _updateRecordCacheForType: function(type, payload) {
-      if (!payload) {
-        //return;
-      }
+      if (!payload) { return; }
       var adapter = this;
       var id = payload.id;
       var cache = adapter._recordCacheForType;
