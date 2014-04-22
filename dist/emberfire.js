@@ -88,6 +88,20 @@
       return map(payload, function(item) {
         return this.extractSingle(store, type, item);
       }, this);
+    },
+
+    /**
+      Overrides ember-data's `serializeHasMany` to serialize oneToMany
+      relationships.
+    */
+    serializeHasMany: function(record, json, relationship) {
+      var key = relationship.key;
+
+      var relationshipType = DS.RelationshipChange.determineRelationshipType(record.constructor, relationship);
+
+      if (relationshipType === 'manyToNone' || relationshipType === 'manyToMany' || relationshipType === 'manyToOne') {
+        json[key] = record.get(key).mapBy('id');
+      }
     }
 
   });
