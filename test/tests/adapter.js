@@ -135,6 +135,15 @@ describe("FirebaseAdapter", function() {
       });
     });
 
+    it("throws an error for records that don't exist", function(done) {
+      Ember.run(function() {
+        adapter.find(store, store.modelFor("post"), "foobar").then(function() {}, function(error) {
+          assert(error instanceof Error);
+          done();
+        });
+      });
+    });
+
     after(function() {
       getRefSpy.restore();
     });
@@ -143,9 +152,15 @@ describe("FirebaseAdapter", function() {
 
   describe("#findAll()", function() {
 
-    var getRefSpy, findAllAddEventListenersSpy, handleChildValueSpy, findAll, findAllRef;
+    var getRefSpy, findAllAddEventListenersSpy, handleChildValueSpy;
+    var findAll, findAllRef;
+    var Post;
 
     before(function(done) {
+      Post = TestHelpers.getModelName('Post');
+      App[Post] = App.Post.extend({
+        comments: DS.hasMany("comment", { async: true })
+      });
       getRefSpy = sinon.spy(adapter, "_getRef");
       findAllAddEventListenersSpy = sinon.spy(adapter, "_findAllAddEventListeners");
       handleChildValueSpy = sinon.spy(adapter, "_handleChildValue");
@@ -205,6 +220,15 @@ describe("FirebaseAdapter", function() {
           assert(store.hasRecordForId('post', 'post_3'));
           done();
         }, adapter._queueFlushDelay * 2);
+    });
+
+    it("handles empty collections", function(done) {
+      Ember.run(function() {
+        adapter.findAll(store, store.modelFor(Post)).then(function(posts) {
+          assert(Ember.isArray(posts));
+          done();
+        });
+      });
     });
 
     after(function() {
