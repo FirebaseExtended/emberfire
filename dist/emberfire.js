@@ -405,8 +405,8 @@
     },
 
     /**
-      Return a serialized version of the record.  Convert the
-      records hasMany relationships back to arrays
+      Return a serialized version of the record.  Includes
+      the record's has many relationships.
     */
     _getSerializedRecord: function(record) {
       var json = record.serialize({includeId: false});
