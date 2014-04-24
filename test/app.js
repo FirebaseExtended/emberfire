@@ -25,7 +25,12 @@
       "normalized": {
         "users": {
           "aputinski": {
-            "created": 1395162147634
+            "firstName": "Adam",
+            "created": 1395162147634,
+            "posts": {
+              "post_1": true,
+              "post_2": true
+            }
           }
         },
         "posts": {
@@ -187,6 +192,7 @@
     username: Ember.computed('id', function() {
       return this.get('id');
     }),
+    firstName: DS.attr('string'),
     avatar: Ember.computed(function() {
       return 'https://www.gravatar.com/avatar/' + md5(this.get('id')) + '.jpg?d=retro&size=80';
     }),
