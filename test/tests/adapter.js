@@ -270,7 +270,10 @@ describe("FirebaseAdapter", function() {
               relationshipRef = getRelationshipRefSpy.getCall(0).returnValue;
               serializedRecord = updateRecordSpy.getCall(0).args[2].serialize();
               finalPayload = getSerializedRecordSpy.getCall(0).returnValue;
-              done();
+              finalPayload.then(function(payload) {
+                finalPayload = payload;
+                done();
+              });
             });
           });
         });
@@ -427,7 +430,10 @@ describe("FirebaseAdapter", function() {
             relationshipRef = getRelationshipRefSpy.getCall(0).returnValue;
             serializedRecord = updateRecordSpy.getCall(0).args[2].serialize();
             finalPayload = getSerializedRecordSpy.getCall(0).returnValue;
-            done();
+            finalPayload.then(function(payload) {
+              finalPayload = payload;
+              done();
+            });
           });
         });
       });
