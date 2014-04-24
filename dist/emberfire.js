@@ -96,11 +96,12 @@
     */
     serializeHasMany: function(record, json, relationship) {
       var key = relationship.key;
-
+      var payloadKey = this.keyForRelationship ? this.keyForRelationship(key, "hasMany") : key;
       var relationshipType = DS.RelationshipChange.determineRelationshipType(record.constructor, relationship);
+      var relationshipTypes = ['manyToNone', 'manyToMany', 'manyToOne'];
 
-      if (relationshipType === 'manyToNone' || relationshipType === 'manyToMany' || relationshipType === 'manyToOne') {
-        json[key] = record.get(key).mapBy('id');
+      if (relationshipTypes.indexOf(relationshipType) > -1) {
+        json[payloadKey] = Ember.A(record.get(key)).mapBy('id');
       }
     }
 
@@ -379,8 +380,8 @@
       var recordRef = this._getRef(type, record.id);
       var recordCache = Ember.get(adapter._recordCacheForType, fmt('%@.%@', [type.typeKey, record.get('id')])) || {};
 
-      return new Promise(function(resolve, reject) {
-        adapter._getSerializedRecord(record).then(function(serializedRecord) {
+      return this._getSerializedRecord(record).then(function(serializedRecord) {
+        return new Promise(function(resolve, reject) {
           var savedRelationships = Ember.A();
           record.eachRelationship(function(key, relationship) {
             switch (relationship.kind) {
@@ -419,28 +420,22 @@
     },
 
     /**
-      Return a serialized version of the record.  Includes
-      the record's has many relationships.
+      Return a serialized version of the record
     */
     _getSerializedRecord: function(record) {
-      var json = record.serialize({includeId: false});
-      return new Promise(function(resolve, reject) {
-        var promises = [];
-        record.eachRelationship(function(name, relationship) {
-          if (relationship.kind === 'hasMany' && relationship.options.embedded !== true) {
-            json[name] = [];
-            promises.push(record.get(name).then(function(hasManyRecords) {
-              hasManyRecords.forEach(function(hasManyRecord) {
-                json[name].push(hasManyRecord.get('id'));
-              });
+      var json = record.serialize({ includeId: false });
+      var relationships = [];
+      record.eachRelationship(function(key, relationship) {
+        switch (relationship.kind) {
+          case 'hasMany':
+            relationships.push(Promise.cast(record.get(key)).then(function(hasManyRecords) {
+              json[key] = Ember.A(hasManyRecords).mapBy('id');
             }));
-          }
-        });
-        Ember.RSVP.allSettled(promises).then(function(settledPromises) {
-          resolve(json);
-        }, function(error) {
-          reject(error);
-        });
+            break;
+        }
+      });
+      return Ember.RSVP.all(relationships).then(function() {
+        return json;
       });
     },
 
