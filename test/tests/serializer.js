@@ -192,4 +192,31 @@ describe("FirebaseSerializer", function() {
 
   });
 
+  describe("#serializeHasMany()", function() {
+
+    describe("normalized payload", function() {
+
+      var json, relationship, serializedRecord, comments;
+
+      before(function(done) {
+        Ember.run(function() {
+          store.find("user", "aputinski").then(function(record) {
+            json = {};
+            relationship = Ember.get(store.modelFor("user"), "relationshipsByName").get("posts");
+            serializer.serializeHasMany(record, json, relationship);
+            posts = Ember.A(json.posts);
+            done();
+          });
+        });
+      });
+
+      it("serializes hasMany relationships", function() {
+        assert(Ember.isArray(posts));
+        assert(posts.contains("post_1") && posts.contains("post_2"));
+      });
+
+    });
+
+  });
+
 });
