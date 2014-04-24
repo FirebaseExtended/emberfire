@@ -96,11 +96,11 @@
     */
     serializeHasMany: function(record, json, relationship) {
       var key = relationship.key;
-
+      var payloadKey = this.keyForRelationship ? this.keyForRelationship(key, "hasMany") : key;
       var relationshipType = DS.RelationshipChange.determineRelationshipType(record.constructor, relationship);
 
       if (relationshipType === 'manyToNone' || relationshipType === 'manyToMany' || relationshipType === 'manyToOne') {
-        json[key] = Ember.A(record.get(key)).mapBy('id');
+        json[payloadKey] = Ember.A(record.get(key)).mapBy('id');
       }
     }
 
