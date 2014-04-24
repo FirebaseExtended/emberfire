@@ -98,8 +98,9 @@
       var key = relationship.key;
       var payloadKey = this.keyForRelationship ? this.keyForRelationship(key, "hasMany") : key;
       var relationshipType = DS.RelationshipChange.determineRelationshipType(record.constructor, relationship);
+      var relationshipTypes = ['manyToNone', 'manyToMany', 'manyToOne'];
 
-      if (relationshipType === 'manyToNone' || relationshipType === 'manyToMany' || relationshipType === 'manyToOne') {
+      if (relationshipTypes.indexOf(relationshipType) > -1) {
         json[payloadKey] = Ember.A(record.get(key)).mapBy('id');
       }
     }
