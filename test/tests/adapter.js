@@ -327,6 +327,74 @@ describe("FirebaseAdapter", function() {
 
     });
 
+    describe("Multiple hasMany", function() {
+
+      var _ref, newPost1, newPost2, newPost3, newComment, newUser;
+
+      before(function(done) {
+        _ref = adapter._ref;
+        adapter._ref = FirebaseTestRef.child("blogs/tests/adapter/updaterecord/normalized");
+        Ember.run(function() {
+          newUser = store.createRecord("user");
+          newComment = store.createRecord("comment", {
+            body: "This is a new comment"
+          });
+          newPost1 = store.createRecord("post", {
+            title: "Post 1"
+          });
+          newPost2 = store.createRecord("post", {
+            title: "Post 2"
+          });
+          newPost3 = store.createRecord("post", {
+            title: "Post 3"
+          });
+          newUser.get("posts").then(function(posts) {
+            posts.addObjects([newPost1, newPost2, newPost3]);
+            newUser.save().then(function() {
+              newPost1.save();
+              newPost2.save();
+              newPost3.save();
+            }).then(function(){
+              done();
+            });
+          });
+        });
+      });
+
+      it("adds a comment without removing old posts", function(done) {
+        Ember.run(function() {
+          newUser.get("comments").then(function(comments) {
+            var posts;
+            comments.addObject(newComment);
+            newUser.save().then(function() {
+              newComment.save();
+            }).then(function() {
+              newUser.get('posts').then(function(ps) {
+                posts = ps;
+              });
+            }).then(function() {
+              assert(Ember.A(posts).contains(newPost1));
+              assert(Ember.A(posts).contains(newPost2));
+              assert(Ember.A(posts).contains(newPost3));
+              done();
+            });
+          });
+        });
+      });
+
+      after(function(done) {
+        Ember.run(function() {
+          newUser.deleteRecord();
+          newPost1.deleteRecord();
+          newPost2.deleteRecord();
+          newPost3.deleteRecord();
+          adapter._ref = _ref;
+          done();
+        });
+      });
+
+    });
+
     describe("denormalized relationship", function() {
 
       var _ref, Post, newPost, newComment;
