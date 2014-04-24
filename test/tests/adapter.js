@@ -327,7 +327,7 @@ describe("FirebaseAdapter", function() {
 
     });
 
-    describe("Multiple hasMany", function() {
+    describe("multiple normalized relationships", function() {
 
       var _ref, newPost1, newPost2, newPost3, newComment, newUser;
 
