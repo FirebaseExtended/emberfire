@@ -190,7 +190,8 @@
     avatar: Ember.computed(function() {
       return 'https://www.gravatar.com/avatar/' + md5(this.get('id')) + '.jpg?d=retro&size=80';
     }),
-    posts: DS.hasMany('post', { async: true })
+    posts: DS.hasMany('post', { async: true }),
+    comments: DS.hasMany('comment', { async: true })
   });
 
   /*App.Router.map(function() {
