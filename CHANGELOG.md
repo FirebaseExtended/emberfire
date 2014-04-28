@@ -1,8 +1,13 @@
 # EmberFire Changelog
 
+### EmberFire 1.0.8 (April 18, 2014)
+
+* `_getSerializedRecord` now correctly serializes hasMany relationships
+* `FirebaseSerializer` now implements `serializeHasMany`
+
 ### EmberFire 1.0.7 (April 18, 2014)
 
-* Added _updateRecordCacheForType to findAll()
+* Added `updateRecordCacheForType` to `findAll()`
 
 ### EmberFire 1.0.6 (April 18, 2014)
 
