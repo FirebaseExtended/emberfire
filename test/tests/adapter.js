@@ -294,11 +294,11 @@ describe("FirebaseAdapter", function() {
         assert(Ember.isNone(finalPayload.comments));
       });
 
-      it("contains a null belongsTo reference", function() {
+      it("contains a null belongsTo relationship", function() {
         assert.equal(serializedRecord.user, null);
       });
-
-      it("null belongsTo reference removed for final playload", function() {
+      
+      it("removed the null belongsTo reference from the final payload", function() {
         assert(Ember.isNone(finalPayload.user));
       });
 
