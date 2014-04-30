@@ -299,7 +299,6 @@ describe("FirebaseAdapter", function() {
       });
 
       it("null belongsTo reference removed for final playload", function() {
-        console.log(finalPayload);
         assert(Ember.isNone(finalPayload.user));
       });
 
