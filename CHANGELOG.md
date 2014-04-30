@@ -1,5 +1,9 @@
 # EmberFire Changelog
 
+### EmberFire 1.0.9 (April 30, 2014)
+
+* `updateRecord` now removes serializedRecord on undefined/null belongsTo relationships
+
 ### EmberFire 1.0.8 (April 18, 2014)
 
 * `_getSerializedRecord` now correctly serializes hasMany relationships

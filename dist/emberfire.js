@@ -393,6 +393,11 @@
                   delete serializedRecord[key];
                 }
                 break;
+              case 'belongsTo':
+                if (typeof serializedRecord[key] === "undefined" || serializedRecord[key] === null || serializedRecord[key] === '') {
+                  delete serializedRecord[key];
+                }
+                break;
               default:
                 break;
             }
