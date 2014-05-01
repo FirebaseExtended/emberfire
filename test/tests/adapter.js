@@ -294,6 +294,14 @@ describe("FirebaseAdapter", function() {
         assert(Ember.isNone(finalPayload.comments));
       });
 
+      it("contains a null belongsTo relationship", function() {
+        assert.equal(serializedRecord.user, null);
+      });
+      
+      it("removed the null belongsTo reference from the final payload", function() {
+        assert(Ember.isNone(finalPayload.user));
+      });
+
       it("created the correct relationship Firebase reference", function() {
         var re = new RegExp(Ember.String.fmt("blogs/tests/adapter/updaterecord/normalized/posts/%@/comments/%@$", [newPost.id, newComment.id]), 'g');
         assert(relationshipRef.toString().match(re));

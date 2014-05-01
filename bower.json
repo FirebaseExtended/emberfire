@@ -1,6 +1,6 @@
 {
   "name": "emberfire",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "Firebase bindings for Ember Data",
   "main": ["./dist/emberfire.js"],
   "dependencies": {
