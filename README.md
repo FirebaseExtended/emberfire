@@ -2,7 +2,7 @@
 
 EmberFire is an officially supported adapter for using
 [Firebase](http://www.firebase.com/?utm_medium=web&utm_source=emberFire) with
-[Ember Data](https://github.com/emberjs/data). 
+[Ember Data](https://github.com/emberjs/data).
 
 The `DS.FirebaseAdapter` provides all of the standard `DS.Adapter` methods and will automatically synchronize the store with Firebase.
 
@@ -18,6 +18,10 @@ If you would like to use Firebase without Ember Data, we recommend the third-par
 <script src="https://cdn.firebase.com/js/client/1.0.6/firebase.js"></script>
 <script src="emberfire.js"></script>
 ```
+
+#### Note
+
+If you load EmberFire with [Bower](https://github.com/firebase/emberFire), it will include ember-data automatically.
 
 ## Usage
 
