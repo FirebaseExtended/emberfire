@@ -2,7 +2,7 @@
 
 EmberFire is an officially supported adapter for using
 [Firebase](http://www.firebase.com/?utm_medium=web&utm_source=emberFire) with
-[Ember Data](https://github.com/emberjs/data). 
+[Ember Data](https://github.com/emberjs/data).
 
 The `DS.FirebaseAdapter` provides all of the standard `DS.Adapter` methods and will automatically synchronize the store with Firebase.
 
@@ -134,7 +134,7 @@ Here is what the data structure would look in Firebase:
 Any relationship that is flagged as `embedded: true` tells the adapter
 that the related records have been included in the payload.
 
-Generally, this approach is more complicated and not as widley used,
+Generally, this approach is more complicated and not as widely used,
 but it has been included to support existing data structures.
 
 ```js
