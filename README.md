@@ -19,6 +19,10 @@ If you would like to use Firebase without Ember Data, we recommend the third-par
 <script src="emberfire.js"></script>
 ```
 
+#### Note
+
+If you load EmberFire with [Bower](https://github.com/firebase/emberFire), it will include ember-data automatically.
+
 ## Usage
 
 To get started, simply create an instance of the
