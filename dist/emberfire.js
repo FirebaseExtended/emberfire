@@ -192,6 +192,7 @@
         ref.on('value', function(snapshot) {
           var payload = adapter._assignIdToPayload(snapshot);
           var record = store.getById(type, snapshot.name());
+          record.set('priority', snapshot.getPriority());
 
           adapter._updateRecordCacheForType(type, payload);
 
@@ -412,11 +413,22 @@
                   error.errors = rejected.mapBy('reason');
               adapter._enqueue(reject, [error]);
             }
-            recordRef.update(serializedRecord, function(error) {
+
+            var _saveHandler = function(error) {
               if (error) {
                 adapter._enqueue(reject, [error]);
               } else {
                 adapter._enqueue(resolve);
+              }
+            };
+
+            recordRef.update(serializedRecord, function(error) {
+              var priority = record.get('priority');
+
+              if (priority != null) {
+                recordRef.setPriority(priority, _saveHandler);
+              } else {
+                _saveHandler(error);
               }
             });
           });
@@ -462,7 +474,7 @@
       // Dirty
       var dirtyRecords = ids.filter(function(id) {
         var type = relationship.type;
-        return store.hasRecordForId(type, id) && store.getById(type, id).get('isDirty') === true;
+        return store.hasRecordForId(type, id) && (store.getById(type, id).get('isDirty') === true || store.getById(type, id).get('priority') != null);
       });
       dirtyRecords = Ember.A(dirtyRecords.concat(addedRecords)).uniq().map(function(id) {
         return adapter._saveHasManyRecord(store, relationship, recordRef, id);
@@ -517,11 +529,26 @@
             adapter._enqueue(resolve);
           }
         };
+
+        var priority = record.get('priority');
+
         if (isEmbedded) {
-          ref.update(valueToSave, _saveHandler);
+          ref.update(valueToSave, function(error) {
+            var priority = record.get('priority');
+
+            if (priority) {
+              ref.setPriority(priority, _saveHandler);
+            } else {
+              _saveHandler(error);
+            }
+          });
         }
         else {
-          ref.set(valueToSave, _saveHandler);
+          if (priority != null) {
+            ref.setWithPriority(valueToSave, priority, _saveHandler);
+          } else {
+            ref.set(valueToSave, _saveHandler);
+          }
         }
       });
     },
