@@ -163,7 +163,7 @@ Here is what the data structure would look like in Firebase:
 }
 ```
 
-**NOTE**: When a modal has embedded relationships, the related model should not be saved on its own.
+**NOTE**: When a model has embedded relationships, the related model should not be saved on its own.
 
 ```js
 var comment = store.createRecords('comment');
