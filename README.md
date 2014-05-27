@@ -166,7 +166,7 @@ Here is what the data structure would look like in Firebase:
 **NOTE**: When a model has embedded relationships, the related model should not be saved on its own.
 
 ```js
-var comment = store.createRecords('comment');
+var comment = store.createRecord('comment');
 // This WILL NOT save the comment inside of the post because the adapter doesn't know
 // where to save the comment without the context of the post
 comment.save();
