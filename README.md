@@ -34,7 +34,7 @@ App.ApplicationAdapter = DS.FirebaseAdapter.extend({
 });
 ```
 
-You're Firebase data will now be synced with the Ember Data store
+Your Firebase data will now be synced with the Ember Data store
 
 You can now interact with the data store as you normally would. For example,
 calling `find()` with a specific ID will retrieve that record from Firebase.
