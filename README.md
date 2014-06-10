@@ -108,6 +108,10 @@ the record if it hasn't already been loaded
 App.Post = DS.Model.extend({
   comments: DS.hasMany('comment', { async: true })
 });
+
+App.Comment = DS.Model.extend({
+  post: DS.belongsTo('post', { async: true })
+});
 ```
 
 In the `App.Post` example, comments will be fetched from
@@ -127,11 +131,14 @@ Here is what the data structure would look in Firebase:
 
   "comments": {
     "comment_id_1": {
-      "body": "This is a comment"
+      "body": "This is a comment",
+      "post": "post_id_1"
     }
   }
 }
 ```
+
+**NOTE:** If your async data isn't autoloading, make sure you've defined your relationships in both directions.
 
 #### Embedded
 
