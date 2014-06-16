@@ -44,11 +44,26 @@ it will automatically be updated in the local data store.
 See the [Ember documentation](http://emberjs.com/guides/models/) for a full
 list of methods, including ways to create, find, delete and query records.
 
-#### Ember AppKit / CLI
+#### Ember CLI
 
-Include `emberfire.js` before your app is created and then create **"adapters/application.js"**
+Run the following to add `emberfire.js` to your project:
+
+```bash
+bower install --save-dev emberfire
+```
+
+Add the following to your `Brocfile.js` (after importing Ember Data):
 
 ```javascript
+app.import('vendor/firebase/firebase.js');
+app.import('vendor/emberfire/dist/emberfire.js');
+```
+
+Create an **"app/adapters/application.js"** with the following content:
+
+```javascript
+/* globals Firebase */
+
 export default DS.FirebaseAdapter.extend({
   firebase: new Firebase('https://<my-firebase>.firebaseio.com')
 });
