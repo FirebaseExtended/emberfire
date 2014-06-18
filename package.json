@@ -2,7 +2,7 @@
   "name": "EmberFire",
   "version": "1.0.9",
   "description": "An officially supported Ember binding for Firebase.",
-  "main": "vendor/emberFire/dist/emberfire.js",
+  "main": "dist/emberfire.js",
   "ember-addon-main": "lib/ember-cli-ember-fire.js",
   "repository": {
     "type": "git",
