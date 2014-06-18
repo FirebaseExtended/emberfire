@@ -1,5 +1,5 @@
 {
-  "name": "EmberFire",
+  "name": "emberfire",
   "version": "1.0.10",
   "description": "An officially supported Ember binding for Firebase.",
   "main": "dist/emberfire.js",
