@@ -12,7 +12,7 @@
     "url": "https://github.com/firebase/emberFire/issues"
   },
   "keywords": [
-    "ember-cli-addon",
+    "ember-addon",
     "firebase"
   ],
   "devDependencies": {
