@@ -14,6 +14,7 @@ module.exports = function(grunt) {
     'concat',
     'jshint',
     'uglify:dist',
+    'copy:npm'
   ]);
 
   // Run client-side tests on the command line.
