@@ -49,14 +49,7 @@ list of methods, including ways to create, find, delete and query records.
 Run the following to add `emberfire.js` to your project:
 
 ```bash
-bower install --save-dev emberfire
-```
-
-Add the following to your `Brocfile.js` (after importing Ember Data):
-
-```javascript
-app.import('vendor/firebase/firebase.js');
-app.import('vendor/emberfire/dist/emberfire.js');
+npm install --save emberfire
 ```
 
 Create an **"app/adapters/application.js"** with the following content:
