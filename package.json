@@ -1,25 +1,39 @@
 {
   "name": "emberfire",
+  "description": "The officially supported Ember binding for Firebase",
   "version": "1.0.13",
-  "description": "An officially supported Ember binding for Firebase.",
-  "main": "dist/emberfire.js",
-  "files": [
-    "dist/**",
-    "lib/**",
-    "vendor/**"
-  ],
-  "ember-addon-main": "lib/ember-cli-ember-fire.js",
+  "author": "Firebase <support@firebase.com> (https://www.firebase.com/)",
+  "homepage": "https://github.com/firebase/emberfire/",
   "repository": {
     "type": "git",
-    "url": "https://github.com/firebase/emberFire.git"
+    "url": "https://github.com/firebase/emberfire.git"
   },
   "bugs": {
-    "url": "https://github.com/firebase/emberFire/issues"
+    "url": "https://github.com/firebase/emberfire/issues"
   },
-  "keywords": [
-    "ember-addon",
-    "firebase"
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "http://firebase.mit-license.org/"
+    }
   ],
+  "keywords": [
+    "ember",
+    "firebase",
+    "realtime",
+    "ember-addon"
+  ],
+  "main": "dist/emberfire.min.js",
+  "files": [
+    "lib/**",
+    "dist/**",
+    "vendor/**",
+    "README.md",
+    "CHANGELOG.md"
+  ],
+  "ember-addon-main": "lib/ember-cli-ember-fire.js",
+  "dependencies": {
+  },
   "devDependencies": {
     "bower": "1.3.5",
     "grunt": "~0.4.5",
@@ -38,5 +52,8 @@
     "grunt-mocha-test": "~0.5.0",
     "load-grunt-config": "~0.5.0",
     "grunt-contrib-copy": "~0.5.0"
+  },
+  "scripts": {
+    "test": "grunt test"
   }
 }
