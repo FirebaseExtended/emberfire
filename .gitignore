@@ -1,5 +1,5 @@
+tmp/
+vendor/
 node_modules/
 *-boilerplate/
-tmp/
 bower_components/
-vendor/

@@ -1,27 +1,46 @@
 # EmberFire (Firebase + Ember Data)
 
-EmberFire is an officially supported adapter for using
-[Firebase](http://www.firebase.com/?utm_medium=web&utm_source=emberFire) with
+[![Build Status](https://travis-ci.org/firebase/emberfire.svg)](https://travis-ci.org/firebase/emberfire)
+[![Version](https://badge.fury.io/gh/firebase%2Femberfire.svg)](http://badge.fury.io/gh/firebase%2Femberfire)
+
+EmberFire is the officially supported adapter for using
+[Firebase](http://www.firebase.com/?utm_medium=web&utm_source=emberfire) with
 [Ember Data](https://github.com/emberjs/data).
 
 The `DS.FirebaseAdapter` provides all of the standard `DS.Adapter` methods and will automatically synchronize the store with Firebase.
 
 If you would like to use Firebase without Ember Data, we recommend the third-party [ember-firebase](https://github.com/mjijackson/ember-firebase) binding.
 
-**Join the [Firebase + Ember Google Group](https://groups.google.com/forum/#!forum/firebase-ember) to ask technical questions, share apps you've built, and chat with other developers in the community**
+**Join the [Firebase + Ember Google Group](https://groups.google.com/forum/#!forum/firebase-ember) to ask technical questions, share apps you've built, and chat with other developers in the community.**
 
-## Installation
+
+## Downloading EmberFire
+
+In order to use EmberFire in your project, you need to include the following files in your HTML:
 
 ```html
-<!-- Don't forget to include Ember and its dependencies -->
-<script src="http://builds.emberjs.com/canary/ember-data.js"></script>
-<script src="https://cdn.firebase.com/js/client/1.0.6/firebase.js"></script>
-<script src="emberfire.js"></script>
+<!-- Ember + Ember Data -->
+<script src="http://builds.emberjs.com/canary/ember.min.js"></script>
+<script src="http://builds.emberjs.com/canary/ember-data.min.js"></script>
+
+<!-- Firebase -->
+<script src="https://cdn.firebase.com/js/client/1.0.17/firebase.js"></script>
+
+<!-- EmberFire -->
+<script src="https://cdn.firebase.com/libs/emberfire/1.0.13/emberfire.min.js"></script>
 ```
 
-#### Note
+Use the URL above to download both the minified and non-minified versions of EmberFire from the Firebase CDN. You can also download them from the `/dist/` directory of this GitHub repository. [Firebase](https://www.firebase.com/docs/web-quickstart.html?utm_medium=web&utm_source=emberfire) and [Ember](http://emberjs.com/guides/getting-started/obtaining-emberjs-and-dependencies/) can be downloaded directly from their respective websites.
 
-If you load EmberFire with [Bower](https://github.com/firebase/emberFire), it will include ember-data automatically.
+You can also install EmberFire via Bower and the dependencies will be downloaded automatically:
+
+```bash
+$ bower install emberfire --save
+```
+
+## Getting Started with Firebase
+
+EmberFire requires Firebase in order to sync data. You can [sign up here](https://www.firebase.com/docs/web-quickstart.html?utm_medium=web&utm_source=emberfire) for a free account.
 
 ## Usage
 
@@ -46,13 +65,13 @@ list of methods, including ways to create, find, delete and query records.
 
 #### Ember CLI
 
-Run the following to add `emberfire.js` to your project:
+EmberFire also works with the Ember CLI. Run the following command to add `emberfire.js` to your project:
 
 ```bash
-npm install --save emberfire
+$ npm install --save emberfire
 ```
 
-Create an **"app/adapters/application.js"** with the following content:
+Then, all you need to do is create `app/adapters/application.js` with the following content:
 
 ```javascript
 /* globals Firebase */
@@ -105,7 +124,7 @@ var newPost = store.createRecord('post').save();
 
 ### Relationships
 
-EmberFire can handle relationships in two different ways
+EmberFire can handle relationships in two different ways: async and embedded.
 
 #### Async
 
@@ -146,7 +165,7 @@ Here is what the data structure would look in Firebase:
 }
 ```
 
-**NOTE:** If your async data isn't autoloading, make sure you've defined your relationships in both directions.
+**Note:** If your async data isn't autoloading, make sure you've defined your relationships in both directions.
 
 #### Embedded
 
@@ -178,7 +197,7 @@ Here is what the data structure would look like in Firebase:
 }
 ```
 
-**NOTE**: When a model has embedded relationships, the related model should not be saved on its own.
+**Note:** When a model has embedded relationships, the related model should not be saved on its own.
 
 ```js
 var comment = store.createRecord('comment');
@@ -197,21 +216,18 @@ post.get('comments').addObject(comment);
 post.save()
 ```
 
-## Development
+## Contributing
 
-If you would like to build EmberFire from the source, use grunt to build and lint the code:
+If you'd like to contribute to EmberFire, you'll need to run the following commands to get your environment set up:
 
 ```bash
-# Install Grunt and development dependencies
-npm install
-# Default task - validates with jshint, minifies source, and runs tests
-grunt
-# Watch for changes and run unit test after each change
-grunt watch
-# Minify source
-grunt build
+$ git clone https://github.com/firebase/emberfire.git
+$ npm install -g grunt  # globally install grunt task runner
+$ npm install           # install local npm build / test dependencies
+$ bower install         # install local JavaScript dependencies
+$ grunt watch           # watch for source file changes
 ```
 
-## License
+`grunt watch` will watch for changes in the `/src/` directory and lint, concatenate, and minify the source files and run the test suite when a change occurs. The output files - `emberfire.js` and `emberfire.min.js` - are written to the `/dist/` directory.
 
-[MIT](http://firebase.mit-license.org).
+You can run the test suite by navigating to `file:///path/to/emberfire/test/index.html` or via the command line using `grunt test`.

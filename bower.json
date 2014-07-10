@@ -1,28 +1,43 @@
 {
   "name": "emberfire",
+  "description": "The officially supported Ember binding for Firebase",
   "version": "1.0.13",
-  "description": "Firebase bindings for Ember Data",
-  "main": ["./dist/emberfire.js"],
-  "dependencies": {
-    "ember": ">=1.4.0 < 2.0.0",
-    "ember-data": "~1.0.0-beta.8",
-    "firebase": "~1.0.17"
-  },
-  "keywords": [
-    "Firebase",
-    "real-time",
-    "websocket"
+  "authors": [
+    "Firebase <support@firebase.com> (https://www.firebase.com/)"
   ],
+  "homepage": "https://github.com/firebase/emberfire",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/firebase/emberfire.git"
+  },
+  "license": "MIT",
+  "keywords": [
+    "ember",
+    "firebase",
+    "realtime",
+    "ember-addon"
+  ],
+  "main": "dist/emberfire.min.js",
   "ignore": [
-    ".jshintrc",
-    "README.md",
-    "Gruntfile.js",
-    "package.json",
-    "examples/",
+    "**/.*",
+    "src",
+    "lib",
+    "test",
+    "tasks",
+    "vendor",
+    "examples",
     "node_modules",
-    "src/",
-    "test/",
-    "tasks/",
-    "CHANGELOG.md"
-  ]
+    "bower_components",
+    "build.sh",
+    "release.sh",
+    "Gruntfile.js",
+    "package.json"
+  ],
+  "dependencies": {
+    "firebase": "1.0.x",
+    "ember": ">=1.4.0 < 2.0.0",
+    "ember-data": "~1.0.0-beta.8"
+  },
+  "devDependencies": {
+  }
 }
