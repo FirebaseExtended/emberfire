@@ -10,7 +10,7 @@ if [[ ! -d $STANDALONE_DEST ]]; then
 fi
 
 # Get the version we are releasing
-PARSED_CLIENT_VERSION=$(head -5 dist/emberfire.js | tail -1 | awk -F ' ' '{print $3}')
+PARSED_CLIENT_VERSION=$(grep 'VERSION' dist/emberfire.js | head -1 | awk -F ' ' '{print $2}' | sed 's/^.\(.*\).$/\1/')
 
 # Ensure this is the correct version number
 read -p "What version of EmberFire are we releasing? ($PARSED_CLIENT_VERSION) " VERSION
@@ -20,7 +20,7 @@ fi
 echo
 
 # Ensure the changelog has been updated for the newest version
-CHANGELOG_VERSION="$(head -1 CHANGELOG.md | awk -F 'v' '{print $2}')"
+CHANGELOG_VERSION="$(head -3 CHANGELOG.md | tail -1 | awk -F ' ' '{print $3}')"
 if [[ $VERSION != $CHANGELOG_VERSION ]]; then
   echo "Error: Most recent version in changelog (${CHANGELOG_VERSION}) does not match version you are releasing (${VERSION})."
   exit 1
