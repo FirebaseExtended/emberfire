@@ -29,7 +29,8 @@
     "dist/**",
     "vendor/**",
     "README.md",
-    "CHANGELOG.md"
+    "CHANGELOG.md",
+    "package.json"
   ],
   "ember-addon-main": "lib/ember-cli-ember-fire.js",
   "dependencies": {
