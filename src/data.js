@@ -408,7 +408,7 @@
                   delete serializedRecord[key];
                 }
                 else if (relationship.options.embedded === true) {
-                  save = adapter._saveBelongsToRecord(store, type, relationship, serializedRecord[key], recordRef);
+                  save = adapter._saveBelongsToRecord(store, type, relationship, serializedRecord[key], recordRef, key);
                   savedRelationships.push(save);
                   delete serializedRecord[key];
                 }
@@ -565,9 +565,9 @@
     /**
       Save an embedded record
     */
-    _saveBelongsToRecord: function(store, type, relationship, id, parentRef) {
+    _saveBelongsToRecord: function(store, type, relationship, id, parentRef, key) {
       var adapter = this;
-      var ref = parentRef.child(relationship.type.typeKey);
+      var ref = parentRef.child(key);
       var record = store.getById(relationship.type, id);
       var isEmbedded = relationship.options.embedded === true;
       var valueToSave = isEmbedded ? record.serialize({ includeId: true }) : true;
