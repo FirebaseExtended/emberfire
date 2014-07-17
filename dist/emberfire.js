@@ -450,7 +450,7 @@
             // if embedded
             if (relationship.options.embedded)
             {
-              json[key] = record.serialize({ includeId: false });
+              json[key] = record.get(key).serialize({ includeId: false });
             }
           break;
         }
