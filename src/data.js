@@ -7,7 +7,7 @@
   }
 
   var EmberFire = Ember.Namespace.create({
-    VERSION: '1.1.0'
+    VERSION: '1.1.1'
   });
 
   if (Ember.libraries) {
@@ -393,10 +393,11 @@
         return new Promise(function(resolve, reject) {
           var savedRelationships = Ember.A();
           record.eachRelationship(function(key, relationship) {
+            var save ;
             switch (relationship.kind) {
               case 'hasMany':
                 if (Ember.isArray(serializedRecord[key])) {
-                  var save = adapter._saveHasManyRelationship(store, type, relationship, serializedRecord[key], recordRef, recordCache);
+                  save = adapter._saveHasManyRelationship(store, type, relationship, serializedRecord[key], recordRef, recordCache);
                   savedRelationships.push(save);
                   // Remove the relationship from the serializedRecord
                   delete serializedRecord[key];
@@ -404,6 +405,11 @@
                 break;
               case 'belongsTo':
                 if (typeof serializedRecord[key] === "undefined" || serializedRecord[key] === null || serializedRecord[key] === '') {
+                  delete serializedRecord[key];
+                }
+                else if (relationship.options.embedded === true) {
+                  save = adapter._saveBelongsToRecord(store, type, relationship, serializedRecord[key], recordRef);
+                  savedRelationships.push(save);
                   delete serializedRecord[key];
                 }
                 break;
@@ -553,6 +559,35 @@
           }
         };
         ref.remove(_removeHandler);
+      });
+    },
+
+    /**
+      Save an embedded record
+    */
+    _saveBelongsToRecord: function(store, type, relationship, id, parentRef) {
+      var adapter = this;
+      var ref = parentRef.child(relationship.type.typeKey);
+      var record = store.getById(relationship.type, id);
+      var isEmbedded = relationship.options.embedded === true;
+      var valueToSave = isEmbedded ? record.serialize({ includeId: true }) : true;
+      return new Promise(function(resolve, reject) {
+        var _saveHandler = function(error) {
+          if (error) {
+            if (typeof error === 'object') {
+              error.location = ref.toString();
+            }
+            adapter._enqueue(reject, [error]);
+          } else {
+            adapter._enqueue(resolve);
+          }
+        };
+        if (isEmbedded) {
+          ref.update(valueToSave, _saveHandler);
+        }
+        else {
+          ref.set(valueToSave, _saveHandler);
+        }
       });
     },
 

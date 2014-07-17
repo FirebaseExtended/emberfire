@@ -27,7 +27,7 @@ In order to use EmberFire in your project, you need to include the following fil
 <script src="https://cdn.firebase.com/js/client/1.0.17/firebase.js"></script>
 
 <!-- EmberFire -->
-<script src="https://cdn.firebase.com/libs/emberfire/1.1.0/emberfire.min.js"></script>
+<script src="https://cdn.firebase.com/libs/emberfire/1.1.1/emberfire.min.js"></script>
 ```
 
 Use the URL above to download both the minified and non-minified versions of EmberFire from the Firebase CDN. You can also download them from the `/dist/` directory of this GitHub repository. [Firebase](https://www.firebase.com/docs/web-quickstart.html?utm_medium=web&utm_source=emberfire) and [Ember](http://emberjs.com/guides/getting-started/obtaining-emberjs-and-dependencies/) can be downloaded directly from their respective websites.

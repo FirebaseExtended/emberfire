@@ -1,3 +1,9 @@
+v1.1.1
+------------------
+Release Date: July 16, 2014
+
+* Fixed `save()` on records with embedded `belongsTo` relationships
+
 v1.1.0
 ------------------
 Release Date: July 16, 2014
