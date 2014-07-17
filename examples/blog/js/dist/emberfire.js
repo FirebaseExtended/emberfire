@@ -7,7 +7,7 @@
   }
 
   var EmberFire = Ember.Namespace.create({
-    VERSION: '1.0.7'
+    VERSION: '1.0.14'
   });
 
   if (Ember.libraries) {
@@ -64,14 +64,23 @@
           var embeddedRecordPayload = normalizedPayload[key];
           var records = [];
           var record;
-          for (embeddedKey in embeddedRecordPayload) {
-            record = embeddedRecordPayload[embeddedKey];
-            if (record !== null && typeof record === 'object') {
-              record.id = embeddedKey;
+          if (relationship.kind === 'belongsTo') {
+            if (typeof embeddedRecordPayload.id !== 'string') {
+              throw new Error(fmt('Embedded relationship "%@" of "%@" must contain an "id" property in the payload', [relationship.type.typeKey, type]));
             }
-            records.push(record);
+            records.push(embeddedRecordPayload);
+            normalizedPayload[key] = embeddedRecordPayload.id;
           }
-          normalizedPayload[key] = Ember.keys(normalizedPayload[key]);
+          else {
+            for (embeddedKey in embeddedRecordPayload) {
+              record = embeddedRecordPayload[embeddedKey];
+              if (record !== null && typeof record === 'object') {
+                record.id = embeddedKey;
+              }
+              records.push(record);
+            }
+            normalizedPayload[key] = Ember.keys(normalizedPayload[key]);
+          }
           // Push the embedded records into the store
           store.pushMany(relationship.type, records);
         }
@@ -88,6 +97,21 @@
       return map(payload, function(item) {
         return this.extractSingle(store, type, item);
       }, this);
+    },
+
+    /**
+      Overrides ember-data's `serializeHasMany` to serialize oneToMany
+      relationships.
+    */
+    serializeHasMany: function(record, json, relationship) {
+      var key = relationship.key;
+      var payloadKey = this.keyForRelationship ? this.keyForRelationship(key, "hasMany") : key;
+      var relationshipType = DS.RelationshipChange.determineRelationshipType(record.constructor, relationship);
+      var relationshipTypes = ['manyToNone', 'manyToMany', 'manyToOne'];
+
+      if (relationshipTypes.indexOf(relationshipType) > -1) {
+        json[payloadKey] = Ember.A(record.get(key)).mapBy('id');
+      }
     }
 
   });
@@ -362,42 +386,48 @@
     */
     updateRecord: function(store, type, record) {
       var adapter = this;
-      var serializedRecord = this._getSerializedRecord(record);
       var recordRef = this._getRef(type, record.id);
       var recordCache = Ember.get(adapter._recordCacheForType, fmt('%@.%@', [type.typeKey, record.get('id')])) || {};
 
-      return new Promise(function(resolve, reject) {
-        var savedRelationships = Ember.A();
-        record.eachRelationship(function(key, relationship) {
-          switch (relationship.kind) {
-            case 'hasMany':
-              if (Ember.isArray(serializedRecord[key])) {
-                var save = adapter._saveHasManyRelationship(store, type, relationship, serializedRecord[key], recordRef, recordCache);
-                savedRelationships.push(save);
-                // Remove the relationship from the serializedRecord
-                delete serializedRecord[key];
-              }
-              break;
-            default:
-              break;
-          }
-        });
-        // Save the record once all the relationships have saved
-        Ember.RSVP.allSettled(savedRelationships).then(function(savedRelationships) {
-          savedRelationships = Ember.A(savedRelationships);
-          var rejected = Ember.A(savedRelationships.filterBy('state', 'rejected'));
-          // Throw an error if any of the relationships failed to save
-          if (rejected.get('length') !== 0) {
-            var error = new Error(fmt('Some errors were encountered while saving %@ %@', [type, record.id]));
-                error.errors = rejected.mapBy('reason');
-            adapter._enqueue(reject, [error]);
-          }
-          recordRef.update(serializedRecord, function(error) {
-            if (error) {
-              adapter._enqueue(reject, [error]);
-            } else {
-              adapter._enqueue(resolve);
+      return this._getSerializedRecord(record).then(function(serializedRecord) {
+        return new Promise(function(resolve, reject) {
+          var savedRelationships = Ember.A();
+          record.eachRelationship(function(key, relationship) {
+            switch (relationship.kind) {
+              case 'hasMany':
+                if (Ember.isArray(serializedRecord[key])) {
+                  var save = adapter._saveHasManyRelationship(store, type, relationship, serializedRecord[key], recordRef, recordCache);
+                  savedRelationships.push(save);
+                  // Remove the relationship from the serializedRecord
+                  delete serializedRecord[key];
+                }
+                break;
+              case 'belongsTo':
+                if (typeof serializedRecord[key] === "undefined" || serializedRecord[key] === null || serializedRecord[key] === '') {
+                  delete serializedRecord[key];
+                }
+                break;
+              default:
+                break;
             }
+          });
+          // Save the record once all the relationships have saved
+          Ember.RSVP.allSettled(savedRelationships).then(function(savedRelationships) {
+            savedRelationships = Ember.A(savedRelationships);
+            var rejected = Ember.A(savedRelationships.filterBy('state', 'rejected'));
+            // Throw an error if any of the relationships failed to save
+            if (rejected.get('length') !== 0) {
+              var error = new Error(fmt('Some errors were encountered while saving %@ %@', [type, record.id]));
+                  error.errors = rejected.mapBy('reason');
+              adapter._enqueue(reject, [error]);
+            }
+            recordRef.update(serializedRecord, function(error) {
+              if (error) {
+                adapter._enqueue(reject, [error]);
+              } else {
+                adapter._enqueue(resolve);
+              }
+            });
           });
         });
       }, fmt('DS: FirebaseAdapter#updateRecord %@ to %@', [type, recordRef.toString()]));
@@ -407,8 +437,19 @@
       Return a serialized version of the record
     */
     _getSerializedRecord: function(record) {
-      return record.serialize({
-        includeId: false
+      var json = record.serialize({ includeId: false });
+      var relationships = [];
+      record.eachRelationship(function(key, relationship) {
+        switch (relationship.kind) {
+          case 'hasMany':
+            relationships.push(Promise.cast(record.get(key)).then(function(hasManyRecords) {
+              json[key] = Ember.A(hasManyRecords).mapBy('id');
+            }));
+            break;
+        }
+      });
+      return Ember.RSVP.all(relationships).then(function() {
+        return json;
       });
     },
 

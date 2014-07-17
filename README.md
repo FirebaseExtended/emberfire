@@ -27,7 +27,7 @@ In order to use EmberFire in your project, you need to include the following fil
 <script src="https://cdn.firebase.com/js/client/1.0.17/firebase.js"></script>
 
 <!-- EmberFire -->
-<script src="https://cdn.firebase.com/libs/emberfire/1.0.13/emberfire.min.js"></script>
+<script src="https://cdn.firebase.com/libs/emberfire/1.1.0/emberfire.min.js"></script>
 ```
 
 Use the URL above to download both the minified and non-minified versions of EmberFire from the Firebase CDN. You can also download them from the `/dist/` directory of this GitHub repository. [Firebase](https://www.firebase.com/docs/web-quickstart.html?utm_medium=web&utm_source=emberfire) and [Ember](http://emberjs.com/guides/getting-started/obtaining-emberjs-and-dependencies/) can be downloaded directly from their respective websites.
@@ -175,6 +175,8 @@ that the related records have been included in the payload.
 Generally, this approach is more complicated and not as widely used,
 but it has been included to support existing data structures.
 
+##### hasMany
+
 ```js
 App.Post = DS.Model.extend({
   comments: DS.hasMany('comment', { embedded: true })
@@ -214,6 +216,22 @@ and then the post can be saved
 post.get('comments').addObject(comment);
 // Saving the post will save the embedded comments
 post.save()
+```
+
+##### belongsTo
+
+Any embedded `belongsTo` relationship must specifiy an id property in the payload
+
+```json
+{
+  "posts": {
+    "post_id_1": {
+      "user": {
+        "id": "myusername"
+      }
+    }
+  }
+}
 ```
 
 ## Contributing

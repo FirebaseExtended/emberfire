@@ -7,7 +7,7 @@
   }
 
   var EmberFire = Ember.Namespace.create({
-    VERSION: '1.0.9'
+    VERSION: '1.1.0'
   });
 
   if (Ember.libraries) {
@@ -64,14 +64,23 @@
           var embeddedRecordPayload = normalizedPayload[key];
           var records = [];
           var record;
-          for (embeddedKey in embeddedRecordPayload) {
-            record = embeddedRecordPayload[embeddedKey];
-            if (record !== null && typeof record === 'object') {
-              record.id = embeddedKey;
+          if (relationship.kind === 'belongsTo') {
+            if (typeof embeddedRecordPayload.id !== 'string') {
+              throw new Error(fmt('Embedded relationship "%@" of "%@" must contain an "id" property in the payload', [relationship.type.typeKey, type]));
             }
-            records.push(record);
+            records.push(embeddedRecordPayload);
+            normalizedPayload[key] = embeddedRecordPayload.id;
           }
-          normalizedPayload[key] = Ember.keys(normalizedPayload[key]);
+          else {
+            for (embeddedKey in embeddedRecordPayload) {
+              record = embeddedRecordPayload[embeddedKey];
+              if (record !== null && typeof record === 'object') {
+                record.id = embeddedKey;
+              }
+              records.push(record);
+            }
+            normalizedPayload[key] = Ember.keys(normalizedPayload[key]);
+          }
           // Push the embedded records into the store
           store.pushMany(relationship.type, records);
         }
