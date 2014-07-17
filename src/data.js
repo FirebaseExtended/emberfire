@@ -7,7 +7,7 @@
   }
 
   var EmberFire = Ember.Namespace.create({
-    VERSION: '1.1.0'
+    VERSION: '1.1.1'
   });
 
   if (Ember.libraries) {
@@ -446,6 +446,13 @@
               json[key] = Ember.A(hasManyRecords).mapBy('id');
             }));
             break;
+          case 'belongsTo':
+            // if embedded
+            if (relationship.options.embedded)
+            {
+              json[key] = record.get(key).serialize({ includeId: false });
+            }
+          break;
         }
       });
       return Ember.RSVP.all(relationships).then(function() {
