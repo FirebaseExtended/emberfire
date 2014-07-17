@@ -567,7 +567,7 @@
     */
     _saveBelongsToRecord: function(store, type, relationship, id, parentRef) {
       var adapter = this;
-      var ref = parentRef.child(relationship.type.typeKey);
+      var ref = parentRef.child(relationship.key);
       var record = store.getById(relationship.type, id);
       var isEmbedded = relationship.options.embedded === true;
       var valueToSave = isEmbedded ? record.serialize({ includeId: true }) : true;
