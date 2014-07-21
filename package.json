@@ -1,7 +1,7 @@
 {
   "name": "emberfire",
   "description": "The officially supported Ember binding for Firebase",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "author": "Firebase <support@firebase.com> (https://www.firebase.com/)",
   "homepage": "https://github.com/firebase/emberfire/",
   "repository": {
@@ -25,9 +25,9 @@
   ],
   "main": "dist/emberfire.min.js",
   "files": [
-    "lib/**",
-    "dist/**",
-    "vendor/**",
+    "lib/**/*",
+    "dist/**/*",
+    "vendor/**/*",
     "README.md",
     "CHANGELOG.md",
     "package.json"

@@ -1,3 +1,9 @@
+v1.1.2
+------------------
+Release Date: July 21, 2014
+
+* Fixed npm publish bug
+
 v1.1.1
 ------------------
 Release Date: July 16, 2014
