@@ -209,7 +209,9 @@
             // If this is the first event, resolve the promise.
             if (payload === null) {
               if (store.hasRecordForId(type, id)) {
-                store.dematerializeRecord(record);
+                adapter._enqueue(function() {
+                  store.dematerializeRecord(record);
+                });
               }
               var error = new Error(fmt('no record was found at %@', [ref.toString()]));
                   error.recordId = id;
