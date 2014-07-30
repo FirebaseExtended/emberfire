@@ -105,7 +105,7 @@ describe("FirebaseSerializer", function() {
       });
 
       it("was called for each item in the payload", function() {
-        assert.equal(spy.callCount, 3);
+        assert.equal(spy.callCount, 2);
       });
 
       after(function() {

@@ -231,10 +231,14 @@ describe("FirebaseAdapter", function() {
       });
     });
 
-    after(function() {
+    after(function(done) {
       getRefSpy.restore();
       findAllAddEventListenersSpy.restore();
       handleChildValueSpy.restore();
+      Ember.run(function() {
+        store.getById('post', 'post_3').destroyRecord();
+        done();
+      });
     });
 
   });
@@ -297,7 +301,7 @@ describe("FirebaseAdapter", function() {
       it("contains a null belongsTo relationship", function() {
         assert.equal(serializedRecord.user, null);
       });
-      
+
       it("removed the null belongsTo reference from the final payload", function() {
         assert(Ember.isNone(finalPayload.user));
       });
