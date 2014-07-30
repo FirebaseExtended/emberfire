@@ -7,7 +7,7 @@
   }
 
   var EmberFire = Ember.Namespace.create({
-    VERSION: '1.1.2'
+    VERSION: '1.1.3'
   });
 
   if (Ember.libraries) {

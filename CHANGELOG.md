@@ -1,3 +1,9 @@
+v1.1.3
+------------------
+Release Date: July 30, 2014
+
+* Updated ember-cli compatability
+
 v1.1.2
 ------------------
 Release Date: July 21, 2014

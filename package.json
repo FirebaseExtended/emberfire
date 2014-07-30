@@ -1,7 +1,7 @@
 {
   "name": "emberfire",
   "description": "The officially supported Ember binding for Firebase",
-  "version": "1.1.2",
+  "version": "1.1.3",
   "author": "Firebase <support@firebase.com> (https://www.firebase.com/)",
   "homepage": "https://github.com/firebase/emberfire/",
   "repository": {
@@ -32,7 +32,9 @@
     "CHANGELOG.md",
     "package.json"
   ],
-  "ember-addon-main": "lib/ember-cli-ember-fire.js",
+  "ember-addon": {
+    "main": "lib/ember-cli-ember-fire.js"
+  },
   "dependencies": {
   },
   "devDependencies": {
