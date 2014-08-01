@@ -240,12 +240,12 @@ If you'd like to contribute to EmberFire, you'll need to run the following comma
 
 ```bash
 $ git clone https://github.com/firebase/emberfire.git
-$ cd emberfire          # go to the emberfire directory
-$ npm install -g grunt  # globally install grunt task runner
-$ npm install -g bower  # globally install Bower package manager
-$ npm install           # install local npm build / test dependencies
-$ bower install         # install local JavaScript dependencies
-$ grunt watch           # watch for source file changes
+$ cd emberfire              # go to the emberfire directory
+$ npm install -g grunt-cli  # globally install grunt task runner
+$ npm install -g bower      # globally install Bower package manager
+$ npm install               # install local npm build / test dependencies
+$ bower install             # install local JavaScript dependencies
+$ grunt watch               # watch for source file changes
 ```
 
 `grunt watch` will watch for changes in the `/src/` directory and lint, concatenate, and minify the source files and run the test suite when a change occurs. The output files - `emberfire.js` and `emberfire.min.js` - are written to the `/dist/` directory.
