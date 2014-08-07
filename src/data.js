@@ -404,10 +404,7 @@
                 }
                 break;
               case 'belongsTo':
-                if (typeof serializedRecord[key] === "undefined" || serializedRecord[key] === null || serializedRecord[key] === '') {
-                  delete serializedRecord[key];
-                }
-                else if (relationship.options.embedded === true) {
+                if (relationship.options.embedded === true) {
                   save = adapter._saveBelongsToRecord(store, type, relationship, serializedRecord[key], recordRef);
                   savedRelationships.push(save);
                   delete serializedRecord[key];
