@@ -404,7 +404,7 @@
                 }
                 break;
               case 'belongsTo':
-                if (typeof serializedRecord[key] === "undefined" || serializedRecord[key] === null || serializedRecord[key] === '') {
+                if (typeof serializedRecord[key] === "undefined" || serializedRecord[key] === '') {
                   delete serializedRecord[key];
                 }
                 else if (relationship.options.embedded === true) {
