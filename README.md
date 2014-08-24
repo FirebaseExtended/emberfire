@@ -49,8 +49,8 @@ $ bower install emberfire --save
 ## Getting Started with Firebase
 
 EmberFire requires Firebase in order to sync data. You can
-[sign up here](https://www.firebase.com/docs/web-quickstart.html?utm_medium=web&utm_source=emberfire)
-for a free account.
+[sign up here](https://www.firebase.com/signup/?utm_medium=web&utm_source=emberfire) for a free
+account.
 
 
 ## Usage
