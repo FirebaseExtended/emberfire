@@ -1,3 +1,10 @@
+/*! EmberFire is the officially supported adapter for using Firebase with
+ *  Ember Data.
+ *
+ *  GeoFire 0.0.0
+ *  https://github.com/firebase/emberfire/
+ *  License: MIT
+ */
 (function() {
   "use strict";
 
@@ -7,7 +14,7 @@
   }
 
   var EmberFire = Ember.Namespace.create({
-    VERSION: '1.1.3'
+    VERSION: '0.0.0'
   });
 
   if (Ember.libraries) {

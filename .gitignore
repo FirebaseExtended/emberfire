@@ -1,4 +1,5 @@
 tmp/
+dist/
 vendor/
 node_modules/
 *-boilerplate/
