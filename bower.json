@@ -29,7 +29,7 @@
     "node_modules",
     "bower_components",
     "build.sh",
-    "release.sh",
+    "changelog.txt",
     "Gruntfile.js",
     "package.json"
   ],
