@@ -35,6 +35,7 @@
     "main": "lib/ember-cli-ember-fire.js"
   },
   "dependencies": {
+    "bower-config": "^0.5.2"
   },
   "devDependencies": {
     "grunt": "~0.4.5",
