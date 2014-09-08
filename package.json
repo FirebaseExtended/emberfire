@@ -32,7 +32,7 @@
     "package.json"
   ],
   "ember-addon": {
-    "main": "lib/ember-cli-ember-fire.js"
+    "main": "lib/ember-addon/index.js"
   },
   "dependencies": {
   },
