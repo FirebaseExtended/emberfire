@@ -18,6 +18,14 @@ If you would like to use Firebase without Ember Data, we recommend the third-par
 **Join the [Firebase + Ember Google Group](https://groups.google.com/forum/#!forum/firebase-ember)
 to ask technical questions, share apps you've built, and chat with other developers in the community.**
 
+## ember-cli
+
+requires `v0.0.44` or greater
+
+```sh
+npm install --save-dev emberfire
+ember generate emberfire
+```
 
 ## Downloading EmberFire
 

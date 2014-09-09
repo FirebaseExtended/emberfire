@@ -23,17 +23,18 @@
     "realtime",
     "ember-addon"
   ],
+  "ember-addon": {
+    "main": "ember-addon.js"
+  },
   "main": "dist/emberfire.min.js",
   "files": [
+    "ember-addon.js",
     "lib/**/*",
     "dist/**/*",
     "vendor/**/*",
     "README.md",
     "package.json"
   ],
-  "ember-addon": {
-    "main": "lib/ember-cli-ember-fire.js"
-  },
   "dependencies": {
   },
   "devDependencies": {
