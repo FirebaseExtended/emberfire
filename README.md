@@ -88,7 +88,8 @@ $ ember generate emberfire
 Then, all you need to do is create `app/adapters/application.js` with the following content:
 
 ```javascript
-/* globals Firebase */
+import DS from 'ember-data';
+import Firebase from 'firebase';
 
 export default DS.FirebaseAdapter.extend({
   firebase: new Firebase("https://<your-firebase>.firebaseio.com")

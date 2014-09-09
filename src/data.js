@@ -724,4 +724,21 @@
     });
   });
 
+  /**
+    AMD-shim, primarily for ember-cli
+  */
+  if (typeof define === 'function') {
+    define('firebase', [], function() {
+      return {
+        'default': Firebase
+      };
+    });
+    
+    define('emberfire', [], function() {
+      return {
+        'default': EmberFire
+      };
+    });
+  }
+
 })();
