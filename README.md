@@ -76,7 +76,7 @@ including ways to create, find, delete and query records.
 
 #### Ember CLI
 
-EmberFire also works with the Ember CLI. Run the following command to add `emberfire.js` to your project:
+EmberFire also works with the Ember CLI [Example App](https://github.com/stefanpenner/ember-cli-ember-fire). Run the following command to add `emberfire.js` to your project:
 
 Temporary install instructions for ember-cli: (v1.2.1 is not yet published to npm)
 
