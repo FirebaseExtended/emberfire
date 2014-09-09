@@ -78,8 +78,10 @@ including ways to create, find, delete and query records.
 
 EmberFire also works with the Ember CLI. Run the following command to add `emberfire.js` to your project:
 
+Temporary install instructions for ember-cli: (v1.2.0 is not yet published to npm)
+
 ```bash
-$ npm install --save-dev emberfire
+$ npm install --save-dev git://github.com/firebase/emberfire#v1.2.0
 $ ember generate emberfire
 ```
 
