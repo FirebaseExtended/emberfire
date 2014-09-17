@@ -1,0 +1,1 @@
+fixed - Fixed a bug in compatability between EmberFire and Ember Data v1.0.0-beta.10 by changing dependency to v1.0.0-beta.8.
