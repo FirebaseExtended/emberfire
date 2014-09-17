@@ -19,7 +19,6 @@ module.exports = function(grunt) {
 
   // Run client-side tests on the command line.
   this.registerTask('test', 'Runs tests through the command line using PhantomJS', [
-    'build',
     'mocha_phantomjs'
   ]);
 
