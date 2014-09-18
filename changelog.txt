@@ -1,1 +1,0 @@
-fixed - Fixed a bug which caused the 1.2.4 release to not include the distribution files in Bower.
