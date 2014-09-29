@@ -28,7 +28,13 @@ module.exports = function(grunt) {
   // Load custom tasks from NPM
   grunt.loadNpmTasks('grunt-mocha-phantomjs');
   grunt.loadNpmTasks('grunt-mocha-test');
+  grunt.loadNpmTasks('grunt-contrib-watch');
 
+
+  config.watch = {
+    files: ['test/**/*.js', 'lib/**/*.js', 'src/**/*.js'],
+    tasks: ['build'],
+  },
   // Merge config into emberConfig, overwriting existing settings
   grunt.initConfig(config);
 
