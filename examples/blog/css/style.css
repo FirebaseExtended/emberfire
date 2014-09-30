@@ -4,26 +4,9 @@
 }
 
 body {
-  font-family: 'HelveticaNeue';
+  font-family: 'Lato', sans-serif;
   color: #333;
   -webkit-font-smoothing: antialiased;
-}
-
-strong {
-  font-family: 'HelveticaNeue-Bold';
-  font-weight: normal;
-}
-
-em {
-  font-family: 'HelveticaNeue-Italic';
-}
-
-h1, h2, h3, h4, h5, h6 {
-  font-weight: normal;
-}
-
-h1 {
-  font-family: 'HelveticaNeue';
 }
 
 a {
@@ -55,7 +38,7 @@ header {
     -ms-flex: 1;
     flex: 1;
 
-    font-family: 'HelveticaNeue-Light';
+    font-weight: 300;
   }
 
   header h1 a {
@@ -114,8 +97,7 @@ button {
   outline: none;
 
   color: #FFF;
-  font-family: 'HelveticaNeue-Light';
-  font-weight: normal;
+  font-weight: 300;
 }
 
 button:hover {
@@ -160,7 +142,7 @@ button:hover {
   .post-author {
     margin-top: 0.5em;
 
-    font-family: 'HelveticaNeue-Medium';
+    font-weight: 700;
   }
 
   .post-date {
@@ -172,7 +154,7 @@ button:hover {
     margin: 0.5em 0;
 
     font-size: 4em;
-    font-family: 'HelveticaNeue-UltraLight';
+    font-weight: 100;
   }
 
   .post-content {
@@ -200,7 +182,8 @@ button:hover {
 
     .post-comments-header {
       font-size: 1.5em;
-      font-family: 'HelveticaNeue-Italic';
+      font-weight: normal;
+      font-style: italic;
     }
 
     .post-comment {
@@ -265,7 +248,7 @@ button:hover {
         padding: 0.5em;
         border: 1px solid #CCC;
 
-        font-family: 'HelveticaNeue-Light';
+        font-weight: 300;
       }
 
       .post-comment-new textarea {
@@ -292,7 +275,7 @@ button:hover {
     margin: 0.5em 0;
 
     font-size: 3em;
-    font-family: 'HelveticaNeue-UltraLight';
+    font-weight: 100;
   }
 
     .post-slug-date {
@@ -321,11 +304,11 @@ button:hover {
         font-size: 0.5em;
         text-transform: uppercase;
 
-        font-family: 'HelveticaNeue-Light';
+        font-weight: 300;
       }
 
       .post-slug-date-day {
-         font-family: 'HelveticaNeue-Light';
+         font-weight: 300;
       }
 
     .post-slug-title {
@@ -342,6 +325,8 @@ button:hover {
       -ms-flex: 1;
       flex: 1;
       margin: 0;
+
+      font-weight: 100;
     }
 
     .post-slug-title a {
@@ -385,7 +370,7 @@ button:hover {
     padding: 0.5em;
     border: 1px solid #CCC;
 
-    font-family: 'HelveticaNeue-Light';
+    font-weight: 300;
   }
 
   .post-publish textarea {
