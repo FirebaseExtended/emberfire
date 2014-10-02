@@ -115,7 +115,7 @@
     serializeHasMany: function(record, json, relationship) {
       var key = relationship.key;
       var payloadKey = this.keyForRelationship ? this.keyForRelationship(key, "hasMany") : key;
-      var relationshipType = DS.RelationshipChange.determineRelationshipType(record.constructor, relationship);
+      var relationshipType = record.constructor.determineRelationshipType(relationship);
       var relationshipTypes = ['manyToNone', 'manyToMany', 'manyToOne'];
 
       if (relationshipTypes.indexOf(relationshipType) > -1) {
