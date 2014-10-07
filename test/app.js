@@ -13,6 +13,8 @@
   App = window.App = Ember.Application.create();
 
   App.rootElement = '#mocha';
+  Ember.Test.adapter = Ember.Test.Adapter.create();
+
   App.setupForTesting();
   App.injectTestHelpers();
 
@@ -118,6 +120,26 @@
           }
         }
       },
+      "double_denormalized": {
+        "posts": {
+          "post_1": {
+            "published": 1395162147646,
+            "user": "aputinski",
+            "body": "This is the first FireBlog post!",
+            "embeddedComments": {
+              "comment_1": {
+                "published": "32",
+                "embeddedUser": {
+                  "id": "aputinski",
+                  "firstName": "Adam"
+                },
+                "body": "This is a comment"
+              },
+            },
+            "title": "Post 1"
+          },
+        },
+      },
       "invalid": {
         "posts": {
           "post_1": {
@@ -164,7 +186,8 @@
   FirebaseTestRef.set(FIREBASE_FIXTURE_DATA);
 
   App.ApplicationAdapter = DS.FirebaseAdapter.extend({
-    firebase: FirebaseTestRef.child('blogs/normalized')
+    firebase: FirebaseTestRef.child('blogs/normalized'),
+    _queueFlushDelay: false
   });
 
   App.Post = DS.Model.extend({
@@ -175,7 +198,8 @@
       return this.get('published');
     }),
     user: DS.belongsTo('user', { async: true }),
-    comments: DS.hasMany('comment', { async: true })
+    comments: DS.hasMany('comment', { async: true }),
+    embeddedComments: DS.hasMany('comment', { embedded: true })
   });
 
   App.Comment = DS.Model.extend({
@@ -184,7 +208,8 @@
     publishedDate: Ember.computed('published', function() {
       return this.get('published');
     }),
-    user: DS.belongsTo('user', { async: true })
+    user: DS.belongsTo('user', { async: true }),
+    embeddedUser: DS.belongsTo('user', { embedded: true, inverse:null })
   });
 
   App.User = DS.Model.extend({
@@ -197,7 +222,7 @@
       return 'https://www.gravatar.com/avatar/' + md5(this.get('id')) + '.jpg?d=retro&size=80';
     }),
     posts: DS.hasMany('post', { async: true }),
-    comments: DS.hasMany('comment', { async: true })
+    comments: DS.hasMany('comment', { async: true, inverse:'user' })
   });
 
   /*App.Router.map(function() {

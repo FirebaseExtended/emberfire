@@ -11,7 +11,7 @@ describe("FirebaseSerializer", function() {
     adapter._ref = FirebaseTestRef.child("blogs/normalized");
   });
 
-  beforeEach(function() {
+  after(function() {
     App.reset();
   });
 
@@ -52,14 +52,12 @@ describe("FirebaseSerializer", function() {
           .child("blogs/denormalized/posts")
           .on("value", function(snapshot) {
             posts = TestHelpers.getPosts(snapshot);
-            normalizedPayload = serializer.normalize(store.modelFor(Post), posts[0]);
-            comments = normalizedPayload.comments;
-            done();
+            Ember.run(function() {
+              normalizedPayload = serializer.normalize(store.modelFor(Post), posts[0]);
+              comments = normalizedPayload.comments;
+              done();
+            });
           });
-      });
-
-      it("leaves embedded hasMany relationships as objects", function() {
-        assert(!Ember.isArray(comments));
       });
 
     });
@@ -105,7 +103,7 @@ describe("FirebaseSerializer", function() {
       });
 
       it("was called for each item in the payload", function() {
-        assert.equal(spy.callCount, 2);
+        assert.equal(spy.callCount, posts.length);
       });
 
       after(function() {
@@ -142,7 +140,7 @@ describe("FirebaseSerializer", function() {
       it("pushed the embedded records into the store", function() {
         var hasComments = function(ids) {
           return Ember.A(ids).every(function(id) {
-            return store.hasRecordForId(store.modelFor("comment"), id);
+            return store.hasRecordForId("comment", id);
           });
         };
         assert(hasComments(["comment_1", "comment_2"]));
