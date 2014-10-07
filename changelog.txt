@@ -1,0 +1,2 @@
+fixed - Embedded processing has been refactored to recursively normalize embedded records, bringing it more in line with the `EmbeddedRecordsMixin`.
+changed - The adapter event subscribing to Firebase events now lives in the `afterPush` hook instead of being scattered around the adapter.
