@@ -132,7 +132,7 @@
 
     App.PostsIndexRoute = Ember.Route.extend({
       model: function() {
-        return this.store.findAll('post');
+        return this.store.find('post');
       }
     });
 
@@ -209,7 +209,7 @@
 
     App.UsersRoute = Ember.Route.extend({
       model: function() {
-        return this.store.findAll('user');
+        return this.store.find('user');
       }
     });
 
