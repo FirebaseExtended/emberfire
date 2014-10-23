@@ -23,7 +23,7 @@
     "realtime",
     "ember-addon"
   ],
-  "main": "dist/emberfire.min.js",
+  "main": "dist/emberfire.js",
   "files": [
     "lib/**/*",
     "dist/**/*",

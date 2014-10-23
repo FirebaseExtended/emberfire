@@ -17,7 +17,7 @@
     "realtime",
     "ember-addon"
   ],
-  "main": "dist/emberfire.min.js",
+  "main": "dist/emberfire.js",
   "ignore": [
     "**/.*",
     "src",
