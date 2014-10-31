@@ -239,11 +239,12 @@
     */
 
     init: function() {
-      if (!this.firebase || typeof this.firebase !== 'object') {
+      var firebase = this.get('firebase');
+      if (!firebase || typeof firebase !== 'object') {
         throw new Error('Please set the `firebase` property on the adapter.');
       }
       // If provided Firebase reference was a query (eg: limits), make it a ref.
-      this._ref = this.firebase.ref();
+      this._ref = firebase.ref();
       // Keep track of what types `.findAll()` has been called for
       this._findAllMapForType = {};
       // Keep a cache to check modified relationships against
