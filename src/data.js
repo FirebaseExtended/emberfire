@@ -29,7 +29,7 @@
       var record = this._super(typeName, data, _partial);
       var adapter = this.adapterFor(record.constructor);
       if (adapter.recordWasPushed) {
-        adapter.recordWasPushed(this, typeName, record);
+        adapter.recordWasPushed(this, this.modelFor(typeName), record);
       }
       return record;
     },
