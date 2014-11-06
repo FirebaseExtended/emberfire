@@ -239,11 +239,12 @@
     */
 
     init: function() {
-      if (!this.firebase || typeof this.firebase !== 'object') {
+      var firebase = this.get('firebase');
+      if (!firebase || typeof firebase !== 'object') {
         throw new Error('Please set the `firebase` property on the adapter.');
       }
       // If provided Firebase reference was a query (eg: limits), make it a ref.
-      this._ref = this.firebase.ref();
+      this._ref = firebase.ref();
       // Keep track of what types `.findAll()` has been called for
       this._findAllMapForType = {};
       // Keep a cache to check modified relationships against
@@ -256,11 +257,11 @@
       Uses push() to generate chronologically ordered unique IDs.
     */
     generateIdForRecord: function() {
-      return this._ref.push().name();
+      return this._getKey(this._ref.push());
     },
 
     /**
-      Use the Firebase snapshot.name() as the record id
+      Use the Firebase DataSnapshot's key as the record id
 
       @param {Object} snapshot - A Firebase snapshot
       @param {Object} payload - The payload that will be pushed into the store
@@ -269,7 +270,7 @@
     _assignIdToPayload: function(snapshot) {
       var payload = snapshot.val();
       if (payload !== null && typeof payload === 'object' && typeof payload.id === 'undefined') {
-        payload.id = snapshot.name();
+        payload.id = this._getKey(snapshot);
       }
       return payload;
     },
@@ -392,7 +393,7 @@
       var serializer = store.serializerFor(type);
 
       ref.on('child_added', function(snapshot) {
-        if (!store.hasRecordForId(type, snapshot.name())) {
+        if (!store.hasRecordForId(type, adapter._getKey(snapshot))) {
           adapter._handleChildValue(store, type, serializer, snapshot);
         }
       });
@@ -409,7 +410,7 @@
       }
       var value = snapshot.val();
       if (value === null) {
-        var id = snapshot.name();
+        var id = this._getKey(snapshot);
         var record = store.getById(type, id);
         //TODO refactor using ED
         if (!record.get('isDeleted')) {
@@ -687,8 +688,18 @@
           cache[typeKey][id][key] = !Ember.isNone(ids) ? Ember.A(Ember.keys(ids)) : Ember.A();
         }
       });
-    }
+    },
 
+    /**
+     * A utility for retrieving the key name of a Firebase ref or
+     * DataSnapshot. This is backwards-compatible with `name()`
+     * from Firebase 1.x.x and `key()` from Firebase 2.0.0+. Once
+     * support for Firebase 1.x.x is dropped in EmberFire, this
+     * helper can be removed.
+     */
+    _getKey: function(refOrSnapshot) {
+      return (typeof refOrSnapshot.key === 'function') ? refOrSnapshot.key() : refOrSnapshot.name();
+    }
   });
 
   /**
