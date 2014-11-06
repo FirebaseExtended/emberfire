@@ -30,7 +30,7 @@ In order to use EmberFire in your project, you need to include the following fil
 <script src="https://cdn.firebase.com/js/client/1.0.21/firebase.js"></script>
 
 <!-- EmberFire -->
-<script src="https://cdn.firebase.com/libs/emberfire/1.2.7/emberfire.min.js"></script>
+<script src="https://cdn.firebase.com/libs/emberfire/1.3.0/emberfire.min.js"></script>
 ```
 
 Use the URL above to download both the minified and non-minified versions of EmberFire from the
