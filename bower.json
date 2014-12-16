@@ -35,8 +35,8 @@
   ],
   "dependencies": {
     "firebase": "2.0.x",
-    "ember": "1.7.x",
-    "ember-data": "http://builds.emberjs.com/canary/ember-data.js"
+    "ember": "1.9.x",
+    "ember-data": "1.0.0-beta.12"
   },
   "devDependencies": {
   }

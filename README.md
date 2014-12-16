@@ -23,11 +23,11 @@ In order to use EmberFire in your project, you need to include the following fil
 
 ```html
 <!-- Ember + Ember Data -->
-<script src="http://builds.emberjs.com/canary/ember.min.js"></script>
-<script src="http://builds.emberjs.com/canary/ember-data.min.js"></script>
+<script src="http://builds.emberjs.com/tags/v1.9.0/ember.js"></script>
+<script src="http://builds.emberjs.com/tags/v1.0.0-beta.12/ember-data.js"></script>
 
 <!-- Firebase -->
-<script src="https://cdn.firebase.com/js/client/1.0.21/firebase.js"></script>
+<script src="https://cdn.firebase.com/js/client/2.0.6/firebase.js"></script>
 
 <!-- EmberFire -->
 <script src="https://cdn.firebase.com/libs/emberfire/1.3.1/emberfire.min.js"></script>

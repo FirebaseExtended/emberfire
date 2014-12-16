@@ -11,6 +11,31 @@
     <link type="text/css" rel="stylesheet" href="css/normalize.css" />
     <link type="text/css" rel="stylesheet" href="css/style.css" />
 
+    <!-- jQuery -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+
+    <!-- Handlebars -->
+    <script src="js/libs/handlebars-v2.0.0.js"></script>
+
+    <!-- Ember and EmberData -->
+    <script src="js/libs/ember-1.9.0.js"></script>
+    <script src="js/libs/ember-data-1.0.0-beta.12.js"></script>
+
+    <!-- Firebase -->
+    <script src="https://cdn.firebase.com/js/client/2.0.6/firebase.js"></script>
+
+    <!-- EmberFire -->
+    <script src="js/dist/emberfire.js"></script>
+
+    <!-- Moment.js -->
+    <script src="js/libs/moment.js"></script>
+
+    <!-- MD5.js -->
+    <script src="js/libs/md5.js"></script>
+
+    <!-- Custom JS -->
+    <script src="js/app.js"></script>
+
   </head>
 
   <body>
@@ -39,7 +64,7 @@
       </div>
       <h3 class="post-title">{{post.title}}</h3>
       {{#if isExpanded}}
-        <div class="post-content">{{markdown post.body}}</div>
+        <div class="post-content">{{post.body}}</div>
         <h4 class="post-comments-header">
           {{#if post.comments}}
             Comments
@@ -56,7 +81,7 @@
                   <strong class="post-comment-author">{{comment.user.username}}</strong>
                   <em class="post-comment-date">{{comment.publishedDate}}</em>
                 </div>
-                {{markdown comment.body}}
+                {{comment.body}}
               </div>
             </li>
           {{/each}}
@@ -150,33 +175,6 @@
       </ul>
     </script>
 
-    <!-- jQuery -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-
-    <!-- Handlebars -->
-    <script src="js/libs/handlebars-v1.3.0.js"></script>
-
-    <!-- Ember and EmberData -->
-    <script src="js/libs/ember-1.7.0.js"></script>
-    <script src="js/libs/ember-data.js"></script>
-
-    <!-- Firebase -->
-    <script src="https://cdn.firebase.com/js/client/2.0.2/firebase.js"></script>
-
-    <!-- EmberFire -->
-    <script src="js/dist/emberfire.js"></script>
-
-    <!-- Moment.js -->
-    <script src="js/libs/moment.js"></script>
-
-    <!-- MD5.js -->
-    <script src="js/libs/md5.js"></script>
-
-    <!-- Markdown.js -->
-    <script src="js/libs/markdown.js"></script>
-
-    <!-- Custom JS -->
-    <script src="js/app.js"></script>
 
   </body>
 </html>

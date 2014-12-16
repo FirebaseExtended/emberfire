@@ -299,14 +299,14 @@
   // Helpers
   ////////////////////////////////////////////////////////////
 
-  Ember.Handlebars.helper('breaklines', function(value, options) {
-    var escaped = Ember.Handlebars.Utils.escapeExpression(value);
-        escaped = escaped.replace(/(\r\n|\n|\r)/gm, '<br>');
-    return new Ember.Handlebars.SafeString(escaped);
-  });
+  // Ember.Handlebars.helper('breaklines', function(value, options) {
+  //   var escaped = Ember.Handlebars.Utils.escapeExpression(value);
+  //       escaped = escaped.replace(/(\r\n|\n|\r)/gm, '<br>');
+  //   return new Ember.Handlebars.SafeString(escaped);
+  // });
 
-  Ember.Handlebars.helper('markdown', function(value, options) {
-    return new Ember.Handlebars.SafeString(window.markdown.toHTML(value));
-  });
+  // Ember.Handlebars.helper('markdown', function(value, options) {
+  //   return new Ember.Handlebars.SafeString(window.markdown.toHTML(value));
+  // });
 
 })(window);
