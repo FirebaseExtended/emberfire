@@ -83,7 +83,13 @@ $ npm install emberfire --save-dev
 $ ember generate emberfire
 ```
 
-Then, all you need to do is create `app/adapters/application.js` with the following content:
+Then, generate an application adapter:
+
+```bash
+ember g adapter application
+```
+
+And edit `app/adapters/application.js` with the following content:
 
 ```javascript
 /* globals Firebase */
