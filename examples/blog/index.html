@@ -18,7 +18,7 @@
     <script src="js/libs/handlebars-v2.0.0.js"></script>
 
     <!-- Ember and EmberData -->
-    <script src="js/libs/ember-1.9.0.js"></script>
+    <script src="js/libs/ember-1.9.1.js"></script>
     <script src="js/libs/ember-data-1.0.0-beta.12.js"></script>
 
     <!-- Firebase -->
@@ -32,6 +32,9 @@
 
     <!-- MD5.js -->
     <script src="js/libs/md5.js"></script>
+
+    <!-- Markdown.js -->
+    <script src="js/libs/markdown.js"></script>
 
     <!-- Custom JS -->
     <script src="js/app.js"></script>
@@ -64,7 +67,7 @@
       </div>
       <h3 class="post-title">{{post.title}}</h3>
       {{#if isExpanded}}
-        <div class="post-content">{{post.body}}</div>
+        <div class="post-content">{{markdown post.body}}</div>
         <h4 class="post-comments-header">
           {{#if post.comments}}
             Comments
@@ -81,7 +84,7 @@
                   <strong class="post-comment-author">{{comment.user.username}}</strong>
                   <em class="post-comment-date">{{comment.publishedDate}}</em>
                 </div>
-                {{comment.body}}
+                {{markdown comment.body}}
               </div>
             </li>
           {{/each}}
