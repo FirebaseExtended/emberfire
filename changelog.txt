@@ -1,4 +1,2 @@
 feature - Upgraded Ember dependency to 1.9.
 feature - Upgraded Ember Data dependency to 1.0.0-beta.12.
-feature - Update blog example to use Firebase Hosting.
-fixed - Blog example now works with the latest versions of Ember (1.9.1), Ember Data (1.0.0-beta.12), Handlebars (2.0), and Firebase (2.0.6).
