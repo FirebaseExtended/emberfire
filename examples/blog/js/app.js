@@ -306,7 +306,9 @@
   });
 
   Ember.Handlebars.helper('markdown', function(value, options) {
-    return new Ember.Handlebars.SafeString(window.markdown.toHTML(value));
+    if (value) {
+      return new Ember.Handlebars.SafeString(window.markdown.toHTML(value));
+    }
   });
 
 })(window);
