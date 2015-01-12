@@ -34,7 +34,7 @@
     "package.json"
   ],
   "dependencies": {
-    "firebase": "2.0.x",
+    "firebase": "2.1.x",
     "ember": "1.9.x",
     "ember-data": "1.0.0-beta.12"
   },

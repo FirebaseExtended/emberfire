@@ -1,2 +1,2 @@
-feature - Upgraded Ember dependency to 1.9.
+feature - Upgraded Ember dependency to 1.9 and Firebase dependency to 2.1.
 feature - Upgraded Ember Data dependency to 1.0.0-beta.12.
