@@ -39,12 +39,23 @@
       if (adapter.recordWillUnload) {
         adapter.recordWillUnload(this, record);
       }
+    },
+
+    recordWillDelete: function (record) {
+      var adapter = this.adapterFor(record.constructor);
+      if (adapter.recordWillDelete) {
+        adapter.recordWillDelete(this, record);
+      }
     }
   });
   DS.Model.reopen({
     unloadRecord: function() {
       this.store.recordWillUnload(this);
       return this._super();
+    },
+    deleteRecord: function () {
+      this.store.recordWillDelete(this);
+      this._super();
     }
   });
   // Shortcuts
@@ -318,6 +329,21 @@
       ref.off('value');
     },
 
+    recordWillDelete: function(store, record) {
+      var adapter = this;
+
+      record.eachRelationship(function (key, relationship) {
+        if (relationship.kind === 'belongsTo') {
+          var parentRecord = record.get(relationship.key);
+          var inverseKey = record.inverseFor(relationship.key);
+          if (inverseKey && parentRecord.get('id')) {
+            var parentRef = adapter._getRef(inverseKey.type, parentRecord.get('id'));
+            adapter._removeHasManyRecord(store, parentRef, inverseKey.name, record.id);
+          }
+        }
+      });
+    },
+
     listenForChanges: function(store, type, record) {
       record.__listening = true;
       var serializer = store.serializerFor(type);
@@ -531,7 +557,7 @@
         return !ids.contains(id);
       });
       removedRecords = Ember.A(removedRecords).map(function(id) {
-        return adapter._removeHasManyRecord(store, relationship, recordRef, id);
+        return adapter._removeHasManyRecord(store, recordRef, relationship.key, id);
       });
       // Combine all the saved records
       var savedRecords = dirtyRecords.concat(removedRecords);
@@ -573,8 +599,8 @@
     /**
       Remove a relationship
     */
-    _removeHasManyRecord: function(store, relationship, parentRef, id) {
-      var ref = this._getRelationshipRef(parentRef, relationship.key, id);
+    _removeHasManyRecord: function(store, parentRef, key, id) {
+      var ref = this._getRelationshipRef(parentRef, key, id);
       return toPromise(ref.remove, ref, [], ref.toString());
     },
 
