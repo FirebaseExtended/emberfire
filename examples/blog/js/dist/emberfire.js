@@ -425,6 +425,16 @@
     },
 
     /**
+      Subclasses of DS.Adapter must implement a findQuery method.
+      Emberfire doesn't officially support it, so instead we fall
+      back to findAll.
+    */
+    findQuery: function(store, type, query) {
+      Ember.warn('DS.FirebaseAdapter does not support findQuery, falling back to findAll.');
+      return this.findAll(store, type);
+    },
+
+    /**
       `createRecord` is an alias for `updateRecord` because calling \
       `ref.set()` would wipe out any existing relationships
     */
