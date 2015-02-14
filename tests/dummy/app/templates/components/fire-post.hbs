@@ -1,0 +1,35 @@
+<div class="post-header">
+  <img {{bind-attr src="post.user.avatar"}} class="avatar post-avatar"/>
+  <div class="post-author">{{post.user.id}}</div>
+  <div class="post-date">{{post.publishedDate}}</div>
+</div>
+<h3 class="post-title">{{post.title}}</h3>
+{{#if isExpanded}}
+  <div class="post-content">{{markdown post.body}}</div>
+  <h4 class="post-comments-header">
+    {{#if post.comments}}
+      Comments
+    {{else}}
+      Leave a comment!
+    {{/if}}
+  </h4>
+  <ul class="post-comments">
+    {{#each comment in post.comments}}
+      <li class="post-comment">
+        <img {{bind-attr src="comment.user.avatar"}} class="avatar post-comment-avatar" />
+        <div class="post-comment-body">
+          <div class="post-comment-meta">
+            <strong class="post-comment-author">{{comment.user.username}}</strong>
+            <em class="post-comment-date">{{comment.publishedDate}}</em>
+          </div>
+          {{markdown comment.body}}
+        </div>
+      </li>
+    {{/each}}
+    <li class="post-comment post-comment-new">
+      {{input value=commentUsername placeholder="Username"}}
+      {{textarea value=commentBody placeholder="Contribute to the conversation"}}
+      <button {{action "publishComment"}}>Publish</button>
+    </li>
+  </ul>
+{{/if}}

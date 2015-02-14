@@ -4,6 +4,15 @@
   "version": "0.0.0",
   "author": "Firebase <support@firebase.com> (https://www.firebase.com/)",
   "homepage": "https://github.com/firebase/emberfire/",
+  "directories": {
+    "doc": "doc",
+    "test": "tests"
+  },
+  "scripts": {
+    "start": "ember server",
+    "build": "ember build",
+    "test": "ember test"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/firebase/emberfire.git"
@@ -23,39 +32,22 @@
     "realtime",
     "ember-addon"
   ],
-  "main": "dist/emberfire.js",
-  "files": [
-    "lib/**/*",
-    "dist/**/*",
-    "vendor/**/*",
-    "README.md",
-    "package.json"
-  ],
   "ember-addon": {
-    "main": "lib/ember-addon/index.js"
-  },
-  "dependencies": {
+    "configPath": "tests/dummy/config"
   },
   "devDependencies": {
-    "grunt": "~0.4.5",
-    "grunt-cli": "0.1.13",
-    "grunt-contrib-clean": "~0.5.0",
-    "grunt-contrib-concat": "~0.3.0",
-    "grunt-contrib-connect": "~0.7.1",
-    "grunt-contrib-jshint": "~0.6.2",
-    "grunt-contrib-uglify": "~0.4.0",
-    "grunt-contrib-watch": "~0.5.1",
-    "grunt-contrib-qunit": "~0.4.0",
-    "grunt-exec": "~0.4.2",
-    "grunt-istanbul": "~0.2.5",
-    "grunt-notify": "~0.2.7",
-    "grunt-mocha-phantomjs": "~0.3.1",
-    "grunt-mocha-test": "~0.5.0",
-    "load-grunt-config": "~0.5.0",
-    "grunt-contrib-copy": "~0.5.0"
-  },
-  "scripts": {
-    "test": "grunt test",
-    "travis": "grunt"
+    "broccoli-asset-rev": "^2.0.0",
+    "ember-cli": "0.1.15",
+    "ember-cli-6to5": "^3.0.0",
+    "ember-cli-dependency-checker": "0.0.7",
+    "ember-cli-htmlbars": "~0.6.0",
+    "ember-cli-ic-ajax": "0.1.1",
+    "ember-cli-inject-live-reload": "^1.3.0",
+    "ember-cli-mocha": "^0.4.0",
+    "ember-cli-uglify": "1.0.1",
+    "ember-data": "1.0.0-beta.12",
+    "ember-export-application-global": "^1.0.2",
+    "express": "^4.8.5",
+    "glob": "^4.0.5"
   }
 }
