@@ -17,4 +17,5 @@ install:
   - bower install
 
 script:
+  - npm run legacy
   - npm test
