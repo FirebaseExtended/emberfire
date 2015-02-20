@@ -11,5 +11,10 @@ module.exports = {
       development: app.bowerDirectory + '/firebase/firebase-debug.js',
       production: app.bowerDirectory + '/firebase/firebase.js'
     });
+
+    app.import('vendor/firebase/shim.js', {
+      type: 'vendor',
+      exports: { 'firebase': ['default'] }
+    });
   }
 };
