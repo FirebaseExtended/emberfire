@@ -1,2 +1,0 @@
-feature - Loosen Ember version requirement to 1.7+ to be compatible with new ember-cli apps.
-fixed - Deleting a record now removes orphaned `hasMany` relationship links.
