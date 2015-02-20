@@ -1,6 +1,6 @@
 import Ember from 'ember';
 import DS from 'ember-data';
-import toPromise from 'emberfire/utils/to-promise';
+import toPromise from '../utils/to-promise';
 
 var fmt = Ember.String.fmt;
 var Promise = Ember.RSVP.Promise;

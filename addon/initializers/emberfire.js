@@ -1,19 +1,19 @@
 import Ember from 'ember';
 import DS from 'ember-data';
-import FirebaseAdapter from 'emberfire/adapters/firebase';
-import FirebaseSerializer from 'emberfire/serializers/firebase';
+import FirebaseAdapter from '../adapters/firebase';
+import FirebaseSerializer from '../serializers/firebase';
+
+var VERSION = '0.0.0';
+
+if (Ember.libraries) {
+  Ember.libraries.registerCoreLibrary('EmberFire', VERSION);
+}
 
 export default {
   name: 'emberfire',
   initialize: function (container, app) {
     app.register('adapter:-firebase', FirebaseAdapter);
     app.register('serializer:-firebase', FirebaseSerializer);
-
-    var VERSION = '0.0.0';
-
-    if (Ember.libraries) {
-      Ember.libraries.registerCoreLibrary('EmberFire', VERSION);
-    }
 
     // Monkeypatch the store until ED gives us a good way to listen to push events
     DS.Store.reopen({
