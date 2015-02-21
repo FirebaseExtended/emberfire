@@ -1,5 +1,6 @@
 import Ember from 'ember';
 import Application from '../../app';
+/* jshint unused:false */
 import Router from '../../router';
 import config from '../../config/environment';
 
