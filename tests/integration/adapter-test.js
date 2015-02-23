@@ -1,29 +1,66 @@
-/*global describe, before, beforeEach, after, afterEach, specify, it, assert, App, FirebaseTestRef, TestHelpers */
+import Ember from 'ember';
+import DS from 'ember-data';
+import startApp from 'dummy/tests/helpers/start-app';
+import { it } from 'ember-mocha';
+import sinon from 'sinon';
+import Firebase from 'firebase';
+import createTestRef from 'dummy/tests/helpers/create-test-ref';
 
 describe("FirebaseAdapter - Finding Records", function() {
+  var App, store, serializer, adapter, firebaseTestRef;
 
-  var store, serializer, adapter;
+  before(function() {
+    App = startApp();
 
-  var setupAdapter = function() {
-    App.ApplicationAdapter = DS.FirebaseAdapter.extend({
-      firebase: FirebaseTestRef.child("blogs/normalized"),
-      _queueFlushDelay: 0
-    });
+    firebaseTestRef = createTestRef();
+    Firebase.goOffline();
     store = App.__container__.lookup("store:main");
     serializer = App.__container__.lookup("serializer:-firebase");
     adapter = App.__container__.lookup("adapter:application");
-  };
+    adapter._ref = firebaseTestRef.child("blogs/normalized");
+    adapter._queueFlushDelay = false;
 
+    App.Post = DS.Model.extend({
+      title: DS.attr('string'),
+      body: DS.attr('string'),
+      published: DS.attr('number'),
+      publishedDate: Ember.computed('published', function() {
+        return this.get('published');
+      }),
+      user: DS.belongsTo('user', { async: true }),
+      comments: DS.hasMany('comment', { async: true }),
+      embeddedComments: DS.hasMany('comment', { embedded: true })
+    });
+
+    App.Comment = DS.Model.extend({
+      body: DS.attr('string'),
+      published: DS.attr('number'),
+      publishedDate: Ember.computed('published', function() {
+        return this.get('published');
+      }),
+      user: DS.belongsTo('user', { async: true }),
+      embeddedUser: DS.belongsTo('user', { embedded: true, inverse:null })
+    });
+
+    App.User = DS.Model.extend({
+      created: DS.attr('number'),
+      username: Ember.computed('id', function() {
+        return this.get('id');
+      }),
+      firstName: DS.attr('string'),
+      avatar: Ember.computed(function() {
+        return 'https://www.gravatar.com/avatar/' + md5(this.get('id')) + '.jpg?d=retro&size=80';
+      }),
+      posts: DS.hasMany('post', { async: true }),
+      comments: DS.hasMany('comment', { async: true, inverse:'user' })
+    });
+  });
 
   after(function() {
     App.reset();
   });
 
   describe("#init()", function() {
-    before(function() {
-      setupAdapter();
-    });
-
     it("has a Firebase ref", function() {
       assert(adapter._ref !== undefined);
       assert(adapter._ref.toString().match(/^https\:\/\/emberfire\-demo\.firebaseio\.com/g));
@@ -32,10 +69,6 @@ describe("FirebaseAdapter - Finding Records", function() {
   });
 
   describe("#_getRef()", function() {
-    before(function() {
-      setupAdapter();
-    });
-
     it("returns the correct Firebase ref for a type", function() {
       var ref = adapter._getRef(store.modelFor("post"));
       assert(ref.toString().match(/blogs\/normalized\/posts$/g));
@@ -54,7 +87,6 @@ describe("FirebaseAdapter - Finding Records", function() {
     var getRefSpy, find, findRef;
 
     before(function() {
-      setupAdapter();
       getRefSpy = sinon.spy(adapter, "_getRef");
       find = adapter.find(store, store.modelFor("post"), "post_1");
       findRef = getRefSpy.getCall(0).returnValue;
@@ -104,14 +136,8 @@ describe("FirebaseAdapter - Finding Records", function() {
 
     var getRefSpy, findAllAddEventListenersSpy, handleChildValueSpy;
     var findAll, findAllRef;
-    var Post;
 
     before(function(done) {
-      setupAdapter();
-      Post = TestHelpers.getModelName('Post');
-      App[Post] = App.Post.extend({
-        comments: DS.hasMany("comment", { async: true })
-      });
       getRefSpy = sinon.spy(adapter, "_getRef");
       findAllAddEventListenersSpy = sinon.spy(adapter, "_findAllAddEventListeners");
       handleChildValueSpy = sinon.spy(adapter, "_handleChildValue");
@@ -144,28 +170,27 @@ describe("FirebaseAdapter - Finding Records", function() {
       });
     });
 
-    /*
     it("only adds event listeners once per type", function(done) {
       adapter.findAll(store, store.modelFor("post")).then(function() {
         assert.equal(findAllAddEventListenersSpy.callCount, 1);
         done();
       });
-    });*/
+    });
 
     it("adds new child values to the store", function() {
-        Ember.run(function(){
-          findAllRef.child('post_3').set({
-            "published": 1395162147646,
-            "body": "This is the third FireBlog post!",
-            "title": "Post 3"
-          });
+      Ember.run(function(){
+        findAllRef.child('post_3').set({
+          published: 1395162147646,
+          body: "This is the third FireBlog post!",
+          title: "Post 3"
         });
-        assert(store.hasRecordForId('post', 'post_3'));
+      });
+      assert(store.hasRecordForId(store.modelFor('post'), 'post_3'));
     });
 
     it("handles empty collections", function(done) {
       Ember.run(function() {
-        adapter.findAll(store, store.modelFor(Post)).then(function(posts) {
+        adapter.findAll(store, store.modelFor("post")).then(function(posts) {
           assert(Ember.isArray(posts));
           done();
         });
