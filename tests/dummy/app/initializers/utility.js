@@ -1,6 +1,4 @@
 import Utility from 'dummy/utils/utility';
-import FirebaseAdapter from 'emberfire/adapters/firebase';
-import FirebaseSerializer from 'emberfire/serializers/firebase';
 
 export default {
   name: 'utility',

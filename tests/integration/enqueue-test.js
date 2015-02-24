@@ -1,62 +1,28 @@
 import Ember from 'ember';
-import DS from 'ember-data';
 import startApp from 'dummy/tests/helpers/start-app';
 import { it } from 'ember-mocha';
 import sinon from 'sinon';
-import Firebase from 'firebase';
+import stubFirebase from 'dummy/tests/helpers/stub-firebase';
+import unstubFirebase from 'dummy/tests/helpers/unstub-firebase';
 import createTestRef from 'dummy/tests/helpers/create-test-ref';
 
-describe("FirebaseAdapter - Queing pushes", function() {
-  var App, store, serializer, adapter, firebaseTestRef;
+describe("Integration: FirebaseAdapter - Queing pushes", function() {
+  var app, adapter;
 
   before(function() {
-    App = startApp();
+    stubFirebase();
+    app = startApp();
 
-    firebaseTestRef = createTestRef();
-    Firebase.goOffline();
-    store = App.__container__.lookup("store:main");
-    serializer = App.__container__.lookup("serializer:-firebase");
-    adapter = App.__container__.lookup("adapter:application");
-    adapter._ref = firebaseTestRef.child("blogs/normalized");
+    adapter = app.__container__.lookup("adapter:application");
+    adapter._ref = createTestRef("blogs/normalized");
+  });
 
-    App.Post = DS.Model.extend({
-      title: DS.attr('string'),
-      body: DS.attr('string'),
-      published: DS.attr('number'),
-      publishedDate: Ember.computed('published', function() {
-        return this.get('published');
-      }),
-      user: DS.belongsTo('user', { async: true }),
-      comments: DS.hasMany('comment', { async: true }),
-      embeddedComments: DS.hasMany('comment', { embedded: true })
-    });
-
-    App.Comment = DS.Model.extend({
-      body: DS.attr('string'),
-      published: DS.attr('number'),
-      publishedDate: Ember.computed('published', function() {
-        return this.get('published');
-      }),
-      user: DS.belongsTo('user', { async: true }),
-      embeddedUser: DS.belongsTo('user', { embedded: true, inverse:null })
-    });
-
-    App.User = DS.Model.extend({
-      created: DS.attr('number'),
-      username: Ember.computed('id', function() {
-        return this.get('id');
-      }),
-      firstName: DS.attr('string'),
-      avatar: Ember.computed(function() {
-        return 'https://www.gravatar.com/avatar/' + md5(this.get('id')) + '.jpg?d=retro&size=80';
-      }),
-      posts: DS.hasMany('post', { async: true }),
-      comments: DS.hasMany('comment', { async: true, inverse:'user' })
-    });
+  after(function () {
+    unstubFirebase();
   });
 
   afterEach(function() {
-    App.reset();
+    Ember.run(app, 'destroy');
   });
 
   describe("#_queueScheduleFlush()", function() {

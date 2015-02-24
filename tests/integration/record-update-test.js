@@ -1,20 +1,34 @@
-/*global describe, before, beforeEach, after, afterEach, specify, it, assert, App, FirebaseTestRef, TestHelpers */
+import Ember from 'ember';
+import DS from 'ember-data';
+import startapp from 'dummy/tests/helpers/start-app';
+import { it } from 'ember-mocha';
+import stubFirebase from 'dummy/tests/helpers/stub-firebase';
+import unstubFirebase from 'dummy/tests/helpers/unstub-firebase';
+import createTestRef from 'dummy/tests/helpers/create-test-ref';
+import reopenModel from 'dummy/tests/helpers/reopen-model';
 
-describe("FirebaseAdapter - Updating records", function() {
-  var store, adapter;
+describe("Integration: FirebaseAdapter - Updating records", function() {
+  var app, store, adapter;
 
   var setupAdapter = function() {
-    App.ApplicationAdapter = DS.FirebaseAdapter.extend({
-      firebase: FirebaseTestRef.child("blogs/normalized"),
-      _queueFlushDelay: 0
-    });
-    store = App.__container__.lookup("store:main");
-    adapter = App.__container__.lookup("adapter:application");
+    app = startapp();
+    store = app.__container__.lookup("store:main");
+    adapter = app.__container__.lookup("adapter:application");
+    adapter._ref = createTestRef("blogs/normalized");
+    adapter._queueFlushDelay = false;
   };
+
+  before(function () {
+    stubFirebase();
+  });
+
+  after(function () {
+    unstubFirebase();
+  });
 
 
   afterEach(function() {
-    App.reset();
+    Ember.run(app, 'destroy');
   });
 
   describe("#updateRecord()", function() {
@@ -25,7 +39,7 @@ describe("FirebaseAdapter - Updating records", function() {
       before(function(done) {
         setupAdapter();
         _ref = adapter._ref;
-        var reference = FirebaseTestRef.child("blogs/tests/adapter/updaterecord/normalized");
+        var reference = createTestRef("blogs/tests/adapter/updaterecord/normalized");
         adapter._ref = reference;
         Ember.run(function() {
           newComment = store.createRecord("comment", {
@@ -66,12 +80,12 @@ describe("FirebaseAdapter - Updating records", function() {
     });
 
     describe("relationships with number ids", function() {
-      var _ref, newPost, newComment, currentData, postData, postId, commentId;
+      var _ref, newPost, newComment, postId, commentId;
 
       before(function(done) {
         setupAdapter();
         _ref = adapter._ref;
-        var reference = FirebaseTestRef.child("blogs/tests/adapter/updaterecord/normalized");
+        var reference = createTestRef("blogs/tests/adapter/updaterecord/normalized");
         adapter._ref = reference;
         Ember.run(function() {
           newComment = store.createRecord("comment", {
@@ -116,8 +130,14 @@ describe("FirebaseAdapter - Updating records", function() {
 
       before(function(done) {
         setupAdapter();
+
+        reopenModel(app, 'user', {
+          comments: DS.hasMany('comment', { async: true, inverse:'user' })
+        });
+
         _ref = adapter._ref;
-        adapter._ref = FirebaseTestRef.child("blogs/tests/adapter/updaterecord/normalized");
+        adapter._ref = createTestRef("blogs/tests/adapter/updaterecord/normalized");
+
         Ember.run(function() {
           newUser = store.createRecord("user");
           newComment = store.createRecord("comment", {
@@ -172,24 +192,24 @@ describe("FirebaseAdapter - Updating records", function() {
 
     describe("denormalized relationship", function() {
 
-      var _ref, postClassName, newPost, newComment, currentData, postData, commentData, postRefName;
-      var updateRef, relationshipRef, serializedRecord, finalPayload, postId, commentId;
+      var _ref, newPost, newComment, currentData, postData, commentData;
+      var postId, commentId;
 
       before(function(done) {
         setupAdapter();
         _ref = adapter._ref;
-        postClassName = TestHelpers.getModelName('Post');
-        postRefName = postClassName.toLowerCase() + 's';
-        App[postClassName] = App.Post.extend({
+
+        reopenModel(app, 'post', {
           comments: DS.hasMany("comment", { embedded: true })
         });
-        var reference = FirebaseTestRef.child("blogs/tests/adapter/updaterecord/denormalized");
+
+        var reference = createTestRef("blogs/tests/adapter/updaterecord/denormalized");
         adapter._ref = reference;
         Ember.run(function() {
           newComment = store.createRecord("comment", {
             body: "This is a new comment"
           });
-          newPost = store.createRecord(postClassName, {
+          newPost = store.createRecord('post', {
             title: "New Post"
           });
           postId = newPost.get('id');
@@ -198,7 +218,7 @@ describe("FirebaseAdapter - Updating records", function() {
           newPost.save().then(function() {
             reference.once('value', function(data) {
               currentData = data.val();
-              postData = currentData[postRefName][postId];
+              postData = currentData.posts[postId];
               commentData = postData.comments[commentId];
               done();
              });

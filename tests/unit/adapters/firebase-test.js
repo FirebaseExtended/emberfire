@@ -13,13 +13,9 @@ describeModule('adapter:firebase', 'FirebaseAdapter', {
     describe('#init', function () {
 
       it('throws an error when the firebase property is not supplied', function() {
-        var subject, msg;
-        try {
-          subject = this.subject();
-        } catch (e) {
-          msg = e.message;
-        }
-        expect(msg).to.be.equal('Please set the `firebase` property on the adapter.');
+        assert.throws(function() {
+          this.subject();
+        });
       });
 
     });

@@ -1,21 +1,58 @@
-/*global describe, before, beforeEach, after, afterEach, specify, it, assert, App, FirebaseTestRef, TestHelpers */
+import Ember from 'ember';
+import DS from 'ember-data';
+import startApp from 'dummy/tests/helpers/start-app';
+import { it } from 'ember-mocha';
+import stubFirebase from 'dummy/tests/helpers/stub-firebase';
+import unstubFirebase from 'dummy/tests/helpers/unstub-firebase';
+import createTestRef from 'dummy/tests/helpers/create-test-ref';
 
-
-describe("FirebaseAdapter - Updates from server", function() {
-  var store, adapter;
+describe("Integration: FirebaseAdapter - Updates from server", function() {
+  var app, store, adapter, firebaseTestRef;
 
   var setupAdapter = function() {
-    App.ApplicationAdapter = DS.FirebaseAdapter.extend({
-      firebase: FirebaseTestRef.child("blogs/normalized"),
-      _queueFlushDelay: 0
+    stubFirebase();
+    app = startApp();
+
+    firebaseTestRef = createTestRef();
+    store = app.__container__.lookup("store:main");
+    adapter = app.__container__.lookup("adapter:application");
+    adapter._ref = createTestRef("blogs/normalized");
+    adapter._queueFlushDelay = false;
+
+    // needs a better way that uses the container
+    app.Post = DS.Model.extend({
+      title: DS.attr('string'),
+      body: DS.attr('string'),
+      published: DS.attr('number'),
+      publishedDate: Ember.computed('published', function() {
+        return this.get('published');
+      }),
+      user: DS.belongsTo('user', { async: true }),
+      comments: DS.hasMany('comment', { async: true }),
+      embeddedComments: DS.hasMany('comment', { embedded: true })
     });
-    store = App.__container__.lookup("store:main");
-    adapter = App.__container__.lookup("adapter:application");
+
+    app.Comment = DS.Model.extend({
+      body: DS.attr('string'),
+      published: DS.attr('number'),
+      publishedDate: Ember.computed('published', function() {
+        return this.get('published');
+      }),
+      user: DS.belongsTo('user', { async: true }),
+      embeddedUser: DS.belongsTo('user', { embedded: true, inverse:null })
+    });
   };
 
+  before(function () {
+    stubFirebase();
+  });
+
+  after(function () {
+    unstubFirebase();
+  });
 
   afterEach(function() {
-    App.reset();
+    Ember.run(app, 'destroy');
   });
 
   describe("A newly created record is updated correctly after saving", function() {
@@ -24,7 +61,7 @@ describe("FirebaseAdapter - Updates from server", function() {
     before(function(done) {
       setupAdapter();
       _ref = adapter._ref;
-      var reference = FirebaseTestRef.child("blogs/tests/adapter/updaterecord/normalized");
+      var reference = firebaseTestRef.child("blogs/tests/adapter/updaterecord/normalized");
       adapter._ref = reference;
       Ember.run(function() {
         newPost = store.createRecord("post", {
@@ -40,7 +77,7 @@ describe("FirebaseAdapter - Updates from server", function() {
     });
 
     it("updates the post correctly", function() {
-      assert(newPost.get('title') === 'Updated');
+      assert(newPost.get('title') === 'Updated', 'property should change');
     });
 
     after(function(done) {
@@ -51,12 +88,12 @@ describe("FirebaseAdapter - Updates from server", function() {
   });
 
   describe("A record coming from find, gets the updates from the server correctly", function() {
-    var _ref, newPost, postId;
+    var _ref, newPost;
 
     before(function(done) {
       setupAdapter();
       _ref = adapter._ref;
-      var reference = FirebaseTestRef.child("blogs/normalized");
+      var reference = firebaseTestRef.child("blogs/normalized");
       adapter._ref = reference;
       Ember.run(function() {
         store.find("post", 'post_1').then(function(post) {
@@ -69,7 +106,7 @@ describe("FirebaseAdapter - Updates from server", function() {
     });
 
     it("updates the post correctly", function() {
-      assert(newPost.get('body') === 'Updated');
+      assert(newPost.get('body') === 'Updated', 'property should change');
     });
 
     after(function(done) {
@@ -80,12 +117,12 @@ describe("FirebaseAdapter - Updates from server", function() {
   });
 
   describe("An embedded record coming from the server, gets the updates correctly", function() {
-    var _ref, newPost, postId, postClassName, postRefName, comment;
+    var _ref, comment;
 
     before(function(done) {
       setupAdapter();
       _ref = adapter._ref;
-      var reference = FirebaseTestRef.child("blogs/double_denormalized");
+      var reference = firebaseTestRef.child("blogs/double_denormalized");
       adapter._ref = reference;
       Ember.run(function() {
         store.find("post", 'post_1').then(function(post) {
@@ -98,7 +135,7 @@ describe("FirebaseAdapter - Updates from server", function() {
     });
 
     it("updates the comment correctly", function() {
-      assert(comment.get('body') === 'Updated');
+      assert(comment.get('body') === 'Updated', 'property should change');
     });
 
     after(function(done) {
@@ -109,12 +146,12 @@ describe("FirebaseAdapter - Updates from server", function() {
   });
 
   describe("Embedded record has transforms applied correctly, issue #88", function() {
-    var _ref, newPost, postId, postClassName, postRefName, comment;
+    var _ref, comment;
 
     before(function(done) {
       setupAdapter();
       _ref = adapter._ref;
-      var reference = FirebaseTestRef.child("blogs/double_denormalized");
+      var reference = firebaseTestRef.child("blogs/double_denormalized");
       adapter._ref = reference;
       Ember.run(function() {
         store.find("post", 'post_1').then(function(post) {
@@ -136,12 +173,12 @@ describe("FirebaseAdapter - Updates from server", function() {
   });
 
   describe("Double embedded records are loaded correctly", function() {
-    var _ref, newPost, postId, postClassName, postRefName, user;
+    var _ref, user;
 
     before(function(done) {
       setupAdapter();
       _ref = adapter._ref;
-      var reference = FirebaseTestRef.child("blogs/double_denormalized");
+      var reference = firebaseTestRef.child("blogs/double_denormalized");
       adapter._ref = reference;
       Ember.run(function() {
         store.find("post", 'post_1').then(function(post) {
@@ -162,12 +199,12 @@ describe("FirebaseAdapter - Updates from server", function() {
   });
 
   describe("Setting a belongsTo to null, wipes it from the server as well issue #103", function() {
-    var _ref, newPost, postId, commentData, postRefName, user;
+    var _ref, commentData;
 
     before(function(done) {
       setupAdapter();
       _ref = adapter._ref;
-      var reference = FirebaseTestRef.child("blogs/normalized");
+      var reference = firebaseTestRef.child("blogs/normalized");
       adapter._ref = reference;
       Ember.run(function() {
         store.find("comment", 'comment_1').then(function(comment) {
@@ -193,12 +230,12 @@ describe("FirebaseAdapter - Updates from server", function() {
   });
 
   describe("Deleting a record serverside, deletes it client side as well", function() {
-    var _ref, currentComment, postId, commentData, postRefName, user;
+    var _ref, currentComment;
 
     before(function(done) {
       setupAdapter();
       _ref = adapter._ref;
-      var reference = FirebaseTestRef.child("blogs/normalized");
+      var reference = firebaseTestRef.child("blogs/normalized");
       adapter._ref = reference;
       Ember.run(function() {
         store.find("comment", 'comment_1').then(function(comment) {
@@ -221,12 +258,12 @@ describe("FirebaseAdapter - Updates from server", function() {
   });
 
   describe("Deleting a record clientside, deletes it on the server side as well", function() {
-    var _ref, reference, postId, commentData, postRefName, user;
+    var _ref, reference;
 
     before(function(done) {
       setupAdapter();
       _ref = adapter._ref;
-      reference = FirebaseTestRef.child("blogs/normalized");
+      reference = firebaseTestRef.child("blogs/normalized");
       adapter._ref = reference;
       Ember.run(function() {
         store.find("comment", 'comment_2').then(function(comment) {
@@ -251,12 +288,12 @@ describe("FirebaseAdapter - Updates from server", function() {
   });
 
  describe("Editing a found record clientside, edits it on the server side as well", function() {
-    var _ref, reference, postId, commentData, postRefName, user;
+    var _ref, reference;
 
     before(function(done) {
       setupAdapter();
       _ref = adapter._ref;
-      reference = FirebaseTestRef.child("blogs/normalized");
+      reference = firebaseTestRef.child("blogs/normalized");
       adapter._ref = reference;
       Ember.run(function() {
         store.find("comment", 'comment_3').then(function(comment) {
