@@ -1,18 +1,59 @@
-/*global describe, before, beforeEach, after, afterEach, specify, it, assert, App, FirebaseTestRef, TestHelpers */
+import Ember from 'ember';
+import DS from 'ember-data';
+import startApp from 'dummy/tests/helpers/start-app';
+import { it } from 'ember-mocha';
+import sinon from 'sinon';
+import Firebase from 'firebase';
+import createTestRef from 'dummy/tests/helpers/create-test-ref';
 
 describe("FirebaseAdapter - Queing pushes", function() {
+  var App, store, serializer, adapter, firebaseTestRef;
 
-  var store, serializer, adapter;
+  before(function() {
+    App = startApp();
 
-  var setupAdapter = function() {
-    App.ApplicationAdapter = DS.FirebaseAdapter.extend({
-      firebase: FirebaseTestRef.child("blogs/normalized"),
-    });
+    firebaseTestRef = createTestRef();
+    Firebase.goOffline();
     store = App.__container__.lookup("store:main");
     serializer = App.__container__.lookup("serializer:-firebase");
     adapter = App.__container__.lookup("adapter:application");
-  };
+    adapter._ref = firebaseTestRef.child("blogs/normalized");
 
+    App.Post = DS.Model.extend({
+      title: DS.attr('string'),
+      body: DS.attr('string'),
+      published: DS.attr('number'),
+      publishedDate: Ember.computed('published', function() {
+        return this.get('published');
+      }),
+      user: DS.belongsTo('user', { async: true }),
+      comments: DS.hasMany('comment', { async: true }),
+      embeddedComments: DS.hasMany('comment', { embedded: true })
+    });
+
+    App.Comment = DS.Model.extend({
+      body: DS.attr('string'),
+      published: DS.attr('number'),
+      publishedDate: Ember.computed('published', function() {
+        return this.get('published');
+      }),
+      user: DS.belongsTo('user', { async: true }),
+      embeddedUser: DS.belongsTo('user', { embedded: true, inverse:null })
+    });
+
+    App.User = DS.Model.extend({
+      created: DS.attr('number'),
+      username: Ember.computed('id', function() {
+        return this.get('id');
+      }),
+      firstName: DS.attr('string'),
+      avatar: Ember.computed(function() {
+        return 'https://www.gravatar.com/avatar/' + md5(this.get('id')) + '.jpg?d=retro&size=80';
+      }),
+      posts: DS.hasMany('post', { async: true }),
+      comments: DS.hasMany('comment', { async: true, inverse:'user' })
+    });
+  });
 
   afterEach(function() {
     App.reset();
@@ -23,7 +64,6 @@ describe("FirebaseAdapter - Queing pushes", function() {
     var spy;
 
     before(function() {
-      setupAdapter();
       spy = sinon.spy(adapter, "_queueScheduleFlush");
     });
 
@@ -42,11 +82,9 @@ describe("FirebaseAdapter - Queing pushes", function() {
   });
 
   describe("#_enqueue()", function() {
-
     var queueScheduleFlushSpy, queueFlushSpy, callbackSpy;
 
     before(function() {
-      setupAdapter();
       queueScheduleFlushSpy = sinon.spy(adapter, "_queueScheduleFlush");
       queueFlushSpy = sinon.spy(adapter, "_queueFlush");
       callbackSpy = sinon.spy();
