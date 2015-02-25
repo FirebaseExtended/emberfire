@@ -20,17 +20,13 @@
   "main": "dist/emberfire.js",
   "ignore": [
     "**/.*",
-    "src",
-    "lib",
-    "test",
-    "tasks",
+    "tests",
     "vendor",
-    "examples",
     "node_modules",
     "bower_components",
     "build.sh",
     "changelog.txt",
-    "Gruntfile.js",
+    "Brocfile.js",
     "package.json"
   ],
   "dependencies": {
@@ -38,6 +34,18 @@
     "ember-data": "1.0.0-beta.12"
   },
   "devDependencies": {
-    "ember": "1.9.x"
+    "ember": "1.9.1",
+    "handlebars": "~2.0.0",
+    "jquery": "^1.11.1",
+    "ember-resolver": "~0.1.11",
+    "loader.js": "ember-cli/loader.js#1.0.1",
+    "ember-cli-shims": "ember-cli/ember-cli-shims#0.0.3",
+    "ember-cli-test-loader": "ember-cli/ember-cli-test-loader#0.1.1",
+    "ember-load-initializers": "ember-cli/ember-load-initializers#0.0.2",
+    "ember-mocha": "~0.4.0",
+    "moment": "2.5.1",
+    "blueimp-md5": "1.0.1",
+    "normalize-css": "2.1.3",
+    "sinon": "http://sinonjs.org/releases/sinon-1.12.2.js"
   }
 }

@@ -1,0 +1,1 @@
+important - EmberFire uses es6 modules. Please check the documentation on updated usage info.

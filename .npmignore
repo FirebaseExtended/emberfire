@@ -1,0 +1,13 @@
+bower_components/
+tests/
+
+.bowerrc
+.editorconfig
+.ember-cli
+.travis.yml
+.npmignore
+**/.gitkeep
+bower.json
+Brocfile.js
+gulpfile.js
+testem.json
