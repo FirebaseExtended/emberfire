@@ -3,7 +3,6 @@
     "document",
     "window",
     "-Promise",
-    "Firebase",
     "moment",
     "md5"
   ],
@@ -31,5 +30,7 @@
   "white": false,
   "eqnull": true,
   "esnext": true,
-  "unused": true
+  "unused": "vars",
+  "smarttabs": true,
+  "bitwise": false
 }

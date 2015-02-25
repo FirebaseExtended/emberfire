@@ -273,18 +273,18 @@ export default DS.Adapter.extend(Ember.Evented, {
       record.eachRelationship(function(key, relationship) {
         var save;
         if (relationship.kind === 'hasMany') {
-            if (serializedRecord[key]) {
-              save = adapter._saveHasManyRelationship(store, type, relationship, serializedRecord[key], recordRef, recordCache);
-              savedRelationships.push(save);
-              // Remove the relationship from the serializedRecord because otherwise we would clobber the entire hasMany
-              delete serializedRecord[key];
-            }
+          if (serializedRecord[key]) {
+            save = adapter._saveHasManyRelationship(store, type, relationship, serializedRecord[key], recordRef, recordCache);
+            savedRelationships.push(save);
+            // Remove the relationship from the serializedRecord because otherwise we would clobber the entire hasMany
+            delete serializedRecord[key];
+          }
         } else {
-            if (relationship.options.embedded === true && serializedRecord[key]) {
-              save = adapter._saveBelongsToRecord(store, type, relationship, serializedRecord[key], recordRef);
-              savedRelationships.push(save);
-              delete serializedRecord[key];
-            }
+          if (relationship.options.embedded === true && serializedRecord[key]) {
+            save = adapter._saveBelongsToRecord(store, type, relationship, serializedRecord[key], recordRef);
+            savedRelationships.push(save);
+            delete serializedRecord[key];
+          }
         }
       });
 

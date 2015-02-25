@@ -9,4 +9,5 @@ tests/
 **/.gitkeep
 bower.json
 Brocfile.js
+gulpfile.js
 testem.json

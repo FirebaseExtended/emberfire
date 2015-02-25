@@ -6,6 +6,13 @@ var sourcemaps = require('gulp-sourcemaps');
 var transpile  = require('gulp-es6-module-transpiler');
 var concat = require('gulp-concat');
 var uglify = require('gulp-uglify');
+var jshint = require('gulp-jshint');
+
+gulp.task('lint', function () {
+  return gulp.src('{addon,app,blueprints,config,tests}/**/*.js')
+    .pipe(jshint())
+    .pipe(jshint.reporter('default'));
+});
 
 gulp.task('clean-dist', function (cb) {
   del([
@@ -14,7 +21,7 @@ gulp.task('clean-dist', function (cb) {
   ], cb);
 });
 
-gulp.task('build-legacy', function() {
+gulp.task('build-legacy', ['lint'], function() {
   return gulp.src('vendor/legacy-shims/emberfire.js')
     .pipe(sourcemaps.init())
     .pipe(transpile({
@@ -26,14 +33,16 @@ gulp.task('build-legacy', function() {
     .pipe(gulp.dest('dist'));
 });
 
-gulp.task('build-legacy-minified', function() {
+gulp.task('build-legacy-minified', ['lint'], function() {
   return gulp.src('vendor/legacy-shims/emberfire.js')
     .pipe(transpile({
       importPaths: ['vendor/legacy-shims'], // for 'ember' and 'ember-data' global shims
       formatter: 'bundle'
     }))
     .pipe(concat('emberfire.min.js'))
-    .pipe(uglify())
+    .pipe(uglify({
+      preserveComments: 'some'
+    }))
     .pipe(gulp.dest('dist'));
 });
 
