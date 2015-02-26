@@ -211,12 +211,19 @@ export default DS.Adapter.extend(Ember.Evented, {
   },
 
   applyQueryToRef: function (ref, query) {
-    if (!query.orderBy || query.orderBy === '_key') {
+
+    if (!query.orderBy) {
+      query.orderBy = '_key';
+    }
+
+    if (query.orderBy === '_key'){
       ref = ref.orderByKey();
-    } else if (query.orderBy && query.orderBy !== '_priority') {
-      ref = ref.orderByChild(query.orderBy);
-    } else {
+    } else if (query.orderBy === '_value') {
+      ref = ref.orderByValue();
+    } else if (query.orderBy === '_priority') {
       ref = ref.orderByPriority();
+    } else {
+      ref.orderByChild(query.orderBy);
     }
 
     ['limitToFirst', 'limitToLast', 'startAt', 'endAt', 'equalTo'].forEach(function (key) {

@@ -35,6 +35,7 @@ describeModule('adapter:firebase', 'FirebaseAdapter', {
         // mock ref doesnt support the new query stuff, yet
         ref.orderByKey = function () { return this; };
         ref.orderByPriority = function () { return this; };
+        ref.orderByValue = function () { return this; };
         ref.orderByChild = function () { return this; };
         ref.limitToFirst = function () { return this; };
         ref.limitToLast = function () { return this; };
@@ -43,25 +44,30 @@ describeModule('adapter:firebase', 'FirebaseAdapter', {
         ref.equalTo = function () { return this; };
       });
 
-      it('defaults to orderByKey', function () {
+      it('defaults to orderByKey when orderBy is not supplied', function () {
         var spy = sinon.spy(ref, 'orderByKey');
 
         adapter.applyQueryToRef(ref, {});
         assert(spy.calledOnce, 'orderByKey should be called');
       });
 
-      it('orderBy: `_key` calls orderByKey', function () {
+      it('defaults to orderByKey when orderBy is an empty string', function () {
         var spy = sinon.spy(ref, 'orderByKey');
 
-        adapter.applyQueryToRef(ref, { orderBy: '_key' });
+        adapter.applyQueryToRef(ref, { orderBy: '' });
         assert(spy.calledOnce, 'orderByKey should be called');
       });
 
-      it('orderBy: `_priority` calls orderByPriority', function () {
-        var spy = sinon.spy(ref, 'orderByPriority');
+      ['key', 'value', 'priority'].forEach(function (k) {
+        var upperK = k.capitalize();
 
-        adapter.applyQueryToRef(ref, { orderBy: '_priority' });
-        assert(spy.calledOnce, 'orderByPriority should be called');
+        it(`orderBy: "_${k}" calls orderBy${upperK}`, function () {
+          var spy = sinon.spy(ref, 'orderBy' + upperK);
+
+          adapter.applyQueryToRef(ref, { orderBy: '_' + k });
+          assert(spy.calledOnce, `orderBy${upperK} should be called`);
+        });
+
       });
 
       it('orderBy: `x` calls orderByChild(x)', function () {
