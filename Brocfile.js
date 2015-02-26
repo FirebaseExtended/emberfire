@@ -23,4 +23,17 @@ app.import('vendor/sinon/shim.js', {
   }
 });
 
+app.import('bower_components/mockfirebase/browser/mockfirebase.js', {
+  type: 'test'
+});
+
+app.import('vendor/mockfirebase/shim.js', {
+  type: 'test',
+  exports: {
+    'mock-firebase': [
+      'default'
+    ]
+  }
+});
+
 module.exports = app.toTree();
