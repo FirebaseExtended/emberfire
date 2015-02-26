@@ -5,6 +5,9 @@ import toPromise from '../utils/to-promise';
 var fmt = Ember.String.fmt;
 var Promise = Ember.RSVP.Promise;
 var forEach = Ember.EnumerableUtils.forEach;
+var filter = Ember.EnumerableUtils.filter;
+var map = Ember.EnumerableUtils.map;
+var intersection = Ember.EnumerableUtils.intersection;
 
 /**
   The Firebase adapter allows your store to communicate with the Firebase
@@ -323,27 +326,33 @@ export default DS.Adapter.extend(Ember.Evented, {
     }
     var adapter = this;
     var idsCache = Ember.A(recordCache[relationship.key]);
-    ids = Ember.A(ids);
     var dirtyRecords = [];
 
     // Added
-    var addedRecords = ids.filter(function(id) {
+    var addedRecords = filter(ids, function(id) {
       return !idsCache.contains(id);
     });
 
     // Dirty
-    dirtyRecords = ids.filter(function(id) {
+    dirtyRecords = filter(ids, function(id) {
       var type = relationship.type;
       return store.hasRecordForId(type, id) && store.getById(type, id).get('isDirty') === true;
     });
-    dirtyRecords = Ember.A(dirtyRecords.concat(addedRecords)).uniq().map(function(id) {
+
+    var duplicateRecords = intersection(dirtyRecords, addedRecords);
+
+    dirtyRecords = filter(dirtyRecords.concat(addedRecords), function(record) {
+      return duplicateRecords.indexOf(record) >= 0;
+    });
+
+    dirtyRecords = map(dirtyRecords, function(id) {
       return adapter._saveHasManyRecord(store, relationship, recordRef, id);
     });
     // Removed
-    var removedRecords = idsCache.filter(function(id) {
+    var removedRecords = filter(idsCache, function(id) {
       return !ids.contains(id);
     });
-    removedRecords = Ember.A(removedRecords).map(function(id) {
+    removedRecords = map(removedRecords, function(id) {
       return adapter._removeHasManyRecord(store, recordRef, relationship.key, id);
     });
     // Combine all the saved records
