@@ -9,6 +9,6 @@ module.exports = {
   },
 
   afterInstall: function() {
-    return this.addBowerPackageToProject('emberfire', '~0.0.0');
+    return this.addBowerPackageToProject('firebase', '~2.1.0');
   }
 };
