@@ -189,33 +189,7 @@ export default DS.Adapter.extend(Ember.Evented, {
     var adapter = this;
     var ref = this._getRef(type);
 
-    if (!query.orderBy || query.orderBy === '_key') {
-      ref = ref.orderByKey();
-    } else if (query.orderBy && query.orderBy !== '_priority') {
-      ref = ref.orderByChild(query.orderBy);
-    } else {
-      ref = ref.orderByPriority();
-    }
-
-    if (query.limitToFirst && query.limitToFirst >= 0) {
-      ref = ref.limitToFirst(query.limitToFirst);
-    }
-
-    if (query.limitToLast && query.limitToLast >= 0) {
-      ref = ref.limitToLast(query.limitToLast);
-    }
-
-    if (query.startAt) {
-      ref = ref.startAt(query.startAt);
-    }
-
-    if (query.endAt) {
-      ref = ref.endAt(query.endAt);
-    }
-
-    if (query.equalTo) {
-      ref = ref.equalTo(query.equalTo);
-    }
+    ref = this.applyQueryToRef(ref, query);
 
     return new Promise(function(resolve, reject) {
       // Listen for child events on the type
@@ -234,6 +208,24 @@ export default DS.Adapter.extend(Ember.Evented, {
         reject(error);
       });
     }, fmt('DS: FirebaseAdapter#findQuery %@ with %@', [type, query]));
+  },
+
+  applyQueryToRef: function (ref, query) {
+    if (!query.orderBy || query.orderBy === '_key') {
+      ref = ref.orderByKey();
+    } else if (query.orderBy && query.orderBy !== '_priority') {
+      ref = ref.orderByChild(query.orderBy);
+    } else {
+      ref = ref.orderByPriority();
+    }
+
+    ['limitToFirst', 'limitToLast', 'startAt', 'endAt', 'equalTo'].forEach(function (key) {
+      if (query[key] || query[key] === '') {
+        ref = ref[key](query[key]);
+      }
+    });
+
+    return ref;
   },
 
   /**
