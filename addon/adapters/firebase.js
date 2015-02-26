@@ -185,6 +185,56 @@ export default DS.Adapter.extend(Ember.Evented, {
     }, fmt('DS: FirebaseAdapter#findAll %@ to %@', [type, ref.toString()]));
   },
 
+  findQuery: function(store, type, query) {
+    var adapter = this;
+    var ref = this._getRef(type);
+
+    ref = this.applyQueryToRef(ref, query);
+
+    return new Promise(function(resolve, reject) {
+      // Listen for child events on the type
+      ref.once('value', function(snapshot) {
+        if (!adapter._findAllHasEventsForType(type)) {
+          adapter._findAllAddEventListeners(store, type, ref);
+        }
+        var results = [];
+        snapshot.forEach(function(childSnapshot) {
+          var payload = adapter._assignIdToPayload(childSnapshot);
+          adapter._updateRecordCacheForType(type, payload);
+          results.push(payload);
+        });
+        resolve(results);
+      }, function(error) {
+        reject(error);
+      });
+    }, fmt('DS: FirebaseAdapter#findQuery %@ with %@', [type, query]));
+  },
+
+  applyQueryToRef: function (ref, query) {
+
+    if (!query.orderBy) {
+      query.orderBy = '_key';
+    }
+
+    if (query.orderBy === '_key'){
+      ref = ref.orderByKey();
+    } else if (query.orderBy === '_value') {
+      ref = ref.orderByValue();
+    } else if (query.orderBy === '_priority') {
+      ref = ref.orderByPriority();
+    } else {
+      ref.orderByChild(query.orderBy);
+    }
+
+    ['limitToFirst', 'limitToLast', 'startAt', 'endAt', 'equalTo'].forEach(function (key) {
+      if (query[key] || query[key] === '') {
+        ref = ref[key](query[key]);
+      }
+    });
+
+    return ref;
+  },
+
   /**
     Keep track of what types `.findAll()` has been called for
     so duplicate listeners aren't added
