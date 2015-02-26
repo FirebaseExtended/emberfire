@@ -1,1 +1,2 @@
+fixed - Use `EnumerableUtils` methods for Ember configs with `EXTEND_PROTOTYPES` set to false.
 important - EmberFire uses es6 modules. Please check the documentation on updated usage info.
