@@ -1,6 +1,8 @@
 /* jshint node: true */
 'use strict';
 
+var EOL         = require('os').EOL;
+
 module.exports = {
   normalizeEntityName: function() {
     // this prevents an error when the entityName is
@@ -8,7 +10,20 @@ module.exports = {
     // to us
   },
 
-  afterInstall: function() {
-    return this.addBowerPackageToProject('firebase', '~2.1.0');
+  availableOptions: [
+    { name: 'url', type: String }
+  ],
+
+  afterInstall: function(options) {
+    var firebaseUrl = options.url || 'https://YOUR-FIREBASE-NAME.firebaseio.com/';
+    return this.addBowerPackagesToProject([
+      {name: 'emberfire', target: "~0.0.0"}
+    ]).then(function() {
+      return this.insertIntoFile(
+        'config/environment.js',
+        '    firebase: \'' + firebaseUrl + '\',',
+        {after: '    locationType: \'auto\',' + EOL}
+      );
+    }.bind(this));
   }
 };
