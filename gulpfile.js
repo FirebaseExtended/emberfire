@@ -9,7 +9,7 @@ var uglify = require('gulp-uglify');
 var jshint = require('gulp-jshint');
 
 gulp.task('lint', function () {
-  return gulp.src('{addon,app,blueprints,config,tests}/**/*.js')
+  return gulp.src('{addon,app,config,tests}/**/*.js')
     .pipe(jshint())
     .pipe(jshint.reporter('default'));
 });
