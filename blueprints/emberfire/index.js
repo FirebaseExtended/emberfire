@@ -17,7 +17,7 @@ module.exports = {
   afterInstall: function(options) {
     var firebaseUrl = options.url || 'https://YOUR-FIREBASE-NAME.firebaseio.com/';
     return this.addBowerPackagesToProject([
-      {name: 'emberfire', target: "~0.0.0"}
+      {name: 'firebase', target: "~2.1.0"}
     ]).then(function() {
       return this.insertIntoFile(
         'config/environment.js',
