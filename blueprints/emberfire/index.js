@@ -1,7 +1,7 @@
-/* jshint node: true */
 'use strict';
 
 var EOL         = require('os').EOL;
+var chalk       = require('chalk');
 
 module.exports = {
   normalizeEntityName: function() {
@@ -24,6 +24,10 @@ module.exports = {
         '    firebase: \'' + firebaseUrl + '\',',
         {after: '    locationType: \'auto\',' + EOL}
       );
-    }.bind(this));
+    }.bind(this)).then(function () {
+      var output = EOL;
+      output += chalk.yellow('EmberFire') + ' has been installed. Please configure your firebase URL in ' + chalk.green('config/environment.js') + EOL;
+      console.log(output);
+    });
   }
 };
