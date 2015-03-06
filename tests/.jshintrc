@@ -29,7 +29,8 @@
     "before",
     "after",
     "beforeEach",
-    "afterEach"
+    "afterEach",
+    "xit"
   ],
   "node": false,
   "browser": false,

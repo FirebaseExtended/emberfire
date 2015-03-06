@@ -7,7 +7,19 @@ var Promise = Ember.RSVP.Promise;
 var forEach = Ember.EnumerableUtils.forEach;
 var filter = Ember.EnumerableUtils.filter;
 var map = Ember.EnumerableUtils.map;
-var intersection = Ember.EnumerableUtils.intersection;
+var indexOf = Ember.EnumerableUtils.indexOf;
+
+var uniq = function (arr) {
+  var ret = Ember.A();
+
+  arr.forEach(function(k) {
+    if (indexOf(ret, k) < 0) {
+      ret.push(k);
+    }
+  });
+
+  return ret;
+};
 
 /**
   The Firebase adapter allows your store to communicate with the Firebase
@@ -389,19 +401,15 @@ export default DS.Adapter.extend(Ember.Evented, {
       return store.hasRecordForId(type, id) && store.getById(type, id).get('isDirty') === true;
     });
 
-    var duplicateRecords = intersection(dirtyRecords, addedRecords);
-
-    dirtyRecords = filter(dirtyRecords.concat(addedRecords), function(record) {
-      return duplicateRecords.indexOf(record) >= 0;
-    });
-
-    dirtyRecords = map(dirtyRecords, function(id) {
+    dirtyRecords = map(uniq(dirtyRecords.concat(addedRecords)), function(id) {
       return adapter._saveHasManyRecord(store, relationship, recordRef, id);
     });
+
     // Removed
     var removedRecords = filter(idsCache, function(id) {
       return !ids.contains(id);
     });
+
     removedRecords = map(removedRecords, function(id) {
       return adapter._removeHasManyRecord(store, recordRef, relationship.key, id);
     });
