@@ -329,7 +329,7 @@ export default DS.Adapter.extend(Ember.Evented, {
   updateRecord: function(store, type, record, _recordRef) {
     var adapter = this;
     var recordRef = _recordRef || this._getRef(type, record.id);
-    var recordCache = Ember.get(adapter._recordCacheForType, fmt('%@.%@', [type.typeKey, record.get('id')])) || {};
+    var recordCache = adapter._getRecordCache(type.typeKey, record.get('id'));
 
     var serializedRecord = record.serialize({includeId:false});
 
@@ -555,19 +555,26 @@ export default DS.Adapter.extend(Ember.Evented, {
   */
   _updateRecordCacheForType: function(type, payload) {
     if (!payload) { return; }
-    var adapter = this;
     var id = payload.id;
-    var cache = adapter._recordCacheForType;
     var typeKey = type.typeKey;
+    var cache = this._getRecordCache(typeKey, id);
     // Only cache relationships for now
     type.eachRelationship(function(key, relationship) {
       if (relationship.kind === 'hasMany') {
         var ids = payload[key];
-        cache[typeKey] = cache[typeKey] || {};
-        cache[typeKey][id] = cache[typeKey][id] || {};
-        cache[typeKey][id][key] = !Ember.isNone(ids) ? Ember.A(Ember.keys(ids)) : Ember.A();
+        cache[key] = !Ember.isNone(ids) ? Ember.A(Ember.keys(ids)) : Ember.A();
       }
     });
+  },
+
+  /**
+    Get or create the cache for a record
+   */
+  _getRecordCache: function (typeKey, id) {
+    var cache = this._recordCacheForType;
+    cache[typeKey] = cache[typeKey] || {};
+    cache[typeKey][id] = cache[typeKey][id] || {};
+    return cache[typeKey][id];
   },
 
   /**
