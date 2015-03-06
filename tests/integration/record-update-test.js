@@ -53,6 +53,11 @@ describe("Integration: FirebaseAdapter - Updating records", function() {
         });
       });
 
+      afterEach(function(done) {
+        adapter._ref = _ref;
+        done();
+      });
+
 
       describe('when the child record has not been saved', function () {
 
@@ -136,12 +141,75 @@ describe("Integration: FirebaseAdapter - Updating records", function() {
 
       }); // when the child record has been saved
 
-      afterEach(function(done) {
-        adapter._ref = _ref;
-        done();
-      });
+      describe('when a child record is removed', function () {
+        var secondComment, secondCommentId;
 
-    });
+        beforeEach(function (done) {
+          Ember.run(function () {
+            secondComment = store.createRecord("comment", {
+              body: "This is a new comment"
+            });
+            secondCommentId = secondComment.get('id');
+
+            Ember.RSVP.all([newComment.save(), secondComment.save()]).then(function () {
+              Ember.RSVP.Promise.cast(newPost.get("comments")).then(function(comments) {
+                comments.pushObject(newComment);
+                comments.pushObject(secondComment);
+                newPost.save().then(function() {
+                  reference.once('value', function(data) {
+                    currentData = data.val();
+                    postData = currentData.posts[postId];
+                    done();
+                  });
+                });
+              });
+            });
+          });
+        });
+
+        it("removes only one hasMany link", function(done) {
+          assert(postData.comments[commentId] === true, 'the first hasMany link should exist before removal');
+          assert(postData.comments[secondCommentId] === true, 'the second hasMany link should exist before removal');
+
+          Ember.RSVP.Promise.cast(newPost.get("comments")).then(function(comments) {
+            comments.removeObject(secondComment);
+            newPost.save().then(function() {
+              reference.once('value', function(data) {
+                currentData = data.val();
+                postData = currentData.posts[postId];
+
+                assert(postData.comments[commentId] === true, 'the first hasMany link should still exist');
+                assert(typeof postData.comments[secondCommentId] === 'undefined', 'the second hasMany link should be removed');
+
+                done();
+              });
+            });
+          });
+        });
+
+        it("removes the comments hash if no hasMany records remain", function(done) {
+          assert(postData.comments[commentId] === true, 'the first hasMany link should exist before removal');
+          assert(postData.comments[secondCommentId] === true, 'the second hasMany link should exist before removal');
+
+          Ember.RSVP.Promise.cast(newPost.get("comments")).then(function(comments) {
+            comments.removeObject(newComment);
+            comments.removeObject(secondComment);
+            newPost.save().then(function() {
+              reference.once('value', function(data) {
+                currentData = data.val();
+                postData = currentData.posts[postId];
+
+                assert(typeof postData.comments === 'undefined', 'the `comments` hash should be removed');
+
+                done();
+              });
+            });
+          });
+        });
+
+      }); // when a child record is removed
+
+    }); // normalized hasMany relationships
 
     describe("relationships with number ids", function() {
       var _ref, newPost, newComment, postId, commentId;
