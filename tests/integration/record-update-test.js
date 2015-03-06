@@ -32,13 +32,13 @@ describe("Integration: FirebaseAdapter - Updating records", function() {
 
   describe("#updateRecord()", function() {
 
-    describe("normalized relationship", function() {
-      var _ref, newPost, newComment, currentData, postData, postId, commentId;
+    describe("normalized hasMany relationships", function() {
+      var _ref, reference, newPost, newComment, currentData, postData, postId, commentId;
 
-      before(function(done) {
+      beforeEach(function(done) {
         setupAdapter();
         _ref = adapter._ref;
-        var reference = createTestRef("blogs/tests/adapter/updaterecord/normalized");
+        reference = createTestRef("blogs/tests/adapter/updaterecord/normalized");
         adapter._ref = reference;
         Ember.run(function() {
           newComment = store.createRecord("comment", {
@@ -49,29 +49,94 @@ describe("Integration: FirebaseAdapter - Updating records", function() {
           });
           postId = newPost.get('id');
           commentId = newComment.get('id');
+          done();
+        });
+      });
+
+
+      describe('when the child record has not been saved', function () {
+
+        // TODO: disabled until next release
+        xit("avoids writing the hasMany relationship link", function(done) {
           Ember.RSVP.Promise.cast(newPost.get("comments")).then(function(comments) {
+            assert(newComment.get('isDirty'), 'the item should be dirty');
+            assert(newComment.get('isNew'), 'the item should be `new`');
+
             comments.pushObject(newComment);
+
             newPost.save().then(function() {
               reference.once('value', function(data) {
                 currentData = data.val();
                 postData = currentData.posts[postId];
+
+                assert(typeof postData.comments === 'undefined', 'the hasMany link should not exist');
+
                 done();
                });
             });
           });
         });
-      });
 
-      it("contains a hasMany relationship", function() {
-        assert(postData.comments[commentId] === true);
-        assert(Ember.isArray(postData.comments) === false);
-      });
+      }); // when the child record has not been saved
 
-      it("removed the null belongsTo reference from the final payload", function() {
-        assert(postData.user === undefined);
-      });
+      describe('when the child record has been saved', function () {
 
-      after(function(done) {
+        it("writes the hasMany relationship link", function(done) {
+          Ember.run(function () {
+            newComment.save().then(function (c) {
+              Ember.RSVP.Promise.cast(newPost.get("comments")).then(function(comments) {
+                comments.pushObject(newComment);
+                newPost.save().then(function() {
+                  reference.once('value', function(data) {
+                    currentData = data.val();
+                    postData = currentData.posts[postId];
+
+                    assert(postData.comments[commentId] === true, 'the hasMany link should exist');
+                    assert(Ember.isArray(postData.comments) === false);
+
+                    done();
+                   });
+                });
+              });
+            });
+          });
+        });
+
+        it("removed the null belongsTo reference from the final payload", function() {
+          assert(postData.user === undefined);
+        });
+
+        describe('and the child is dirty', function () {
+
+          it("writes the hasMany relationship link", function(done) {
+            Ember.run(function () {
+              newComment.save().then(function () {
+                newComment.set('body', 'dirty this record!');
+                assert(newComment.get('isDirty'), 'the item should be dirty');
+                assert(!newComment.get('isNew'), 'the item should not be `new`');
+
+                Ember.RSVP.Promise.cast(newPost.get("comments")).then(function(comments) {
+                  comments.pushObject(newComment);
+                  newPost.save().then(function() {
+                    reference.once('value', function(data) {
+                      currentData = data.val();
+                      postData = currentData.posts[postId];
+
+                      assert(postData.comments[commentId] === true, 'the hasMany link should exist');
+
+                      done();
+                     });
+                  });
+                });
+              });
+            });
+          });
+
+        }); // and the child is dirty
+
+      }); // when the child record has been saved
+
+      afterEach(function(done) {
         adapter._ref = _ref;
         done();
       });
