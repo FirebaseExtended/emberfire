@@ -37,11 +37,10 @@
     "configPath": "tests/dummy/config"
   },
   "dependencies":{
-    "rimraf": "2.3.1"
+    "chalk": "^1.0.0"
   },
   "devDependencies": {
     "broccoli-asset-rev": "2.0.1",
-    "chalk": "1.0.0",
     "del": "1.1.1",
     "ember-cli": "0.1.15",
     "ember-cli-6to5": "3.0.0",
