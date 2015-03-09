@@ -1,9 +1,0 @@
-important - EmberFire uses es6 modules. Please check the documentation on updated usage info.
-changed - `ember generate emberfire` adds a Content Security Policy exception to `config/environment.js`
-changed - `ember generate emberfire` adds firebase url to `config/environment.js`.
-changed - `ember generate emberfire` creates a default adapter in `app/adapters/application.js`.
-feature - Added `ember generate firebase-adapter <name>` for generating firebase adapters.
-changed - Removed `emberfire` bower dependency from `ember-cli` projects, only `firebase` is needed.
-changed - Allow Ember Data versions `1.0.0.beta.11` through `beta.14.x`.
-fixed - Use `EnumerableUtils` methods for Ember configs with `EXTEND_PROTOTYPES` set to false.
-fixed - Fixed a bug where in some situations `hasMany` links were not being correctly removed when the child record was removed.
