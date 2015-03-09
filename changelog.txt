@@ -1,1 +1,0 @@
-fixed - Add `chalk` dependency to fix the addon install process.

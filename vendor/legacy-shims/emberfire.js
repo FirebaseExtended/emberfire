@@ -8,7 +8,7 @@ import EmberFireInitializer from '../../addon/initializers/emberfire';
  * Ember Data. The DS.FirebaseAdapter provides all of the standard DS.Adapter
  * methods and will automatically synchronize the store with Firebase.
  *
- * EmberFire 1.4.1
+ * EmberFire 0.0.0
  * https://github.com/firebase/emberfire/
  * License: MIT
  */
