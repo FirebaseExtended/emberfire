@@ -37,7 +37,9 @@
     "configPath": "tests/dummy/config"
   },
   "dependencies":{
-    "chalk": "^1.0.0"
+    "chalk": "^1.0.0",
+    "fs-extra": "0.16.4",
+    "rsvp": "3.0.17"
   },
   "devDependencies": {
     "broccoli-asset-rev": "2.0.1",
@@ -52,15 +54,12 @@
     "ember-data": "1.0.0-beta.14.1",
     "ember-export-application-global": "1.0.2",
     "express": "4.12.2",
-    "fs-extra": "0.16.4",
     "glob": "4.5.0",
     "gulp": "3.8.11",
     "gulp-concat": "2.5.2",
     "gulp-es6-module-transpiler": "0.2.1",
     "gulp-jshint": "1.9.2",
     "gulp-sourcemaps": "1.5.0",
-    "gulp-uglify": "1.1.0",
-    "inflection": "1.6.0",
-    "rsvp": "3.0.17"
+    "gulp-uglify": "1.1.0"
   }
 }
