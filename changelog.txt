@@ -1,0 +1,1 @@
+fixed - Fixed an issue where `orderBy: 'property'` queries were not working.
