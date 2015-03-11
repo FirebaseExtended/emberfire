@@ -235,7 +235,7 @@ export default DS.Adapter.extend(Ember.Evented, {
     } else if (query.orderBy === '_priority') {
       ref = ref.orderByPriority();
     } else {
-      ref.orderByChild(query.orderBy);
+      ref = ref.orderByChild(query.orderBy);
     }
 
     ['limitToFirst', 'limitToLast', 'startAt', 'endAt', 'equalTo'].forEach(function (key) {
