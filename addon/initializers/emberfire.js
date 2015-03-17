@@ -1,11 +1,16 @@
 import Ember from 'ember';
 import DS from 'ember-data';
+import Firebase from 'firebase';
 import FirebaseAdapter from '../adapters/firebase';
 import FirebaseSerializer from '../serializers/firebase';
 
 var VERSION = '0.0.0';
 
 if (Ember.libraries) {
+  if (Firebase.SDK_VERSION) {
+    Ember.libraries.registerCoreLibrary('Firebase', Firebase.SDK_VERSION);
+  }
+
   Ember.libraries.registerCoreLibrary('EmberFire', VERSION);
 }
 
