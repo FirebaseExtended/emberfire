@@ -3,7 +3,6 @@ import Application from '../../app';
 /* jshint unused:false */
 import Router from '../../router';
 import config from '../../config/environment';
-import Firebase from 'firebase';
 
 export default function startApp(attrs) {
   var application;
@@ -15,8 +14,6 @@ export default function startApp(attrs) {
     application = Application.create(attributes);
     application.setupForTesting();
     application.injectTestHelpers();
-
-    Firebase.goOffline();
   });
 
   return application;
