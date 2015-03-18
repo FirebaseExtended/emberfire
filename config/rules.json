@@ -4,7 +4,8 @@
     "comments": {
       "$comment": {
         ".read": true,
-        ".write": "!data.exists()"
+        ".write": "!data.exists()",
+        ".validate": "newData.hasChildren(['user', 'body', 'published'])",
       }
     },
 
@@ -13,7 +14,7 @@
       "$post": {
         ".read": true,
         ".write": true,
-        ".validate": "newData.hasChildren(['body', 'published', 'title'])",
+        ".validate": "newData.hasChildren(['user', 'body', 'published', 'title'])",
         "body": {
           ".validate": "newData.isString()"
         },
