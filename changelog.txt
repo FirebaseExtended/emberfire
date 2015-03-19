@@ -1,1 +1,2 @@
+fixed - Fixed an issue where `model.destroyRecord` was throwing an error `undefined is not a function`.
 changed - Show the `Firebase` version in Ember Inspector's info panel.
