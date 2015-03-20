@@ -22,7 +22,7 @@ module.exports = {
     var self = this,
         firebaseUrl = options.url || 'https://YOUR-FIREBASE-NAME.firebaseio.com/';
 
-    return this.addBowerPackagesToProject([ {name: 'firebase', target: "~2.1.0"} ])
+    return this.addBowerPackagesToProject([ {name: 'firebase', target: "^2.1.0"} ])
     .then(function() {
       return self.addToConfig('firebase', '\'' + firebaseUrl + '\'');
     })
