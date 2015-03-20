@@ -1,3 +1,0 @@
-fixed - Fixed an issue where `model.destroyRecord` was throwing an error `undefined is not a function`.
-changed - Installs Firebase dependency with version compatibility of `^2.1.0`.
-changed - Show the `Firebase` version in Ember Inspector's info panel.
