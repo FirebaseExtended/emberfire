@@ -57,7 +57,7 @@ describe("Integration: FirebaseAdapter - Updates from server", function() {
     delete app.Comment;
   });
 
-  describe("A newly created record is updated correctly after saving", function() {
+  describe("A locally created record is updated correctly after saving", function() {
     var _ref, newPost, postId;
 
     before(function(done) {
@@ -251,6 +251,49 @@ describe("Integration: FirebaseAdapter - Updates from server", function() {
 
     it("Comment was deleted client side as well", function() {
       assert(currentComment.get('isDeleted'));
+    });
+
+    after(function(done) {
+      adapter._ref = _ref;
+      done();
+    });
+  });
+
+  describe("hasMany relationships", function() {
+    var _ref, currentPost, reference;
+
+    beforeEach(function(done) {
+      setupAdapter();
+      _ref = adapter._ref;
+      reference = firebaseTestRef.child("blogs/normalized");
+      adapter._ref = reference;
+      Ember.run(function() {
+        store.find("post", 'post_1').then(function(post) {
+          currentPost = post;
+          done();
+        });
+      });
+    });
+
+
+    it("removes the correct client side association when removed on server", function(done) {
+      assert(currentPost.get('comments.length') === 2, 'should have 2 related comments');
+      Ember.run(function () {
+        reference.child('posts/post_1/comments/comment_1').remove(function() {
+          assert(currentPost.get('comments.firstObject.id') === 'comment_2', 'only comment_2 should remain');
+          done();
+        });
+      });
+    });
+
+    it("removes all client side associations when entire property is removed", function(done) {
+      assert(currentPost.get('comments.length') === 2, 'should have 2 related comments');
+      Ember.run(function () {
+        reference.child('posts/post_1/comments').remove(function() {
+          assert(currentPost.get('comments.length') === 0, 'all related comments should be removed');
+          done();
+        });
+      });
     });
 
     after(function(done) {
