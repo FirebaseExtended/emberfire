@@ -302,6 +302,39 @@ describe("Integration: FirebaseAdapter - Updates from server", function() {
     });
   });
 
+describe("belongsTo relationships", function() {
+    var _ref, currentComment, reference;
+
+    beforeEach(function(done) {
+      setupAdapter();
+      _ref = adapter._ref;
+      reference = firebaseTestRef.child("blogs/normalized");
+      adapter._ref = reference;
+      Ember.run(function() {
+        store.find("comment", 'comment_1').then(function(comment) {
+          currentComment = comment;
+          done();
+        });
+      });
+    });
+
+
+    it("removes the client side association when removed on server", function(done) {
+      assert(currentComment.get('user.id'), 'should have a user');
+      Ember.run(function () {
+        reference.child('comments/comment_1/user').remove(function() {
+          assert(currentComment.get('user'), 'user association should be missing');
+          done();
+        });
+      });
+    });
+
+    after(function(done) {
+      adapter._ref = _ref;
+      done();
+    });
+  });
+
   describe("Deleting a record clientside, deletes it on the server side as well", function() {
     var _ref, reference;
 
