@@ -51,16 +51,40 @@ If you'd like to contribute to EmberFire, run the following commands to get your
 * `npm install`
 * `bower install`
 
-### Running
+### Using a local EmberFire workdir in another project
 
-* `ember server`
-* Visit your app at http://localhost:4200.
+From your `emberfire` workdir
+
+* `npm link`
+* `rm -rf node_modules`
+* `npm install --production` (does not install dev dependencies, these can trip you up!)
+
+From your *app* workdir
+
+* `npm link emberfire`
+* Update your `package.json` so that `emberfire` is in `devDependencies` and is set to version `0.0.0`
+
+  ```
+  "devDependencies": {
+    "emberfire": "0.0.0"
+  ``` 
 
 ### Running Tests
 
 * `ember test`
 * `ember test --server`
 
-### Building
+##### Running tests against a specific version of ember-data
 
-* `ember build`
+Invoke `./config/select-dep-versions.js` with environment var `EMBER_DATA_VERSION=<version>` where `<version>` is an `ember-data` version number (e.g. `1.0.0-beta.12`) or `beta` or `canary`.
+
+Example:
+
+```
+EMBER_DATA_VERSION=canary ./config/select-dep-versions.js && ember test
+```
+
+### Running the FireBlog demo app
+
+* `ember server`
+* Visit your app at http://localhost:4200.
