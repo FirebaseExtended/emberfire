@@ -296,6 +296,14 @@ export default DS.Adapter.extend(Ember.Evented, {
       }
     } else {
       var payload = this._assignIdToPayload(snapshot);
+
+      // firebase doesn't send the property for empty relationships
+      type.eachRelationship(function (key, relationship) {
+        if (relationship.kind === 'hasMany' && !payload[key]) {
+          payload[key] = {};
+        }
+      });
+
       this._enqueue(function() {
         store.push(type, serializer.extractSingle(store, type, payload));
       });
