@@ -6,18 +6,18 @@ import sinon from 'sinon';
 import stubFirebase from 'dummy/tests/helpers/stub-firebase';
 import unstubFirebase from 'dummy/tests/helpers/unstub-firebase';
 import createTestRef from 'dummy/tests/helpers/create-test-ref';
-import getPosts from 'dummy/tests/helpers/get-posts';
+import snapshotToArray from 'dummy/tests/helpers/snapshot-to-array';
 import defineModel from 'dummy/tests/helpers/define-model';
 
 describe("Integration: FirebaseSerializer", function() {
   var app, store, serializer, firebaseTestRef;
 
-  before(function() {
+  beforeEach(function() {
     stubFirebase();
     app = startApp();
     firebaseTestRef = createTestRef();
     store = app.__container__.lookup("store:main");
-    serializer = app.__container__.lookup("serializer:-firebase");
+    serializer = store.serializerFor('post');
   });
 
   afterEach(function() {
@@ -31,11 +31,11 @@ describe("Integration: FirebaseSerializer", function() {
 
       var posts, normalizedPayload, comments;
 
-      before(function(done) {
+      beforeEach(function(done) {
         firebaseTestRef
           .child("blogs/normalized/posts")
           .once("value", function(snapshot) {
-            posts = getPosts(snapshot);
+            posts = snapshotToArray(snapshot);
             normalizedPayload = serializer.normalize(store.modelFor('post'), posts[0]);
             comments = Ember.A(normalizedPayload.comments);
             done();
@@ -61,7 +61,7 @@ describe("Integration: FirebaseSerializer", function() {
         firebaseTestRef
           .child("blogs/denormalized/posts")
           .once("value", function(snapshot) {
-            posts = getPosts(snapshot);
+            posts = snapshotToArray(snapshot);
             Ember.run(function() {
               normalizedPayload = serializer.normalize(store.modelFor('post2'), posts[0]);
               comments = normalizedPayload.comments;
@@ -79,21 +79,17 @@ describe("Integration: FirebaseSerializer", function() {
         assert(hasComments(["comment_1", "comment_2"]), 'embedded records not found in store');
       });
 
-      afterEach(function () {
-        Ember.run(app, 'reset');
-      });
-
     });
 
     describe("invalid payload", function() {
 
       var posts;
 
-      before(function(done) {
+      beforeEach(function(done) {
         firebaseTestRef
           .child("blogs/invalid/posts")
           .once("value", function(snapshot) {
-            posts = getPosts(snapshot);
+            posts = snapshotToArray(snapshot);
             done();
           });
       });
@@ -119,7 +115,7 @@ describe("Integration: FirebaseSerializer", function() {
         firebaseTestRef
           .child("blogs/normalized/posts")
           .once("value", function(snapshot) {
-            posts = getPosts(snapshot);
+            posts = snapshotToArray(snapshot);
             extractedArray = serializer.extractArray(store, store.modelFor("post"), posts);
             done();
           });
@@ -140,6 +136,7 @@ describe("Integration: FirebaseSerializer", function() {
       var posts, spy, extractedArray;
 
       beforeEach(function(done) {
+
         defineModel(app, 'post2', {
           title: DS.attr('string'),
           comments: DS.hasMany("comment", { embedded: true })
@@ -149,7 +146,7 @@ describe("Integration: FirebaseSerializer", function() {
         firebaseTestRef
           .child("blogs/denormalized/posts")
           .once("value", function(snapshot) {
-            posts = getPosts(snapshot);
+            posts = snapshotToArray(snapshot);
             Ember.run(function() {
               extractedArray = serializer.extractArray(store, store.modelFor('post2'), posts);
               done();
@@ -171,7 +168,6 @@ describe("Integration: FirebaseSerializer", function() {
       });
 
       afterEach(function() {
-        Ember.run(app, 'reset');
         spy.restore();
       });
 
@@ -191,7 +187,7 @@ describe("Integration: FirebaseSerializer", function() {
         firebaseTestRef
           .child("blogs/normalized/posts")
           .once("value", function(snapshot) {
-            posts = getPosts(snapshot);
+            posts = snapshotToArray(snapshot);
             extractedArray = serializer.extractArray(store, store.modelFor("post"), posts);
             done();
           });
@@ -224,7 +220,7 @@ describe("Integration: FirebaseSerializer", function() {
 
       var json, relationship, serializedRecord, posts, comments;
 
-      before(function(done) {
+      beforeEach(function(done) {
         Ember.run(function() {
           var post = store.createRecord("post", {
             id: "post_a",

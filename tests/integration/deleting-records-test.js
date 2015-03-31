@@ -8,14 +8,14 @@ import createTestRef from 'dummy/tests/helpers/create-test-ref';
 describe("Integration: FirebaseAdapter - Deleting records", function() {
   var app, store, adapter, firebaseTestRef;
 
-  var setupAdapter = function() {
+  beforeEach(function () {
     stubFirebase();
     app = startApp();
 
     firebaseTestRef = createTestRef();
     store = app.__container__.lookup("store:main");
-    adapter = app.__container__.lookup("adapter:application");
-  };
+    adapter = store.adapterFor('application');
+  });
 
   afterEach(function() {
     unstubFirebase();
@@ -26,7 +26,6 @@ describe("Integration: FirebaseAdapter - Deleting records", function() {
     var _ref, newPost, newUser, postId, userRef, userId;
 
     beforeEach(function(done) {
-      setupAdapter();
       _ref = adapter._ref;
       var reference = firebaseTestRef.child("blogs/tests/adapter/deleterecord/normalized");
       adapter._ref = reference;
@@ -49,6 +48,10 @@ describe("Integration: FirebaseAdapter - Deleting records", function() {
       });
     });
 
+    afterEach(function() {
+      adapter._ref = _ref;
+    });
+
     it("removes entries from inverse (hasMany) side", function(done) {
       newPost.destroyRecord().then(function () {
         userRef.once('value', function(snapshot) {
@@ -57,11 +60,6 @@ describe("Integration: FirebaseAdapter - Deleting records", function() {
           done();
         });
       });
-    });
-
-    afterEach(function(done) {
-      adapter._ref = _ref;
-      done();
     });
 
   });

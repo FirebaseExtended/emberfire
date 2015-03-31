@@ -1,33 +1,31 @@
 import Ember from 'ember';
 import DS from 'ember-data';
-import startapp from 'dummy/tests/helpers/start-app';
+import startApp from 'dummy/tests/helpers/start-app';
 import { it } from 'ember-mocha';
 import stubFirebase from 'dummy/tests/helpers/stub-firebase';
 import unstubFirebase from 'dummy/tests/helpers/unstub-firebase';
 import createTestRef from 'dummy/tests/helpers/create-test-ref';
 
 describe("Integration: FirebaseAdapter - Updating records", function() {
-  var app, store, adapter;
+  var app, store, adapter, firebaseTestRef;
 
   var setupAdapter = function() {
-    app = startapp();
+    app = startApp();
     store = app.__container__.lookup("store:main");
-    adapter = app.__container__.lookup("adapter:application");
+    adapter = store.adapterFor('application');
     adapter._ref = createTestRef("blogs/normalized");
     adapter._queueFlushDelay = false;
+    firebaseTestRef = createTestRef("blogs/tests/adapter/updaterecord");
   };
 
-  before(function () {
+  beforeEach(function () {
     stubFirebase();
+    setupAdapter();
   });
-
-  after(function () {
-    unstubFirebase();
-  });
-
 
   afterEach(function() {
     Ember.run(app, 'destroy');
+    unstubFirebase();
   });
 
   describe("#updateRecord()", function() {
@@ -36,9 +34,8 @@ describe("Integration: FirebaseAdapter - Updating records", function() {
       var _ref, reference, newPost, newComment, currentData, postData, postId, commentId;
 
       beforeEach(function(done) {
-        setupAdapter();
         _ref = adapter._ref;
-        reference = createTestRef("blogs/tests/adapter/updaterecord/normalized");
+        reference = firebaseTestRef.child("normalized");
         adapter._ref = reference;
         Ember.run(function() {
           newComment = store.createRecord("comment", {
@@ -47,15 +44,15 @@ describe("Integration: FirebaseAdapter - Updating records", function() {
           newPost = store.createRecord("post", {
             title: "New Post"
           });
+
           postId = newPost.get('id');
           commentId = newComment.get('id');
           done();
         });
       });
 
-      afterEach(function(done) {
+      afterEach(function() {
         adapter._ref = _ref;
-        done();
       });
 
 
@@ -214,10 +211,9 @@ describe("Integration: FirebaseAdapter - Updating records", function() {
     describe("relationships with number ids", function() {
       var _ref, newPost, newComment, postId, commentId;
 
-      before(function(done) {
-        setupAdapter();
+      beforeEach(function(done) {
         _ref = adapter._ref;
-        var reference = createTestRef("blogs/tests/adapter/updaterecord/normalized");
+        var reference = firebaseTestRef.child("normalized");
         adapter._ref = reference;
         Ember.run(function() {
           newComment = store.createRecord("comment", {
@@ -242,16 +238,15 @@ describe("Integration: FirebaseAdapter - Updating records", function() {
         });
       });
 
+      afterEach(function() {
+        adapter._ref = _ref;
+      });
+
       it("contains a hasMany relationship", function(done) {
         newPost.get('comments').then(function(comments) {
           assert(comments.objectAt(0).get('body'), 'This is a new comment');
           done();
         });
-      });
-
-      after(function(done) {
-        adapter._ref = _ref;
-        done();
       });
 
     });
@@ -260,9 +255,7 @@ describe("Integration: FirebaseAdapter - Updating records", function() {
 
       var _ref, newPost1, newPost2, newPost3, newComment, newUser;
 
-      before(function(done) {
-        setupAdapter();
-
+      beforeEach(function(done) {
         app.User = DS.Model.extend({
           created: DS.attr('number'),
           username: function() {
@@ -277,7 +270,7 @@ describe("Integration: FirebaseAdapter - Updating records", function() {
         });
 
         _ref = adapter._ref;
-        adapter._ref = createTestRef("blogs/tests/adapter/updaterecord/normalized");
+        adapter._ref = firebaseTestRef.child("normalized");
 
         Ember.run(function() {
           newUser = store.createRecord("user");
@@ -304,6 +297,11 @@ describe("Integration: FirebaseAdapter - Updating records", function() {
         });
       });
 
+      afterEach(function() {
+        delete app.User;
+        adapter._ref = _ref;
+      });
+
       it("adds a comment without removing old posts", function(done) {
         Ember.run(function() {
           newUser.get("comments").then(function(comments) {
@@ -325,11 +323,6 @@ describe("Integration: FirebaseAdapter - Updating records", function() {
         });
       });
 
-      after(function(done) {
-        delete app.User;
-        adapter._ref = _ref;
-        done();
-      });
     });
 
     describe("denormalized relationship", function() {
@@ -337,8 +330,7 @@ describe("Integration: FirebaseAdapter - Updating records", function() {
       var _ref, newPost, newComment, currentData, postData, commentData;
       var postId, commentId;
 
-      before(function(done) {
-        setupAdapter();
+      beforeEach(function(done) {
         _ref = adapter._ref;
 
         app.Post = DS.Model.extend({
@@ -352,7 +344,7 @@ describe("Integration: FirebaseAdapter - Updating records", function() {
           comments: DS.hasMany("comment", { embedded: true }) // force embedded
         });
 
-        var reference = createTestRef("blogs/tests/adapter/updaterecord/denormalized");
+        var reference = firebaseTestRef.child("denormalized");
         adapter._ref = reference;
         Ember.run(function() {
           newComment = store.createRecord("comment", {
@@ -375,14 +367,13 @@ describe("Integration: FirebaseAdapter - Updating records", function() {
         });
       });
 
-      it("embedded the comments correctly ", function() {
-        assert(commentData.body, "This is a new comment");
-      });
-
-      after(function(done) {
+      afterEach(function() {
         delete app.Post;
         adapter._ref = _ref;
-        done();
+      });
+
+      it("embedded the comments correctly ", function() {
+        assert(commentData.body, "This is a new comment");
       });
 
     });

@@ -10,12 +10,11 @@ describe("Integration: FirebaseAdapter - Updates from server", function() {
   var app, store, adapter, firebaseTestRef;
 
   var setupAdapter = function() {
-    stubFirebase();
     app = startApp();
 
     firebaseTestRef = createTestRef();
     store = app.__container__.lookup("store:main");
-    adapter = app.__container__.lookup("adapter:application");
+    adapter = store.adapterFor('application');
     adapter._ref = createTestRef("blogs/normalized");
     adapter._queueFlushDelay = false;
 
@@ -43,25 +42,22 @@ describe("Integration: FirebaseAdapter - Updates from server", function() {
     });
   };
 
-  before(function () {
+  beforeEach(function () {
     stubFirebase();
-  });
-
-  after(function () {
-    unstubFirebase();
+    setupAdapter();
   });
 
   afterEach(function() {
-    Ember.run(app, 'destroy');
+    unstubFirebase();
     delete app.Post;
     delete app.Comment;
+    Ember.run(app, 'destroy');
   });
 
   describe("A locally created record is updated correctly after saving", function() {
     var _ref, newPost, postId;
 
-    before(function(done) {
-      setupAdapter();
+    beforeEach(function(done) {
       _ref = adapter._ref;
       var reference = firebaseTestRef.child("blogs/tests/adapter/updaterecord/normalized");
       adapter._ref = reference;
@@ -78,25 +74,21 @@ describe("Integration: FirebaseAdapter - Updates from server", function() {
       });
     });
 
-    it("updates the post correctly", function() {
-      assert(newPost.get('title') === 'Updated', 'property should change');
+    afterEach(function() {
+      adapter._ref = _ref;
     });
 
-    after(function(done) {
-      adapter._ref = _ref;
-      done();
+    it("updates the post correctly", function() {
+      assert(newPost.get('title') === 'Updated', 'property should change');
     });
 
   });
 
   describe("A record coming from find, gets the updates from the server correctly", function() {
-    var _ref, newPost;
+    var newPost;
 
-    before(function(done) {
-      setupAdapter();
-      _ref = adapter._ref;
-      var reference = firebaseTestRef.child("blogs/normalized");
-      adapter._ref = reference;
+    beforeEach(function(done) {
+      var reference = adapter._ref;
       Ember.run(function() {
         store.find("post", 'post_1').then(function(post) {
           newPost = post;
@@ -110,19 +102,12 @@ describe("Integration: FirebaseAdapter - Updates from server", function() {
     it("updates the post correctly", function() {
       assert(newPost.get('body') === 'Updated', 'property should change');
     });
-
-    after(function(done) {
-      adapter._ref = _ref;
-      done();
-    });
-
   });
 
   describe("An embedded record coming from the server, gets the updates correctly", function() {
     var _ref, comment;
 
-    before(function(done) {
-      setupAdapter();
+    beforeEach(function(done) {
       _ref = adapter._ref;
       var reference = firebaseTestRef.child("blogs/double_denormalized");
       adapter._ref = reference;
@@ -136,13 +121,12 @@ describe("Integration: FirebaseAdapter - Updates from server", function() {
       });
     });
 
-    it("updates the comment correctly", function() {
-      assert(comment.get('body') === 'Updated', 'property should change');
+    afterEach(function() {
+      adapter._ref = _ref;
     });
 
-    after(function(done) {
-      adapter._ref = _ref;
-      done();
+    it("updates the comment correctly", function() {
+      assert(comment.get('body') === 'Updated', 'property should change');
     });
 
   });
@@ -150,8 +134,7 @@ describe("Integration: FirebaseAdapter - Updates from server", function() {
   describe("Embedded record has transforms applied correctly, issue #88", function() {
     var _ref, comment;
 
-    before(function(done) {
-      setupAdapter();
+    beforeEach(function(done) {
       _ref = adapter._ref;
       var reference = firebaseTestRef.child("blogs/double_denormalized");
       adapter._ref = reference;
@@ -163,13 +146,12 @@ describe("Integration: FirebaseAdapter - Updates from server", function() {
       });
     });
 
-    it("Published transformed to a number", function() {
-      assert(typeof comment.get('published')  === 'number');
+    afterEach(function() {
+      adapter._ref = _ref;
     });
 
-    after(function(done) {
-      adapter._ref = _ref;
-      done();
+    it("Published transformed to a number", function() {
+      assert(typeof comment.get('published')  === 'number');
     });
 
   });
@@ -177,8 +159,7 @@ describe("Integration: FirebaseAdapter - Updates from server", function() {
   describe("Double embedded records are loaded correctly", function() {
     var _ref, user;
 
-    before(function(done) {
-      setupAdapter();
+    beforeEach(function(done) {
       _ref = adapter._ref;
       var reference = firebaseTestRef.child("blogs/double_denormalized");
       adapter._ref = reference;
@@ -190,24 +171,21 @@ describe("Integration: FirebaseAdapter - Updates from server", function() {
       });
     });
 
+    afterEach(function() {
+      adapter._ref = _ref;
+    });
+
     it("doubly embedded user is loaded correctly", function() {
       assert(user.get('firstName') === 'Adam');
     });
 
-    after(function(done) {
-      adapter._ref = _ref;
-      done();
-    });
   });
 
   describe("Setting a belongsTo to null, wipes it from the server as well issue #103", function() {
-    var _ref, commentData;
+    var commentData;
 
-    before(function(done) {
-      setupAdapter();
-      _ref = adapter._ref;
-      var reference = firebaseTestRef.child("blogs/normalized");
-      adapter._ref = reference;
+    beforeEach(function(done) {
+      var reference = adapter._ref;
       Ember.run(function() {
         store.find("comment", 'comment_1').then(function(comment) {
           comment.set('user', null);
@@ -224,21 +202,13 @@ describe("Integration: FirebaseAdapter - Updates from server", function() {
     it("Removed the user from the server", function() {
       assert(!commentData.user);
     });
-
-    after(function(done) {
-      adapter._ref = _ref;
-      done();
-    });
   });
 
   describe("Deleting a record serverside, deletes it client side as well", function() {
-    var _ref, currentComment;
+    var currentComment;
 
-    before(function(done) {
-      setupAdapter();
-      _ref = adapter._ref;
-      var reference = firebaseTestRef.child("blogs/normalized");
-      adapter._ref = reference;
+    beforeEach(function(done) {
+      var reference = adapter._ref;
       Ember.run(function() {
         store.find("comment", 'comment_1').then(function(comment) {
           currentComment = comment;
@@ -251,11 +221,6 @@ describe("Integration: FirebaseAdapter - Updates from server", function() {
 
     it("Comment was deleted client side as well", function() {
       assert(currentComment.get('isDeleted'));
-    });
-
-    after(function(done) {
-      adapter._ref = _ref;
-      done();
     });
   });
 
@@ -336,13 +301,10 @@ describe("belongsTo relationships", function() {
   });
 
   describe("Deleting a record clientside, deletes it on the server side as well", function() {
-    var _ref, reference;
+    var reference;
 
-    before(function(done) {
-      setupAdapter();
-      _ref = adapter._ref;
-      reference = firebaseTestRef.child("blogs/normalized");
-      adapter._ref = reference;
+    beforeEach(function(done) {
+      reference = adapter._ref;
       Ember.run(function() {
         store.find("comment", 'comment_2').then(function(comment) {
           comment.destroyRecord().then(function() {
@@ -358,21 +320,13 @@ describe("belongsTo relationships", function() {
         done();
       });
     });
-
-    after(function(done) {
-      adapter._ref = _ref;
-      done();
-    });
   });
 
  describe("Editing a found record clientside, edits it on the server side as well", function() {
-    var _ref, reference;
+    var reference;
 
-    before(function(done) {
-      setupAdapter();
-      _ref = adapter._ref;
-      reference = firebaseTestRef.child("blogs/normalized");
-      adapter._ref = reference;
+    beforeEach(function(done) {
+      reference = adapter._ref;
       Ember.run(function() {
         store.find("comment", 'comment_3').then(function(comment) {
           comment.set('body', 'Updated');
@@ -388,11 +342,6 @@ describe("belongsTo relationships", function() {
         assert(data.val() === 'Updated');
         done();
       });
-    });
-
-    after(function(done) {
-      adapter._ref = _ref;
-      done();
     });
   });
 });
