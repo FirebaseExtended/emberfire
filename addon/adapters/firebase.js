@@ -127,7 +127,7 @@ export default DS.Adapter.extend(Ember.Evented, {
   },
 
   recordWillUnload: function(store, record) {
-    var ref = this._getRef(record.typeKey, record.get('id'));
+    var ref = this._getRef(record.constructor, record.get('id'));
     ref.off('value');
   },
 
@@ -152,7 +152,7 @@ export default DS.Adapter.extend(Ember.Evented, {
     var adapter = this;
     var ref = this._getRef(type, record.get('id'));
     var called = false;
-    ref.on('value', function(snapshot) {
+    ref.on('value', function FirebaseAdapter$changeListener(snapshot) {
       if (called) {
         adapter._handleChildValue(store, type, serializer, snapshot);
       }
@@ -304,8 +304,10 @@ export default DS.Adapter.extend(Ember.Evented, {
         }
       });
 
-      this._enqueue(function() {
-        store.push(type, serializer.extractSingle(store, type, payload));
+      this._enqueue(function FirebaseAdapter$enqueueStorePush() {
+        if (!store.isDestroying) {
+          store.push(type, serializer.extractSingle(store, type, payload));
+        }
       });
     }
   },
@@ -535,7 +537,7 @@ export default DS.Adapter.extend(Ember.Evented, {
     Call each function in the _queue and the reset the _queue
   */
   _queueFlush: function() {
-    forEach(this._queue, function(queueItem) {
+    forEach(this._queue, function FirebaseAdapter$flushQueueItem(queueItem) {
       var fn = queueItem[0];
       var args = queueItem[1];
       fn.apply(null, args);
