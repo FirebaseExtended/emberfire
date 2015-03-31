@@ -38,7 +38,7 @@ describe("Integration: FirebaseAdapter - Deleting records", function() {
         });
         postId = newPost.get('id');
         userId = newUser.get('id');
-        userRef = firebaseTestRef.child("blogs/tests/adapter/deleterecord/normalized/users/" + userId);
+        userRef = reference.child("users/" + userId);
         Ember.RSVP.Promise.cast(newUser.get("posts")).then(function(posts) {
           posts.pushObject(newPost);
           newUser.save().then(function() {
@@ -46,10 +46,6 @@ describe("Integration: FirebaseAdapter - Deleting records", function() {
           });
         });
       });
-    });
-
-    afterEach(function() {
-      adapter._ref = _ref;
     });
 
     it("removes entries from inverse (hasMany) side", function(done) {

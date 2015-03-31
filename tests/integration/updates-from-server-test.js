@@ -55,10 +55,9 @@ describe("Integration: FirebaseAdapter - Updates from server", function() {
   });
 
   describe("A locally created record is updated correctly after saving", function() {
-    var _ref, newPost, postId;
+    var newPost, postId;
 
     beforeEach(function(done) {
-      _ref = adapter._ref;
       var reference = firebaseTestRef.child("blogs/tests/adapter/updaterecord/normalized");
       adapter._ref = reference;
       Ember.run(function() {
@@ -72,10 +71,6 @@ describe("Integration: FirebaseAdapter - Updates from server", function() {
           });
         });
       });
-    });
-
-    afterEach(function() {
-      adapter._ref = _ref;
     });
 
     it("updates the post correctly", function() {
@@ -105,10 +100,9 @@ describe("Integration: FirebaseAdapter - Updates from server", function() {
   });
 
   describe("An embedded record coming from the server, gets the updates correctly", function() {
-    var _ref, comment;
+    var comment;
 
     beforeEach(function(done) {
-      _ref = adapter._ref;
       var reference = firebaseTestRef.child("blogs/double_denormalized");
       adapter._ref = reference;
       Ember.run(function() {
@@ -121,10 +115,6 @@ describe("Integration: FirebaseAdapter - Updates from server", function() {
       });
     });
 
-    afterEach(function() {
-      adapter._ref = _ref;
-    });
-
     it("updates the comment correctly", function() {
       assert(comment.get('body') === 'Updated', 'property should change');
     });
@@ -132,22 +122,16 @@ describe("Integration: FirebaseAdapter - Updates from server", function() {
   });
 
   describe("Embedded record has transforms applied correctly, issue #88", function() {
-    var _ref, comment;
+    var comment;
 
     beforeEach(function(done) {
-      _ref = adapter._ref;
-      var reference = firebaseTestRef.child("blogs/double_denormalized");
-      adapter._ref = reference;
+      adapter._ref = firebaseTestRef.child("blogs/double_denormalized");
       Ember.run(function() {
         store.find("post", 'post_1').then(function(post) {
           comment = post.get('embeddedComments').objectAt(0);
           done();
         });
       });
-    });
-
-    afterEach(function() {
-      adapter._ref = _ref;
     });
 
     it("Published transformed to a number", function() {
@@ -157,22 +141,16 @@ describe("Integration: FirebaseAdapter - Updates from server", function() {
   });
 
   describe("Double embedded records are loaded correctly", function() {
-    var _ref, user;
+    var user;
 
     beforeEach(function(done) {
-      _ref = adapter._ref;
-      var reference = firebaseTestRef.child("blogs/double_denormalized");
-      adapter._ref = reference;
+      adapter._ref = firebaseTestRef.child("blogs/double_denormalized");
       Ember.run(function() {
         store.find("post", 'post_1').then(function(post) {
           user = post.get('embeddedComments').objectAt(0).get('embeddedUser');
           done();
         });
       });
-    });
-
-    afterEach(function() {
-      adapter._ref = _ref;
     });
 
     it("doubly embedded user is loaded correctly", function() {
@@ -225,13 +203,10 @@ describe("Integration: FirebaseAdapter - Updates from server", function() {
   });
 
   describe("hasMany relationships", function() {
-    var _ref, currentPost, reference;
+    var currentPost, reference;
 
     beforeEach(function(done) {
-      setupAdapter();
-      _ref = adapter._ref;
-      reference = firebaseTestRef.child("blogs/normalized");
-      adapter._ref = reference;
+      reference = adapter._ref;
       Ember.run(function() {
         store.find("post", 'post_1').then(function(post) {
           currentPost = post;
@@ -261,20 +236,13 @@ describe("Integration: FirebaseAdapter - Updates from server", function() {
       });
     });
 
-    after(function(done) {
-      adapter._ref = _ref;
-      done();
-    });
   });
 
-describe("belongsTo relationships", function() {
-    var _ref, currentComment, reference;
+  describe("belongsTo relationships", function() {
+    var currentComment, reference;
 
     beforeEach(function(done) {
-      setupAdapter();
-      _ref = adapter._ref;
-      reference = firebaseTestRef.child("blogs/normalized");
-      adapter._ref = reference;
+      reference = adapter._ref;
       Ember.run(function() {
         store.find("comment", 'comment_1').then(function(comment) {
           currentComment = comment;
@@ -294,10 +262,6 @@ describe("belongsTo relationships", function() {
       });
     });
 
-    after(function(done) {
-      adapter._ref = _ref;
-      done();
-    });
   });
 
   describe("Deleting a record clientside, deletes it on the server side as well", function() {
@@ -322,7 +286,7 @@ describe("belongsTo relationships", function() {
     });
   });
 
- describe("Editing a found record clientside, edits it on the server side as well", function() {
+  describe("Editing a found record clientside, edits it on the server side as well", function() {
     var reference;
 
     beforeEach(function(done) {

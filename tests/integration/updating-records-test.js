@@ -31,10 +31,9 @@ describe("Integration: FirebaseAdapter - Updating records", function() {
   describe("#updateRecord()", function() {
 
     describe("normalized hasMany relationships", function() {
-      var _ref, reference, newPost, newComment, currentData, postData, postId, commentId;
+      var reference, newPost, newComment, currentData, postData, postId, commentId;
 
       beforeEach(function(done) {
-        _ref = adapter._ref;
         reference = firebaseTestRef.child("normalized");
         adapter._ref = reference;
         Ember.run(function() {
@@ -50,11 +49,6 @@ describe("Integration: FirebaseAdapter - Updating records", function() {
           done();
         });
       });
-
-      afterEach(function() {
-        adapter._ref = _ref;
-      });
-
 
       describe('when the child record has not been saved', function () {
 
@@ -209,10 +203,9 @@ describe("Integration: FirebaseAdapter - Updating records", function() {
     }); // normalized hasMany relationships
 
     describe("relationships with number ids", function() {
-      var _ref, newPost, newComment, postId, commentId;
+      var newPost, newComment, postId, commentId;
 
       beforeEach(function(done) {
-        _ref = adapter._ref;
         var reference = firebaseTestRef.child("normalized");
         adapter._ref = reference;
         Ember.run(function() {
@@ -238,10 +231,6 @@ describe("Integration: FirebaseAdapter - Updating records", function() {
         });
       });
 
-      afterEach(function() {
-        adapter._ref = _ref;
-      });
-
       it("contains a hasMany relationship", function(done) {
         newPost.get('comments').then(function(comments) {
           assert(comments.objectAt(0).get('body'), 'This is a new comment');
@@ -253,7 +242,7 @@ describe("Integration: FirebaseAdapter - Updating records", function() {
 
     describe("multiple normalized relationships", function() {
 
-      var _ref, newPost1, newPost2, newPost3, newComment, newUser;
+      var newPost1, newPost2, newPost3, newComment, newUser;
 
       beforeEach(function(done) {
         app.User = DS.Model.extend({
@@ -269,7 +258,6 @@ describe("Integration: FirebaseAdapter - Updating records", function() {
           comments: DS.hasMany('comment', { async: true, inverse:'user' })
         });
 
-        _ref = adapter._ref;
         adapter._ref = firebaseTestRef.child("normalized");
 
         Ember.run(function() {
@@ -299,7 +287,6 @@ describe("Integration: FirebaseAdapter - Updating records", function() {
 
       afterEach(function() {
         delete app.User;
-        adapter._ref = _ref;
       });
 
       it("adds a comment without removing old posts", function(done) {
@@ -327,12 +314,10 @@ describe("Integration: FirebaseAdapter - Updating records", function() {
 
     describe("denormalized relationship", function() {
 
-      var _ref, newPost, newComment, currentData, postData, commentData;
+      var newPost, newComment, currentData, postData, commentData;
       var postId, commentId;
 
       beforeEach(function(done) {
-        _ref = adapter._ref;
-
         app.Post = DS.Model.extend({
           title: DS.attr('string'),
           body: DS.attr('string'),
@@ -369,7 +354,6 @@ describe("Integration: FirebaseAdapter - Updating records", function() {
 
       afterEach(function() {
         delete app.Post;
-        adapter._ref = _ref;
       });
 
       it("embedded the comments correctly ", function() {
