@@ -122,14 +122,15 @@ export default DS.JSONSerializer.extend(Ember.Evented, {
     Overrides ember-data's `serializeHasMany` to serialize oneToMany
     relationships.
   */
-  serializeHasMany: function(record, json, relationship) {
+  serializeHasMany: function(snapshot, json, relationship) {
+    var record = snapshot.record || snapshot;
     var key = relationship.key;
     var payloadKey = this.keyForRelationship ? this.keyForRelationship(key, "hasMany") : key;
     json[payloadKey] = Ember.A(record.get(key)).mapBy('id');
   },
 
-  serializeBelongsTo: function(record, json, relationship) {
-    this._super(record, json, relationship);
+  serializeBelongsTo: function(snapshot, json, relationship) {
+    this._super(snapshot, json, relationship);
     var key = relationship.key;
     // var payloadKey = this.keyForRelationship ? this.keyForRelationship(key, "belongsTo") : relationship.key;
     if (typeof json[key] === "undefined" || json[key] === '') {

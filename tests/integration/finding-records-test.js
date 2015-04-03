@@ -9,18 +9,18 @@ import createTestRef from 'dummy/tests/helpers/create-test-ref';
 describe("Integration: FirebaseAdapter - Finding Records", function() {
   var app, store, adapter;
 
-  before(function() {
+  beforeEach(function() {
     stubFirebase();
 
     app = startApp();
 
     store = app.__container__.lookup("store:main");
-    adapter = app.__container__.lookup("adapter:application");
+    adapter = store.adapterFor('application');
     adapter._ref = createTestRef("blogs/normalized");
     adapter._queueFlushDelay = false;
   });
 
-  after(function() {
+  afterEach(function() {
     unstubFirebase();
     Ember.run(app, 'destroy');
   });
@@ -49,12 +49,22 @@ describe("Integration: FirebaseAdapter - Finding Records", function() {
 
   describe("#find()", function() {
 
-    var getRefSpy, find, findRef;
+    var getRefSpy, findPromise, findRef;
 
-    before(function() {
+    beforeEach(function(done) {
       getRefSpy = sinon.spy(adapter, "_getRef");
-      find = adapter.find(store, store.modelFor("post"), "post_1");
-      findRef = getRefSpy.getCall(0).returnValue;
+      Ember.run(function () {
+        findPromise = adapter.find(store, store.modelFor("post"), "post_1");
+
+        findPromise.then(() => {
+          findRef = getRefSpy.getCall(0).returnValue;
+          done();
+        });
+      });
+    });
+
+    afterEach(function() {
+      getRefSpy.restore();
     });
 
     it("creates a single Firebase reference", function() {
@@ -66,16 +76,16 @@ describe("Integration: FirebaseAdapter - Finding Records", function() {
     });
 
     it("returns an object", function() {
-      assert.equal(typeof find, "object");
+      assert.equal(typeof findPromise, "object");
     });
 
     it("returns a promise", function() {
-      assert.equal(typeof find.then, "function");
+      assert.equal(typeof findPromise.then, "function");
     });
 
     it("resolves with the correct payload", function(done) {
       Ember.run(function() {
-        find.then(function(payload) {
+        findPromise.then(function(payload) {
           assert.equal(payload.id, "post_1");
           done();
         });
@@ -90,27 +100,32 @@ describe("Integration: FirebaseAdapter - Finding Records", function() {
         });
       });
     });
-
-    after(function() {
-      getRefSpy.restore();
-    });
-
   });
 
   describe("#findAll()", function() {
 
     var getRefSpy, findAllAddEventListenersSpy, handleChildValueSpy;
-    var findAll, findAllRef;
+    var findAllPromise, findAllRef;
 
-    before(function(done) {
+    beforeEach(function(done) {
       getRefSpy = sinon.spy(adapter, "_getRef");
       findAllAddEventListenersSpy = sinon.spy(adapter, "_findAllAddEventListeners");
       handleChildValueSpy = sinon.spy(adapter, "_handleChildValue");
-      Ember.run(function() {
-        findAll = adapter.findAll(store, store.modelFor("post"));
-        findAllRef = getRefSpy.getCall(0).returnValue;
-        done();
+
+      Ember.run(function () {
+        findAllPromise = adapter.findAll(store, store.modelFor("post"));
+
+        findAllPromise.then(() => {
+          findAllRef = getRefSpy.getCall(0).returnValue;
+          done();
+        });
       });
+    });
+
+    afterEach(function() {
+      getRefSpy.restore();
+      findAllAddEventListenersSpy.restore();
+      handleChildValueSpy.restore();
     });
 
     it("creates the correct Firebase reference", function() {
@@ -118,16 +133,16 @@ describe("Integration: FirebaseAdapter - Finding Records", function() {
     });
 
     it("returns an object", function() {
-      assert.equal(typeof findAll, "object");
+      assert.equal(typeof findAllPromise, "object");
     });
 
     it("returns a promise", function() {
-      assert.equal(typeof findAll.then, "function");
+      assert.equal(typeof findAllPromise.then, "function");
     });
 
     it("resolves with the correct payload", function(done) {
       Ember.run(function() {
-        findAll.then(function(payload) {
+        findAllPromise.then(function(payload) {
           assert(Ember.isArray(payload));
           assert.equal(payload.length, 2);
           done();
@@ -160,13 +175,6 @@ describe("Integration: FirebaseAdapter - Finding Records", function() {
           done();
         });
       });
-    });
-
-    after(function(done) {
-      getRefSpy.restore();
-      findAllAddEventListenersSpy.restore();
-      handleChildValueSpy.restore();
-      done();
     });
   });
 });

@@ -127,7 +127,7 @@ export default DS.Adapter.extend(Ember.Evented, {
   },
 
   recordWillUnload: function(store, record) {
-    var ref = this._getRef(record.typeKey, record.get('id'));
+    var ref = this._getRef(record.constructor, record.get('id'));
     ref.off('value');
   },
 
@@ -152,7 +152,7 @@ export default DS.Adapter.extend(Ember.Evented, {
     var adapter = this;
     var ref = this._getRef(type, record.get('id'));
     var called = false;
-    ref.on('value', function(snapshot) {
+    ref.on('value', function FirebaseAdapter$changeListener(snapshot) {
       if (called) {
         adapter._handleChildValue(store, type, serializer, snapshot);
       }
@@ -304,8 +304,10 @@ export default DS.Adapter.extend(Ember.Evented, {
         }
       });
 
-      this._enqueue(function() {
-        store.push(type, serializer.extractSingle(store, type, payload));
+      this._enqueue(function FirebaseAdapter$enqueueStorePush() {
+        if (!store.isDestroying) {
+          store.push(type, serializer.extractSingle(store, type, payload));
+        }
       });
     }
   },
@@ -314,9 +316,10 @@ export default DS.Adapter.extend(Ember.Evented, {
     `createRecord` is an alias for `updateRecord` because calling \
     `ref.set()` would wipe out any existing relationships
   */
-  createRecord: function(store, type, record) {
+  createRecord: function(store, type, snapshot) {
     var adapter = this;
-    return this.updateRecord(store, type, record).then(function() {
+    var record = snapshot.record || snapshot;
+    return this.updateRecord(store, type, snapshot).then(function() {
       adapter.listenForChanges(store, type, record);
     });
   },
@@ -334,9 +337,10 @@ export default DS.Adapter.extend(Ember.Evented, {
     for saving nested records as well.
 
   */
-  updateRecord: function(store, type, record, _recordRef) {
+  updateRecord: function(store, type, snapshot, _recordRef) {
     var adapter = this;
-    var recordRef = _recordRef || this._getRef(type, record.id);
+    var record = snapshot.record || snapshot;
+    var recordRef = _recordRef || this._getRef(type, record.get('id'));
     var recordCache = adapter._getRecordCache(type.typeKey, record.get('id'));
 
     var serializedRecord = record.serialize({includeId:false});
@@ -478,7 +482,8 @@ export default DS.Adapter.extend(Ember.Evented, {
   /**
     Called by the store when a record is deleted.
   */
-  deleteRecord: function(store, type, record) {
+  deleteRecord: function(store, type, snapshot) {
+    var record = snapshot.record || snapshot;
     var ref = this._getRef(type, record.get('id'));
     return toPromise(ref.remove, ref);
   },
@@ -486,8 +491,8 @@ export default DS.Adapter.extend(Ember.Evented, {
   /**
     Determines a path fo a given type
   */
-  pathForType: function(type) {
-    var camelized = Ember.String.camelize(type);
+  pathForType: function(typeName) {
+    var camelized = Ember.String.camelize(typeName);
     return Ember.String.pluralize(camelized);
   },
 
@@ -496,8 +501,12 @@ export default DS.Adapter.extend(Ember.Evented, {
   */
   _getRef: function(type, id) {
     var ref = this._ref;
-    if (type) {
-      ref = ref.child(this.pathForType(type.typeKey));
+    var typeName = type;
+    if (type && type.typeKey) {
+      typeName = type.typeKey;
+    }
+    if (typeName) {
+      ref = ref.child(this.pathForType(typeName));
     }
     if (id) {
       ref = ref.child(id);
@@ -528,7 +537,7 @@ export default DS.Adapter.extend(Ember.Evented, {
     Call each function in the _queue and the reset the _queue
   */
   _queueFlush: function() {
-    forEach(this._queue, function(queueItem) {
+    forEach(this._queue, function FirebaseAdapter$flushQueueItem(queueItem) {
       var fn = queueItem[0];
       var args = queueItem[1];
       fn.apply(null, args);

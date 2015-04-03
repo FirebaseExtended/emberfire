@@ -8,14 +8,14 @@ import createTestRef from 'dummy/tests/helpers/create-test-ref';
 describe("Integration: FirebaseAdapter - Deleting records", function() {
   var app, store, adapter, firebaseTestRef;
 
-  var setupAdapter = function() {
+  beforeEach(function () {
     stubFirebase();
     app = startApp();
 
     firebaseTestRef = createTestRef();
     store = app.__container__.lookup("store:main");
-    adapter = app.__container__.lookup("adapter:application");
-  };
+    adapter = store.adapterFor('application');
+  });
 
   afterEach(function() {
     unstubFirebase();
@@ -26,7 +26,6 @@ describe("Integration: FirebaseAdapter - Deleting records", function() {
     var _ref, newPost, newUser, postId, userRef, userId;
 
     beforeEach(function(done) {
-      setupAdapter();
       _ref = adapter._ref;
       var reference = firebaseTestRef.child("blogs/tests/adapter/deleterecord/normalized");
       adapter._ref = reference;
@@ -39,7 +38,7 @@ describe("Integration: FirebaseAdapter - Deleting records", function() {
         });
         postId = newPost.get('id');
         userId = newUser.get('id');
-        userRef = firebaseTestRef.child("blogs/tests/adapter/deleterecord/normalized/users/" + userId);
+        userRef = reference.child("users/" + userId);
         Ember.RSVP.Promise.cast(newUser.get("posts")).then(function(posts) {
           posts.pushObject(newPost);
           newUser.save().then(function() {
@@ -57,11 +56,6 @@ describe("Integration: FirebaseAdapter - Deleting records", function() {
           done();
         });
       });
-    });
-
-    afterEach(function(done) {
-      adapter._ref = _ref;
-      done();
     });
 
   });

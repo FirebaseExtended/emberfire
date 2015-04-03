@@ -1,4 +1,5 @@
 /* jshint expr:true */
+import Ember from 'ember';
 import {
   describeModule,
   it
@@ -21,7 +22,7 @@ describeModule('adapter:firebase', 'FirebaseAdapter', {
         });
       });
 
-    });
+    }); // #init
 
     describe('#applyQueryToRef', function () {
       var mockFirebase, adapter, ref;
@@ -114,8 +115,81 @@ describeModule('adapter:firebase', 'FirebaseAdapter', {
           assert(spy.called === false, `${key} should not be called`);
         });
 
+      }); // forEach
+
+    }); // #applyQueryToRef
+
+    describe("#_queueScheduleFlush", function() {
+
+      var adapter, spy;
+
+      beforeEach(function() {
+        adapter = this.subject({
+          firebase: new MockFirebase('https://emberfire-demo.firebaseio.com'),
+          _queueFlushDelay: 1
+        });
+        spy = sinon.spy(adapter, "_queueScheduleFlush");
       });
 
-    });
-  }
-);
+      afterEach(function() {
+        spy.restore();
+      });
+
+      it("schedules a #_queueFlush", function(done) {
+        adapter._queueScheduleFlush();
+        Ember.run.later(this, function() {
+          assert.equal(spy.callCount, 1);
+          done();
+        }, adapter._queueFlushDelay * 2);
+      });
+
+    }); // #_queueScheduleFlush
+
+    describe("#_enqueue", function() {
+      var adapter, queueScheduleFlushSpy, queueFlushSpy, callbackSpy;
+
+      beforeEach(function() {
+        adapter = this.subject({
+          firebase: new MockFirebase('https://emberfire-demo.firebaseio.com'),
+          _queueFlushDelay: 1
+        });
+        queueScheduleFlushSpy = sinon.spy(adapter, "_queueScheduleFlush");
+        queueFlushSpy = sinon.spy(adapter, "_queueFlush");
+        callbackSpy = sinon.spy();
+      });
+
+      afterEach(function() {
+        queueScheduleFlushSpy.restore();
+        queueFlushSpy.restore();
+      });
+
+      it("pushes a new item into the _queue", function() {
+        adapter._enqueue(callbackSpy, ['foo']);
+        assert.equal(adapter._queue.length, 1);
+      });
+
+      it("schedules a _queueFlush()", function() {
+        adapter._enqueue(callbackSpy, ['foo']);
+        assert.equal(queueScheduleFlushSpy.callCount, 1);
+      });
+
+      it("flushes the _queue", function(done) {
+        adapter._enqueue(callbackSpy, ['foo']);
+        Ember.run.later(this, function() {
+          assert.equal(queueFlushSpy.callCount, 1);
+          done();
+        }, adapter._queueFlushDelay * 2);
+      });
+
+      it("applys the callback with the correct arguments", function(done) {
+        adapter._enqueue(callbackSpy, ['foo']);
+        Ember.run.later(this, function() {
+          assert.equal(callbackSpy.callCount, 1);
+          assert.equal(callbackSpy.getCall(0).args[0], 'foo');
+          done();
+        }, adapter._queueFlushDelay * 2);
+      });
+
+    }); // #_enqueue
+
+});
