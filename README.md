@@ -18,7 +18,7 @@ to ask technical questions, share apps you've built, and chat with other develop
 To install EmberFire as an addon with your Ember CLI app, run the following command within your app's directory:
 
 ```bash
-$ ember install:addon emberfire
+$ ember install emberfire
 ```
 
 This will add Firebase as a dependency in your `bower.json` file, create `app/adapters/application.js` and add configuration to `config/environment.js`. Now, update your firebase url in `config/environment.js`:
