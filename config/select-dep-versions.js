@@ -25,10 +25,11 @@ function maybeChangeVersion(channel) {
       return run('git', ['checkout', 'package.json'], {cwd: path.join(__dirname, '..')});
     })
     .then(function () {
+      var npmVersion = channel;
       if (channel === 'canary' || channel === 'beta' ) {
-        return run('npm', ['install'], {cwd: path.join(__dirname, '..')});
+        npmVersion = 'latest';
       }
-      return run('npm', ['install', '--save-dev', 'ember-data@' + channel], {cwd: path.join(__dirname, '..')});
+      return run('npm', ['install', '--save-dev', 'ember-data@' + npmVersion], {cwd: path.join(__dirname, '..')});
     })
     .then(function() {
       return channel;
