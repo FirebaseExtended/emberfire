@@ -13,12 +13,12 @@ The `FirebaseAdapter` provides all of the standard `DS.Adapter` methods and will
 to ask technical questions, share apps you've built, and chat with other developers in the community.**
 
 
-## Installing EmberFire with the Ember CLI
+## Installing EmberFire with Ember CLI
 
 To install EmberFire as an addon with your Ember CLI app, run the following command within your app's directory:
 
 ```bash
-$ ember install:addon emberfire
+$ ember install emberfire
 ```
 
 This will add Firebase as a dependency in your `bower.json` file, create `app/adapters/application.js` and add configuration to `config/environment.js`. Now, update your firebase url in `config/environment.js`:
@@ -56,8 +56,7 @@ If you'd like to contribute to EmberFire, run the following commands to get your
 From your `emberfire` workdir
 
 * `npm link`
-* `rm -rf node_modules`
-* `npm install --production` (does not install dev dependencies, these can trip you up!)
+* `npm prune --production` (removes dev dependencies, these can trip you up!)
 
 From your *app* workdir
 
