@@ -60,6 +60,17 @@ export default {
         deleteRecord: function () {
           this.store.recordWillDelete(this);
           this._super();
+        },
+
+        ref: function () {
+          if (this.__firebaseRef) {
+            return this.__firebaseRef;
+          }
+
+          var adapter = this.store.adapterFor(this.constructor);
+          if (adapter._getRef) {
+            return adapter._getRef(this.constructor, this.id);
+          }
         }
       });
     }
