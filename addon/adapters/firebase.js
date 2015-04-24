@@ -460,7 +460,12 @@ export default DS.Adapter.extend(Ember.Evented, {
     var isEmbedded = relationship.options.embedded === true;
     if (isEmbedded) {
       record.__firebaseRef = ref;
-      return this.updateRecord(store, relationship.type, record);
+      record.send('willCommit');
+      return this.updateRecord(store, relationship.type, record, 'hasMany')
+        .then(function () {
+          record.set('_attributes', {});
+          record.adapterDidCommit();
+        });
     }
 
     return toPromise(ref.set, ref,  [true]);
@@ -480,7 +485,12 @@ export default DS.Adapter.extend(Ember.Evented, {
   _saveBelongsToRecord: function(store, type, relationship, id, parentRef) {
     var record = store.getById(relationship.type, id);
     record.__firebaseRef = parentRef.child(relationship.key);
-    return this.updateRecord(store, relationship.type, record, 'belongsTo');
+    record.send('willCommit');
+    return this.updateRecord(store, relationship.type, record, 'belongsTo')
+      .then(function () {
+        record.set('_attributes', {});
+        record.adapterDidCommit();
+      });
   },
 
   /**

@@ -312,7 +312,7 @@ describe("Integration: FirebaseAdapter - Updating records", function() {
 
     });
 
-    describe("denormalized relationship", function() {
+    describe("embedded hasMany records", function() {
 
       var newPost, newComment, currentData, postData, commentData;
       var postId, commentId;
@@ -347,6 +347,91 @@ describe("Integration: FirebaseAdapter - Updating records", function() {
               postData = currentData.posts[postId];
               commentData = postData.comments[commentId];
               done();
+            });
+          });
+        });
+      });
+
+      afterEach(function() {
+        delete app.Post;
+      });
+
+      it("save to server correctly", function() {
+        assert.equal(commentData.body, "This is a new comment");
+      });
+
+      it("maintain the correct .ref()", function() {
+        var refPath = newComment.ref().path.toString();
+        var expectedPath = `/blogs/tests/adapter/updaterecord/denormalized/posts/${postId}/comments/${commentId}`;
+        assert.equal(refPath, expectedPath);
+      });
+
+      it("are not 'dirty'", function() {
+        assert(!newComment.get('isDirty'), "The embedded record should not be 'dirty'");
+      });
+
+      it("are not 'new'", function() {
+        assert(!newComment.get('isNew'), "The embedded record should not be 'new'");
+      });
+
+      it("are not 'saving'", function() {
+        assert(!newComment.get('isSaving'), "The embedded record should be 'saving'");
+      });
+
+      it("become 'dirty' when editing", function() {
+        newComment.set('body', 'new body');
+        assert(newComment.get('isDirty'), "The embedded record should be 'dirty'");
+      });
+
+      it("are not 'dirty' after re-saving", function(done) {
+        newComment.set('body', 'new body');
+        newPost.save().then(function () {
+          newComment.ref().once('value', function(snapshot) {
+            commentData = snapshot.val();
+            assert.equal(commentData.body, 'new body');
+            assert(!newComment.get('isDirty'), 'record should not be dirty');
+            done();
+          });
+        });
+      });
+
+    });
+
+    describe("embedded belongsTo records", function() {
+
+      var newPost, newComment, currentData, postData, commentData;
+      var postId, commentId;
+
+      beforeEach(function(done) {
+        app.Post = DS.Model.extend({
+          title: DS.attr('string'),
+          body: DS.attr('string'),
+          published: DS.attr('number'),
+          publishedDate: function() {
+            return moment(this.get('published')).format('MMMM Do, YYYY');
+          }.property('published'),
+          user: DS.belongsTo('user', { async: true }),
+          comment: DS.belongsTo("comment", { embedded: true }) // force embedded
+        });
+
+        var reference = firebaseTestRef.child("denormalized");
+        adapter._ref = reference;
+        Ember.run(function() {
+          newComment = store.createRecord("comment", {
+            body: "This is a new comment"
+          });
+          newPost = store.createRecord('post', {
+            title: "New Post"
+          });
+          postId = newPost.get('id');
+          commentId = newComment.get('id');
+          newPost.set("comment", newComment);
+          newPost.save().then(function() {
+            reference.once('value', function(data) {
+              currentData = data.val();
+              postData = currentData.posts[postId];
+              commentData = postData.comment;
+              done();
              });
           });
         });
@@ -356,8 +441,47 @@ describe("Integration: FirebaseAdapter - Updating records", function() {
         delete app.Post;
       });
 
-      it("embedded the comments correctly ", function() {
-        assert(commentData.body, "This is a new comment");
+      it("save to server correctly", function() {
+        assert.equal(commentData.body, "This is a new comment");
+      });
+
+      it("maintain the correct .ref()", function() {
+        var refPath = newComment.ref().path.toString();
+        var expectedPath = `/blogs/tests/adapter/updaterecord/denormalized/posts/${postId}/comment`;
+        assert.equal(refPath, expectedPath);
+      });
+
+      it("save with an id", function() {
+        assert(commentData.id, "The id should exist in the embedded payload");
+      });
+
+      it("are not 'dirty'", function() {
+        assert(!newComment.get('isDirty'), "The embedded record should not be 'dirty'");
+      });
+
+      it("are not 'new'", function() {
+        assert(!newComment.get('isNew'), "The embedded record should not be 'new'");
+      });
+
+      it("are not 'saving'", function() {
+        assert(!newComment.get('isSaving'), "The embedded record should be 'saving'");
+      });
+
+      it("become 'dirty' when editing", function() {
+        newComment.set('body', 'new body');
+        assert(newComment.get('isDirty'), "The embedded record should be 'dirty'");
+      });
+
+      it("are not 'dirty' after re-saving", function(done) {
+        newComment.set('body', 'new body');
+        newPost.save().then(function () {
+          newComment.ref().once('value', function(snapshot) {
+            commentData = snapshot.val();
+            assert.equal(commentData.body, 'new body');
+            assert(!newComment.get('isDirty'), 'record should not be dirty');
+            done();
+          });
+        });
       });
 
     });
