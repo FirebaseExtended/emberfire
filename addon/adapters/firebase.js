@@ -337,14 +337,16 @@ export default DS.Adapter.extend(Ember.Evented, {
     for saving nested records as well.
 
   */
-  updateRecord: function(store, type, snapshot) {
+  updateRecord: function(store, type, snapshot, embeddedType) {
     var adapter = this;
     var record = snapshot.record || snapshot;
     var recordRef = record.__firebaseRef || this._getRef(type, record.get('id'));
     var modelName = Ember.String.camelize(type.modelName || type.typeKey);
     var recordCache = adapter._getRecordCache(modelName, record.get('id'));
 
-    var serializedRecord = record.serialize({includeId:false});
+    var serializedRecord = record.serialize({
+      includeId: embeddedType === 'belongsTo'
+    });
 
     return new Promise(function(resolve, reject) {
       var savedRelationships = Ember.A();
@@ -478,7 +480,7 @@ export default DS.Adapter.extend(Ember.Evented, {
   _saveBelongsToRecord: function(store, type, relationship, id, parentRef) {
     var record = store.getById(relationship.type, id);
     record.__firebaseRef = parentRef.child(relationship.key);
-    return this.updateRecord(store, relationship.type, record);
+    return this.updateRecord(store, relationship.type, record, 'belongsTo');
   },
 
   /**
