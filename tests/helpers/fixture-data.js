@@ -9,6 +9,13 @@ export default {
             "post_1": true,
             "post_2": true
           }
+        },
+        "esnowden": {
+          "firstName": "Edward",
+          "created": 1395162147634,
+          "posts": {
+            "post_3": true
+          }
         }
       },
       "posts": {
@@ -31,6 +38,16 @@ export default {
             "comment_4": true
           },
           "title": "Post 2"
+        },
+        "post_3": {
+          "published": 1395162147646,
+          "user": "esnowden",
+          "body": "This is the third FireBlog post!",
+          "comments": {
+            "comment_5": true,
+            "comment_6": true
+          },
+          "title": "Post 3"
         }
       },
       "comments": {
@@ -53,8 +70,63 @@ export default {
           "published": 1395176007626,
           "user": "aputinski",
           "body": "This is a fourth comment"
+        },
+        "comment_5": {
+          "published": 1395176007627,
+          "user": "esnowden",
+          "body": "This is a fifth comment"
+        },
+        "comment_6": {
+          "published": 1395176007628,
+          "user": "esnowden",
+          "body": "This is a sixth comment"
         }
       }
+    },
+    "queries": {
+      "users": {
+        "tstirrat": {
+          "firstName": "Tim",
+          "created": 1395162147634,
+          "posts": {
+            "post_1": true,
+            "post_2": true,
+            "post_3": true
+          }
+        }
+      },
+      "posts": {
+        "post_1": {
+          "published": 1395162147646,
+          "user": "tstirrat",
+          "body": "This is the first FireBlog post!",
+          "comments": {
+            "comment_1": true,
+            "comment_2": true
+          },
+          "title": "Post 1"
+        },
+        "post_2": {
+          "published": 1395162147646,
+          "user": "tstirrat",
+          "body": "This is the second FireBlog post!",
+          "comments": {
+            "comment_3": true,
+            "comment_4": true
+          },
+          "title": "Post 2"
+        },
+        "post_3": {
+          "published": 1395162147646,
+          "user": "tstirrat",
+          "body": "This is the third FireBlog post!",
+          "comments": {
+            "comment_3": true,
+            "comment_4": true
+          },
+          "title": "Post 3"
+        }
+      },
     },
     "denormalized": {
       "posts": {
