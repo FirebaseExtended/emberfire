@@ -197,11 +197,36 @@ export default DS.Adapter.extend(Ember.Evented, {
     }, fmt('DS: FirebaseAdapter#findAll %@ to %@', [type, ref.toString()]));
   },
 
-  findQuery: function(store, type, query) {
+  findQuery: function(store, type, query, recordArray) {
     var adapter = this;
     var ref = this._getRef(type);
-
     ref = this.applyQueryToRef(ref, query);
+
+    ref.on('child_added', function(snapshot) {
+      var record = store.recordForId(type, snapshot.key());
+
+      if (!record || !record.__listening) {
+        var payload = adapter._assignIdToPayload(snapshot);
+        var serializer = store.serializerFor(type);
+        adapter._updateRecordCacheForType(type, payload);
+        record = store.push(type, serializer.extractSingle(store, type, payload));
+      }
+
+      if (record) {
+        recordArray.addObject(record);
+      }
+    });
+
+    // `child_changed` is already handled by the record's
+    // value listener after a store.push. `child_moved` is
+    // a much less common case because it relates to priority
+
+    ref.on('child_removed', function(snapshot) {
+      var record = store.recordForId(type, snapshot.key());
+      if (record) {
+        recordArray.removeObject(record);
+      }
+    });
 
     return new Promise(function(resolve, reject) {
       // Listen for child events on the type
