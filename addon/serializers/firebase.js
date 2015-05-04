@@ -38,34 +38,44 @@ export default DS.JSONSerializer.extend(Ember.Evented, {
     }
   },
 
-  normalizeEmbeddedHasMany: function(type, hash, relationship) {
+  normalizeEmbeddedHasMany: function(type, hash, relationship, ref) {
     var key = relationship.key;
-    var embeddedRecordPayload = hash[key];
-    var embeddedKey;
+    var embedded = hash[key];
+    var embeddedRef;
     if (!hash[key]) {
       return;
     }
-    for (embeddedKey in embeddedRecordPayload) {
-      var record = embeddedRecordPayload[embeddedKey];
-      if (record !== null && typeof record === 'object') {
-        record.id = embeddedKey;
+    ref = ref || this.store.adapterFor(type)._getRef(type, hash.id);
+
+    for (var id in embedded) {
+      var payload = embedded[id];
+      if (payload !== null && typeof payload === 'object') {
+        payload.id = id;
       }
-      this.store.push(relationship.type, this.normalize(relationship.type, record));
+      embeddedRef = ref.child(key).child(id);
+      var record = this.store.push(relationship.type, this.normalize(relationship.type, payload, embeddedRef));
+      record.__firebaseRef = embeddedRef;
     }
     hash[key] = Ember.keys(hash[key]);
   },
 
-  normalizeEmbeddedBelongsTo: function(type, hash, relationship) {
+  normalizeEmbeddedBelongsTo: function(type, hash, relationship, ref) {
     var key = relationship.key;
     if (!hash[key]) {
       return;
     }
-    var embeddedRecordPayload = hash[key];
-    if (typeof embeddedRecordPayload.id !== 'string') {
+
+    ref = ref || this.store.adapterFor(type)._getRef(type, hash.id);
+
+    var payload = hash[key];
+    if (typeof payload.id !== 'string') {
       throw new Error(fmt('Embedded relationship "%@" of "%@" must contain an "id" property in the payload', [relationship.type.typeKey, type]));
     }
-    this.store.push(relationship.type, this.normalize(relationship.type, embeddedRecordPayload));
-    hash[key] = embeddedRecordPayload.id;
+    var embeddedRef = ref.child(key);
+    var record = this.store.push(relationship.type, this.normalize(relationship.type, payload, embeddedRef));
+    record.__firebaseRef = embeddedRef;
+
+    hash[key] = payload.id;
   },
 
   normalizeBelongsTo: Ember.K,
@@ -74,19 +84,19 @@ export default DS.JSONSerializer.extend(Ember.Evented, {
     for `hasMany` relationships and makes sure the value is an object.
     The object is then converted to an Array using `Ember.keys`
   */
-  normalize: function(type, hash) {
+  normalize: function(type, hash, ref) {
     var serializer = this;
     // Check if the model contains any 'hasMany' relationships
     type.eachRelationship(function(key, relationship) {
       if (relationship.kind === 'hasMany') {
         if (relationship.options.embedded) {
-          serializer.normalizeEmbeddedHasMany(type, hash, relationship);
+          serializer.normalizeEmbeddedHasMany(type, hash, relationship, ref);
         } else {
           serializer.normalizeHasMany(type, hash, relationship);
         }
       } else {
         if (relationship.options.embedded) {
-          serializer.normalizeEmbeddedBelongsTo(type, hash, relationship);
+          serializer.normalizeEmbeddedBelongsTo(type, hash, relationship, ref);
         } else {
           serializer.normalizeBelongsTo(type, hash, relationship);
         }
@@ -99,7 +109,7 @@ export default DS.JSONSerializer.extend(Ember.Evented, {
     Called on a records returned from `find()` and all records
     returned from `findAll()`
 
-    This method also checkes for `embedded: true`, extracts the
+    This method also checks for `embedded: true`, extracts the
     embedded records, pushes them into the store, and then replaces
     the records with an array of ids
   */
