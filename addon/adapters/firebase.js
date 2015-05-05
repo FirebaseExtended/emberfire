@@ -346,9 +346,8 @@ export default DS.Adapter.extend(Ember.Evented, {
 
     var pathPieces = recordRef.path.toString().split('/');
     var lastPiece = pathPieces[pathPieces.length-1];
-    var includeId = (lastPiece !== record.id); // record has no key
     var serializedRecord = record.serialize({
-      includeId
+      includeId: (lastPiece !== record.id) // record has no firebase `key` in path
     });
 
     return new Promise(function(resolve, reject) {
