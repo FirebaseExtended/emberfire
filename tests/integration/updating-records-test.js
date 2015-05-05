@@ -395,6 +395,20 @@ describe("Integration: FirebaseAdapter - Updating records", function() {
         });
       });
 
+      it("rollback to a clean state", function() {
+        newComment.set('body', 'new body');
+        assert(newComment.get('isDirty'), "The embedded record should be 'dirty'");
+        newComment.rollback();
+        assert(!newComment.get('isDirty'), "The embedded record should not be 'dirty'");
+      });
+
+      it("rollback to their last saved state", function() {
+        newComment.set('body', 'new body');
+        assert(newComment.get('isDirty'), "The embedded record should be 'dirty'");
+        newComment.rollback();
+        assert.equal(newComment.get('body'), 'This is a new comment');
+      });
+
     });
 
     describe("embedded belongsTo records", function() {
@@ -482,6 +496,20 @@ describe("Integration: FirebaseAdapter - Updating records", function() {
             done();
           });
         });
+      });
+
+      it("rollback to a clean state", function() {
+        newComment.set('body', 'new body');
+        assert(newComment.get('isDirty'), "The embedded record should be 'dirty'");
+        newComment.rollback();
+        assert(!newComment.get('isDirty'), "The embedded record should not be 'dirty'");
+      });
+
+      it("rollback to their last saved state", function() {
+        newComment.set('body', 'new body');
+        assert(newComment.get('isDirty'), "The embedded record should be 'dirty'");
+        newComment.rollback();
+        assert.equal(newComment.get('body'), 'This is a new comment');
       });
 
     });

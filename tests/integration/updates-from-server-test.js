@@ -54,7 +54,7 @@ describe("Integration: FirebaseAdapter - Updates from server", function() {
     Ember.run(app, 'destroy');
   });
 
-  describe("A locally created record is updated correctly after saving", function() {
+  describe("A locally created (and saved) record", function() {
     var newPost, postId;
 
     beforeEach(function(done) {
@@ -73,13 +73,19 @@ describe("Integration: FirebaseAdapter - Updates from server", function() {
       });
     });
 
-    it("updates the post correctly", function() {
+    it("receives server updates correctly", function() {
       assert(newPost.get('title') === 'Updated', 'property should change');
+    });
+
+    it("has the correct .ref()", function() {
+      var refPath = newPost.ref().path.toString();
+      var expectedPath = `/blogs/tests/adapter/updaterecord/normalized/posts/${postId}`;
+      assert.equal(refPath, expectedPath);
     });
 
   });
 
-  describe("A record coming from find, gets the updates from the server correctly", function() {
+  describe("A record coming from find", function() {
     var newPost;
 
     beforeEach(function(done) {
@@ -94,38 +100,23 @@ describe("Integration: FirebaseAdapter - Updates from server", function() {
       });
     });
 
-    it("updates the post correctly", function() {
-      assert(newPost.get('body') === 'Updated', 'property should change');
+    it("receives server updates correctly", function() {
+      assert.equal(newPost.get('body'), 'Updated', 'property should change');
+    });
+
+    it("has the correct .ref()", function() {
+      var refPath = newPost.ref().path.toString();
+      var expectedPath = `/blogs/normalized/posts/post_1`;
+      assert.equal(refPath, expectedPath);
     });
   });
 
-  describe("An embedded record coming from the server, gets the updates correctly", function() {
-    var comment;
+  describe("An embedded record coming from the server", function() {
+    var comment, reference;
 
     beforeEach(function(done) {
-      var reference = firebaseTestRef.child("blogs/double_denormalized");
+      reference = firebaseTestRef.child("blogs/double_denormalized");
       adapter._ref = reference;
-      Ember.run(function() {
-        store.find("post", 'post_1').then(function(post) {
-          comment = post.get('embeddedComments').objectAt(0);
-          reference.child('posts/post_1/embeddedComments/comment_1/body').set('Updated', function() {
-            done();
-          });
-        });
-      });
-    });
-
-    it("updates the comment correctly", function() {
-      assert(comment.get('body') === 'Updated', 'property should change');
-    });
-
-  });
-
-  describe("Embedded record has transforms applied correctly, issue #88", function() {
-    var comment;
-
-    beforeEach(function(done) {
-      adapter._ref = firebaseTestRef.child("blogs/double_denormalized");
       Ember.run(function() {
         store.find("post", 'post_1').then(function(post) {
           comment = post.get('embeddedComments').objectAt(0);
@@ -134,17 +125,31 @@ describe("Integration: FirebaseAdapter - Updates from server", function() {
       });
     });
 
-    it("Published transformed to a number", function() {
+    it("receives server updates", function(done) {
+      reference.child('posts/post_1/embeddedComments/comment_1/body').set('Updated', function() {
+        assert.equal(comment.get('body'), 'Updated', 'property should change');
+        done();
+      });
+    });
+
+    it("has transforms applied correctly", function() {
       assert(typeof comment.get('published')  === 'number');
+    });
+
+    it("has the correct .ref()", function() {
+      var refPath = comment.ref().path.toString();
+      var expectedPath = `/blogs/double_denormalized/posts/post_1/embeddedComments/comment_1`;
+      assert.equal(refPath, expectedPath);
     });
 
   });
 
-  describe("Double embedded records are loaded correctly", function() {
-    var user;
+  describe("An embedded record inside another embedded record", function() {
+    var user, reference;
 
     beforeEach(function(done) {
-      adapter._ref = firebaseTestRef.child("blogs/double_denormalized");
+      reference = firebaseTestRef.child("blogs/double_denormalized");
+      adapter._ref = reference;
       Ember.run(function() {
         store.find("post", 'post_1').then(function(post) {
           user = post.get('embeddedComments').objectAt(0).get('embeddedUser');
@@ -153,8 +158,21 @@ describe("Integration: FirebaseAdapter - Updates from server", function() {
       });
     });
 
-    it("doubly embedded user is loaded correctly", function() {
+    it("loads correctly", function() {
       assert(user.get('firstName') === 'Adam');
+    });
+
+    it("receives server updates", function(done) {
+      reference.child('posts/post_1/embeddedComments/comment_1/embeddedUser/firstName').set('Updated', function() {
+        assert.equal(user.get('firstName'), 'Updated', 'property should change');
+        done();
+      });
+    });
+
+    it("has the correct .ref()", function() {
+      var refPath = user.ref().path.toString();
+      var expectedPath = `/blogs/double_denormalized/posts/post_1/embeddedComments/comment_1/embeddedUser`;
+      assert.equal(refPath, expectedPath);
     });
 
   });
