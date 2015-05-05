@@ -2,18 +2,13 @@
 var gulp = require('gulp');
 
 var del = require('del');
-var sourcemaps = require('gulp-sourcemaps');
-var transpile  = require('gulp-es6-module-transpiler');
-var concat = require('gulp-concat');
-var uglify = require('gulp-uglify');
-var jshint = require('gulp-jshint');
-var header = require('gulp-header');
+var $ = require('gulp-load-plugins')();
 var fs = require('fs');
 
 gulp.task('lint', function () {
   return gulp.src('{addon,app,config,tests}/**/*.js')
-    .pipe(jshint())
-    .pipe(jshint.reporter('default'));
+    .pipe($.jshint())
+    .pipe($.jshint.reporter('default'));
 });
 
 gulp.task('clean-dist', function (cb) {
@@ -25,28 +20,29 @@ gulp.task('clean-dist', function (cb) {
 
 gulp.task('build-legacy', ['lint'], function() {
   return gulp.src('vendor/legacy-shims/emberfire.js')
-    .pipe(sourcemaps.init())
-    .pipe(transpile({
+    .pipe($.sourcemaps.init())
+    .pipe($.es6ModuleTranspiler({
       importPaths: ['vendor/legacy-shims'],
       formatter: 'bundle'
     }))
-    .pipe(concat('emberfire.js'))
-    .pipe(header(fs.readFileSync('vendor/legacy-shims/header.js', 'utf8')))
-    .pipe(sourcemaps.write('./'))
+    .pipe($.concat('emberfire.js'))
+    .pipe($.header(fs.readFileSync('vendor/legacy-shims/header.js', 'utf8')))
+    .pipe($.sourcemaps.write('./'))
     .pipe(gulp.dest('dist'));
 });
 
 gulp.task('build-legacy-minified', ['lint'], function() {
   return gulp.src('vendor/legacy-shims/emberfire.js')
-    .pipe(transpile({
+    .pipe($.es6ModuleTranspiler({
       importPaths: ['vendor/legacy-shims'], // for 'ember' and 'ember-data' global shims
       formatter: 'bundle'
     }))
-    .pipe(concat('emberfire.min.js'))
-    .pipe(header(fs.readFileSync('vendor/legacy-shims/header.js', 'utf8')))
-    .pipe(uglify({
-      preserveComments: 'some'
-    }))
+    .pipe($.concat('emberfire.min.js'))
+    .pipe($.uglify())
+    .on('error', function (e) {
+      throw new $.util.PluginError('gulp-uglify', e.message);
+    })
+    .pipe($.header(fs.readFileSync('vendor/legacy-shims/header.js', 'utf8')))
     .pipe(gulp.dest('dist'));
 });
 
