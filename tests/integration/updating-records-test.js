@@ -314,7 +314,7 @@ describe("Integration: FirebaseAdapter - Updating records", function() {
 
     describe("embedded hasMany records", function() {
 
-      var newPost, newComment, currentData, postData, commentData;
+      var reference, newPost, newComment, currentData, postData, commentData;
       var postId, commentId;
 
       beforeEach(function(done) {
@@ -329,7 +329,7 @@ describe("Integration: FirebaseAdapter - Updating records", function() {
           comments: DS.hasMany("comment", { embedded: true }) // force embedded
         });
 
-        var reference = firebaseTestRef.child("denormalized");
+        reference = firebaseTestRef.child("denormalized");
         adapter._ref = reference;
         Ember.run(function() {
           newComment = store.createRecord("comment", {
@@ -409,11 +409,38 @@ describe("Integration: FirebaseAdapter - Updating records", function() {
         assert.equal(newComment.get('body'), 'This is a new comment');
       });
 
-    });
+      describe('when invoking .save() directly', function () {
+
+        it("update on the server at the correct location", function(done) {
+          Ember.run(() => {
+            newComment.set('body', 'Updated');
+            newComment.save().then(() => {
+              newComment.ref().once('value', function (snap) {
+                assert.equal(snap.val().body, "Updated");
+                done();
+              });
+            });
+          });
+        });
+
+        it("do not duplicate data on the server", function(done) {
+          Ember.run(() => {
+            newComment.save().then(() => {
+              reference.once('value', function (snap) {
+                assert.equal(snap.val().comments, undefined);
+                done();
+              });
+            });
+          });
+        });
+
+      }); // when invoking .save() directly
+
+    }); // embedded hasMany records
 
     describe("embedded belongsTo records", function() {
 
-      var newPost, newComment, currentData, postData, commentData;
+      var reference, newPost, newComment, currentData, postData, commentData;
       var postId, commentId;
 
       beforeEach(function(done) {
@@ -428,7 +455,7 @@ describe("Integration: FirebaseAdapter - Updating records", function() {
           comment: DS.belongsTo("comment", { embedded: true }) // force embedded
         });
 
-        var reference = firebaseTestRef.child("denormalized");
+        reference = firebaseTestRef.child("denormalized");
         adapter._ref = reference;
         Ember.run(function() {
           newComment = store.createRecord("comment", {
@@ -512,7 +539,34 @@ describe("Integration: FirebaseAdapter - Updating records", function() {
         assert.equal(newComment.get('body'), 'This is a new comment');
       });
 
-    });
+      describe('when invoking .save() directly', function () {
+
+        it("update on the server at the correct location", function(done) {
+          Ember.run(() => {
+            newComment.set('body', 'Updated');
+            newComment.save().then(() => {
+              newComment.ref().once('value', function (snap) {
+                assert.equal(snap.val().body, "Updated");
+                done();
+              });
+            });
+          });
+        });
+
+        it("do not duplicate data on the server", function(done) {
+          Ember.run(() => {
+            newComment.save().then(() => {
+              reference.once('value', function (snap) {
+                assert.equal(snap.val().comments, undefined);
+                done();
+              });
+            });
+          });
+        });
+
+      }); // when invoking .save() directly
+
+    }); // embedded belongsTo records
 
   });
 
