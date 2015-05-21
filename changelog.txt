@@ -1,0 +1,1 @@
+fixed - `model.destroyRecord` was throwing `undefined is not a function` when using EmberFire without `ember-cli`.
