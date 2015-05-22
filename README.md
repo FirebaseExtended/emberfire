@@ -7,7 +7,7 @@ EmberFire is the officially supported adapter for using
 [Firebase](http://www.firebase.com/?utm_medium=web&utm_source=emberfire) with
 [Ember Data](https://github.com/emberjs/data).
 
-The `FirebaseAdapter` provides all of the standard `DS.Adapter` methods and will automatically synchronize the store with Firebase. **EmberFire is packaged as an addon with Ember CLI by default**, and is also available to use without the CLI. See below for instructions on getting started, and check out the full [EmberFire documentation](https://firebase.com/docs/web/libraries/ember/) on the Firebase website. EmberFire works with Ember Data beta.11+
+The `FirebaseAdapter` provides all of the standard `DS.Adapter` methods and will automatically synchronize the store with your Firebase database. **EmberFire is packaged as an addon with Ember CLI by default**, and is also available to use without the CLI. See below for instructions on getting started, and check out the full [EmberFire documentation](https://firebase.com/docs/web/libraries/ember/) on the Firebase website. EmberFire works with Ember Data beta.11+
 
 **Join the [Firebase + Ember Google Group](https://groups.google.com/forum/#!forum/firebase-ember)
 to ask technical questions, share apps you've built, and chat with other developers in the community.**
@@ -21,7 +21,7 @@ To install EmberFire as an addon with your Ember CLI app, run the following comm
 $ ember install emberfire
 ```
 
-This will add Firebase as a dependency in your `bower.json` file, create `app/adapters/application.js` and add configuration to `config/environment.js`. Now, update your firebase url in `config/environment.js`:
+This will add Firebase as a dependency in your `bower.json` file, create `app/adapters/application.js` and add configuration to `config/environment.js`. Now, update your Firebase database url in `config/environment.js`:
 
 ```js
 // config/environment.js
@@ -66,7 +66,7 @@ From your *app* workdir
   ```
   "devDependencies": {
     "emberfire": "0.0.0"
-  ``` 
+  ```
 
 ### Running Tests
 
