@@ -341,7 +341,8 @@ export default DS.Adapter.extend(Ember.Evented, {
     var adapter = this;
     var record = snapshot.record || snapshot;
     var recordRef = _recordRef || this._getRef(type, record.get('id'));
-    var recordCache = adapter._getRecordCache(type.typeKey, record.get('id'));
+    var modelName = Ember.String.camelize(type.modelName || type.typeKey);
+    var recordCache = adapter._getRecordCache(modelName, record.get('id'));
 
     var serializedRecord = record.serialize({includeId:false});
 
@@ -502,8 +503,10 @@ export default DS.Adapter.extend(Ember.Evented, {
   _getRef: function(type, id) {
     var ref = this._ref;
     var typeName = type;
-    if (type && type.typeKey) {
-      typeName = type.typeKey;
+
+    // Fallback to typeKey for Ember Data < 1.0beta.18
+    if (type && (type.modelName || type.typeKey)) {
+      typeName = type.modelName || type.typeKey;
     }
     if (typeName) {
       ref = ref.child(this.pathForType(typeName));
@@ -573,8 +576,8 @@ export default DS.Adapter.extend(Ember.Evented, {
   _updateRecordCacheForType: function(type, payload) {
     if (!payload) { return; }
     var id = payload.id;
-    var typeKey = type.typeKey;
-    var cache = this._getRecordCache(typeKey, id);
+    var typeName = Ember.String.camelize(type.modelName || type.typeKey);
+    var cache = this._getRecordCache(typeName, id);
     // Only cache relationships for now
     type.eachRelationship(function(key, relationship) {
       if (relationship.kind === 'hasMany') {
@@ -587,11 +590,11 @@ export default DS.Adapter.extend(Ember.Evented, {
   /**
     Get or create the cache for a record
    */
-  _getRecordCache: function (typeKey, id) {
+  _getRecordCache: function (modelName, id) {
     var cache = this._recordCacheForType;
-    cache[typeKey] = cache[typeKey] || {};
-    cache[typeKey][id] = cache[typeKey][id] || {};
-    return cache[typeKey][id];
+    cache[modelName] = cache[modelName] || {};
+    cache[modelName][id] = cache[modelName][id] || {};
+    return cache[modelName][id];
   },
 
   /**
