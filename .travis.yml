@@ -28,4 +28,6 @@ env:
     - EMBER_DATA_VERSION=1.0.0-beta.15
     # - EMBER_DATA_VERSION=1.0.0-beta.16 # broken adapterFor('application')
     - EMBER_DATA_VERSION=1.0.0-beta.16.1
+    - EMBER_DATA_VERSION=1.0.0-beta.17
+    - EMBER_DATA_VERSION=1.0.0-beta.18
     - EMBER_DATA_VERSION=canary
