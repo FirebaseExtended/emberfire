@@ -5,6 +5,10 @@ node_js:
 
 sudo: false
 
+branches:
+  only:
+    - master # otherwise pull requests get built twice
+
 cache:
   directories:
     - node_modules
@@ -14,7 +18,7 @@ env:
   - EMBER_TRY_SCENARIO=ember-data-beta.14.1
   - EMBER_TRY_SCENARIO=ember-data-beta.16.1
   - EMBER_TRY_SCENARIO=ember-data-beta.17
-  - EMBER_TRY_SCENARIO=ember-data-release
+  - EMBER_TRY_SCENARIO=ember-data-beta.18
   - EMBER_TRY_SCENARIO=ember-data-canary
 
 matrix:
