@@ -1,7 +1,8 @@
+import Ember from 'ember';
 import DS from 'ember-data';
 
 export default function defineModel(app, modelName, attrs) {
-  modelName = modelName.camelize();
+  modelName = Ember.String.camelize(modelName);
   var resolverName = `model:${modelName}`;
 
   var Model = DS.Model.extend(attrs);

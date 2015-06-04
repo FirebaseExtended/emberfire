@@ -60,7 +60,7 @@ describeModule('adapter:firebase', 'FirebaseAdapter', {
       });
 
       ['key', 'value', 'priority'].forEach(function (k) {
-        var upperK = k.capitalize();
+        var upperK = Ember.String.capitalize(k);
 
         it(`orderBy: "_${k}" calls orderBy${upperK}`, function () {
           var spy = sinon.spy(ref, 'orderBy' + upperK);
