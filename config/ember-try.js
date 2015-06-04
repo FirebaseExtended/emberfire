@@ -37,12 +37,12 @@ module.exports = {
       }
     },
     {
-      name: 'ember-data-release',
+      name: 'ember-data-beta.18',
       dependencies: {
-        'ember-data': 'components/ember-data#release'
+        'ember-data': '1.0.0-beta.18'
       },
       resolutions: {
-        'ember-data': 'release'
+        'ember-data': '1.0.0-beta.18'
       }
     },
     {
