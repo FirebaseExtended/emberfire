@@ -38,4 +38,4 @@ install:
 
 script:
   - npm run legacy
-  - ember try $EMBER_TRY_SCENARIO test
+  - ember try $EMBER_TRY_SCENARIO test --skip-cleanup
