@@ -1,5 +1,7 @@
 ---
 language: node_js
+node_js:
+  - "0.12"
 
 sudo: false
 
@@ -7,7 +9,19 @@ cache:
   directories:
     - node_modules
 
+env:
+  - EMBER_TRY_SCENARIO=default
+  - EMBER_TRY_SCENARIO=ember-release
+  - EMBER_TRY_SCENARIO=ember-beta
+  - EMBER_TRY_SCENARIO=ember-canary
+
+matrix:
+  fast_finish: true
+  allow_failures:
+    - env: EMBER_TRY_SCENARIO=ember-canary
+
 before_install:
+  - export PATH=/usr/local/phantomjs-2.0.0/bin:$PATH
   - "npm config set spin false"
   - "npm install -g npm@^2"
 
@@ -15,22 +29,7 @@ install:
   - npm install -g bower
   - npm install
   - bower install
-  - ./config/select-dep-versions.js
 
 script:
   - npm run legacy
-  - npm test
-
-matrix:
-  include:
-    - env: EMBER_DATA_VERSION=1.0.0-beta.12
-    - env: EMBER_DATA_VERSION=1.0.0-beta.14.1
-    - env: EMBER_DATA_VERSION=1.0.0-beta.15
-    # - env: EMBER_DATA_VERSION=1.0.0-beta.16 # broken adapterFor('application')
-    - env: EMBER_DATA_VERSION=1.0.0-beta.16.1
-    - env: EMBER_DATA_VERSION=1.0.0-beta.17
-    - env: EMBER_DATA_VERSION=1.0.0-beta.18
-    - env: EMBER_DATA_VERSION=canary
-
-  allow_failures:
-    - env: EMBER_DATA_VERSION=canary
+  - ember try $EMBER_TRY_SCENARIO test
