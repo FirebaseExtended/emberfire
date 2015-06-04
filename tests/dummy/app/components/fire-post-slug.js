@@ -2,10 +2,10 @@ import Ember from 'ember';
 
 export default Ember.Component.extend({
   classNames: ['post-slug'],
-  publishedMonth: function() {
+  publishedMonth: Ember.computed('post.published', function() {
     return moment(this.get('post.published')).format('MMM');
-  }.property('post.published'),
-  publishedDay: function() {
+  }),
+  publishedDay: Ember.computed('post.published', function() {
     return moment(this.get('post.published')).format('D');
-  }.property('post.published')
+  })
 });

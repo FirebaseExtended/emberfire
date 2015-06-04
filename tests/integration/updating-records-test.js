@@ -247,13 +247,13 @@ describe("Integration: FirebaseAdapter - Updating records", function() {
       beforeEach(function(done) {
         app.User = DS.Model.extend({
           created: DS.attr('number'),
-          username: function() {
+          username: Ember.computed(function() {
             return this.get('id');
-          }.property(),
+          }),
           firstName: DS.attr('string'),
-          avatar: function() {
+          avatar: Ember.computed(function() {
             return 'https://www.gravatar.com/avatar/' + md5(this.get('id')) + '.jpg?d=retro&size=80';
-          }.property(),
+          }),
           posts: DS.hasMany('post', { async: true }),
           comments: DS.hasMany('comment', { async: true, inverse:'user' })
         });
@@ -322,9 +322,9 @@ describe("Integration: FirebaseAdapter - Updating records", function() {
           title: DS.attr('string'),
           body: DS.attr('string'),
           published: DS.attr('number'),
-          publishedDate: function() {
+          publishedDate: Ember.computed('published', function() {
             return moment(this.get('published')).format('MMMM Do, YYYY');
-          }.property('published'),
+          }),
           user: DS.belongsTo('user', { async: true }),
           comments: DS.hasMany("comment", { embedded: true }) // force embedded
         });
@@ -448,9 +448,9 @@ describe("Integration: FirebaseAdapter - Updating records", function() {
           title: DS.attr('string'),
           body: DS.attr('string'),
           published: DS.attr('number'),
-          publishedDate: function() {
+          publishedDate: Ember.computed('published', function() {
             return moment(this.get('published')).format('MMMM Do, YYYY');
-          }.property('published'),
+          }),
           user: DS.belongsTo('user', { async: true }),
           comment: DS.belongsTo("comment", { embedded: true }) // force embedded
         });
