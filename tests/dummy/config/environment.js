@@ -7,6 +7,12 @@ module.exports = function(environment) {
     baseURL: '/',
     locationType: 'auto',
     firebase: 'https://emberfire-demo.firebaseio.com',
+    contentSecurityPolicy: {
+      'style-src': '\'self\' fonts.googleapis.com',
+      'font-src': '\'self\' fonts.gstatic.com',
+      'img-src': '\'self\' *.gravatar.com',
+      'connect-src': '\'self\' wss://*.firebaseio.com'
+    },
     EmberENV: {
       FEATURES: {
         // Here you can enable experimental features on an ember canary build
