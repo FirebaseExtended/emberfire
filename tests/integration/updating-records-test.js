@@ -11,7 +11,7 @@ describe("Integration: FirebaseAdapter - Updating records", function() {
 
   var setupAdapter = function() {
     app = startApp();
-    store = app.__container__.lookup("store:main");
+    store = app.__container__.lookup("service:store");
     adapter = store.adapterFor('application');
     adapter._ref = createTestRef("blogs/normalized");
     adapter._queueFlushDelay = false;
@@ -55,7 +55,7 @@ describe("Integration: FirebaseAdapter - Updating records", function() {
         // TODO: disabled until next release
         xit("avoids writing the hasMany relationship link", function(done) {
           Ember.RSVP.Promise.cast(newPost.get("comments")).then(function(comments) {
-            assert(newComment.get('isDirty'), 'the item should be dirty');
+            assert(newComment.get('hasDirtyAttributes'), 'the item should be dirty');
             assert(newComment.get('isNew'), 'the item should be `new`');
 
             comments.pushObject(newComment);
@@ -108,7 +108,7 @@ describe("Integration: FirebaseAdapter - Updating records", function() {
             Ember.run(function () {
               newComment.save().then(function () {
                 newComment.set('body', 'dirty this record!');
-                assert(newComment.get('isDirty'), 'the item should be dirty');
+                assert(newComment.get('hasDirtyAttributes'), 'the item should be dirty');
                 assert(!newComment.get('isNew'), 'the item should not be `new`');
 
                 Ember.RSVP.Promise.cast(newPost.get("comments")).then(function(comments) {
@@ -326,7 +326,7 @@ describe("Integration: FirebaseAdapter - Updating records", function() {
             return moment(this.get('published')).format('MMMM Do, YYYY');
           }),
           user: DS.belongsTo('user', { async: true }),
-          comments: DS.hasMany("comment", { embedded: true }) // force embedded
+          comments: DS.hasMany("comment", { async: false, embedded: true }) // force embedded
         });
 
         reference = firebaseTestRef.child("denormalized");
@@ -367,7 +367,7 @@ describe("Integration: FirebaseAdapter - Updating records", function() {
       });
 
       it("are not 'dirty'", function() {
-        assert(!newComment.get('isDirty'), "The embedded record should not be 'dirty'");
+        assert(!newComment.get('hasDirtyAttributes'), "The embedded record should not be 'dirty'");
       });
 
       it("are not 'new'", function() {
@@ -380,7 +380,7 @@ describe("Integration: FirebaseAdapter - Updating records", function() {
 
       it("become 'dirty' when editing", function() {
         newComment.set('body', 'new body');
-        assert(newComment.get('isDirty'), "The embedded record should be 'dirty'");
+        assert(newComment.get('hasDirtyAttributes'), "The embedded record should be 'dirty'");
       });
 
       it("are not 'dirty' after re-saving", function(done) {
@@ -389,7 +389,7 @@ describe("Integration: FirebaseAdapter - Updating records", function() {
           newComment.ref().once('value', function(snapshot) {
             commentData = snapshot.val();
             assert.equal(commentData.body, 'new body');
-            assert(!newComment.get('isDirty'), 'record should not be dirty');
+            assert(!newComment.get('hasDirtyAttributes'), 'record should not be dirty');
             done();
           });
         });
@@ -397,15 +397,15 @@ describe("Integration: FirebaseAdapter - Updating records", function() {
 
       it("rollback to a clean state", function() {
         newComment.set('body', 'new body');
-        assert(newComment.get('isDirty'), "The embedded record should be 'dirty'");
-        newComment.rollback();
-        assert(!newComment.get('isDirty'), "The embedded record should not be 'dirty'");
+        assert(newComment.get('hasDirtyAttributes'), "The embedded record should be 'dirty'");
+        newComment.rollbackAttributes();
+        assert(!newComment.get('hasDirtyAttributes'), "The embedded record should not be 'dirty'");
       });
 
       it("rollback to their last saved state", function() {
         newComment.set('body', 'new body');
-        assert(newComment.get('isDirty'), "The embedded record should be 'dirty'");
-        newComment.rollback();
+        assert(newComment.get('hasDirtyAttributes'), "The embedded record should be 'dirty'");
+        newComment.rollbackAttributes();
         assert.equal(newComment.get('body'), 'This is a new comment');
       });
 
@@ -452,7 +452,7 @@ describe("Integration: FirebaseAdapter - Updating records", function() {
             return moment(this.get('published')).format('MMMM Do, YYYY');
           }),
           user: DS.belongsTo('user', { async: true }),
-          comment: DS.belongsTo("comment", { embedded: true }) // force embedded
+          comment: DS.belongsTo("comment", { async: false, embedded: true }) // force embedded
         });
 
         reference = firebaseTestRef.child("denormalized");
@@ -497,7 +497,7 @@ describe("Integration: FirebaseAdapter - Updating records", function() {
       });
 
       it("are not 'dirty'", function() {
-        assert(!newComment.get('isDirty'), "The embedded record should not be 'dirty'");
+        assert(!newComment.get('hasDirtyAttributes'), "The embedded record should not be 'dirty'");
       });
 
       it("are not 'new'", function() {
@@ -510,7 +510,7 @@ describe("Integration: FirebaseAdapter - Updating records", function() {
 
       it("become 'dirty' when editing", function() {
         newComment.set('body', 'new body');
-        assert(newComment.get('isDirty'), "The embedded record should be 'dirty'");
+        assert(newComment.get('hasDirtyAttributes'), "The embedded record should be 'dirty'");
       });
 
       it("are not 'dirty' after re-saving", function(done) {
@@ -519,7 +519,7 @@ describe("Integration: FirebaseAdapter - Updating records", function() {
           newComment.ref().once('value', function(snapshot) {
             commentData = snapshot.val();
             assert.equal(commentData.body, 'new body');
-            assert(!newComment.get('isDirty'), 'record should not be dirty');
+            assert(!newComment.get('hasDirtyAttributes'), 'record should not be dirty');
             done();
           });
         });
@@ -527,15 +527,15 @@ describe("Integration: FirebaseAdapter - Updating records", function() {
 
       it("rollback to a clean state", function() {
         newComment.set('body', 'new body');
-        assert(newComment.get('isDirty'), "The embedded record should be 'dirty'");
-        newComment.rollback();
-        assert(!newComment.get('isDirty'), "The embedded record should not be 'dirty'");
+        assert(newComment.get('hasDirtyAttributes'), "The embedded record should be 'dirty'");
+        newComment.rollbackAttributes();
+        assert(!newComment.get('hasDirtyAttributes'), "The embedded record should not be 'dirty'");
       });
 
       it("rollback to their last saved state", function() {
         newComment.set('body', 'new body');
-        assert(newComment.get('isDirty'), "The embedded record should be 'dirty'");
-        newComment.rollback();
+        assert(newComment.get('hasDirtyAttributes'), "The embedded record should be 'dirty'");
+        newComment.rollbackAttributes();
         assert.equal(newComment.get('body'), 'This is a new comment');
       });
 

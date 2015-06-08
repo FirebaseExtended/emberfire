@@ -97,14 +97,14 @@ export default DS.Adapter.extend(Ember.Evented, {
     Additionally, from this point on, the object's value in the store will
     also be automatically updated whenever the remote value changes.
   */
-  find: function(store, type, id) {
+  findRecord: function(store, typeClass, id) {
     var adapter = this;
-    var ref = this._getRef(type, id);
+    var ref = this._getRef(typeClass, id);
 
     return new Promise(function(resolve, reject) {
       ref.once('value', function(snapshot) {
         var payload = adapter._assignIdToPayload(snapshot);
-        adapter._updateRecordCacheForType(type, payload);
+        adapter._updateRecordCacheForType(typeClass, payload);
         if (payload === null) {
           var error = new Error(fmt('no record was found at %@', [ref.toString()]));
               error.recordId = id;
@@ -117,12 +117,13 @@ export default DS.Adapter.extend(Ember.Evented, {
       function(err) {
         reject(err);
       });
-    }, fmt('DS: FirebaseAdapter#find %@ to %@', [type, ref.toString()]));
+    }, fmt('DS: FirebaseAdapter#findRecord %@ to %@', [typeClass.modelName, ref.toString()]));
   },
 
-  recordWasPushed: function(store, type, record) {
+  recordWasPushed: function(store, modelName, record) {
     if (!record.__listening) {
-      this.listenForChanges(store, type, record);
+      var typeClass = store.modelFor(modelName);
+      this.listenForChanges(store, typeClass, record);
     }
   },
 
@@ -146,15 +147,14 @@ export default DS.Adapter.extend(Ember.Evented, {
     });
   },
 
-  listenForChanges: function(store, type, record) {
+  listenForChanges: function(store, typeClass, record) {
     record.__listening = true;
-    var serializer = store.serializerFor(type);
     var adapter = this;
-    var ref = this._getRef(type, record.get('id'));
+    var ref = this._getRef(typeClass, record.get('id'));
     var called = false;
     ref.on('value', function FirebaseAdapter$changeListener(snapshot) {
       if (called) {
-        adapter._handleChildValue(store, type, serializer, snapshot);
+        adapter._handleChildValue(store, typeClass, snapshot);
       }
       called = true;
     });
@@ -174,46 +174,48 @@ export default DS.Adapter.extend(Ember.Evented, {
     removed or modified from Firebase will automatically be reflected in the
     store.
   */
-  findAll: function(store, type) {
+  findAll: function(store, typeClass) {
     var adapter = this;
-    var ref = this._getRef(type);
+    var ref = this._getRef(typeClass);
 
     return new Promise(function(resolve, reject) {
       // Listen for child events on the type
       ref.once('value', function(snapshot) {
-        if (!adapter._findAllHasEventsForType(type)) {
-          adapter._findAllAddEventListeners(store, type, ref);
+        if (!adapter._findAllHasEventsForType(typeClass)) {
+          adapter._findAllAddEventListeners(store, typeClass, ref);
         }
         var results = [];
         snapshot.forEach(function(childSnapshot) {
           var payload = adapter._assignIdToPayload(childSnapshot);
-          adapter._updateRecordCacheForType(type, payload);
+          adapter._updateRecordCacheForType(typeClass, payload);
           results.push(payload);
         });
         resolve(results);
       }, function(error) {
         reject(error);
       });
-    }, fmt('DS: FirebaseAdapter#findAll %@ to %@', [type, ref.toString()]));
+    }, fmt('DS: FirebaseAdapter#findAll %@ to %@', [typeClass.modelName, ref.toString()]));
   },
 
-  findQuery: function(store, type, query, recordArray) {
+  query: function(store, typeClass, query, recordArray) {
     var adapter = this;
-    var ref = this._getRef(type);
+    var ref = this._getRef(typeClass);
+    var modelName = typeClass.modelName;
+
     ref = this.applyQueryToRef(ref, query);
 
     ref.on('child_added', function(snapshot) {
-      var record = store.recordForId(type, snapshot.key());
+      var record = store.peekRecord(modelName, snapshot.key());
 
       if (!record || !record.__listening) {
         var payload = adapter._assignIdToPayload(snapshot);
-        var serializer = store.serializerFor(type);
-        adapter._updateRecordCacheForType(type, payload);
-        record = store.push(type, serializer.extractSingle(store, type, payload));
+        var serializer = store.serializerFor(modelName);
+        adapter._updateRecordCacheForType(typeClass, payload);
+        record = store.push(modelName, serializer.extractSingle(store, typeClass, payload));
       }
 
       if (record) {
-        recordArray.addObject(record);
+        recordArray.get('content').addObject(record._internalModel);
       }
     });
 
@@ -222,9 +224,9 @@ export default DS.Adapter.extend(Ember.Evented, {
     // a much less common case because it relates to priority
 
     ref.on('child_removed', function(snapshot) {
-      var record = store.recordForId(type, snapshot.key());
+      var record = store.peekRecord(modelName, snapshot.key());
       if (record) {
-        recordArray.removeObject(record);
+        recordArray.get('content').removeObject(record._internalModel);
       }
     });
 
@@ -239,20 +241,20 @@ export default DS.Adapter.extend(Ember.Evented, {
     return new Promise(function(resolve, reject) {
       // Listen for child events on the type
       ref.once('value', function(snapshot) {
-        if (!adapter._findAllHasEventsForType(type)) {
-          adapter._findAllAddEventListeners(store, type, ref);
+        if (!adapter._findAllHasEventsForType(typeClass)) {
+          adapter._findAllAddEventListeners(store, typeClass, ref);
         }
         var results = [];
         snapshot.forEach(function(childSnapshot) {
           var payload = adapter._assignIdToPayload(childSnapshot);
-          adapter._updateRecordCacheForType(type, payload);
+          adapter._updateRecordCacheForType(typeClass, payload);
           results.push(payload);
         });
         resolve(results);
       }, function(error) {
         reject(error);
       });
-    }, fmt('DS: FirebaseAdapter#findQuery %@ with %@', [type, query]));
+    }, fmt('DS: FirebaseAdapter#query %@ with %@', [modelName, query]));
   },
 
   applyQueryToRef: function (ref, query) {
@@ -289,23 +291,22 @@ export default DS.Adapter.extend(Ember.Evented, {
   /**
     Determine if the current type is already listening for children events
   */
-  _findAllHasEventsForType: function(type) {
-    return !Ember.isNone(this._findAllMapForType[type]);
+  _findAllHasEventsForType: function(typeClass) {
+    return !Ember.isNone(this._findAllMapForType[typeClass.modelName]);
   },
 
   /**
-    After `.findAll()` is called on a type, continue to listen for
+    After `.findAll()` is called on a modelName, continue to listen for
     `child_added`, `child_removed`, and `child_changed`
   */
-  _findAllAddEventListeners: function(store, type, ref) {
-    this._findAllMapForType[type] = true;
+  _findAllAddEventListeners: function(store, typeClass, ref) {
+    var modelName = typeClass.modelName;
+    this._findAllMapForType[modelName] = true;
 
     var adapter = this;
-    var serializer = store.serializerFor(type);
-
     ref.on('child_added', function(snapshot) {
-      if (!store.hasRecordForId(type, adapter._getKey(snapshot))) {
-        adapter._handleChildValue(store, type, serializer, snapshot);
+      if (!store.hasRecordForId(modelName, adapter._getKey(snapshot))) {
+        adapter._handleChildValue(store, typeClass, snapshot);
       }
     });
   },
@@ -313,17 +314,17 @@ export default DS.Adapter.extend(Ember.Evented, {
   /**
     Push a new child record into the store
   */
-  _handleChildValue: function(store, type, serializer, snapshot) {
-    //No idea why we need this, we are alredy turning off the callback by
-    //calling ref.off in recordWillUnload. Something is fishy here
+  _handleChildValue: function(store, typeClass, snapshot) {
+    // No idea why we need this, we are already turning off the callback by
+    // calling ref.off in recordWillUnload. Something is fishy here
     if (store.isDestroying) {
       return;
     }
     var value = snapshot.val();
     if (value === null) {
       var id = this._getKey(snapshot);
-      var record = store.getById(type, id);
-      //TODO refactor using ED
+      var record = store.peekRecord(typeClass.modelName, id);
+      // TODO: refactor using ED
       if (!record.get('isDeleted')) {
         record.deleteRecord();
       }
@@ -331,7 +332,7 @@ export default DS.Adapter.extend(Ember.Evented, {
       var payload = this._assignIdToPayload(snapshot);
 
       // firebase doesn't send the property for empty relationships
-      type.eachRelationship(function (key, relationship) {
+      typeClass.eachRelationship(function (key, relationship) {
         if (relationship.kind === 'hasMany' && !payload[key]) {
           payload[key] = {};
         }
@@ -339,7 +340,8 @@ export default DS.Adapter.extend(Ember.Evented, {
 
       this._enqueue(function FirebaseAdapter$enqueueStorePush() {
         if (!store.isDestroying) {
-          store.push(type, serializer.extractSingle(store, type, payload));
+          var serializer = store.serializerFor(typeClass.modelName);
+          store.push(typeClass.modelName, serializer.extractSingle(store, typeClass, payload));
         }
       });
     }
@@ -349,11 +351,11 @@ export default DS.Adapter.extend(Ember.Evented, {
     `createRecord` is an alias for `updateRecord` because calling \
     `ref.set()` would wipe out any existing relationships
   */
-  createRecord: function(store, type, snapshot) {
+  createRecord: function(store, typeClass, snapshot) {
     var adapter = this;
     var record = snapshot.record || snapshot;
-    return this.updateRecord(store, type, snapshot).then(function() {
-      adapter.listenForChanges(store, type, record);
+    return this.updateRecord(store, typeClass, snapshot).then(function() {
+      adapter.listenForChanges(store, typeClass, record);
     });
   },
 
@@ -370,12 +372,11 @@ export default DS.Adapter.extend(Ember.Evented, {
     for saving nested records as well.
 
   */
-  updateRecord: function(store, type, snapshot) {
+  updateRecord: function(store, typeClass, snapshot) {
     var adapter = this;
     var record = snapshot.record || snapshot;
-    var recordRef = record.__firebaseRef || this._getRef(type, record.get('id'));
-    var modelName = Ember.String.camelize(type.modelName || type.typeKey);
-    var recordCache = adapter._getRecordCache(modelName, record.get('id'));
+    var recordRef = record.__firebaseRef || this._getRef(typeClass, record.get('id'));
+    var recordCache = adapter._getRecordCache(typeClass, record.get('id'));
 
     var pathPieces = recordRef.path.toString().split('/');
     var lastPiece = pathPieces[pathPieces.length-1];
@@ -389,14 +390,14 @@ export default DS.Adapter.extend(Ember.Evented, {
         var save;
         if (relationship.kind === 'hasMany') {
           if (serializedRecord[key]) {
-            save = adapter._saveHasManyRelationship(store, type, relationship, serializedRecord[key], recordRef, recordCache);
+            save = adapter._saveHasManyRelationship(store, typeClass, relationship, serializedRecord[key], recordRef, recordCache);
             savedRelationships.push(save);
             // Remove the relationship from the serializedRecord because otherwise we would clobber the entire hasMany
             delete serializedRecord[key];
           }
         } else {
           if (relationship.options.embedded === true && serializedRecord[key]) {
-            save = adapter._saveBelongsToRecord(store, type, relationship, serializedRecord[key], recordRef);
+            save = adapter._saveBelongsToRecord(store, typeClass, relationship, serializedRecord[key], recordRef);
             savedRelationships.push(save);
             delete serializedRecord[key];
           }
@@ -413,14 +414,14 @@ export default DS.Adapter.extend(Ember.Evented, {
         }
         // Throw an error if any of the relationships failed to save
         if (rejected.length !== 0) {
-          var error = new Error(fmt('Some errors were encountered while saving %@ %@', [type, record.id]));
+          var error = new Error(fmt('Some errors were encountered while saving %@ %@', [typeClass, record.id]));
               error.errors = rejected.mapBy('reason');
           reject(error);
         } else {
           resolve();
         }
       });
-    }, fmt('DS: FirebaseAdapter#updateRecord %@ to %@', [type, recordRef.toString()]));
+    }, fmt('DS: FirebaseAdapter#updateRecord %@ to %@', [typeClass, recordRef.toString()]));
   },
 
   //Just update the record itself without caring for the relationships
@@ -432,7 +433,7 @@ export default DS.Adapter.extend(Ember.Evented, {
     Call _saveHasManyRelationshipRecord on each record in the relationship
     and then resolve once they have all settled
   */
-  _saveHasManyRelationship: function(store, type, relationship, ids, recordRef, recordCache) {
+  _saveHasManyRelationship: function(store, typeClass, relationship, ids, recordRef, recordCache) {
     if (!Ember.isArray(ids)) {
       throw new Error('hasMany relationships must must be an array');
     }
@@ -447,8 +448,8 @@ export default DS.Adapter.extend(Ember.Evented, {
 
     // Dirty
     dirtyRecords = filter(ids, function(id) {
-      var type = relationship.type;
-      return store.hasRecordForId(type, id) && store.getById(type, id).get('isDirty') === true;
+      var relatedModelName = relationship.type;
+      return store.hasRecordForId(relatedModelName, id) && store.peekRecord(relatedModelName, id).get('hasDirtyAttributes') === true;
     });
 
     dirtyRecords = map(uniq(dirtyRecords.concat(addedRecords)), function(id) {
@@ -491,7 +492,7 @@ export default DS.Adapter.extend(Ember.Evented, {
   */
   _saveHasManyRecord: function(store, relationship, parentRef, id) {
     var ref = this._getRelationshipRef(parentRef, relationship.key, id);
-    var record = store.getById(relationship.type, id);
+    var record = store.peekRecord(relationship.type, id);
     var isEmbedded = relationship.options.embedded === true;
     if (isEmbedded) {
       record.__firebaseRef = ref;
@@ -512,8 +513,8 @@ export default DS.Adapter.extend(Ember.Evented, {
   /**
     Save an embedded record
   */
-  _saveBelongsToRecord: function(store, type, relationship, id, parentRef) {
-    var record = store.getById(relationship.type, id);
+  _saveBelongsToRecord: function(store, typeClass, relationship, id, parentRef) {
+    var record = store.peekRecord(relationship.type, id);
     record.__firebaseRef = parentRef.child(relationship.key);
     return record.save();
   },
@@ -521,33 +522,27 @@ export default DS.Adapter.extend(Ember.Evented, {
   /**
     Called by the store when a record is deleted.
   */
-  deleteRecord: function(store, type, snapshot) {
+  deleteRecord: function(store, typeClass, snapshot) {
     var record = snapshot.record || snapshot;
-    var ref = record.__firebaseRef || this._getRef(type, record.get('id'));
+    var ref = record.__firebaseRef || this._getRef(typeClass, record.get('id'));
     return toPromise(ref.remove, ref);
   },
 
   /**
     Determines a path fo a given type
   */
-  pathForType: function(typeName) {
-    var camelized = Ember.String.camelize(typeName);
+  pathForType: function(modelName) {
+    var camelized = Ember.String.camelize(modelName);
     return Ember.String.pluralize(camelized);
   },
 
   /**
-    Return a Firebase reference for a given type and optional ID.
+    Return a Firebase reference for a given modelName and optional ID.
   */
-  _getRef: function(type, id) {
+  _getRef: function(typeClass, id) {
     var ref = this._ref;
-    var typeName = type;
-
-    // Fallback to typeKey for Ember Data < 1.0beta.18
-    if (type && (type.modelName || type.typeKey)) {
-      typeName = type.modelName || type.typeKey;
-    }
-    if (typeName) {
-      ref = ref.child(this.pathForType(typeName));
+    if (typeClass) {
+      ref = ref.child(this.pathForType(typeClass.modelName));
     }
     if (id) {
       ref = ref.child(id);
@@ -611,13 +606,12 @@ export default DS.Adapter.extend(Ember.Evented, {
   /**
     _updateHasManyCacheForType
   */
-  _updateRecordCacheForType: function(type, payload) {
+  _updateRecordCacheForType: function(typeClass, payload) {
     if (!payload) { return; }
     var id = payload.id;
-    var typeName = Ember.String.camelize(type.modelName || type.typeKey);
-    var cache = this._getRecordCache(typeName, id);
+    var cache = this._getRecordCache(typeClass, id);
     // Only cache relationships for now
-    type.eachRelationship(function(key, relationship) {
+    typeClass.eachRelationship(function(key, relationship) {
       if (relationship.kind === 'hasMany') {
         var ids = payload[key];
         cache[key] = !Ember.isNone(ids) ? Ember.A(Ember.keys(ids)) : Ember.A();
@@ -628,7 +622,8 @@ export default DS.Adapter.extend(Ember.Evented, {
   /**
     Get or create the cache for a record
    */
-  _getRecordCache: function (modelName, id) {
+  _getRecordCache: function (typeClass, id) {
+    var modelName = typeClass.modelName;
     var cache = this._recordCacheForType;
     cache[modelName] = cache[modelName] || {};
     cache[modelName][id] = cache[modelName][id] || {};

@@ -1,6 +1,6 @@
 <h2>Users</h2>
 <ul>
-{{#each user in model}}
+{{#each model as |user|}}
   <li class="item">
     <ul class="item-info">
       <li><strong>id:</strong> {{user.id}}</li>
@@ -8,7 +8,7 @@
       <li>
         <ul>
           <li><strong>posts:</strong></li>
-          {{#each post in user.posts}}
+          {{#each user.posts as |post|}}
             <li>{{post.title}}</li>
           {{/each}}
         </ul>

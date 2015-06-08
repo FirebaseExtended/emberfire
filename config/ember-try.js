@@ -2,48 +2,30 @@
 module.exports = {
   scenarios: [
     {
-      name: 'ember-data-beta.12',
+      name: 'ember-data-1.13.0',
       dependencies: {
-        'ember-data': '1.0.0-beta.12'
+        'ember-data': '1.13.0'
       },
       resolutions: {
-        'ember-data': '1.0.0-beta.12'
+        'ember-data': '1.13.0'
       }
     },
     {
-      name: 'ember-data-beta.14.1',
+      name: 'ember-data-1.13.1',
       dependencies: {
-        'ember-data': '1.0.0-beta.14.1'
+        'ember-data': '1.13.1'
       },
       resolutions: {
-        'ember-data': '1.0.0-beta.14.1'
+        'ember-data': '1.13.1'
       }
     },
     {
-      name: 'ember-data-beta.16.1',
+      name: 'ember-data-1.13.2',
       dependencies: {
-        'ember-data': '1.0.0-beta.16.1'
+        'ember-data': '1.13.2'
       },
       resolutions: {
-        'ember-data': '1.0.0-beta.16.1'
-      }
-    },
-    {
-      name: 'ember-data-beta.17',
-      dependencies: {
-        'ember-data': '1.0.0-beta.17'
-      },
-      resolutions: {
-        'ember-data': '1.0.0-beta.17'
-      }
-    },
-    {
-      name: 'ember-data-beta.18',
-      dependencies: {
-        'ember-data': '1.0.0-beta.18'
-      },
-      resolutions: {
-        'ember-data': '1.0.0-beta.18'
+        'ember-data': '1.13.2'
       }
     },
     {

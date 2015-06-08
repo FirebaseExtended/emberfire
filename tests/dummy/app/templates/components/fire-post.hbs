@@ -1,5 +1,5 @@
 <div class="post-header">
-  <img {{bind-attr src="post.user.avatar"}} class="avatar post-avatar"/>
+  <img src={{post.user.avatar}} class="avatar post-avatar"/>
   <div class="post-author">{{post.user.id}}</div>
   <div class="post-date">{{post.publishedDate}}</div>
 </div>
@@ -14,9 +14,9 @@
     {{/if}}
   </h4>
   <ul class="post-comments">
-    {{#each comment in post.comments}}
+    {{#each post.comments as |comment|}}
       <li class="post-comment">
-        <img {{bind-attr src="comment.user.avatar"}} class="avatar post-comment-avatar" />
+        <img src={{comment.user.avatar}} class="avatar post-comment-avatar" />
         <div class="post-comment-body">
           <div class="post-comment-meta">
             <strong class="post-comment-author">{{comment.user.username}}</strong>

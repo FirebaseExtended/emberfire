@@ -14,7 +14,7 @@ describe("Integration: FirebaseAdapter - Finding Records", function() {
 
     app = startApp();
 
-    store = app.__container__.lookup("store:main");
+    store = app.__container__.lookup("service:store");
     adapter = store.adapterFor('application');
     adapter._ref = createTestRef("blogs/normalized");
     adapter._queueFlushDelay = false;
@@ -54,7 +54,7 @@ describe("Integration: FirebaseAdapter - Finding Records", function() {
     beforeEach(function(done) {
       getRefSpy = sinon.spy(adapter, "_getRef");
       Ember.run(function () {
-        findPromise = adapter.find(store, store.modelFor("post"), "post_1");
+        findPromise =  adapter.findRecord(store, store.modelFor("post"), "post_1");
 
         findPromise.then(() => {
           findRef = getRefSpy.getCall(0).returnValue;
@@ -94,7 +94,7 @@ describe("Integration: FirebaseAdapter - Finding Records", function() {
 
     it("throws an error for records that don't exist", function(done) {
       Ember.run(function() {
-        adapter.find(store, store.modelFor("post"), "foobar").then(function() {}, function(error) {
+         adapter.findRecord(store, store.modelFor("post"), "foobar").then(function() {}, function(error) {
           assert(error instanceof Error);
           done();
         });
@@ -165,7 +165,7 @@ describe("Integration: FirebaseAdapter - Finding Records", function() {
           title: "Post 3"
         });
       });
-      assert(store.hasRecordForId(store.modelFor('post'), 'post_3'));
+      assert(store.hasRecordForId('post', 'post_3'));
     });
 
     it("handles empty collections", function(done) {

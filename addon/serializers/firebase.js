@@ -23,7 +23,7 @@ export default DS.JSONSerializer.extend(Ember.Evented, {
     hash[key] = newHash;
   },
 
-  normalizeHasMany: function(type, hash, relationship) {
+  normalizeHasMany: function(typeClass, hash, relationship) {
     var key = relationship.key;
     if (typeof hash[key] === 'object' && !Ember.isArray(hash[key])) {
       hash[key] = Ember.keys(hash[key]);
@@ -34,18 +34,19 @@ export default DS.JSONSerializer.extend(Ember.Evented, {
       this._normalizeNumberIDs(hash, key);
     }
     else if (Ember.isArray(hash[key])) {
-      throw new Error(fmt('%@ relationship %@(\'%@\') must be a key/value map in Firebase. Example: { "%@": { "%@_id": true } }', [type.toString(), relationship.kind, relationship.type.typeKey, key, relationship.type.typeKey]));
+      throw new Error(fmt('%@ relationship %@(\'%@\') must be a key/value map in Firebase. Example: { "%@": { "%@_id": true } }', [typeClass.toString(), relationship.kind, relationship.type, key, relationship.type]));
     }
   },
 
-  normalizeEmbeddedHasMany: function(type, hash, relationship, ref) {
+  normalizeEmbeddedHasMany: function(typeClass, hash, relationship, ref) {
     var key = relationship.key;
     var embedded = hash[key];
     var embeddedRef;
     if (!hash[key]) {
       return;
     }
-    ref = ref || this.store.adapterFor(type)._getRef(type, hash.id);
+    var modelName = typeClass.modelName;
+    ref = ref || this.store.adapterFor(modelName)._getRef(typeClass, hash.id);
 
     for (var id in embedded) {
       var payload = embedded[id];
@@ -53,26 +54,29 @@ export default DS.JSONSerializer.extend(Ember.Evented, {
         payload.id = id;
       }
       embeddedRef = ref.child(key).child(id);
-      var record = this.store.push(relationship.type, this.normalize(relationship.type, payload, embeddedRef));
+      var embeddedTypeClass = this.store.modelFor(relationship.type);
+      var record = this.store.push(relationship.type, this.normalize(embeddedTypeClass, payload, embeddedRef));
       record.__firebaseRef = embeddedRef;
     }
     hash[key] = Ember.keys(hash[key]);
   },
 
-  normalizeEmbeddedBelongsTo: function(type, hash, relationship, ref) {
+  normalizeEmbeddedBelongsTo: function(typeClass, hash, relationship, ref) {
     var key = relationship.key;
     if (!hash[key]) {
       return;
     }
 
-    ref = ref || this.store.adapterFor(type)._getRef(type, hash.id);
+    var modelName = typeClass.modelName;
+    ref = ref || this.store.adapterFor(modelName)._getRef(typeClass, hash.id);
 
     var payload = hash[key];
     if (typeof payload.id !== 'string') {
-      throw new Error(fmt('Embedded relationship "%@" of "%@" must contain an "id" property in the payload', [relationship.type.typeKey, type]));
+      throw new Error(fmt('Embedded relationship "%@" of "%@" must contain an "id" property in the payload', [relationship.type, typeClass]));
     }
     var embeddedRef = ref.child(key);
-    var record = this.store.push(relationship.type, this.normalize(relationship.type, payload, embeddedRef));
+    var embeddedTypeClass = this.store.modelFor(relationship.type);
+    var record = this.store.push(relationship.type, this.normalize(embeddedTypeClass, payload, embeddedRef));
     record.__firebaseRef = embeddedRef;
 
     hash[key] = payload.id;
@@ -84,21 +88,21 @@ export default DS.JSONSerializer.extend(Ember.Evented, {
     for `hasMany` relationships and makes sure the value is an object.
     The object is then converted to an Array using `Ember.keys`
   */
-  normalize: function(type, hash, ref) {
+  normalize: function(typeClass, hash, ref) {
     var serializer = this;
     // Check if the model contains any 'hasMany' relationships
-    type.eachRelationship(function(key, relationship) {
+    typeClass.eachRelationship(function(key, relationship) {
       if (relationship.kind === 'hasMany') {
         if (relationship.options.embedded) {
-          serializer.normalizeEmbeddedHasMany(type, hash, relationship, ref);
+          serializer.normalizeEmbeddedHasMany(typeClass, hash, relationship, ref);
         } else {
-          serializer.normalizeHasMany(type, hash, relationship);
+          serializer.normalizeHasMany(typeClass, hash, relationship);
         }
       } else {
         if (relationship.options.embedded) {
-          serializer.normalizeEmbeddedBelongsTo(type, hash, relationship, ref);
+          serializer.normalizeEmbeddedBelongsTo(typeClass, hash, relationship, ref);
         } else {
-          serializer.normalizeBelongsTo(type, hash, relationship);
+          serializer.normalizeBelongsTo(typeClass, hash, relationship);
         }
       }
     });
@@ -113,8 +117,8 @@ export default DS.JSONSerializer.extend(Ember.Evented, {
     embedded records, pushes them into the store, and then replaces
     the records with an array of ids
   */
-  extractSingle: function(store, type, payload) {
-    return this.normalize(type, payload);
+  extractSingle: function(store, typeClass, payload) {
+    return this.normalize(typeClass, payload);
   },
 
   /**
@@ -122,9 +126,9 @@ export default DS.JSONSerializer.extend(Ember.Evented, {
     `extractSingle()` on each item in the payload and as a result each item
     will have `normalize()` called on it
   */
-  extractArray: function(store, type, payload) {
+  extractArray: function(store, typeClass, payload) {
     return map(payload, function(item) {
-      return this.extractSingle(store, type, item);
+      return this.extractSingle(store, typeClass, item);
     }, this);
   },
 

@@ -16,7 +16,7 @@ describe("Integration: FirebaseSerializer", function() {
     stubFirebase();
     app = startApp();
     firebaseTestRef = createTestRef();
-    store = app.__container__.lookup("store:main");
+    store = app.__container__.lookup("service:store");
     serializer = store.serializerFor('post');
   });
 
@@ -56,7 +56,7 @@ describe("Integration: FirebaseSerializer", function() {
       beforeEach(function(done) {
         defineModel(app, 'post2', {
           title: DS.attr('string'),
-          comments: DS.hasMany('comment', { embedded: true })
+          comments: DS.hasMany('comment', { async: false, embedded: true })
         });
         firebaseTestRef
           .child("blogs/denormalized/posts")
@@ -139,7 +139,7 @@ describe("Integration: FirebaseSerializer", function() {
 
         defineModel(app, 'post2', {
           title: DS.attr('string'),
-          comments: DS.hasMany("comment", { embedded: true })
+          comments: DS.hasMany("comment", { async: false, embedded: true })
         });
 
         spy = sinon.spy(serializer, "extractSingle");
@@ -230,13 +230,13 @@ describe("Integration: FirebaseSerializer", function() {
             id: "user_a",
             posts: ["post_a"]
           });
-          var user = store.getById("user", "user_a");
+          var user = store.peekRecord("user", "user_a");
           var json = {};
 
           relationship = Ember.get(store.modelFor("user"), "relationshipsByName").get("posts");
           serializer.serializeHasMany(user, json, relationship);
 
-          store.find("user", "aputinski").then(function(record) {
+          store.findRecord("user", "aputinski").then(function(record) {
             Ember.run(function() {
             record.get('posts').then(function(foo) {
               console.log(foo.getObject(0));
