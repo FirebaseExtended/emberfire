@@ -1,0 +1,5 @@
+feature - Use `record.ref()` to get the firebase ref for a particular record.
+fixed - Embedded records, when calling `.save()` directly, will no longer write data at the root collection level in the db.
+fixed - Embedded records, when calling `.destroyRecord()` directly, will correctly be removed on the server.
+fixed - Embedded `belongsTo` records correctly serialize an id.
+fixed - Embedded records clear their `isDirty` and `isNew` state when saving directly or via the parent, fixing `record.rollback()`.
