@@ -102,6 +102,53 @@ describe("Integration: FirebaseAdapter - Finding Records", function() {
     });
   });
 
+  describe("#findQuery()", function() {
+    var getRefSpy, findQueryPromise, findQueryRef, recordArray;
+
+    beforeEach(function(done) {
+      recordArray = store.recordArrayManager
+        .createAdapterPopulatedRecordArray(store.modelFor('post'), null);
+      getRefSpy = sinon.spy(adapter, "_getRef");
+      Ember.run(function () {
+        findQueryPromise = adapter.findQuery(store, store.modelFor("post"), {
+          limit: 2
+        }, recordArray);
+
+        findQueryPromise.then(() => {
+          findQueryRef = getRefSpy.getCall(0).returnValue;
+          done();
+        });
+      });
+    });
+
+    afterEach(function() {
+      getRefSpy.restore();
+    });
+
+    it("creates the correct Firebase reference", function() {
+      assert(findQueryRef.toString().match(/blogs\/normalized\/posts$/g));
+    });
+
+    it("returns an object", function() {
+      assert.equal(typeof findQueryPromise, "object");
+    });
+
+    it("returns a promise", function() {
+      assert.equal(typeof findQueryPromise.then, "function");
+    });
+
+    it("resolves with the correct payload", function(done) {
+      Ember.run(function() {
+        findQueryPromise.then(function(payload) {
+          assert(Ember.isArray(payload));
+          // This should equal 2 - mockfirebase does not implement #limit yet
+          assert.equal(payload.length, 3);
+          done();
+        });
+      });
+    });
+  });
+
   describe("#findAll()", function() {
 
     var getRefSpy, findAllAddEventListenersSpy, handleChildValueSpy;
@@ -144,7 +191,7 @@ describe("Integration: FirebaseAdapter - Finding Records", function() {
       Ember.run(function() {
         findAllPromise.then(function(payload) {
           assert(Ember.isArray(payload));
-          assert.equal(payload.length, 2);
+          assert.equal(payload.length, 3);
           done();
         });
       });
