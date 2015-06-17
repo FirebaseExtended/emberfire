@@ -3,3 +3,4 @@ fixed - Embedded records, when calling `.save()` directly, will no longer write 
 fixed - Embedded records, when calling `.destroyRecord()` directly, will correctly be removed on the server.
 fixed - Embedded `belongsTo` records correctly serialize an id.
 fixed - Embedded records clear their `isDirty` and `isNew` state when saving directly or via the parent, fixing `record.rollback()`.
+fixed - Use `modelName` instead of `typeKey` to get rid of Ember Data `beta.18` deprecation warnings.
