@@ -12,7 +12,7 @@ export default {
 
     // Store
     ['component', 'utility:main'].forEach(function(type) {
-      app.inject(type, 'store', 'store:main');
+      app.inject(type, 'store', 'service:store');
     });
   }
 };

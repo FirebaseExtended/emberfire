@@ -13,7 +13,7 @@ describe("Integration: FirebaseAdapter - Updates from server", function() {
     app = startApp();
 
     firebaseTestRef = createTestRef();
-    store = app.__container__.lookup("store:main");
+    store = app.__container__.lookup("service:store");
     adapter = store.adapterFor('application');
     adapter._ref = createTestRef("blogs/normalized");
     adapter._queueFlushDelay = false;
@@ -28,7 +28,7 @@ describe("Integration: FirebaseAdapter - Updates from server", function() {
       }),
       user: DS.belongsTo('user', { async: true }),
       comments: DS.hasMany('comment', { async: true }),
-      embeddedComments: DS.hasMany('comment', { embedded: true })
+      embeddedComments: DS.hasMany('comment', { async: false, embedded: true })
     });
 
     app.Comment = DS.Model.extend({
@@ -38,7 +38,7 @@ describe("Integration: FirebaseAdapter - Updates from server", function() {
         return this.get('published');
       }),
       user: DS.belongsTo('user', { async: true }),
-      embeddedUser: DS.belongsTo('user', { embedded: true, inverse:null })
+      embeddedUser: DS.belongsTo('user', { async: false, embedded: true, inverse:null })
     });
   };
 
@@ -91,7 +91,7 @@ describe("Integration: FirebaseAdapter - Updates from server", function() {
     beforeEach(function(done) {
       var reference = adapter._ref;
       Ember.run(function() {
-        store.find("post", 'post_1').then(function(post) {
+        store.findRecord("post", 'post_1').then(function(post) {
           newPost = post;
           reference.child('posts/post_1/body').set('Updated', function() {
             done();
@@ -118,7 +118,7 @@ describe("Integration: FirebaseAdapter - Updates from server", function() {
       reference = firebaseTestRef.child("blogs/double_denormalized");
       adapter._ref = reference;
       Ember.run(function() {
-        store.find("post", 'post_1').then(function(post) {
+        store.findRecord("post", 'post_1').then(function(post) {
           comment = post.get('embeddedComments').objectAt(0);
           done();
         });
@@ -151,7 +151,7 @@ describe("Integration: FirebaseAdapter - Updates from server", function() {
       reference = firebaseTestRef.child("blogs/double_denormalized");
       adapter._ref = reference;
       Ember.run(function() {
-        store.find("post", 'post_1').then(function(post) {
+        store.findRecord("post", 'post_1').then(function(post) {
           user = post.get('embeddedComments').objectAt(0).get('embeddedUser');
           done();
         });
@@ -183,7 +183,7 @@ describe("Integration: FirebaseAdapter - Updates from server", function() {
     beforeEach(function(done) {
       var reference = adapter._ref;
       Ember.run(function() {
-        store.find("comment", 'comment_1').then(function(comment) {
+        store.findRecord("comment", 'comment_1').then(function(comment) {
           comment.set('user', null);
           comment.save().then(function(){
             reference.child('comments/comment_1').once('value', function(data) {
@@ -206,7 +206,7 @@ describe("Integration: FirebaseAdapter - Updates from server", function() {
     beforeEach(function(done) {
       var reference = adapter._ref;
       Ember.run(function() {
-        store.find("comment", 'comment_1').then(function(comment) {
+        store.findRecord("comment", 'comment_1').then(function(comment) {
           currentComment = comment;
           reference.child('comments/comment_1').set(null, function() {
             done();
@@ -226,7 +226,7 @@ describe("Integration: FirebaseAdapter - Updates from server", function() {
     beforeEach(function(done) {
       reference = adapter._ref;
       Ember.run(function() {
-        store.find("post", 'post_1').then(function(post) {
+        store.findRecord("post", 'post_1').then(function(post) {
           currentPost = post;
           done();
         });
@@ -262,7 +262,7 @@ describe("Integration: FirebaseAdapter - Updates from server", function() {
     beforeEach(function(done) {
       reference = adapter._ref;
       Ember.run(function() {
-        store.find("comment", 'comment_1').then(function(comment) {
+        store.findRecord("comment", 'comment_1').then(function(comment) {
           currentComment = comment;
           done();
         });
@@ -288,7 +288,7 @@ describe("Integration: FirebaseAdapter - Updates from server", function() {
     beforeEach(function(done) {
       reference = adapter._ref;
       Ember.run(function() {
-        store.find("comment", 'comment_2').then(function(comment) {
+        store.findRecord("comment", 'comment_2').then(function(comment) {
           comment.destroyRecord().then(function() {
             done();
           });
@@ -310,7 +310,7 @@ describe("Integration: FirebaseAdapter - Updates from server", function() {
     beforeEach(function(done) {
       reference = adapter._ref;
       Ember.run(function() {
-        store.find("comment", 'comment_3').then(function(comment) {
+        store.findRecord("comment", 'comment_3').then(function(comment) {
           comment.set('body', 'Updated');
           comment.save().then(function() {
             done();

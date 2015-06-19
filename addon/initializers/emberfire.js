@@ -25,24 +25,25 @@ export default {
     if (!DS.Store.prototype._emberfirePatched) {
       DS.Store.reopen({
         _emberfirePatched: true,
-        push: function(typeName, data, _partial) {
-          var record = this._super(typeName, data, _partial);
-          var adapter = this.adapterFor(record.constructor);
+        push: function() {
+          var record = this._super.apply(this, arguments);
+          var modelName = record.constructor.modelName;
+          var adapter = this.adapterFor(modelName);
           if (adapter.recordWasPushed) {
-            adapter.recordWasPushed(this, typeName, record);
+            adapter.recordWasPushed(this, modelName, record);
           }
           return record;
         },
 
         recordWillUnload: function(record) {
-          var adapter = this.adapterFor(record.constructor);
+          var adapter = this.adapterFor(record.constructor.modelName);
           if (adapter.recordWillUnload) {
             adapter.recordWillUnload(this, record);
           }
         },
 
         recordWillDelete: function (record) {
-          var adapter = this.adapterFor(record.constructor);
+          var adapter = this.adapterFor(record.constructor.modelName);
           if (adapter.recordWillDelete) {
             adapter.recordWillDelete(this, record);
           }
@@ -67,7 +68,7 @@ export default {
             return this.__firebaseRef;
           }
 
-          var adapter = this.store.adapterFor(this.constructor);
+          var adapter = this.store.adapterFor(this.constructor.modelName);
           if (adapter._getRef) {
             return adapter._getRef(this.constructor, this.id);
           }

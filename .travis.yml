@@ -14,11 +14,9 @@ cache:
     - node_modules
 
 env:
-  - EMBER_TRY_SCENARIO=ember-data-beta.12
-  - EMBER_TRY_SCENARIO=ember-data-beta.14.1
-  - EMBER_TRY_SCENARIO=ember-data-beta.16.1
-  - EMBER_TRY_SCENARIO=ember-data-beta.17
-  - EMBER_TRY_SCENARIO=ember-data-beta.18
+  - EMBER_TRY_SCENARIO=ember-data-1.13.0
+  - EMBER_TRY_SCENARIO=ember-data-1.13.1
+  - EMBER_TRY_SCENARIO=ember-data-1.13.2
   - EMBER_TRY_SCENARIO=ember-data-canary
 
 matrix:

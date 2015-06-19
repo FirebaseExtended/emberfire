@@ -14,7 +14,7 @@ describe('Integration: FirebaseAdapter - Deleting records', function() {
     app = startApp();
 
     firebaseTestRef = createTestRef();
-    store = app.__container__.lookup('store:main');
+    store = app.__container__.lookup('service:store');
     adapter = store.adapterFor('application');
   });
 
@@ -61,7 +61,7 @@ describe('Integration: FirebaseAdapter - Deleting records', function() {
       var reference = firebaseTestRef.child('blogs/normalized');
       adapter._ref = reference;
       Ember.run(function() {
-        store.find('post', 'post_1').then(function(p) {
+        store.findRecord('post', 'post_1').then(function(p) {
           post = p;
           postId = post.get('id');
           postRef = post.ref();
@@ -95,13 +95,13 @@ describe('Integration: FirebaseAdapter - Deleting records', function() {
         }),
         user: DS.belongsTo('user', { async: true }),
         comments: DS.hasMany('comment', { async: true }),
-        embeddedComments: DS.hasMany('comment', { embedded: true })
+        embeddedComments: DS.hasMany('comment', { async: false, embedded: true })
       });
 
       reference = firebaseTestRef.child('blogs/double_denormalized');
       adapter._ref = reference;
       Ember.run(function() {
-        store.find('post', 'post_1').then(function(post) {
+        store.findRecord('post', 'post_1').then(function(post) {
           comment = post.get('embeddedComments').objectAt(0);
           done();
         });
@@ -137,7 +137,7 @@ describe('Integration: FirebaseAdapter - Deleting records', function() {
         }),
         user: DS.belongsTo('user', { async: true }),
         comments: DS.hasMany('comment', { async: true }),
-        embeddedComments: DS.hasMany('comment', { embedded: true })
+        embeddedComments: DS.hasMany('comment', { async: false, embedded: true })
       });
 
       app.Comment = DS.Model.extend({
@@ -147,13 +147,13 @@ describe('Integration: FirebaseAdapter - Deleting records', function() {
           return this.get('published');
         }),
         user: DS.belongsTo('user', { async: true }),
-        embeddedUser: DS.belongsTo('user', { embedded: true, inverse:null })
+        embeddedUser: DS.belongsTo('user', { async: false, embedded: true, inverse:null })
       });
 
       reference = firebaseTestRef.child('blogs/double_denormalized');
       adapter._ref = reference;
       Ember.run(function() {
-        store.find('post', 'post_1').then(function(post) {
+        store.findRecord('post', 'post_1').then(function(post) {
           user = post.get('embeddedComments').objectAt(0).get('embeddedUser');
           done();
         });

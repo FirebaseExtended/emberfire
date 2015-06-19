@@ -7,10 +7,10 @@ export default function defineModel(app, modelName, attrs) {
 
   var Model = DS.Model.extend(attrs);
 
-  if (app.__container__.resolve(resolverName)) {
-    app.__container__.unregister(resolverName);
+  if (app.registry.resolve(resolverName)) {
+    app.registry.unregister(resolverName);
   }
-  app.__container__.register(resolverName, Model);
+  app.registry.register(resolverName, Model);
 
   return Model;
 }
