@@ -144,7 +144,7 @@ describe("Integration: FirebaseAdapter - Finding Records", function() {
       Ember.run(function() {
         findAllPromise.then(function(payload) {
           assert(Ember.isArray(payload));
-          assert.equal(payload.length, 2);
+          assert.equal(payload.length, 3);
           done();
         });
       });

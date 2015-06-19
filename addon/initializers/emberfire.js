@@ -75,6 +75,18 @@ export default {
       });
     }
 
+    if (!DS.AdapterPopulatedRecordArray.prototype._emberfirePatched) {
+      DS.AdapterPopulatedRecordArray.reopen({
+        _emberfirePatched: true,
+        willDestroy: function() {
+          if (this.__firebaseCleanup) {
+            this.__firebaseCleanup();
+          }
+          return this._super();
+        }
+      });
+    }
+
     DS.FirebaseAdapter = FirebaseAdapter;
     DS.FirebaseSerializer = FirebaseSerializer;
   }

@@ -1,0 +1,1 @@
+feature - `store.find` with queries now returns a realtime array.
