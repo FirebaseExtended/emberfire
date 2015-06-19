@@ -4,7 +4,7 @@ import Firebase from 'firebase';
 import FirebaseAdapter from '../adapters/firebase';
 import FirebaseSerializer from '../serializers/firebase';
 
-var VERSION = '1.4.7';
+var VERSION = '0.0.0';
 
 if (Ember.libraries) {
   if (Firebase.SDK_VERSION) {
