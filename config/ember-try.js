@@ -29,6 +29,24 @@ module.exports = {
       }
     },
     {
+      name: 'ember-data-1.13.3',
+      dependencies: {
+        'ember-data': '1.13.3'
+      },
+      resolutions: {
+        'ember-data': '1.13.3'
+      }
+    },
+    {
+      name: 'ember-data-1.13.x',
+      dependencies: {
+        'ember-data': '^1.13.4'
+      },
+      resolutions: {
+        'ember-data': '^1.13.4'
+      }
+    },
+    {
       name: 'ember-data-canary',
       dependencies: {
         'ember-data': 'components/ember-data#canary'
