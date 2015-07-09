@@ -1,13 +1,13 @@
 import Ember from 'ember';
 import DS from 'ember-data';
 import toPromise from '../utils/to-promise';
+import forEach from 'lodash/collection/forEach';
+import filter from 'lodash/collection/filter';
+import map from 'lodash/collection/map';
+import indexOf from 'lodash/array/indexOf';
 
 var fmt = Ember.String.fmt;
 var Promise = Ember.RSVP.Promise;
-var forEach = Ember.EnumerableUtils.forEach;
-var filter = Ember.EnumerableUtils.filter;
-var map = Ember.EnumerableUtils.map;
-var indexOf = Ember.EnumerableUtils.indexOf;
 
 var uniq = function (arr) {
   var ret = Ember.A();
