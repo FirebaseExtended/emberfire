@@ -53,6 +53,7 @@
   "dependencies": {
     "chalk": "^1.0.0",
     "ember-cli-babel": "5.0.0",
+    "ember-lodash": "0.0.3",
     "fs-extra": "0.20.0",
     "rsvp": "3.0.18"
   },
@@ -74,6 +75,7 @@
     "ember-disable-prototype-extensions": "1.0.1",
     "ember-disable-proxy-controllers": "1.0.0",
     "ember-export-application-global": "1.0.2",
+    "lodash": "3.10.0",
     "ember-try": "0.0.7",
     "glob": "4.5.0",
     "gulp": "3.9.0",
