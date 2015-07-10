@@ -1,6 +1,5 @@
 import Ember from 'ember';
 import DS from 'ember-data';
-import map from 'lodash/collection/map';
 
 var fmt = Ember.String.fmt;
 
@@ -9,6 +8,8 @@ var fmt = Ember.String.fmt;
   a per model basis.
 */
 export default DS.JSONSerializer.extend(Ember.Evented, {
+  //Enable the new serializer API
+  isNewSerializerAPI: true,
 
   //We need to account for Firebase turning key/value pairs with ids '1' and '0' into arrays
   //See https://github.com/firebase/emberfire/issues/124
@@ -25,6 +26,7 @@ export default DS.JSONSerializer.extend(Ember.Evented, {
 
   normalizeHasMany: function(typeClass, hash, relationship) {
     var key = relationship.key;
+
     if (typeof hash[key] === 'object' && !Ember.isArray(hash[key])) {
       hash[key] = Object.keys(hash[key]);
     }
@@ -55,7 +57,8 @@ export default DS.JSONSerializer.extend(Ember.Evented, {
       }
       embeddedRef = ref.child(key).child(id);
       var embeddedTypeClass = this.store.modelFor(relationship.type);
-      var record = this.store.push(relationship.type, this.normalize(embeddedTypeClass, payload, embeddedRef));
+      var normalizedData = this.normalize(embeddedTypeClass, payload, embeddedRef);
+      var record = this.store.push(normalizedData);
       record.__firebaseRef = embeddedRef;
     }
     hash[key] = Object.keys(hash[key]);
@@ -76,7 +79,8 @@ export default DS.JSONSerializer.extend(Ember.Evented, {
     }
     var embeddedRef = ref.child(key);
     var embeddedTypeClass = this.store.modelFor(relationship.type);
-    var record = this.store.push(relationship.type, this.normalize(embeddedTypeClass, payload, embeddedRef));
+    var normalizedData = this.normalize(embeddedTypeClass, payload, embeddedRef);
+    var record = this.store.push(normalizedData);
     record.__firebaseRef = embeddedRef;
 
     hash[key] = payload.id;
@@ -84,13 +88,13 @@ export default DS.JSONSerializer.extend(Ember.Evented, {
 
   normalizeBelongsTo: Ember.K,
   /**
-    Called after `extractSingle()`. This method checks the model
+    This method checks the model
     for `hasMany` relationships and makes sure the value is an object.
     The object is then converted to an Array using `Ember.keys`
   */
   normalize: function(typeClass, hash, ref) {
     var serializer = this;
-    // Check if the model contains any 'hasMany' relationships
+    //Check if the model contains any 'hasMany' relationships
     typeClass.eachRelationship(function(key, relationship) {
       if (relationship.kind === 'hasMany') {
         if (relationship.options.embedded) {
@@ -107,29 +111,6 @@ export default DS.JSONSerializer.extend(Ember.Evented, {
       }
     });
     return this._super.apply(this, arguments);
-  },
-
-  /**
-    Called on a records returned from `find()` and all records
-    returned from `findAll()`
-
-    This method also checks for `embedded: true`, extracts the
-    embedded records, pushes them into the store, and then replaces
-    the records with an array of ids
-  */
-  extractSingle: function(store, typeClass, payload) {
-    return this.normalize(typeClass, payload);
-  },
-
-  /**
-    Called after the adpter runs `findAll()` or `findMany()`. This method runs
-    `extractSingle()` on each item in the payload and as a result each item
-    will have `normalize()` called on it
-  */
-  extractArray: function(store, typeClass, payload) {
-    return map(payload, function(item) {
-      return this.extractSingle(store, typeClass, item);
-    }, this);
   },
 
   /**
