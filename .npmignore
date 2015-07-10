@@ -10,6 +10,7 @@ dist/
 .npmignore
 **/.gitkeep
 bower.json
+ember-cli-build.js
 Brocfile.js
 gulpfile.js
 testem.json
