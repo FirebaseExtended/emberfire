@@ -11,6 +11,8 @@
 
     "posts": {
       ".read": true,
+      ".indexOn": "published",
+
       "$post": {
         ".read": true,
         ".write": true,
