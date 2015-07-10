@@ -614,7 +614,7 @@ export default DS.Adapter.extend(Ember.Evented, {
     typeClass.eachRelationship(function(key, relationship) {
       if (relationship.kind === 'hasMany') {
         var ids = payload[key];
-        cache[key] = !Ember.isNone(ids) ? Ember.A(Ember.keys(ids)) : Ember.A();
+        cache[key] = !Ember.isNone(ids) ? Ember.A(Object.keys(ids)) : Ember.A();
       }
     });
   },

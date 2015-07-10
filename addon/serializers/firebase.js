@@ -26,7 +26,7 @@ export default DS.JSONSerializer.extend(Ember.Evented, {
   normalizeHasMany: function(typeClass, hash, relationship) {
     var key = relationship.key;
     if (typeof hash[key] === 'object' && !Ember.isArray(hash[key])) {
-      hash[key] = Ember.keys(hash[key]);
+      hash[key] = Object.keys(hash[key]);
     }
     //We need to account for Firebase turning key/value pairs with ids '1' and '0' into arrays
     //See https://github.com/firebase/emberfire/issues/124
@@ -58,7 +58,7 @@ export default DS.JSONSerializer.extend(Ember.Evented, {
       var record = this.store.push(relationship.type, this.normalize(embeddedTypeClass, payload, embeddedRef));
       record.__firebaseRef = embeddedRef;
     }
-    hash[key] = Ember.keys(hash[key]);
+    hash[key] = Object.keys(hash[key]);
   },
 
   normalizeEmbeddedBelongsTo: function(typeClass, hash, relationship, ref) {
