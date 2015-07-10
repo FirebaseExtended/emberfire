@@ -26,7 +26,8 @@ describe('Integration: FirebaseAdapter - Queries', function() {
 
     Ember.run(function () {
       adapter.query(store, store.modelFor('post'), query, queryArray)
-        .then(() => {
+        .then((records) => {
+          queryArray.load(records);
           done();
         });
     });

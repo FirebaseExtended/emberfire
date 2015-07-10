@@ -209,9 +209,9 @@ export default DS.Adapter.extend(Ember.Evented, {
 
       if (!record || !record.__listening) {
         var payload = adapter._assignIdToPayload(snapshot);
-        var serializer = store.serializerFor(modelName);
+        var normalizedData = store.normalize(typeClass.modelName, payload);
         adapter._updateRecordCacheForType(typeClass, payload);
-        record = store.push(modelName, serializer.extractSingle(store, typeClass, payload));
+        store.push(normalizedData);
       }
 
       if (record) {
@@ -340,8 +340,8 @@ export default DS.Adapter.extend(Ember.Evented, {
 
       this._enqueue(function FirebaseAdapter$enqueueStorePush() {
         if (!store.isDestroying) {
-          var serializer = store.serializerFor(typeClass.modelName);
-          store.push(typeClass.modelName, serializer.extractSingle(store, typeClass, payload));
+          var normalizedData = store.normalize(typeClass.modelName, payload);
+          store.push(normalizedData);
         }
       });
     }

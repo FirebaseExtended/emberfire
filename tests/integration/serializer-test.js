@@ -2,7 +2,6 @@ import Ember from 'ember';
 import DS from 'ember-data';
 import startApp from 'dummy/tests/helpers/start-app';
 import { it } from 'ember-mocha';
-import sinon from 'sinon';
 import stubFirebase from 'dummy/tests/helpers/stub-firebase';
 import unstubFirebase from 'dummy/tests/helpers/unstub-firebase';
 import createTestRef from 'dummy/tests/helpers/create-test-ref';
@@ -104,114 +103,6 @@ describe("Integration: FirebaseSerializer", function() {
 
   });
 
-  describe("#extractSingle()", function() {
-
-    describe("normalized payload", function() {
-
-      var posts, spy, extractedArray;
-
-      beforeEach(function(done) {
-        spy = sinon.spy(serializer, "extractSingle");
-        firebaseTestRef
-          .child("blogs/normalized/posts")
-          .once("value", function(snapshot) {
-            posts = snapshotToArray(snapshot);
-            extractedArray = serializer.extractArray(store, store.modelFor("post"), posts);
-            done();
-          });
-      });
-
-      it("was called for each item in the payload", function() {
-        assert.equal(spy.callCount, posts.length);
-      });
-
-      afterEach(function() {
-        spy.restore();
-      });
-
-    });
-
-    describe("denormalized payload", function() {
-
-      var posts, spy, extractedArray;
-
-      beforeEach(function(done) {
-
-        defineModel(app, 'post2', {
-          title: DS.attr('string'),
-          comments: DS.hasMany("comment", { async: false, embedded: true })
-        });
-
-        spy = sinon.spy(serializer, "extractSingle");
-        firebaseTestRef
-          .child("blogs/denormalized/posts")
-          .once("value", function(snapshot) {
-            posts = snapshotToArray(snapshot);
-            Ember.run(function() {
-              extractedArray = serializer.extractArray(store, store.modelFor('post2'), posts);
-              done();
-            });
-          });
-      });
-
-      it("was called for each item in the payload", function() {
-        assert.equal(spy.callCount, 2);
-      });
-
-      it("pushed the embedded records into the store", function() {
-        var hasComments = function(ids) {
-          return Ember.A(ids).every(function(id) {
-            return store.hasRecordForId("comment", id);
-          });
-        };
-        assert(hasComments(["comment_1", "comment_2"]), 'embedded records not found in store');
-      });
-
-      afterEach(function() {
-        spy.restore();
-      });
-
-    });
-
-  });
-
-
-  describe("#extractArray()", function() {
-
-    describe("normalized payload", function() {
-
-      var posts, spy, extractedArray;
-
-      beforeEach(function(done) {
-        spy = sinon.spy(serializer, "extractArray");
-        firebaseTestRef
-          .child("blogs/normalized/posts")
-          .once("value", function(snapshot) {
-            posts = snapshotToArray(snapshot);
-            extractedArray = serializer.extractArray(store, store.modelFor("post"), posts);
-            done();
-          });
-      });
-
-      it("was called once", function() {
-        assert.equal(spy.callCount, 1);
-      });
-
-      it("returns an array", function() {
-        assert(Ember.isArray(extractedArray));
-      });
-
-      it("the returned array contains the correct number of items", function() {
-        assert(extractedArray.length, 2);
-      });
-
-      afterEach(function() {
-        spy.restore();
-      });
-
-    });
-
-  });
 
   // TODO: make this work
   /*describe("#serializeHasMany()", function() {
