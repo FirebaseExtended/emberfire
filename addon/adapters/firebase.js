@@ -639,5 +639,15 @@ export default DS.Adapter.extend(Ember.Evented, {
    */
   _getKey: function(refOrSnapshot) {
     return (typeof refOrSnapshot.key === 'function') ? refOrSnapshot.key() : refOrSnapshot.name();
-  }
+  },
+
+  /**
+   * We don't need background reloading, because firebase!
+   */
+  shouldBackgroundReloadRecord: function() {
+    return false;
+  },
+  shouldReloadAll: function() {
+    return false;
+  },
 });
