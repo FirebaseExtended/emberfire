@@ -211,7 +211,7 @@ export default DS.Adapter.extend(Ember.Evented, {
         var payload = adapter._assignIdToPayload(snapshot);
         var normalizedData = store.normalize(typeClass.modelName, payload);
         adapter._updateRecordCacheForType(typeClass, payload);
-        store.push(normalizedData);
+        record = store.push(normalizedData);
       }
 
       if (record) {
