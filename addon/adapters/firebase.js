@@ -331,13 +331,6 @@ export default DS.Adapter.extend(Ember.Evented, {
     } else {
       var payload = this._assignIdToPayload(snapshot);
 
-      // firebase doesn't send the property for empty relationships
-      typeClass.eachRelationship(function (key, relationship) {
-        if (relationship.kind === 'hasMany' && !payload[key]) {
-          payload[key] = {};
-        }
-      });
-
       this._enqueue(function FirebaseAdapter$enqueueStorePush() {
         if (!store.isDestroying) {
           var normalizedData = store.normalize(typeClass.modelName, payload);

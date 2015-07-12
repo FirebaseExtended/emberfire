@@ -68,8 +68,8 @@ export default DS.JSONSerializer.extend(DS.EmbeddedRecordsMixin, {
    */
   extractRelationships(modelClass, payload) {
     modelClass.eachRelationship((key, meta) => {
-      if (payload.hasOwnProperty(key)) {
-        if (meta.kind === 'hasMany') {
+      if (meta.kind === 'hasMany') {
+        if (payload.hasOwnProperty(key)) {
 
           // embedded
           if (this.hasDeserializeRecordsOption(key)) {
@@ -80,6 +80,7 @@ export default DS.JSONSerializer.extend(DS.EmbeddedRecordsMixin, {
             } else if (Ember.isArray(payload[key])) {
               payload[key] = this._addNumericIdsToEmbeddedArray(payload[key]);
             } else {
+              console.log('here');
               throw new Error(fmt('%@ relationship %@(\'%@\') must contain embedded records with an `id`. Example: { "%@": { "%@_1": { "id": "%@_1" } } } instead got: %@', [modelClass.toString(), meta.kind, meta.type, key, meta.type, meta.type, JSON.stringify(payload[key])] ));
             }
           }
@@ -91,9 +92,19 @@ export default DS.JSONSerializer.extend(DS.EmbeddedRecordsMixin, {
             } else if (Ember.isArray(payload[key])) {
               payload[key] = this._convertBooleanArrayToIds(payload[key]);
             } else {
+              console.log('here');
               throw new Error(fmt('%@ relationship %@(\'%@\') must be a key/value map. Example: { "%@": { "%@_1": true } } instead got: %@', [modelClass.toString(), meta.kind, meta.type, key, meta.type, JSON.stringify(payload[key])] ));
             }
           }
+
+        }
+
+        // hasMany property is not present
+        // server will not send a property which has no content
+        // (i.e. it will never send `comments: null`) so we need to
+        // force the empty relationship
+        else {
+          payload[key] = [];
         }
       }
     });
@@ -133,6 +144,9 @@ export default DS.JSONSerializer.extend(DS.EmbeddedRecordsMixin, {
     for (var i = 0; i <  arr.length; i++) {
       if (arr[i] === true) {
         result.push('' + i);
+      }
+      else if (typeof arr[i] === 'string') {
+        throw new Error(`hasMany relationship contains invalid data, should be in the form: { comment_1: true, comment_2: true } but was ${JSON.stringify(arr)}`);
       }
     }
     return result;
