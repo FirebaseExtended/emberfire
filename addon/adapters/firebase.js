@@ -4,6 +4,7 @@ import toPromise from '../utils/to-promise';
 import forEach from 'lodash/collection/forEach';
 import filter from 'lodash/collection/filter';
 import map from 'lodash/collection/map';
+import includes from 'lodash/collection/includes';
 import indexOf from 'lodash/array/indexOf';
 
 var fmt = Ember.String.fmt;
@@ -451,7 +452,7 @@ export default DS.Adapter.extend(Ember.Evented, {
 
     // Removed
     var removedRecords = filter(idsCache, function(id) {
-      return !ids.contains(id);
+      return !includes(ids, id);
     });
 
     removedRecords = map(removedRecords, function(id) {
