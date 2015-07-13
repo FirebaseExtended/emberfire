@@ -80,7 +80,6 @@ export default DS.JSONSerializer.extend(DS.EmbeddedRecordsMixin, {
             } else if (Ember.isArray(payload[key])) {
               payload[key] = this._addNumericIdsToEmbeddedArray(payload[key]);
             } else {
-              console.log('here');
               throw new Error(fmt('%@ relationship %@(\'%@\') must contain embedded records with an `id`. Example: { "%@": { "%@_1": { "id": "%@_1" } } } instead got: %@', [modelClass.toString(), meta.kind, meta.type, key, meta.type, meta.type, JSON.stringify(payload[key])] ));
             }
           }
@@ -92,7 +91,6 @@ export default DS.JSONSerializer.extend(DS.EmbeddedRecordsMixin, {
             } else if (Ember.isArray(payload[key])) {
               payload[key] = this._convertBooleanArrayToIds(payload[key]);
             } else {
-              console.log('here');
               throw new Error(fmt('%@ relationship %@(\'%@\') must be a key/value map. Example: { "%@": { "%@_1": true } } instead got: %@', [modelClass.toString(), meta.kind, meta.type, key, meta.type, JSON.stringify(payload[key])] ));
             }
           }
@@ -113,7 +111,12 @@ export default DS.JSONSerializer.extend(DS.EmbeddedRecordsMixin, {
   },
 
   /**
-   * Coerce arrays back into relationship arrays.
+   * Coerce arrays back into relationship arrays. When numeric ids are used
+   * the firebase server will send back arrays instead of object hashes in
+   * certain situations.
+   *
+   * See the conditions and reasoning here:
+   * https://www.firebase.com/docs/web/guide/understanding-data.html#section-arrays-in-firebase
    *
    * Stored in Firebase:
    *
@@ -127,13 +130,15 @@ export default DS.JSONSerializer.extend(DS.EmbeddedRecordsMixin, {
    *
    * Given back by the JS client:
    *
+   * ```js
    * [true, true, null, true]
+   * ```
    *
    * What we need:
    *
+   * ```js
    * [ "0", "1", "3" ]
-   *
-   * https://www.firebase.com/docs/web/guide/understanding-data.html#section-arrays-in-firebase
+   * ```
    *
    * @param {Array} arr   Input array
    * @return {Array}      Fixed array
@@ -155,7 +160,7 @@ export default DS.JSONSerializer.extend(DS.EmbeddedRecordsMixin, {
   /**
    * Fix embedded array ids.
    *
-   * Stored in Firebase:
+   * Objects are stored in Firebase with their id in the key only:
    *
    * ```json
    * {
@@ -196,5 +201,28 @@ export default DS.JSONSerializer.extend(DS.EmbeddedRecordsMixin, {
     return result;
   },
 
+  /**
+   * Even when records are embedded, bypass EmbeddedRecordsMixin
+   * and invoke JSONSerializer's method which serializes to ids only.
+   *
+   * The adapter handles saving the embedded records via `r.save()`
+   * and ensures that dirty states and rollback work.
+   *
+   * Will not be neccesary when this issue is resolved:
+   *
+   * https://github.com/emberjs/data/issues/2487
+   *
+   * @override
+   */
+  serializeHasMany: function (snapshot, json, relationship) {
+    DS.JSONSerializer.prototype.serializeHasMany.call(this, snapshot, json, relationship);
+  },
 
+  /**
+   * @see #serializeHasMany
+   * @override
+   */
+  serializeBelongsTo: function (snapshot, json, relationship) {
+    DS.JSONSerializer.prototype.serializeBelongsTo.call(this, snapshot, json, relationship);
+  },
 });

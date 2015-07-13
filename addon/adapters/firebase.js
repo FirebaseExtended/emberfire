@@ -390,8 +390,8 @@ export default DS.Adapter.extend(Ember.Evented, {
             delete serializedRecord[key];
           }
         } else {
-          if (relationship.options.embedded === true && serializedRecord[key]) {
-            save = adapter._saveBelongsToRecord(store, typeClass, relationship, serializedRecord[key], recordRef);
+          if (adapter.isRelationshipEmbedded(store, typeClass, relationship) && serializedRecord[key]) {
+            save = adapter._saveEmbeddedBelongsToRecord(store, typeClass, relationship, serializedRecord[key], recordRef);
             savedRelationships.push(save);
             delete serializedRecord[key];
           }
@@ -447,7 +447,7 @@ export default DS.Adapter.extend(Ember.Evented, {
     });
 
     dirtyRecords = map(uniq(dirtyRecords.concat(addedRecords)), function(id) {
-      return adapter._saveHasManyRecord(store, relationship, recordRef, id);
+      return adapter._saveHasManyRecord(store, typeClass, relationship, recordRef, id);
     });
 
     // Removed
@@ -484,16 +484,27 @@ export default DS.Adapter.extend(Ember.Evented, {
     named with the record id and update the value to the serialized
     version of the record
   */
-  _saveHasManyRecord: function(store, relationship, parentRef, id) {
+  _saveHasManyRecord: function(store, typeClass, relationship, parentRef, id) {
     var ref = this._getRelationshipRef(parentRef, relationship.key, id);
     var record = store.peekRecord(relationship.type, id);
-    var isEmbedded = relationship.options.embedded === true;
+    var isEmbedded = this.isRelationshipEmbedded(store, typeClass, relationship);
     if (isEmbedded) {
       record.__firebaseRef = ref;
       return record.save();
     }
 
     return toPromise(ref.set, ref,  [true]);
+  },
+
+  /**
+   * Determine from the serializer if the relationship is embedded via the
+   * serializer's `attrs` hash.
+   *
+   * @return {Boolean}              Is the relationship embedded?
+   */
+  isRelationshipEmbedded(store, typeClass, relationship) {
+    var serializer = store.serializerFor(typeClass.modelName);
+    return serializer.hasDeserializeRecordsOption(relationship.key);
   },
 
   /**
@@ -505,12 +516,17 @@ export default DS.Adapter.extend(Ember.Evented, {
   },
 
   /**
-    Save an embedded record
-  */
-  _saveBelongsToRecord: function(store, typeClass, relationship, id, parentRef) {
+   * Save an embedded belongsTo record and set its internal firebase ref
+   *
+   * @return {Promise<DS.Model>}
+   */
+  _saveEmbeddedBelongsToRecord: function(store, typeClass, relationship, id, parentRef) {
     var record = store.peekRecord(relationship.type, id);
-    record.__firebaseRef = parentRef.child(relationship.key);
-    return record.save();
+    if (record) {
+      record.__firebaseRef = parentRef.child(relationship.key);
+      return record.save();
+    }
+    return Ember.RSVP.Promise.reject(new Error(`Unable to find record with id ${id} from embedded relationship: ${JSON.stringify(relationship)}`));
   },
 
   /**
