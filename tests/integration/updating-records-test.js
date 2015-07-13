@@ -55,8 +55,8 @@ describe('Integration: FirebaseAdapter - Updating records', function() {
         // TODO: disabled until next release
         xit('avoids writing the hasMany relationship link', function(done) {
           Ember.RSVP.Promise.cast(newPost.get('comments')).then(function(comments) {
-            expect(newComment.get('hasDirtyAttributes')).to.be.equal(true, 'the item should be dirty');
-            expect(newComment.get('isNew')).to.be.equal(true, 'the item should be `new`');
+            expect(newComment.get('hasDirtyAttributes')).to.equal(true, 'the item should be dirty');
+            expect(newComment.get('isNew')).to.equal(true, 'the item should be `new`');
 
             comments.pushObject(newComment);
 
@@ -87,7 +87,7 @@ describe('Integration: FirebaseAdapter - Updating records', function() {
                     currentData = data.val();
                     postData = currentData.posts[postId];
 
-                    expect(postData.comments[commentId]).to.be.equal(true, 'the hasMany link should exist');
+                    expect(postData.comments[commentId]).to.equal(true, 'the hasMany link should exist');
                     expect(postData.comments).to.be.an('object');
 
                     done();
@@ -108,8 +108,8 @@ describe('Integration: FirebaseAdapter - Updating records', function() {
             Ember.run(function () {
               newComment.save().then(function () {
                 newComment.set('body', 'dirty this record!');
-                expect(newComment.get('hasDirtyAttributes')).to.be.equal(true, 'the item should be dirty');
-                expect(newComment.get('isNew')).to.be.equal(false, 'the item should not be `new`');
+                expect(newComment.get('hasDirtyAttributes')).to.equal(true, 'the item should be dirty');
+                expect(newComment.get('isNew')).to.equal(false, 'the item should not be `new`');
 
                 Ember.RSVP.Promise.cast(newPost.get('comments')).then(function(comments) {
                   comments.pushObject(newComment);
@@ -118,7 +118,7 @@ describe('Integration: FirebaseAdapter - Updating records', function() {
                       currentData = data.val();
                       postData = currentData.posts[postId];
 
-                      expect(postData.comments[commentId]).to.be.equal(true, 'the hasMany link should exist');
+                      expect(postData.comments[commentId]).to.equal(true, 'the hasMany link should exist');
 
                       done();
                      });
@@ -159,8 +159,8 @@ describe('Integration: FirebaseAdapter - Updating records', function() {
         });
 
         it('removes only one hasMany link', function(done) {
-          expect(postData.comments[commentId]).to.be.equal(true, 'the first hasMany link should exist before removal');
-          expect(postData.comments[secondCommentId]).to.be.equal(true, 'the second hasMany link should exist before removal');
+          expect(postData.comments[commentId]).to.equal(true, 'the first hasMany link should exist before removal');
+          expect(postData.comments[secondCommentId]).to.equal(true, 'the second hasMany link should exist before removal');
 
           Ember.RSVP.Promise.cast(newPost.get('comments')).then(function(comments) {
             comments.removeObject(secondComment);
@@ -169,7 +169,7 @@ describe('Integration: FirebaseAdapter - Updating records', function() {
                 currentData = data.val();
                 postData = currentData.posts[postId];
 
-                expect(postData.comments[commentId]).to.be.equal(true, 'the first hasMany link should still exist');
+                expect(postData.comments[commentId]).to.equal(true, 'the first hasMany link should still exist');
                 expect(postData.comments[secondCommentId]).to.be.an('undefined', 'the second hasMany link should be removed');
 
                 done();
@@ -179,8 +179,8 @@ describe('Integration: FirebaseAdapter - Updating records', function() {
         });
 
         it('removes the comments hash if no hasMany records remain', function(done) {
-          expect(postData.comments[commentId]).to.be.equal(true, 'the first hasMany link should exist before removal');
-          expect(postData.comments[secondCommentId]).to.be.equal(true, 'the second hasMany link should exist before removal');
+          expect(postData.comments[commentId]).to.equal(true, 'the first hasMany link should exist before removal');
+          expect(postData.comments[secondCommentId]).to.equal(true, 'the second hasMany link should exist before removal');
 
           Ember.RSVP.Promise.cast(newPost.get('comments')).then(function(comments) {
             comments.removeObject(newComment);
@@ -233,7 +233,7 @@ describe('Integration: FirebaseAdapter - Updating records', function() {
 
       it('contains a hasMany relationship', function(done) {
         newPost.get('comments').then(function(comments) {
-          expect(comments.objectAt(0).get('body')).to.be.equal('This is a new comment');
+          expect(comments.objectAt(0).get('body')).to.equal('This is a new comment');
           done();
         });
       });
@@ -301,9 +301,9 @@ describe('Integration: FirebaseAdapter - Updating records', function() {
                 posts = ps;
               });
             }).then(function() {
-              expect(Ember.A(posts).contains(newPost1)).to.be.equal(true);
-              expect(Ember.A(posts).contains(newPost2)).to.be.equal(true);
-              expect(Ember.A(posts).contains(newPost3)).to.be.equal(true);
+              expect(Ember.A(posts).contains(newPost1)).to.equal(true);
+              expect(Ember.A(posts).contains(newPost2)).to.equal(true);
+              expect(Ember.A(posts).contains(newPost3)).to.equal(true);
               done();
             });
           });
@@ -342,30 +342,30 @@ describe('Integration: FirebaseAdapter - Updating records', function() {
       });
 
       it('save to server correctly', function() {
-        expect(embeddedData.label).to.be.equal('Child Node');
+        expect(embeddedData.label).to.equal('Child Node');
       });
 
       it('maintain the correct .ref()', function() {
         var refPath = embeddedRecord.ref().path.toString();
         var expectedPath = `/blogs/tests/adapter/updaterecord/embedded/treeNodes/${parentId}/children/${embeddedId}`;
-        expect(refPath).to.be.equal(expectedPath);
+        expect(refPath).to.equal(expectedPath);
       });
 
       it('are not `dirty`', function() {
-        expect(embeddedRecord.get('hasDirtyAttributes')).to.be.equal(false, 'The embedded record should not be `dirty`');
+        expect(embeddedRecord.get('hasDirtyAttributes')).to.equal(false, 'The embedded record should not be `dirty`');
       });
 
       it('are not `new`', function() {
-        expect(embeddedRecord.get('isNew')).to.be.equal(false, 'The embedded record should not be `new`');
+        expect(embeddedRecord.get('isNew')).to.equal(false, 'The embedded record should not be `new`');
       });
 
       it('are not `saving`', function() {
-        expect(embeddedRecord.get('isSaving')).to.be.equal(false, 'The embedded record should be `saving`');
+        expect(embeddedRecord.get('isSaving')).to.equal(false, 'The embedded record should be `saving`');
       });
 
       it('become `dirty` when editing', function() {
         embeddedRecord.set('label', 'new label');
-        expect(embeddedRecord.get('hasDirtyAttributes')).to.be.equal(true, 'The embedded record should be `dirty`');
+        expect(embeddedRecord.get('hasDirtyAttributes')).to.equal(true, 'The embedded record should be `dirty`');
       });
 
       it('are not `dirty` after re-saving', function(done) {
@@ -373,8 +373,8 @@ describe('Integration: FirebaseAdapter - Updating records', function() {
         parentRecord.save().then(function () {
           embeddedRecord.ref().once('value', function(snapshot) {
             embeddedData = snapshot.val();
-            expect(embeddedData.label).to.be.equal('new label');
-            expect(embeddedRecord.get('hasDirtyAttributes')).to.be.equal(false, 'record should not be dirty');
+            expect(embeddedData.label).to.equal('new label');
+            expect(embeddedRecord.get('hasDirtyAttributes')).to.equal(false, 'record should not be dirty');
             done();
           });
         });
@@ -382,18 +382,18 @@ describe('Integration: FirebaseAdapter - Updating records', function() {
 
       it('rollback to a clean state', function() {
         embeddedRecord.set('label', 'new label');
-        expect(embeddedRecord.get('hasDirtyAttributes')).to.be.equal(true, 'The embedded record should be `dirty`');
+        expect(embeddedRecord.get('hasDirtyAttributes')).to.equal(true, 'The embedded record should be `dirty`');
 
         embeddedRecord.rollbackAttributes();
-        expect(embeddedRecord.get('hasDirtyAttributes')).to.be.equal(false, 'The embedded record should not be `dirty`');
+        expect(embeddedRecord.get('hasDirtyAttributes')).to.equal(false, 'The embedded record should not be `dirty`');
       });
 
       it('rollback to their last saved state', function() {
         embeddedRecord.set('label', 'new label');
-        expect(embeddedRecord.get('hasDirtyAttributes')).to.be.equal(true, 'The embedded record should be `dirty`');
+        expect(embeddedRecord.get('hasDirtyAttributes')).to.equal(true, 'The embedded record should be `dirty`');
 
         embeddedRecord.rollbackAttributes();
-        expect(embeddedRecord.get('label')).to.be.equal('Child Node');
+        expect(embeddedRecord.get('label')).to.equal('Child Node');
       });
 
       describe('when invoking .save() directly', function () {
@@ -403,7 +403,7 @@ describe('Integration: FirebaseAdapter - Updating records', function() {
             embeddedRecord.set('label', 'Updated');
             embeddedRecord.save().then(() => {
               embeddedRecord.ref().once('value', function (snap) {
-                expect(snap.val().label).to.be.equal('Updated');
+                expect(snap.val().label).to.equal('Updated');
                 done();
               });
             });
@@ -460,28 +460,28 @@ describe('Integration: FirebaseAdapter - Updating records', function() {
       it('maintain the correct .ref()', function() {
         var refPath = embeddedRecord.ref().path.toString();
         var expectedPath = `/blogs/tests/adapter/updaterecord/embedded/treeNodes/${parentId}/config`;
-        expect(refPath).to.be.equal(expectedPath);
+        expect(refPath).to.equal(expectedPath);
       });
 
       it('save with an id', function() {
-        expect(embeddedData.id).to.be.equal(embeddedId, 'The id should exist in the embedded payload');
+        expect(embeddedData.id).to.equal(embeddedId, 'The id should exist in the embedded payload');
       });
 
       it('are not `dirty`', function() {
-        expect(embeddedRecord.get('hasDirtyAttributes')).to.be.equal(false, 'The embedded record should not be `dirty`');
+        expect(embeddedRecord.get('hasDirtyAttributes')).to.equal(false, 'The embedded record should not be `dirty`');
       });
 
       it('are not `new`', function() {
-        expect(embeddedRecord.get('isNew')).to.be.equal(false, 'The embedded record should not be `new`');
+        expect(embeddedRecord.get('isNew')).to.equal(false, 'The embedded record should not be `new`');
       });
 
       it('are not `saving`', function() {
-        expect(embeddedRecord.get('isSaving')).to.be.equal(false, 'The embedded record should be `saving`');
+        expect(embeddedRecord.get('isSaving')).to.equal(false, 'The embedded record should be `saving`');
       });
 
       it('become `dirty` when editing', function() {
         embeddedRecord.set('sync', false);
-        expect(embeddedRecord.get('hasDirtyAttributes')).to.be.equal(true, 'The embedded record should be `dirty`');
+        expect(embeddedRecord.get('hasDirtyAttributes')).to.equal(true, 'The embedded record should be `dirty`');
       });
 
       it('are not `dirty` after re-saving', function(done) {
@@ -489,7 +489,7 @@ describe('Integration: FirebaseAdapter - Updating records', function() {
         parentRecord.save().then(function () {
           embeddedRecord.ref().once('value', function(snapshot) {
             expect(snapshot.val().sync).to.be.false;
-            expect(embeddedRecord.get('hasDirtyAttributes')).to.be.equal(false, 'record should not be dirty');
+            expect(embeddedRecord.get('hasDirtyAttributes')).to.equal(false, 'record should not be dirty');
             done();
           });
         });
@@ -497,15 +497,15 @@ describe('Integration: FirebaseAdapter - Updating records', function() {
 
       it('rollback to a clean state', function() {
         embeddedRecord.set('sync', false);
-        expect(embeddedRecord.get('hasDirtyAttributes')).to.be.equal(true, 'The embedded record should be `dirty`');
+        expect(embeddedRecord.get('hasDirtyAttributes')).to.equal(true, 'The embedded record should be `dirty`');
 
         embeddedRecord.rollbackAttributes();
-        expect(embeddedRecord.get('hasDirtyAttributes')).to.be.equal(false, 'The embedded record should not be `dirty`');
+        expect(embeddedRecord.get('hasDirtyAttributes')).to.equal(false, 'The embedded record should not be `dirty`');
       });
 
       it('rollback to their last saved state', function() {
         embeddedRecord.set('sync', false);
-        expect(embeddedRecord.get('hasDirtyAttributes')).to.be.equal(true, 'The embedded record should be `dirty`');
+        expect(embeddedRecord.get('hasDirtyAttributes')).to.equal(true, 'The embedded record should be `dirty`');
 
         embeddedRecord.rollbackAttributes();
         expect(embeddedRecord.get('sync')).to.be.true;
