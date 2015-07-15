@@ -12,8 +12,15 @@ export default DS.JSONSerializer.extend(DS.EmbeddedRecordsMixin, {
   isNewSerializerAPI: true,
 
   /**
-   * Overrides the default behaviour of JSONSerializer
-   *
+   * @override
+   */
+  extractRelationships(modelClass, payload) {
+    this.normalizeRelationships(modelClass, payload);
+
+    return this._super(modelClass, payload);
+  },
+
+  /**
    * Normalizes `hasMany` relationship structure before passing
    * to `JSONSerializer.extractRelationships`
    *
@@ -63,10 +70,8 @@ export default DS.JSONSerializer.extend(DS.EmbeddedRecordsMixin, {
    *   ]
    * }
    * ```
-   *
-   * @override
    */
-  extractRelationships(modelClass, payload) {
+  normalizeRelationships(modelClass, payload) {
     modelClass.eachRelationship((key, meta) => {
       if (meta.kind === 'hasMany') {
         if (payload.hasOwnProperty(key)) {
@@ -105,9 +110,14 @@ export default DS.JSONSerializer.extend(DS.EmbeddedRecordsMixin, {
           payload[key] = [];
         }
       }
-    });
 
-    return this._super(modelClass, payload);
+      if (meta.kind === 'belongsTo') {
+        if (!payload.hasOwnProperty(key)) {
+          // server wont send property if it was made null elsewhere
+          payload[key] = null;
+        }
+      }
+    });
   },
 
   /**

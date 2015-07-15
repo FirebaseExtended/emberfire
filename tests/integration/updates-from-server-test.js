@@ -107,7 +107,7 @@ describe('Integration: FirebaseAdapter - Updates from server', function() {
     });
 
     it('has transforms applied correctly', function() {
-      expect(embeddedRecord.get('published')).to.be.a('number');
+      expect(embeddedRecord.get('created')).to.be.a('number');
     });
 
     it('has the correct .ref()', function() {
@@ -140,7 +140,7 @@ describe('Integration: FirebaseAdapter - Updates from server', function() {
     });
 
     it('has transforms applied correctly', function() {
-      expect(embeddedRecord.get('published')).to.be.a('number');
+      expect(embeddedRecord.get('updated')).to.be.a('number');
     });
 
     it('has the correct .ref()', function() {
@@ -158,7 +158,7 @@ describe('Integration: FirebaseAdapter - Updates from server', function() {
       reference = firebaseTestRef.child('blogs/embedded');
       adapter._ref = reference;
       Ember.run(function() {
-        store.findRecord('tree-node', 'node_1').then(function(post) {
+        store.findRecord('tree-node', 'node_4').then(function(post) {
           embeddedRecord = post.get('children').objectAt(0).get('config');
           done();
         });
@@ -166,11 +166,11 @@ describe('Integration: FirebaseAdapter - Updates from server', function() {
     });
 
     it('loads correctly', function() {
-      expect(embeddedRecord.get('firstName')).to.equal('Adam');
+      expect(embeddedRecord.get('sync')).to.equal(true);
     });
 
     it('receives server updates', function(done) {
-      reference.child('treeNodes/node_1/children/node_1_1/config/sync').set(false, function() {
+      reference.child('treeNodes/node_4/children/node_4_1/config/sync').set(false, function() {
         expect(embeddedRecord.get('sync')).to.equal(false, 'property should change');
         done();
       });
@@ -178,7 +178,7 @@ describe('Integration: FirebaseAdapter - Updates from server', function() {
 
     it('has the correct .ref()', function() {
       var refPath = embeddedRecord.ref().path.toString();
-      var expectedPath = `/blogs/embedded/treeNodes/node_1/children/node_1_1/config`;
+      var expectedPath = `/blogs/embedded/treeNodes/node_4/children/node_4_1/config`;
       expect(refPath).to.equal(expectedPath);
     });
 
@@ -278,10 +278,10 @@ describe('Integration: FirebaseAdapter - Updates from server', function() {
 
 
     it('removes the client side association when removed on server', function(done) {
-      expect(currentComment.get('user.id'), 'should have a user');
+      expect(currentComment.get('user.id')).to.exist;
       Ember.run(function () {
         reference.child('comments/comment_1/user').remove(function() {
-          expect(currentComment.get('user')).to.not.exist;
+          expect(currentComment.get('user.id')).to.not.exist;
           done();
         });
       });

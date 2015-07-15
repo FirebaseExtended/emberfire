@@ -139,15 +139,15 @@ export default {
           user: 'tstirrat',
           label: 'Node 1 (hasMany single level)',
           children: {
-            node_1a: {
-              created: 1395162147646,
+            node_1_1: {
+              created: '1395162147646', // to test transforms
               user: 'tstirrat',
-              label: 'Node 1a'
+              label: 'Node 1.1'
             },
-            node_1b: {
+            node_1_2: {
               created: 1395162147646,
               user: 'tstirrat',
-              label: 'Node 1b'
+              label: 'Node 1.2'
             },
           }
         },
@@ -189,7 +189,8 @@ export default {
           label: 'Node 3 (belongsTo)',
           config: {
             id: 'node_3_config',
-            sync: true
+            sync: true,
+            updated: '1395162147646' // to test transforms
           }
         },
 

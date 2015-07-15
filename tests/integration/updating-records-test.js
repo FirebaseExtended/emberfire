@@ -50,31 +50,6 @@ describe('Integration: FirebaseAdapter - Updating records', function() {
         });
       });
 
-      describe('when the child record has not been saved', function () {
-
-        // TODO: disabled until next release
-        xit('avoids writing the hasMany relationship link', function(done) {
-          Ember.RSVP.Promise.cast(newPost.get('comments')).then(function(comments) {
-            expect(newComment.get('hasDirtyAttributes')).to.equal(true, 'the item should be dirty');
-            expect(newComment.get('isNew')).to.equal(true, 'the item should be `new`');
-
-            comments.pushObject(newComment);
-
-            newPost.save().then(function() {
-              reference.once('value', function(data) {
-                currentData = data.val();
-                postData = currentData.posts[postId];
-
-                expect(postData.comments).to.not.exist;
-
-                done();
-               });
-            });
-          });
-        });
-
-      }); // when the child record has not been saved
-
       describe('when the child record has been saved', function () {
 
         it('writes the hasMany relationship link', function(done) {

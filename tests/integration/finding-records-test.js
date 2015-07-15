@@ -33,14 +33,14 @@ describe("Integration: FirebaseAdapter - Finding Records", function() {
 
   });
 
-  describe("#_getRef()", function() {
+  describe("#_getCollectionRef()", function() {
     it("returns the correct Firebase ref for a type", function() {
-      var ref = adapter._getRef(store.modelFor("post"));
+      var ref = adapter._getCollectionRef(store.modelFor("post"));
       assert(ref.toString().match(/blogs\/normalized\/posts$/g));
     });
 
     it("returns the correct Firebase ref for a type and id", function() {
-      var ref = adapter._getRef(store.modelFor("post"), "post_1");
+      var ref = adapter._getCollectionRef(store.modelFor("post"), "post_1");
       assert(ref.toString().match(/blogs\/normalized\/posts\/post_1$/g));
     });
 
@@ -52,7 +52,7 @@ describe("Integration: FirebaseAdapter - Finding Records", function() {
     var getRefSpy, findPromise, findRef;
 
     beforeEach(function(done) {
-      getRefSpy = sinon.spy(adapter, "_getRef");
+      getRefSpy = sinon.spy(adapter, "_getCollectionRef");
       Ember.run(function () {
         findPromise =  adapter.findRecord(store, store.modelFor("post"), "post_1");
 
@@ -108,7 +108,7 @@ describe("Integration: FirebaseAdapter - Finding Records", function() {
     var findAllPromise, findAllRef;
 
     beforeEach(function(done) {
-      getRefSpy = sinon.spy(adapter, "_getRef");
+      getRefSpy = sinon.spy(adapter, "_getCollectionRef");
       findAllAddEventListenersSpy = sinon.spy(adapter, "_findAllAddEventListeners");
       handleChildValueSpy = sinon.spy(adapter, "_handleChildValue");
 
