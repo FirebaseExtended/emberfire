@@ -80,7 +80,7 @@ describe('Integration: FirebaseAdapter - Deleting records', function() {
 
   });
 
-  describe('an embedded (hasMany) record coming from the server', function() {
+  xdescribe('an embedded (hasMany) record coming from the server', function() {
     var embeddedRecord, reference;
 
     beforeEach(function(done) {
@@ -106,7 +106,7 @@ describe('Integration: FirebaseAdapter - Deleting records', function() {
 
   });
 
-  describe('an embedded (belongsTo) record inside another embedded record', function() {
+  xdescribe('an embedded (belongsTo) record inside another embedded record', function() {
     var embeddedRecord, reference;
 
     beforeEach(function(done) {

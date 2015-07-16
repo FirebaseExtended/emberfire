@@ -164,201 +164,283 @@ describeModule(
 
     }); // #_addNumericIdsToEmbeddedArray
 
-    describe('normalized relationships', function() {
+    describe('#normalize', function () {
 
-      var postPayload;
+      describe('normalized relationships', function() {
 
-      beforeEach(function() {
-        Post.modelName = 'post';
+        var postPayload;
 
-        postPayload = {
+        beforeEach(function() {
+          Post.modelName = 'post';
+
+          postPayload = {
+            id: 'post_1',
+            published: 1395162147646,
+            user: 'aputinski',
+            body: 'This is the first FireBlog post!',
+            comments: {
+              comment_1: true,
+              comment_2: true
+            },
+            title: 'Post 1'
+          };
+        });
+
+        afterEach(function() {
+          delete Post.modelName;
+        });
+
+        it('normalizes id correctly', function() {
+          var serializer = this.subject();
+          var { data } = serializer.normalize(Post, postPayload);
+
+          expect(data.id).to.equal('post_1');
+        });
+
+        it('normalizes type correctly', function() {
+          var serializer = this.subject();
+          var { data } = serializer.normalize(Post, postPayload);
+
+          expect(data.type).to.equal('post');
+        });
+
+        it('normalizes attributes correctly', function() {
+          var serializer = this.subject();
+          var { data } = serializer.normalize(Post, postPayload);
+
+          expect(data.attributes).to.deep.equal({
+            published: 1395162147646,
+            body: 'This is the first FireBlog post!',
+            title: 'Post 1'
+          });
+        });
+
+        it('normalizes `hasMany` relationships correctly', function() {
+          var serializer = this.subject();
+          var { data } = serializer.normalize(Post, postPayload);
+
+          expect(data.relationships.comments).to.deep.equal({
+            data: [
+              { type: 'comment', id: 'comment_1' },
+              { type: 'comment', id: 'comment_2' }
+            ],
+          });
+        });
+
+        it('normalizes `belongsTo` relationships correctly', function() {
+          var serializer = this.subject();
+          var { data } = serializer.normalize(Post, postPayload);
+
+          expect(data.relationships.user).to.deep.equal({
+            data: { type: 'user', id: 'aputinski' }
+          });
+        });
+
+        it('normalizes empty `hasMany` relationship when property is omitted by server', function() {
+          var serializer = this.subject();
+          var { data } = serializer.normalize(Post, {
+            id: 'post_1',
+            published: 1395162147646,
+            user: 'aputinski',
+            body: 'This is the first FireBlog post!',
+            title: 'Post 1'
+          });
+
+          expect(data.relationships.comments).to.deep.equal({
+            data: []
+          });
+        });
+
+      }); // normalized relationships
+
+      describe('invalid data', function () {
+
+        it('throws an error when hasMany relationship info is malformed', function() {
+          var invalidPayload = assign({
+            id: 'post_1',
+            published: 1395162147646,
+            user: 'aputinski',
+            body: 'This is the first FireBlog post!',
+            comments: ['comment_1', 'comment_2'],
+            title: 'Post 1'
+          });
+          var serializer = this.subject();
+
+          expect(function() {
+            serializer.normalize(Post, invalidPayload);
+          }).to.throw(Error);
+        });
+      }); // invalid data
+
+      describe('embedded `hasMany` relationships', function() {
+
+        var postPayload = {
           id: 'post_1',
           published: 1395162147646,
           user: 'aputinski',
           body: 'This is the first FireBlog post!',
           comments: {
-            comment_1: true,
-            comment_2: true
+            comment_1: {
+              published: 1395176007623,
+              user: 'aputinski',
+              body: 'This is a comment'
+            },
+            comment_2: {
+              published: 1395176007624,
+              user: 'aputinski',
+              body: 'This is a second comment'
+            }
           },
           title: 'Post 1'
         };
-      });
+        var serializer;
 
-      afterEach(function() {
-        delete Post.modelName;
-      });
+        beforeEach(function () {
+          serializer = this.subject();
 
-      it('normalizes id correctly', function() {
-        var serializer = this.subject();
-        var { data } = serializer.normalize(Post, postPayload);
+          // enable embedded comments
+          serializer.set('attrs', { comments: { embedded: 'always' } });
 
-        expect(data.id).to.equal('post_1');
-      });
-
-      it('normalizes type correctly', function() {
-        var serializer = this.subject();
-        var { data } = serializer.normalize(Post, postPayload);
-
-        expect(data.type).to.equal('post');
-      });
-
-      it('normalizes attributes correctly', function() {
-        var serializer = this.subject();
-        var { data } = serializer.normalize(Post, postPayload);
-
-        expect(data.attributes).to.deep.equal({
-          published: 1395162147646,
-          body: 'This is the first FireBlog post!',
-          title: 'Post 1'
+          // mock out the store
+          serializer.store = {
+            modelFor: function () {
+              Comment.modelName = 'comment';
+              return Comment;
+            },
+            serializerFor: function () {
+              return serializer;
+            }
+          };
         });
-      });
 
-      it('normalizes `hasMany` relationships correctly', function() {
-        var serializer = this.subject();
-        var { data } = serializer.normalize(Post, postPayload);
+        afterEach(function () {
+          delete Comment.modelName;
+        });
 
-        expect(data.relationships.comments).to.deep.equal({
-          data: [
+        it('normalizes id correctly', function() {
+          var { data } = serializer.normalize(Post, postPayload);
+
+          expect(data.id).to.equal('post_1');
+        });
+
+        it('normalizes attributes correctly', function() {
+          var { data } = serializer.normalize(Post, postPayload);
+
+          expect(data.attributes).to.deep.equal({
+            published: 1395162147646,
+            body: 'This is the first FireBlog post!',
+            title: 'Post 1'
+          });
+        });
+
+        it('normalizes relationships correctly', function() {
+          var { data } = serializer.normalize(Post, postPayload);
+
+          expect(data.relationships.comments.data).to.deep.equal([
             { type: 'comment', id: 'comment_1' },
             { type: 'comment', id: 'comment_2' }
-          ],
-        });
-      });
-
-      it('normalizes `belongsTo` relationships correctly', function() {
-        var serializer = this.subject();
-        var { data } = serializer.normalize(Post, postPayload);
-
-        expect(data.relationships.user).to.deep.equal({
-          data: { type: 'user', id: 'aputinski' }
-        });
-      });
-
-      it('normalizes empty `hasMany` relationship when property is omitted by server', function() {
-        var serializer = this.subject();
-        var { data } = serializer.normalize(Post, {
-          id: 'post_1',
-          published: 1395162147646,
-          user: 'aputinski',
-          body: 'This is the first FireBlog post!',
-          title: 'Post 1'
+          ]);
         });
 
-        expect(data.relationships.comments).to.deep.equal({
-          data: []
-        });
-      });
+        it('includes embedded data in `payload.included`', function() {
+          var json = serializer.normalize(Post, postPayload);
 
-    }); // normalized relationships
-
-    describe('invalid data', function () {
-
-      it('throws an error when hasMany relationship info is malformed', function() {
-        var invalidPayload = assign({
-          id: 'post_1',
-          published: 1395162147646,
-          user: 'aputinski',
-          body: 'This is the first FireBlog post!',
-          comments: ['comment_1', 'comment_2'],
-          title: 'Post 1'
-        });
-        var serializer = this.subject();
-
-        expect(function() {
-          serializer.normalize(Post, invalidPayload);
-        }).to.throw(Error);
-      });
-    }); // invalid data
-
-    describe('embedded `hasMany` relationships', function() {
-
-      var postPayload = {
-        id: 'post_1',
-        published: 1395162147646,
-        user: 'aputinski',
-        body: 'This is the first FireBlog post!',
-        comments: {
-          comment_1: {
+          expect(json.included).to.have.length(2);
+          expect(json.included[0].attributes).to.deep.equal({
             published: 1395176007623,
-            user: 'aputinski',
             body: 'This is a comment'
-          },
-          comment_2: {
-            published: 1395176007624,
-            user: 'aputinski',
-            body: 'This is a second comment'
-          }
-        },
-        title: 'Post 1'
-      };
-      var serializer;
+          });
 
-      beforeEach(function () {
-        serializer = this.subject();
-
-        // enable embedded comments
-        serializer.set('attrs', { comments: { embedded: 'always' } });
-
-        // mock out the store
-        serializer.store = {
-          modelFor: function () {
-            Comment.modelName = 'comment';
-            return Comment;
-          },
-          serializerFor: function () {
-            return serializer;
-          }
-        };
-      });
-
-      afterEach(function () {
-        delete Comment.modelName;
-      });
-
-      it('normalizes id correctly', function() {
-        var { data } = serializer.normalize(Post, postPayload);
-
-        expect(data.id).to.equal('post_1');
-      });
-
-      it('normalizes attributes correctly', function() {
-        var { data } = serializer.normalize(Post, postPayload);
-
-        expect(data.attributes).to.deep.equal({
-          published: 1395162147646,
-          body: 'This is the first FireBlog post!',
-          title: 'Post 1'
-        });
-      });
-
-      it('normalizes relationships correctly', function() {
-        var { data } = serializer.normalize(Post, postPayload);
-
-        expect(data.relationships.comments.data).to.deep.equal([
-          { type: 'comment', id: 'comment_1' },
-          { type: 'comment', id: 'comment_2' }
-        ]);
-      });
-
-      it('includes embedded data in `payload.included`', function() {
-        var json = serializer.normalize(Post, postPayload);
-
-        expect(json.included).to.have.length(2);
-        expect(json.included[0].attributes).to.deep.equal({
-          published: 1395176007623,
-          body: 'This is a comment'
+          expect(json.included[1].id).to.equal('comment_2');
         });
 
-        expect(json.included[1].id).to.equal('comment_2');
-      });
-
-    }); // embedded `hasMany` relationships
+      }); // embedded `hasMany` relationships
 
 
-    describe('embedded `belongsTo` relationships', function() {
+      describe('embedded `belongsTo` relationships', function() {
 
+        var commentPayload;
+        var serializer;
+
+        beforeEach(function () {
+          commentPayload = {
+            id: 'comment_1',
+            published: 1395162147646,
+            user: {
+              id: 'aputinski',
+              firstName: 'Adam'
+            },
+            body: 'This is a comment'
+          };
+
+          serializer = this.subject();
+
+          // enable embedded user
+          serializer.set('attrs', {
+            user: {
+              key: 'user',
+              embedded: 'always'
+            }
+          });
+
+          // mock out the store
+          serializer.store = {
+            modelFor: function () {
+              User.modelName = 'user';
+              return User;
+            },
+            serializerFor: function () {
+              return serializer;
+            }
+          };
+        });
+
+        afterEach(function () {
+          delete User.modelName;
+        });
+
+        it('normalizes id correctly', function() {
+          var { data } = serializer.normalize(Comment, commentPayload);
+
+          expect(data.id).to.equal('comment_1');
+        });
+
+        it('normalizes attributes correctly', function() {
+          var { data } = serializer.normalize(Comment, commentPayload);
+
+          expect(data.attributes).to.deep.equal({
+            body: 'This is a comment',
+            published: 1395162147646
+          });
+        });
+
+        it('normalizes relationships correctly', function() {
+          var { data } = serializer.normalize(Comment, commentPayload);
+
+          expect(data.relationships.user.data).to.deep.equal({
+            type: 'user', id: 'aputinski'
+          });
+        });
+
+        it('includes embedded data in `payload.included`', function() {
+          var json = serializer.normalize(Comment, commentPayload);
+
+          expect(json.included).to.have.length(1);
+          expect(json.included[0].attributes).to.deep.equal({
+            firstName: 'Adam'
+          });
+
+          expect(json.included[0].id).to.equal('aputinski');
+        });
+
+      }); // embedded `belongsTo` relationships
+
+    }); // #normalize
+
+    xdescribe('#normalizeResponse', function() {
       var commentPayload;
       var serializer;
+      var store;
 
       beforeEach(function () {
         commentPayload = {
@@ -382,7 +464,7 @@ describeModule(
         });
 
         // mock out the store
-        serializer.store = {
+        store = {
           modelFor: function () {
             User.modelName = 'user';
             return User;
@@ -391,37 +473,16 @@ describeModule(
             return serializer;
           }
         };
+
+        serializer.store = store;
       });
 
       afterEach(function () {
         delete User.modelName;
       });
 
-      it('normalizes id correctly', function() {
-        var { data } = serializer.normalize(Comment, commentPayload);
-
-        expect(data.id).to.equal('comment_1');
-      });
-
-      it('normalizes attributes correctly', function() {
-        var { data } = serializer.normalize(Comment, commentPayload);
-
-        expect(data.attributes).to.deep.equal({
-          body: 'This is a comment',
-          published: 1395162147646
-        });
-      });
-
-      it('normalizes relationships correctly', function() {
-        var { data } = serializer.normalize(Comment, commentPayload);
-
-        expect(data.relationships.user.data).to.deep.equal({
-          type: 'user', id: 'aputinski'
-        });
-      });
-
       it('includes embedded data in `payload.included`', function() {
-        var json = serializer.normalize(Comment, commentPayload);
+        var json = serializer.normalizeResponse(store, Comment, commentPayload, 'comment_1', 'findRecord');
 
         expect(json.included).to.have.length(1);
         expect(json.included[0].attributes).to.deep.equal({
@@ -431,7 +492,7 @@ describeModule(
         expect(json.included[0].id).to.equal('aputinski');
       });
 
-    }); // embedded `belongsTo` relationships
+    }); // #normalizeResponse
 
   }
 );
