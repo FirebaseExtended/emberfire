@@ -52,7 +52,7 @@ EmberFire also works without ember-cli. See the [Firebase documentation](https:/
 
 If you'd like to contribute to EmberFire, run the following commands to get your environment set up:
 
-### Installation
+### Setup
 
 * `git clone` this repository
 * `npm install -g ember-cli bower gulp`
