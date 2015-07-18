@@ -1,5 +1,4 @@
 import Ember from 'ember';
-import DS from 'ember-data';
 import startApp from 'dummy/tests/helpers/start-app';
 import { it } from 'ember-mocha';
 import stubFirebase from 'dummy/tests/helpers/stub-firebase';
@@ -45,7 +44,7 @@ describe('Integration: FirebaseAdapter - Deleting records', function() {
     it('removes the record from the server', function(done) {
       newPost.destroyRecord().then(function () {
         postRef.once('value', function(snapshot) {
-          assert.equal(snapshot.val(), null);
+          expect(snapshot.val()).to.not.exist;
           done();
         });
       });
@@ -73,7 +72,7 @@ describe('Integration: FirebaseAdapter - Deleting records', function() {
     it('removes the record from the server', function(done) {
       post.destroyRecord().then(function () {
         postRef.once('value', function(snapshot) {
-          assert.equal(snapshot.val(), null);
+          expect(snapshot.val()).to.not.exist;
           done();
         });
       });
@@ -81,42 +80,25 @@ describe('Integration: FirebaseAdapter - Deleting records', function() {
 
   });
 
-  describe('an embedded (hasMany) record coming from the server', function() {
-    var comment, reference;
+  xdescribe('an embedded (hasMany) record coming from the server', function() {
+    var embeddedRecord, reference;
 
     beforeEach(function(done) {
-      // needs a better way that uses the container
-      app.Post = DS.Model.extend({
-        title: DS.attr('string'),
-        body: DS.attr('string'),
-        published: DS.attr('number'),
-        publishedDate: Ember.computed('published', function() {
-          return this.get('published');
-        }),
-        user: DS.belongsTo('user', { async: true }),
-        comments: DS.hasMany('comment', { async: true }),
-        embeddedComments: DS.hasMany('comment', { async: false, embedded: true })
-      });
-
-      reference = firebaseTestRef.child('blogs/double_denormalized');
+      reference = firebaseTestRef.child('blogs/embedded');
       adapter._ref = reference;
       Ember.run(function() {
-        store.findRecord('post', 'post_1').then(function(post) {
-          comment = post.get('embeddedComments').objectAt(0);
+        store.findRecord('tree-node', 'node_1').then(function(parentRecord) {
+          embeddedRecord = parentRecord.get('children').objectAt(0);
           done();
         });
       });
     });
 
-    afterEach(() => {
-      delete app.Post;
-    });
-
     it('removes the record from the server', function(done) {
-      var commentRef = reference.child('posts/post_1/embeddedComments/comment_1');
-      comment.destroyRecord().then(function () {
-        commentRef.once('value', function(snapshot) {
-          assert.equal(snapshot.val(), null);
+      var nodeRef = reference.child('treeNodes/node_1/children/node_1_1');
+      embeddedRecord.destroyRecord().then(function () {
+        nodeRef.once('value', function(snapshot) {
+          expect(snapshot.val()).to.not.exist;
           done();
         });
       });
@@ -124,52 +106,25 @@ describe('Integration: FirebaseAdapter - Deleting records', function() {
 
   });
 
-  describe('an embedded (belongsTo) record inside another embedded record', function() {
-    var user, reference;
+  xdescribe('an embedded (belongsTo) record inside another embedded record', function() {
+    var embeddedRecord, reference;
 
     beforeEach(function(done) {
-      app.Post = DS.Model.extend({
-        title: DS.attr('string'),
-        body: DS.attr('string'),
-        published: DS.attr('number'),
-        publishedDate: Ember.computed('published', function() {
-          return this.get('published');
-        }),
-        user: DS.belongsTo('user', { async: true }),
-        comments: DS.hasMany('comment', { async: true }),
-        embeddedComments: DS.hasMany('comment', { async: false, embedded: true })
-      });
-
-      app.Comment = DS.Model.extend({
-        body: DS.attr('string'),
-        published: DS.attr('number'),
-        publishedDate: Ember.computed('published', function() {
-          return this.get('published');
-        }),
-        user: DS.belongsTo('user', { async: true }),
-        embeddedUser: DS.belongsTo('user', { async: false, embedded: true, inverse:null })
-      });
-
-      reference = firebaseTestRef.child('blogs/double_denormalized');
+      reference = firebaseTestRef.child('blogs/embedded');
       adapter._ref = reference;
       Ember.run(function() {
-        store.findRecord('post', 'post_1').then(function(post) {
-          user = post.get('embeddedComments').objectAt(0).get('embeddedUser');
+        store.findRecord('tree-node', 'node_4').then(function(post) {
+          embeddedRecord = post.get('children').objectAt(0).get('config');
           done();
         });
       });
     });
 
-    afterEach(() => {
-      delete app.Post;
-      delete app.Comment;
-    });
-
     it('removes the record from the server', function(done) {
-      var userRef = reference.child('posts/post_1/embeddedComments/comment_1/embeddedUser');
-      user.destroyRecord().then(function () {
-        userRef.once('value', function(snapshot) {
-          assert.equal(snapshot.val(), null);
+      var embeddedRef = reference.child('treeNodes/node_4/children/node_4_1/config');
+      embeddedRecord.destroyRecord().then(function () {
+        embeddedRef.once('value', function(snapshot) {
+          expect(snapshot.val()).to.not.exist;
           done();
         });
       });
@@ -207,7 +162,7 @@ describe('Integration: FirebaseAdapter - Deleting records', function() {
       newPost.destroyRecord().then(function () {
         userRef.once('value', function(snapshot) {
           var userData = snapshot.val();
-          assert(typeof userData.posts === 'undefined');
+          expect(userData.posts).to.not.exist;
           done();
         });
       });

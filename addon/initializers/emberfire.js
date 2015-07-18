@@ -3,6 +3,7 @@ import DS from 'ember-data';
 import Firebase from 'firebase';
 import FirebaseAdapter from '../adapters/firebase';
 import FirebaseSerializer from '../serializers/firebase';
+import forEach from 'lodash/collection/forEach';
 
 var VERSION = '0.0.0';
 
@@ -26,13 +27,22 @@ export default {
       DS.Store.reopen({
         _emberfirePatched: true,
         push: function() {
-          var record = this._super.apply(this, arguments);
-          var modelName = record.constructor.modelName;
-          var adapter = this.adapterFor(modelName);
-          if (adapter.recordWasPushed) {
-            adapter.recordWasPushed(this, modelName, record);
+          var result = this._super.apply(this, arguments);
+          var records = result;
+
+          if (!Ember.isArray(result)) {
+            records = [result];
           }
-          return record;
+
+          forEach(records, (record) => {
+            var modelName = record.constructor.modelName;
+            var adapter = this.adapterFor(modelName);
+            if (adapter.recordWasPushed) {
+              adapter.recordWasPushed(this, modelName, record);
+            }
+          });
+
+          return result;
         },
 
         recordWillUnload: function(record) {
@@ -64,13 +74,9 @@ export default {
         },
 
         ref: function () {
-          if (this.__firebaseRef) {
-            return this.__firebaseRef;
-          }
-
           var adapter = this.store.adapterFor(this.constructor.modelName);
-          if (adapter._getRef) {
-            return adapter._getRef(this.constructor, this.id);
+          if (adapter._getAbsoluteRef) {
+            return adapter._getAbsoluteRef(this);
           }
         }
       });

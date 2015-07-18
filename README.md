@@ -2,41 +2,49 @@
 
 [![Build Status](https://travis-ci.org/firebase/emberfire.svg?branch=master)](https://travis-ci.org/firebase/emberfire)
 [![Version](https://badge.fury.io/gh/firebase%2Femberfire.svg)](http://badge.fury.io/gh/firebase%2Femberfire)
+[![Monthly Downloads](http://img.shields.io/npm/dm/emberfire.svg?style=flat)](https://www.npmjs.org/package/emberfire)
+[![Ember Observer Score](http://emberobserver.com/badges/emberfire.svg)](http://emberobserver.com/addons/emberfire)
 
 EmberFire is the officially supported adapter for using
 [Firebase](http://www.firebase.com/?utm_medium=web&utm_source=emberfire) with
 [Ember Data](https://github.com/emberjs/data).
 
-The `FirebaseAdapter` provides all of the standard `DS.Adapter` methods and will automatically synchronize the store with your Firebase database. **EmberFire is packaged as an addon with Ember CLI by default**, and is also available to use without the CLI. See below for instructions on getting started, and check out the full [EmberFire documentation](https://firebase.com/docs/web/libraries/ember/) on the Firebase website. EmberFire works with Ember Data beta.11+
+**IMPORTANT NOTICE:** *If you require embedded records, there is a [bug](https://github.com/emberjs/data/issues/3549) in Ember Data that prevents them from working in `1.13.0 - 1.13.5`, you will need to wait until `1.13.6` is released. In the meantime, for embedded records, please use Ember Data `beta.18` and EmberFire `1.4.7`*
 
 **Join the [Firebase + Ember Google Group](https://groups.google.com/forum/#!forum/firebase-ember)
 to ask technical questions, share apps you've built, and chat with other developers in the community.**
 
+## Compatibility
 
-## Installing EmberFire with Ember CLI
+Please consult this table when selecting your version of EmberFire:
 
-To install EmberFire as an addon with your Ember CLI app, run the following command within your app's directory:
+| Ember Data        | EmberFire      |
+| ------------------| ---------------|
+| beta.12 - beta.18 | 1.4.x          |
+| beta.19           | none           |
+| 1.13+             | [master](https://github.com/firebase/emberfire/issues/138#issuecomment-84148825) |
+
+## Installation
+
+To install EmberFire as an addon with ember-cli, run the following command within your app's directory:
 
 ```bash
 $ ember install emberfire
 ```
 
-This will add Firebase as a dependency in your `bower.json` file, create `app/adapters/application.js` and add configuration to `config/environment.js`. Now, update your Firebase database url in `config/environment.js`:
+This will create a `app/adapters/application.js`. All you need to do is update your Firebase database url in `config/environment.js`:
 
 ```js
 // config/environment.js
-module.exports = function(environment) {
   var ENV = {
-    modulePrefix: 'firebase-app',
-    environment: environment,
+    // ...
     firebase: 'https://YOUR-FIREBASE-NAME.firebaseio.com/',
-    baseURL: '/',
-    ...
+    // ...
 ```
 
 Your Firebase data will now be synced with the Ember Data store. For detailed EmberFire documentation, check out the [quickstart](https://firebase.com/docs/web/libraries/ember/quickstart.html) or [guide](https://firebase.com/docs/web/libraries/ember/guide.html) in the Firebase docs.
 
-## Using EmberFire Without Ember CLI
+## Using EmberFire without ember-cli
 
 EmberFire also works without ember-cli. See the [Firebase documentation](https://firebase.com/docs/web/libraries/ember/guide.html#section-without-ember-cli) for instructions on getting started.
 
@@ -44,14 +52,14 @@ EmberFire also works without ember-cli. See the [Firebase documentation](https:/
 
 If you'd like to contribute to EmberFire, run the following commands to get your environment set up:
 
-### Installation
+### Setup
 
 * `git clone` this repository
-* `npm install -g ember-cli bower`
+* `npm install -g ember-cli bower gulp`
 * `npm install`
 * `bower install`
 
-### Using a local EmberFire workdir in another project
+### Using your local EmberFire workdir in another local project
 
 From your `emberfire` workdir
 
@@ -68,19 +76,19 @@ From your *app* workdir
     "emberfire": "0.0.0"
   ```
 
-### Running Tests
+### Running tests
 
-* `ember test`
+* `ember test` OR
 * `ember test --server`
 
 ##### Running tests against a specific version of ember-data
 
-Invoke `./config/select-dep-versions.js` with environment var `EMBER_DATA_VERSION=<version>` where `<version>` is an `ember-data` version number (e.g. `1.0.0-beta.12`) or `beta` or `canary`.
+* `ember try <scenario>` where  `<scenario>` is one of the scenarios in `config/ember-try.js`
 
 Example:
 
 ```
-EMBER_DATA_VERSION=canary ./config/select-dep-versions.js && ember test
+ember try ember-data-canary
 ```
 
 ### Running the FireBlog demo app

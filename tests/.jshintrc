@@ -30,7 +30,8 @@
     "after",
     "beforeEach",
     "afterEach",
-    "xit"
+    "xit",
+    "xdescribe"
   ],
   "node": false,
   "browser": false,
@@ -40,6 +41,7 @@
   "devel": false,
   "eqeqeq": true,
   "evil": true,
+  "expr": true,
   "forin": false,
   "immed": false,
   "laxbreak": false,
