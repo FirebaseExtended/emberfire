@@ -85,7 +85,7 @@ describe('Integration: FirebaseAdapter - Updates from server', function() {
     });
   });
 
-  xdescribe('An embedded (hasMany) record coming from the server', function() {
+  describe('An embedded (hasMany) record coming from the server', function() {
     var embeddedRecord, reference;
 
     beforeEach(function(done) {
@@ -118,7 +118,7 @@ describe('Integration: FirebaseAdapter - Updates from server', function() {
 
   });
 
-  xdescribe('An embedded (belongsTo) record coming from the server', function() {
+  describe('An embedded (belongsTo) record coming from the server', function() {
     var embeddedRecord, reference;
 
     beforeEach(function(done) {
@@ -151,7 +151,7 @@ describe('Integration: FirebaseAdapter - Updates from server', function() {
 
   });
 
-  xdescribe('An embedded (belongsTo) record inside another embedded record', function() {
+  describe('An embedded (belongsTo) record inside another embedded record', function() {
     var embeddedRecord, reference;
 
     beforeEach(function(done) {
