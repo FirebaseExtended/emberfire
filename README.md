@@ -18,11 +18,11 @@ to ask technical questions, share apps you've built, and chat with other develop
 
 Please consult this table when selecting your version of EmberFire:
 
-| Ember Data        | EmberFire |
-| ------------------| ----------|
-| beta.12 - beta.18 | 1.4.x     |
-| beta.19           | none      |
-| 1.13+             | 1.13.x    |
+| Ember Data        | EmberFire      |
+| ------------------| ---------------|
+| beta.12 - beta.18 | 1.4.x          |
+| beta.19           | none           |
+| 1.13+             | [master](https://github.com/firebase/emberfire/issues/138#issuecomment-84148825) |
 
 ## Installation
 
