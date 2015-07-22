@@ -437,7 +437,7 @@ describeModule(
 
     }); // #normalize
 
-    xdescribe('#normalizeResponse', function() {
+    describe('#normalizeResponse', function() {
       var commentPayload;
       var serializer;
       var store;

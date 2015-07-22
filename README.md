@@ -9,7 +9,7 @@ EmberFire is the officially supported adapter for using
 [Firebase](http://www.firebase.com/?utm_medium=web&utm_source=emberfire) with
 [Ember Data](https://github.com/emberjs/data).
 
-**IMPORTANT NOTICE:** *If you require embedded records, there is a [bug](https://github.com/emberjs/data/issues/3549) in Ember Data that prevents them from working in `1.13.0 - 1.13.5`, you will need to wait until `1.13.6` is released. In the meantime, for embedded records, please use Ember Data `beta.18` and EmberFire `1.4.7`*
+**IMPORTANT NOTICE:** *If you require embedded records, there is a [bug](https://github.com/emberjs/data/issues/3549) in Ember Data that prevents them from working in `1.13.0 - 1.13.5`, you will need to use `1.13.6` or higher*
 
 **Join the [Firebase + Ember Google Group](https://groups.google.com/forum/#!forum/firebase-ember)
 to ask technical questions, share apps you've built, and chat with other developers in the community.**
