@@ -28,7 +28,7 @@ describe('Integration: FirebaseSerializer - Serializing records', function() {
     unstubFirebase();
   });
 
-  describe.only('#serialize()', function() {
+  describe('#serialize()', function() {
 
     describe('hasMany relationships', function() {
 
