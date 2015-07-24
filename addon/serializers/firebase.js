@@ -235,4 +235,11 @@ export default DS.JSONSerializer.extend(DS.EmbeddedRecordsMixin, {
   serializeBelongsTo: function (snapshot, json, relationship) {
     DS.JSONSerializer.prototype.serializeBelongsTo.call(this, snapshot, json, relationship);
   },
+
+  /**
+   * @override
+   */
+  _shouldSerializeHasMany: function (snapshot, key, relationship) {
+    return this._canSerialize(key);
+  }
 });
