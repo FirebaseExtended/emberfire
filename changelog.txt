@@ -1,3 +1,0 @@
-important - This release is compatible with Ember Data 1.13.0+.
-important - Embedded records will not work due to a bug in Ember Data versions below 1.13.6.
-feature - Added integration with `torii` so you can easily use Firebase Authentication in your ember app.
