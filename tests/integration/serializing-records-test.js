@@ -68,7 +68,6 @@ describe('Integration: FirebaseSerializer - Serializing records', function() {
       it('serializes the hasMany side in a manyToOne relationship', function() {
 
         var snapshot = newUser._createSnapshot();
-        console.log(snapshot);
         var json = serializer.serialize(snapshot);
 
         var expectedJSON = {
