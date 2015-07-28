@@ -5,7 +5,7 @@ import FirebaseAdapter from '../adapters/firebase';
 import FirebaseSerializer from '../serializers/firebase';
 import forEach from 'lodash/collection/forEach';
 
-var VERSION = '0.0.0';
+var VERSION = '1.5.0';
 
 if (Ember.libraries) {
   if (Firebase.SDK_VERSION) {
