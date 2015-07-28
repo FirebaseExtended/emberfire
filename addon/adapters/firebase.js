@@ -619,6 +619,11 @@ export default DS.Adapter.extend(Ember.Evented, {
     var embeddingParentRel = find(internalModel._implicitRelationships, (implicitRel) => {
       var members = implicitRel.members.toArray();
       var parent = members[0];
+
+      if (!parent) {
+        return false;
+      }
+
       var parentRel = parent._relationships.get(implicitRel.inverseKey);
       return this.isRelationshipEmbedded(this.store, parent.type.modelName, parentRel.relationshipMeta);
     });
