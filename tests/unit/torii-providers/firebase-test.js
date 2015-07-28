@@ -19,7 +19,7 @@ describeModule('torii-provider:firebase', 'FirebaseToriiProvider', {
         provider.set('firebase', firebaseMock);
 
         Ember.run(function() {
-          provider.open({authWith: 'errorProvider'}).catch(function(error) {
+          provider.open({provider: 'errorProvider'}).catch(function(error) {
             expect(firebaseMock.authWithOAuthPopup.calledWith('errorProvider')).to.be.true;
 
             expect(error).to.equal(errorMock);

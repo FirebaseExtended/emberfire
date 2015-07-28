@@ -4,7 +4,7 @@ export default Ember.Object.extend({
   firebase: Ember.inject.service(),
 
   open: function(options) {
-    var provider = options.authWith || options.provider;
+    var provider = options.provider || options.authWith;
 
     return new Ember.RSVP.Promise((resolve, reject) => {
       if (!provider) {
