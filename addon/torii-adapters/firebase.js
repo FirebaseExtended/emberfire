@@ -9,6 +9,7 @@ export default Ember.Object.extend({
   open(authentication) {
     return Ember.RSVP.resolve({
       provider: authentication.provider,
+      uid: authentication.uid,
       currentUser: authentication[authentication.provider]
     });
   },

@@ -27,7 +27,7 @@ module.exports = {
       return self.addToConfig('firebase', '\'' + firebaseUrl + '\'');
     })
     .then(function () {
-      return self.addToConfig('contentSecurityPolicy', '{ \'connect-src\': "\'self\' wss://*.firebaseio.com" }');
+      return self.addToConfig('contentSecurityPolicy', '{ \'connect-src\': "\'self\' https://auth.firebase.com wss://*.firebaseio.com" }');
     })
     .then(function () {
       var output = EOL;
