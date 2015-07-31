@@ -1,0 +1,1 @@
+feature - Added `custom` and `anonymous` login capability to the `torii` auth adapter.
