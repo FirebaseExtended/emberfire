@@ -28,6 +28,28 @@ export default Ember.Object.extend({
           }
         });
 
+      } else if (provider === 'custom') {
+        if (!options.token) {
+          reject(new Error('A token must be supplied'));
+        }
+        this.get('firebase').authWithCustomToken({
+          token: options.token
+        }, (error, authData) => {
+          if (error) {
+            reject(error);
+          } else {
+            resolve(authData);
+          }
+        });
+      } else if (provider === 'anonymous') {
+        console.log('authing anonymously');
+        this.get('firebase').authAnonymously((error, authData) => {
+          if (error) {
+            reject(error);
+          } else {
+            resolve(authData);
+          }
+        });
       } else {
         this.get('firebase').authWithOAuthPopup(provider, (error, authData) => {
           if (error) {
