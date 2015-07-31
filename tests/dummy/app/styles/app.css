@@ -380,3 +380,25 @@ button:hover {
   .post-publish textarea {
     min-height: 5em;
   }
+
+
+/**
+ * Authentication Page
+ */
+
+.user-data {
+  margin: 30px;
+}
+
+.user-data-table tr td {
+  padding: 10px 10px 10px 15px;
+}
+
+.auth {
+  margin: 30px;
+}
+
+
+.bold {
+  font-weight: bold;
+}

@@ -12,6 +12,7 @@ Router.map(function() {
   this.resource('post', { path: '/post/:post_id' });
   this.resource('users', { path: '/users' });
   this.resource('user', { path: '/user/:user_id' });
+  this.route('auth');
 });
 
 export default Router;
