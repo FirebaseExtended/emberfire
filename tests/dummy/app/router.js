@@ -10,7 +10,6 @@ Router.map(function() {
     this.route('new');
   });
   this.resource('post', { path: '/post/:post_id' });
-  this.resource('users', { path: '/users' });
   this.resource('user', { path: '/user/:user_id' });
   this.route('auth');
 });
