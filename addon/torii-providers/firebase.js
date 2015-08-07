@@ -42,7 +42,6 @@ export default Ember.Object.extend({
           }
         });
       } else if (provider === 'anonymous') {
-        console.log('authing anonymously');
         this.get('firebase').authAnonymously((error, authData) => {
           if (error) {
             reject(error);
