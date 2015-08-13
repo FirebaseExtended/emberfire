@@ -2,8 +2,6 @@ import Ember from 'ember';
 import DS from 'ember-data';
 import assign from 'lodash/object/assign';
 
-var fmt = Ember.String.fmt;
-
 /**
  * The Firebase serializer helps normalize relationships and can be extended on
  * a per model basis.
@@ -85,7 +83,7 @@ export default DS.JSONSerializer.extend(DS.EmbeddedRecordsMixin, {
             } else if (Ember.isArray(payload[key])) {
               payload[key] = this._addNumericIdsToEmbeddedArray(payload[key]);
             } else {
-              throw new Error(fmt('%@ relationship %@(\'%@\') must contain embedded records with an `id`. Example: { "%@": { "%@_1": { "id": "%@_1" } } } instead got: %@', [modelClass.toString(), meta.kind, meta.type, key, meta.type, meta.type, JSON.stringify(payload[key])] ));
+              throw new Error(`${modelClass.toString()} relationship ${meta.kind}('${meta.type}') must contain embedded records with an \`id\`. Example: { "${key}": { "${meta.type}_1": { "id": "${meta.type}_1" } } } instead got: ${JSON.stringify(payload[key])}`);
             }
           }
 
@@ -96,7 +94,7 @@ export default DS.JSONSerializer.extend(DS.EmbeddedRecordsMixin, {
             } else if (Ember.isArray(payload[key])) {
               payload[key] = this._convertBooleanArrayToIds(payload[key]);
             } else {
-              throw new Error(fmt('%@ relationship %@(\'%@\') must be a key/value map. Example: { "%@": { "%@_1": true } } instead got: %@', [modelClass.toString(), meta.kind, meta.type, key, meta.type, JSON.stringify(payload[key])] ));
+              throw new Error(`${modelClass.toString()} relationship ${meta.kind}('${meta.type}') must be a key/value map. Example: { "${key}": { "${meta.type}_1": true } } instead got: ${JSON.stringify(payload[key])}`);
             }
           }
 
@@ -203,7 +201,7 @@ export default DS.JSONSerializer.extend(DS.EmbeddedRecordsMixin, {
     for (var i = 0; i <  arr.length; i++) {
       if (arr[i]) {
         if (typeof arr[i] !== 'object') {
-          throw new Error(fmt('expecting embedded object hash but found %@', [JSON.stringify(arr[i])] ));
+          throw new Error(`expecting embedded object hash but found ${JSON.stringify(arr[i])}`);
         }
         result.push(assign({ id: '' + i }, arr[i]));
       }
