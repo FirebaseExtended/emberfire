@@ -8,7 +8,6 @@ import includes from 'lodash/collection/includes';
 import indexOf from 'lodash/array/indexOf';
 import find from 'lodash/collection/find';
 
-var fmt = Ember.String.fmt;
 var Promise = Ember.RSVP.Promise;
 
 var uniq = function (arr) {
@@ -108,7 +107,7 @@ export default DS.Adapter.extend(Ember.Evented, {
         var payload = adapter._assignIdToPayload(snapshot);
         adapter._updateRecordCacheForType(typeClass, payload);
         if (payload === null) {
-          var error = new Error(fmt('no record was found at %@', [ref.toString()]));
+          var error = new Error(`no record was found at ${ref.toString()}`);
               error.recordId = id;
           reject(error);
         }
@@ -119,7 +118,7 @@ export default DS.Adapter.extend(Ember.Evented, {
       function(err) {
         reject(err);
       });
-    }, fmt('DS: FirebaseAdapter#findRecord %@ to %@', [typeClass.modelName, ref.toString()]));
+    }, `DS: FirebaseAdapter#findRecord ${typeClass.modelName} to ${ref.toString()}`);
   },
 
   recordWasPushed: function(store, modelName, record) {
@@ -208,7 +207,7 @@ export default DS.Adapter.extend(Ember.Evented, {
       }, function(error) {
         reject(error);
       });
-    }, fmt('DS: FirebaseAdapter#findAll %@ to %@', [typeClass.modelName, ref.toString()]));
+    }, `DS: FirebaseAdapter#findAll ${typeClass.modelName} to ${ref.toString()}`);
   },
 
   query: function(store, typeClass, query, recordArray) {
@@ -268,7 +267,7 @@ export default DS.Adapter.extend(Ember.Evented, {
       }, function(error) {
         reject(error);
       });
-    }, fmt('DS: FirebaseAdapter#query %@ with %@', [modelName, query]));
+    }, `DS: FirebaseAdapter#query ${modelName} with ${query}`);
   },
 
   applyQueryToRef: function (ref, query) {
@@ -419,14 +418,14 @@ export default DS.Adapter.extend(Ember.Evented, {
         }
         // Throw an error if any of the relationships failed to save
         if (rejected.length !== 0) {
-          var error = new Error(fmt('Some errors were encountered while saving %@ %@', [typeClass, snapshot.id]));
+          var error = new Error(`Some errors were encountered while saving ${typeClass} ${snapshot.id}`);
               error.errors = rejected.mapBy('reason');
           reject(error);
         } else {
           resolve();
         }
       });
-    }, fmt('DS: FirebaseAdapter#updateRecord %@ to %@', [typeClass, recordRef.toString()]));
+    }, `DS: FirebaseAdapter#updateRecord ${typeClass} to ${recordRef.toString()}`);
   },
 
   //Just update the record itself without caring for the relationships
@@ -480,7 +479,7 @@ export default DS.Adapter.extend(Ember.Evented, {
         return savedRecords;
       }
       else {
-        var error = new Error(fmt('Some errors were encountered while saving a hasMany relationship %@ -> %@', [relationship.parentType, relationship.type]));
+        var error = new Error(`Some errors were encountered while saving a hasMany relationship ${relationship.parentType} -> ${relationship.type}`);
             error.errors = Ember.A(rejected).mapBy('reason');
         throw error;
       }
