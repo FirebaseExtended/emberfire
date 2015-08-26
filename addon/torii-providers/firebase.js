@@ -32,9 +32,7 @@ export default Ember.Object.extend({
         if (!options.token) {
           reject(new Error('A token must be supplied'));
         }
-        this.get('firebase').authWithCustomToken({
-          token: options.token
-        }, (error, authData) => {
+        this.get('firebase').authWithCustomToken(options.token, (error, authData) => {
           if (error) {
             reject(error);
           } else {
