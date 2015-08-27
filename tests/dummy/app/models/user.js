@@ -9,5 +9,6 @@ export default DS.Model.extend({
   firstName: DS.attr('string'),
   avatar: Ember.computed(function() {
     return 'https://www.gravatar.com/avatar/' + md5(this.get('id')) + '.jpg?d=retro&size=80';
-  })
+  }),
+  posts: DS.hasMany('post', { async: true })
 });
