@@ -255,9 +255,7 @@ describeModule('torii-provider:firebase', 'FirebaseToriiProvider', {
             provider: 'custom',
             token: 'token'
           }).then(function(authData) {
-            expect(firebaseMock.authWithCustomToken.calledWith({
-              token: 'token'
-            })).to.be.true;
+            expect(firebaseMock.authWithCustomToken.calledWith('token')).to.be.true;
             expect(authData).to.equal(authDataMock);
             done();
           });
