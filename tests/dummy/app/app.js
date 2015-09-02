@@ -7,13 +7,6 @@ var App;
 
 Ember.MODEL_FACTORY_INJECTIONS = true;
 
-import markdownHelper from 'dummy/helpers/markdown';
-Ember.Handlebars.helper('markdown', markdownHelper);
-
-import breaklinesHelper from 'dummy/helpers/breaklines';
-Ember.Handlebars.helper('breaklines', breaklinesHelper);
-
-
 App = Ember.Application.extend({
   modulePrefix: config.modulePrefix,
   podModulePrefix: config.podModulePrefix,
