@@ -42,7 +42,7 @@ describe('Integration: FirebaseAdapter - Queries', function() {
   });
 
   it('resolves with the correct initial payload', function() {
-    assert(Ember.isArray(queryArray));
+    assert(queryArray.get('length') === 3, 'array should have length of 3');
     assert.deepEqual(queryArray.get('content').mapBy('id'), ['post_1', 'post_2', 'post_3'], 'array should contain post_1, 2, 3');
   });
 
