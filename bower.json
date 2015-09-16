@@ -48,8 +48,5 @@
     "normalize-css": "3.0.3",
     "sinon": "http://sinonjs.org/releases/sinon-1.16.1.js",
     "mockfirebase": "0.11.0"
-  },
-  "resolutions": {
-    "ember": "2.0.2"
   }
 }
