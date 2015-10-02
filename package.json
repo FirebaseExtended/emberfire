@@ -21,12 +21,7 @@
   "bugs": {
     "url": "https://github.com/firebase/emberfire/issues"
   },
-  "licenses": [
-    {
-      "type": "MIT",
-      "url": "http://firebase.mit-license.org/"
-    }
-  ],
+  "license": "MIT",
   "keywords": [
     "ember",
     "firebase",
