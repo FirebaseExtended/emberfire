@@ -58,7 +58,7 @@ If you'd like to contribute to EmberFire, run the following commands to get your
 ### Setup
 
 * `git clone` this repository
-* `npm install -g ember-cli bower gulp`
+* `npm install -g ember-cli bower gulp phantomjs`
 * `npm install`
 * `bower install`
 

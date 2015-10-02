@@ -30,7 +30,7 @@
     "package.json"
   ],
   "dependencies": {
-    "firebase": "^2.1.0",
+    "firebase": "2.x.x",
     "ember-data": ">=1.13.6"
   },
   "devDependencies": {
