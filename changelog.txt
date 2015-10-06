@@ -1,2 +1,0 @@
-feature - Upgraded Firebase dependency to 2.x.x.
-feature - Added `custom` and `anonymous` login capability to the `torii` authentication adapter.
