@@ -47,6 +47,20 @@ This will create a `app/adapters/application.js`. All you need to do is update y
 
 Your Firebase data will now be synced with the Ember Data store. For detailed EmberFire documentation, check out the [quickstart](https://firebase.com/docs/web/libraries/ember/quickstart.html) or [guide](https://firebase.com/docs/web/libraries/ember/guide.html) in the Firebase docs.
 
+### Nested Addon Usage Caveat
+
+To publish an addon that exports functionality driven by EmberFire,
+note that EmberFire must be listed in the `dependencies` for NPM
+and not the `devDependencies`.
+
+When consuming an addon that consumes EmberFire, running the
+initializing generator by hand is required.
+
+```sh
+ember generate ../node_modules/your-addon/node_modules/emberfire/blueprints/emberfire
+```
+
+
 ## Using EmberFire without ember-cli
 
 EmberFire also works without ember-cli. See the [Firebase documentation](https://firebase.com/docs/web/libraries/ember/guide.html#section-without-ember-cli) for instructions on getting started.
