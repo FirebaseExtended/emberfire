@@ -54,7 +54,7 @@ export default Ember.Object.extend({
           } else {
             resolve(authData);
           }
-        });
+        }, (options.settings || {}));
       }
 
     });
