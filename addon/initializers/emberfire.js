@@ -18,9 +18,9 @@ if (Ember.libraries) {
 export default {
   name: 'emberfire',
   before: 'ember-data',
-  initialize: function (container, app) {
-    app.register('adapter:-firebase', FirebaseAdapter);
-    app.register('serializer:-firebase', FirebaseSerializer);
+  initialize: function (application) {
+    application.register('adapter:-firebase', FirebaseAdapter);
+    application.register('serializer:-firebase', FirebaseSerializer);
 
     // Monkeypatch the store until ED gives us a good way to listen to push events
     if (!DS.Store.prototype._emberfirePatched) {
