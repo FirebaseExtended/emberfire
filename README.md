@@ -44,7 +44,7 @@ This will create a `app/adapters/application.js`. All you need to do is update y
     firebase: 'https://YOUR-FIREBASE-NAME.firebaseio.com/',
     // ...
     contentSecurityPolicy: {
-      'connect-src': " wss://*.firebaseio.com"
+      'connect-src': "'self' https://auth.firebase.com wss://*.firebaseio.com"
     }
     // ...
 ```
