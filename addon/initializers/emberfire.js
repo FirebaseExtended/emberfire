@@ -18,9 +18,14 @@ if (Ember.libraries) {
 export default {
   name: 'emberfire',
   before: 'ember-data',
-  initialize: function (container, app) {
-    app.register('adapter:-firebase', FirebaseAdapter);
-    app.register('serializer:-firebase', FirebaseSerializer);
+  initialize: function () {
+
+    // To support Ember versions below 2.1.0 as well.
+    // See http://emberjs.com/deprecations/v2.x/#toc_initializer-arity
+    let application = arguments[1] || arguments[0];
+
+    application.register('adapter:-firebase', FirebaseAdapter);
+    application.register('serializer:-firebase', FirebaseSerializer);
 
     // Monkeypatch the store until ED gives us a good way to listen to push events
     if (!DS.Store.prototype._emberfirePatched) {
