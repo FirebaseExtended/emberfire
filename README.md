@@ -64,6 +64,15 @@ initializing generator by hand is required.
 ember generate ../node_modules/your-addon/node_modules/emberfire/blueprints/emberfire
 ```
 
+### Testing
+
+Because Firebase doesn't communicate via AJAX, Ember acceptance tests won't automatically
+wait for requests to complete. To work around this, you can install
+[test-model-waiter](https://github.com/gabrielgrant/ember-cli-test-model-waiter) (with
+`ember install ember-cli-test-model-waiter`) which will wait for all models to finish
+loading before testing advances, or you can ensure all required requests are fulfilled
+by manually tracking the relevant promises.
+
 
 ## Using EmberFire without ember-cli
 
