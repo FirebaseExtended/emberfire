@@ -419,7 +419,7 @@ export default DS.Adapter.extend(Ember.Evented, {
         // Throw an error if any of the relationships failed to save
         if (rejected.length !== 0) {
           var error = new Error(`Some errors were encountered while saving ${typeClass} ${snapshot.id}`);
-              error.errors = rejected.mapBy('reason');
+          error.errors = Ember.A(rejected).mapBy('reason');
           reject(error);
         } else {
           resolve();
