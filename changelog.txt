@@ -1,5 +1,0 @@
-fixed - `updateRecord` was not fully compatible with Ember's disabled prototype extensions.
-fixed - Remove Ember Data 2.1.0 `initialize` deprecation warnings.
-changed - Allow passing of authentication settings such as `scope` and `remember` when using Torii.
-changed - EmberFire can now be used as a nested addon.
-
