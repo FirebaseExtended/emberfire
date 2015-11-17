@@ -1,86 +1,137 @@
 import Ember from 'ember';
 import DS from 'ember-data';
-import startApp from 'dummy/tests/helpers/start-app';
+import setupStore from 'dummy/tests/helpers/setup-store';
 import { it } from 'ember-mocha';
-import stubFirebase from 'dummy/tests/helpers/stub-firebase';
-import unstubFirebase from 'dummy/tests/helpers/unstub-firebase';
-import createTestRef from 'dummy/tests/helpers/create-test-ref';
+import FirebaseSerializer from 'emberfire/serializers/firebase';
+
+var run = Ember.run;
 
 describe('Integration: FirebaseSerializer - Serializing records', function() {
-  var app, store, adapter, firebaseTestRef;
+  var Post, post, Comment, comment, env;
 
-  var setupAdapter = function() {
-    app = startApp();
-    store = app.__container__.lookup('service:store');
-    adapter = store.adapterFor('application');
-    adapter._ref = createTestRef('blogs/normalized');
-    adapter._queueFlushDelay = false;
-    firebaseTestRef = createTestRef('blogs/tests/adapter/updaterecord');
-  };
+  beforeEach(function() {
+    Comment = DS.Model.extend({
+      body: DS.attr('string'),
+      published: DS.attr('number'),
+    });
 
-  beforeEach(function () {
-    stubFirebase();
-    setupAdapter();
+    Post = DS.Model.extend({
+      title: DS.attr('string'),
+      body: DS.attr('string'),
+      published: DS.attr('number'),
+      comments: DS.hasMany('comment', { async: true })
+    });
+
+    env = setupStore({
+      comment: Comment,
+      post: Post
+    });
+    env.store.modelFor('comment');
+    env.store.modelFor('post');
+
+    env.registry.register('serializer:application', FirebaseSerializer);
   });
 
   afterEach(function() {
-    Ember.run(app, 'destroy');
-    unstubFirebase();
+    run(env.store, 'destroy');
   });
 
   describe('#serialize()', function() {
 
-    describe('hasMany relationships', function() {
+    describe('hasMany relationships (manyToOne)', function() {
 
-      var newUser, newComment, serializer;
+      var serializer;
 
-      beforeEach(function(done) {
-        app.User = DS.Model.extend({
-          created: DS.attr('number'),
-          username: Ember.computed(function() {
-            return this.get('id');
-          }),
-          firstName: DS.attr('string'),
-          avatar: Ember.computed(function() {
-            return 'https://www.gravatar.com/avatar/' + md5(this.get('id')) + '.jpg?d=retro&size=80';
-          }),
-          posts: DS.hasMany('post', { async: true }),
-          comments: DS.hasMany('comment', { async: true, inverse: 'user' })
-        });
+      beforeEach(function() {
+        serializer = env.store.serializerFor('post');
 
-        adapter._ref = firebaseTestRef.child('normalized');
-        serializer = store.serializerFor('user');
-
-        Ember.run(function() {
-          newUser = store.createRecord('user', { firstName: 'Tim' });
-          newComment = store.createRecord('comment', {
+        run(function() {
+          comment = env.store.createRecord('comment', {
+            id: 'comment_1',
             body: 'This is a new comment'
           });
-          newUser.get('comments').pushObject(newComment);
-          done();
+          post = env.store.createRecord('post', { tile: 'New Post' });
+          post.get('comments').pushObject(comment);
         });
       });
 
-      afterEach(function() {
-        delete app.User;
+      it('serializes as an object', function() {
+        var snapshot = post._createSnapshot();
+        var json = serializer.serialize(snapshot);
+
+        expect(json.comments).to.be.an('object',
+            'hasMany relationship should be an object');
       });
 
-      it('serializes the hasMany side in a manyToOne relationship', function() {
-
-        var snapshot = newUser._createSnapshot();
+      it('serializes each link as a boolean value', function() {
+        var snapshot = post._createSnapshot();
         var json = serializer.serialize(snapshot);
 
         var expectedJSON = {
           created: null,
-          firstName: 'Tim',
-          comments: [newComment.get('id')]
+          firstName: 'New Post',
+          comments: {
+            [comment.get('id')]: true
+          }
         };
 
-        expect(json.comments).to.be.an('array', 'hasMany relationship should exist');
-        expect(json.comments).to.deep.equal(expectedJSON.comments, 'hasMany relationship should contain the right children');
+        expect(json.comments).to.deep.equal(expectedJSON.comments,
+            'hasMany relationship should contain boolean links');
       });
 
-    }); // hasMany relationships
+    }); // hasMany relationships (manyToOne)
+
+    describe('hasMany relationships (embedded)', function() {
+      var serializer;
+
+      beforeEach(function() {
+        env.registry.register('serializer:post', FirebaseSerializer.extend({
+          attrs: {
+            comments: { embedded: 'always' }
+          }
+        }));
+
+        serializer = env.store.serializerFor('post');
+
+        run(function() {
+          comment = env.store.createRecord('comment', {
+            id: 'comment_1',
+            body: 'This is a new comment'
+          });
+          post = env.store.createRecord('post', { tile: 'New Post' });
+          post.get('comments').pushObject(comment);
+        });
+      });
+
+      it('serializes as an object', function() {
+        var snapshot = post._createSnapshot();
+        var json = serializer.serialize(snapshot);
+
+        expect(json.comments).to.be.an('object',
+            'hasMany relationship should be an object');
+      });
+
+      it('embeds the child object correctly', function() {
+        var snapshot = post._createSnapshot();
+        var json = serializer.serialize(snapshot);
+
+        var expectedJSON = {
+          created: null,
+          firstName: 'New Post',
+          comments: {
+            [comment.get('id')]: {
+              id: 'comment_1',
+              body: 'This is a new comment',
+              published: null
+            }
+          }
+        };
+
+        expect(json.comments.comment_1).to.deep.equal(expectedJSON.comments.comment_1,
+            'hasMany relationship should contain the full object');
+      });
+
+    }); // hasMany relationships (embedded)
 
   }); // #serialize()
 

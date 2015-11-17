@@ -389,7 +389,7 @@ describe('Integration: FirebaseAdapter - Updating records', function() {
           Ember.run(() => {
             embeddedRecord.save().then(() => {
               reference.once('value', function (snap) {
-                expect(snap.val().children).to.not.exist;
+                expect(snap.val().treeNodes[embeddedId]).to.not.exist;
                 done();
               });
             });
@@ -397,6 +397,126 @@ describe('Integration: FirebaseAdapter - Updating records', function() {
         });
 
       }); // when invoking .save() directly
+
+      describe('inside embedded records', function() {
+
+        var reference, parentRecord, embeddedRecord, parentData, embeddedData,
+            doubleEmbeddedId, doubleEmbeddedRecord, doubleEmbeddedData;
+        var parentId, embeddedId;
+
+        beforeEach(function(done) {
+          reference = firebaseTestRef.child('embedded');
+          adapter._ref = reference;
+          Ember.run(function() {
+            parentRecord = store.createRecord('tree-node', {
+              label: 'Parent Node'
+            });
+            embeddedRecord = store.createRecord('tree-node', {
+              label: 'Child Node'
+            });
+            doubleEmbeddedRecord = store.createRecord('tree-node', {
+              label: 'Child Sub Node'
+            });
+            parentId = parentRecord.get('id');
+            embeddedId = embeddedRecord.get('id');
+            doubleEmbeddedId = doubleEmbeddedRecord.get('id');
+            embeddedRecord.get('children').addObject(doubleEmbeddedRecord);
+            parentRecord.get('children').addObject(embeddedRecord);
+            // debugger;
+            parentRecord.save().then(function() {
+              reference.once('value', function(snapshot) {
+                parentData = snapshot.val().treeNodes[parentId];
+                embeddedData = parentData.children[embeddedId];
+                doubleEmbeddedData = embeddedData.children[doubleEmbeddedId];
+                done();
+              });
+            });
+          });
+        });
+
+        it('save to server correctly', function() {
+          expect(doubleEmbeddedData.label).to.equal('Child Sub Node');
+        });
+
+        it('maintain the correct .ref()', function() {
+          var refPath = doubleEmbeddedRecord.ref().path.toString();
+          var expectedPath = `/blogs/tests/adapter/updaterecord/embedded/treeNodes/${parentId}/children/${embeddedId}/children/${doubleEmbeddedId}`;
+          expect(refPath).to.equal(expectedPath);
+        });
+
+        it('are not `dirty`', function() {
+          expect(doubleEmbeddedRecord.get('hasDirtyAttributes')).to.equal(false, 'The embedded record should not be `dirty`');
+        });
+
+        it('are not `new`', function() {
+          expect(doubleEmbeddedRecord.get('isNew')).to.equal(false, 'The embedded record should not be `new`');
+        });
+
+        it('are not `saving`', function() {
+          expect(doubleEmbeddedRecord.get('isSaving')).to.equal(false, 'The embedded record should be `saving`');
+        });
+
+        it('become `dirty` when editing', function() {
+          doubleEmbeddedRecord.set('label', 'new label');
+          expect(doubleEmbeddedRecord.get('hasDirtyAttributes')).to.equal(true, 'The embedded record should be `dirty`');
+        });
+
+        it('are not `dirty` after re-saving', function(done) {
+          doubleEmbeddedRecord.set('label', 'new label');
+          parentRecord.save().then(function () {
+            doubleEmbeddedRecord.ref().once('value', function(snapshot) {
+              doubleEmbeddedData = snapshot.val();
+              expect(doubleEmbeddedData.label).to.equal('new label');
+              expect(doubleEmbeddedRecord.get('hasDirtyAttributes')).to.equal(false, 'record should not be dirty');
+              done();
+            });
+          });
+        });
+
+        it('rollback to a clean state', function() {
+          doubleEmbeddedRecord.set('label', 'new label');
+          expect(doubleEmbeddedRecord.get('hasDirtyAttributes')).to.equal(true, 'The embedded record should be `dirty`');
+
+          doubleEmbeddedRecord.rollbackAttributes();
+          expect(doubleEmbeddedRecord.get('hasDirtyAttributes')).to.equal(false, 'The embedded record should not be `dirty`');
+        });
+
+        it('rollback to their last saved state', function() {
+          doubleEmbeddedRecord.set('label', 'new label');
+          expect(doubleEmbeddedRecord.get('hasDirtyAttributes')).to.equal(true, 'The embedded record should be `dirty`');
+
+          doubleEmbeddedRecord.rollbackAttributes();
+          expect(doubleEmbeddedRecord.get('label')).to.equal('Child Sub Node');
+        });
+
+        describe('when invoking .save() directly', function () {
+
+          it('update on the server at the correct location', function(done) {
+            Ember.run(() => {
+              doubleEmbeddedRecord.set('label', 'Updated');
+              doubleEmbeddedRecord.save().then(() => {
+                doubleEmbeddedRecord.ref().once('value', function (snap) {
+                  expect(snap.val().label).to.equal('Updated');
+                  done();
+                });
+              });
+            });
+          });
+
+          it('do not duplicate data on the server', function(done) {
+            Ember.run(() => {
+              doubleEmbeddedRecord.save().then(() => {
+                reference.once('value', function (snap) {
+                  expect(snap.val().treeNodes[doubleEmbeddedId]).to.not.exist;
+                  done();
+                });
+              });
+            });
+          });
+
+        }); // when invoking .save() directly
+
+      }); // inside embedded records
 
     }); // embedded hasMany records
 
