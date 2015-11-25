@@ -115,4 +115,4 @@ ember try ember-data-canary
 ### Running the FireBlog demo app
 
 * `ember server`
-* Visit your app at http://localhost:4200.
+* Visit your app at [http://localhost:4200](http://localhost:4200).
