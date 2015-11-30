@@ -1,1 +1,0 @@
-fixed - `store.findAll` was populating record arrays in the background, this has been reverted to the original behaviour where the promise waits for the server response and populates the array immediately.
