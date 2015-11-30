@@ -13,10 +13,28 @@ module.exports = {
     {
       name: 'ember-data-2.0.x',
       dependencies: {
-        'ember-data': '^2.0.0'
+        'ember-data': '2.0.x'
       },
       resolutions: {
-        'ember-data': '^2.0.0'
+        'ember-data': '2.0.x'
+      }
+    },
+    {
+      name: 'ember-data-2.1.x',
+      dependencies: {
+        'ember-data': '2.1.x'
+      },
+      resolutions: {
+        'ember-data': '2.1.x'
+      }
+    },
+    {
+      name: 'ember-data-2.2.x',
+      dependencies: {
+        'ember-data': '2.2.x'
+      },
+      resolutions: {
+        'ember-data': '2.2.x'
       }
     },
     {
