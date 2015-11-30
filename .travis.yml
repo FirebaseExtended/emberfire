@@ -12,6 +12,8 @@ cache:
 env:
   - EMBER_TRY_SCENARIO=ember-data-1.13.x
   - EMBER_TRY_SCENARIO=ember-data-2.0.x
+  - EMBER_TRY_SCENARIO=ember-data-2.1.x
+  - EMBER_TRY_SCENARIO=ember-data-2.2.x
   - EMBER_TRY_SCENARIO=ember-data-canary
 
 matrix:
