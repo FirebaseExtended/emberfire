@@ -1,0 +1,1 @@
+fixed - `store.findAll` was populating record arrays asynchronously, this has been reverted to the original behaviour.

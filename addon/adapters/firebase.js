@@ -731,8 +731,5 @@ export default DS.Adapter.extend(Ember.Evented, {
    */
   shouldBackgroundReloadRecord: function() {
     return false;
-  },
-  shouldReloadAll: function() {
-    return false;
-  },
+  }
 });
