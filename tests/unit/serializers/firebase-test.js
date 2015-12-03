@@ -427,7 +427,8 @@ describeModule(
 
           expect(json.included).to.have.length(1);
           expect(json.included[0].attributes).to.deep.equal({
-            firstName: 'Adam'
+            firstName: 'Adam',
+            created: null
           });
 
           expect(json.included[0].id).to.equal('aputinski');
@@ -486,7 +487,8 @@ describeModule(
 
         expect(json.included).to.have.length(1);
         expect(json.included[0].attributes).to.deep.equal({
-          firstName: 'Adam'
+          firstName: 'Adam',
+          created: null
         });
 
         expect(json.included[0].id).to.equal('aputinski');
