@@ -5,6 +5,10 @@ node_js:
 
 sudo: false
 
+branches:
+  only:
+    - master # otherwise pull requests get built twice
+
 cache:
   directories:
     - node_modules
