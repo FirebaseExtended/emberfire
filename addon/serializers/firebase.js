@@ -10,6 +10,25 @@ export default DS.JSONSerializer.extend(DS.EmbeddedRecordsMixin, {
   isNewSerializerAPI: true,
 
   /**
+   * Firebase does not send null values, it omits the key altogether. This nullifies omitted
+   * properties so that property deletions sync correctly.
+   *
+   * @override
+   */
+  extractAttributes: function (modelClass, resourceHash) {
+    var attributes = this._super(modelClass, resourceHash);
+
+    // nullify omitted attributes
+    modelClass.eachAttribute(function (key) {
+      if (!attributes.hasOwnProperty(key)) {
+        attributes[key] = null;
+      }
+    });
+
+    return attributes;
+  },
+
+  /**
    * @override
    */
   extractRelationships(modelClass, payload) {

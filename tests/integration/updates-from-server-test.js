@@ -60,22 +60,30 @@ describe('Integration: FirebaseAdapter - Updates from server', function() {
   });
 
   describe('A record coming from find', function() {
-    var newPost;
+    var reference, newPost;
 
     beforeEach(function(done) {
-      var reference = adapter._ref;
+      reference = adapter._ref;
       Ember.run(function() {
         store.findRecord('post', 'post_1').then(function(post) {
           newPost = post;
-          reference.child('posts/post_1/body').set('Updated', function() {
-            done();
-          });
+          done();
         });
       });
     });
 
-    it('receives server updates correctly', function() {
-      expect(newPost.get('body')).to.equal('Updated', 'property should change');
+    it('receives server updates correctly', function(done) {
+      reference.child('posts/post_1/body').set('Updated', function() {
+        expect(newPost.get('body')).to.equal('Updated', 'property should change');
+        done();
+      });
+    });
+
+    it('receives server property deletions correctly', function(done) {
+      reference.child('posts/post_1/body').remove(function() {
+        expect(newPost.get('body')).to.equal(null, 'property should be deleted');
+        done();
+      });
     });
 
     it('has the correct .ref()', function() {
