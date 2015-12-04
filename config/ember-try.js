@@ -38,6 +38,15 @@ module.exports = {
       }
     },
     {
+      name: 'ember-data-beta',
+      dependencies: {
+        'ember-data': 'components/ember-data#beta'
+      },
+      resolutions: {
+        'ember-data': 'beta'
+      }
+    },
+    {
       name: 'ember-data-canary',
       dependencies: {
         'ember-data': 'components/ember-data#canary'
