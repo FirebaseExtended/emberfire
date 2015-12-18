@@ -9,17 +9,18 @@ import assign from 'lodash/object/assign';
 export default DS.JSONSerializer.extend(DS.EmbeddedRecordsMixin, {
   isNewSerializerAPI: true,
 
+
   /**
    * Firebase does not send null values, it omits the key altogether. This nullifies omitted
    * properties so that property deletions sync correctly.
    *
    * @override
    */
-  extractAttributes: function (modelClass, resourceHash) {
+  extractAttributes(modelClass, resourceHash) {
     var attributes = this._super(modelClass, resourceHash);
 
     // nullify omitted attributes
-    modelClass.eachAttribute(function (key) {
+    modelClass.eachAttribute((key) => {
       if (!attributes.hasOwnProperty(key)) {
         attributes[key] = null;
       }
@@ -27,6 +28,7 @@ export default DS.JSONSerializer.extend(DS.EmbeddedRecordsMixin, {
 
     return attributes;
   },
+
 
   /**
    * @override
@@ -36,6 +38,7 @@ export default DS.JSONSerializer.extend(DS.EmbeddedRecordsMixin, {
 
     return this._super(modelClass, payload);
   },
+
 
   /**
    * Normalizes `hasMany` relationship structure before passing
@@ -96,7 +99,7 @@ export default DS.JSONSerializer.extend(DS.EmbeddedRecordsMixin, {
           // embedded
           if (this.hasDeserializeRecordsOption(key)) {
             if (typeof payload[key] === 'object' && !Ember.isArray(payload[key])) {
-              payload[key] = Object.keys(payload[key]).map(function(id) {
+              payload[key] = Object.keys(payload[key]).map((id) => {
                 return assign({ id: id }, payload[key][id]);
               });
             } else if (Ember.isArray(payload[key])) {
@@ -136,6 +139,7 @@ export default DS.JSONSerializer.extend(DS.EmbeddedRecordsMixin, {
       }
     });
   },
+
 
   /**
    * Coerce arrays back into relationship arrays. When numeric ids are used
@@ -184,6 +188,7 @@ export default DS.JSONSerializer.extend(DS.EmbeddedRecordsMixin, {
     return result;
   },
 
+
   /**
    * Fix embedded array ids.
    *
@@ -228,6 +233,7 @@ export default DS.JSONSerializer.extend(DS.EmbeddedRecordsMixin, {
     return result;
   },
 
+
   /**
    * Even when records are embedded, bypass EmbeddedRecordsMixin
    * and invoke JSONSerializer's method which serializes to ids only.
@@ -241,22 +247,24 @@ export default DS.JSONSerializer.extend(DS.EmbeddedRecordsMixin, {
    *
    * @override
    */
-  serializeHasMany: function (snapshot, json, relationship) {
+  serializeHasMany(snapshot, json, relationship) {
     DS.JSONSerializer.prototype.serializeHasMany.call(this, snapshot, json, relationship);
   },
+
 
   /**
    * @see #serializeHasMany
    * @override
    */
-  serializeBelongsTo: function (snapshot, json, relationship) {
+  serializeBelongsTo(snapshot, json, relationship) {
     DS.JSONSerializer.prototype.serializeBelongsTo.call(this, snapshot, json, relationship);
   },
+
 
   /**
    * @override
    */
-  _shouldSerializeHasMany: function (snapshot, key, relationship) {
+  _shouldSerializeHasMany(snapshot, key, relationship) {
     return this._canSerialize(key);
   }
 });

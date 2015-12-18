@@ -1,8 +1,11 @@
 import Ember from 'ember';
 
 export default Ember.Object.extend({
+
+
   /**
    * Extacts session information from authentication response
+   *
    * @param {object} authentication - hash containing response payload
    * @return {Promise}
    */
@@ -13,13 +16,16 @@ export default Ember.Object.extend({
       currentUser: authentication[authentication.provider]
     });
   },
+
+
   /**
    * Restore existing authenticated session
+   *
    * @return {Promise}
    */
   fetch() {
     let firebase = this.get('firebase');
-    return new Ember.RSVP.Promise((resolve, reject)=>{
+    return new Ember.RSVP.Promise((resolve, reject) => {
       let auth = firebase.getAuth();
       if (!auth) {
         reject("No session available");
@@ -28,8 +34,11 @@ export default Ember.Object.extend({
       }
     }, "Firebase Torii Adapter#fetch Firebase session");
   },
+
+
   /**
    * Close existing authenticated session
+   *
    * @return {Promise}
    */
   close() {
