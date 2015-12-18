@@ -18,7 +18,7 @@ if (Ember.libraries) {
 export default {
   name: 'emberfire',
   before: 'ember-data',
-  initialize: function () {
+  initialize() {
 
     // To support Ember versions below 2.1.0 as well.
     // See http://emberjs.com/deprecations/v2.x/#toc_initializer-arity
@@ -31,7 +31,8 @@ export default {
     if (!DS.Store.prototype._emberfirePatched) {
       DS.Store.reopen({
         _emberfirePatched: true,
-        push: function() {
+
+        push() {
           var result = this._super.apply(this, arguments);
           var records = result;
 
@@ -50,14 +51,14 @@ export default {
           return result;
         },
 
-        recordWillUnload: function(record) {
+        recordWillUnload(record) {
           var adapter = this.adapterFor(record.constructor.modelName);
           if (adapter.recordWillUnload) {
             adapter.recordWillUnload(this, record);
           }
         },
 
-        recordWillDelete: function (record) {
+        recordWillDelete(record) {
           var adapter = this.adapterFor(record.constructor.modelName);
           if (adapter.recordWillDelete) {
             adapter.recordWillDelete(this, record);
@@ -69,16 +70,18 @@ export default {
     if (!DS.Model.prototype._emberfirePatched) {
       DS.Model.reopen({
         _emberfirePatched: true,
-        unloadRecord: function() {
+
+        unloadRecord() {
           this.store.recordWillUnload(this);
           return this._super();
         },
-        deleteRecord: function () {
+
+        deleteRecord() {
           this.store.recordWillDelete(this);
           this._super();
         },
 
-        ref: function () {
+        ref() {
           var adapter = this.store.adapterFor(this.constructor.modelName);
           if (adapter._getAbsoluteRef) {
             return adapter._getAbsoluteRef(this);
@@ -90,7 +93,8 @@ export default {
     if (!DS.AdapterPopulatedRecordArray.prototype._emberfirePatched) {
       DS.AdapterPopulatedRecordArray.reopen({
         _emberfirePatched: true,
-        willDestroy: function() {
+
+        willDestroy() {
           if (this.__firebaseCleanup) {
             this.__firebaseCleanup();
           }
