@@ -46,6 +46,43 @@ describeModule('torii-provider:firebase', 'FirebaseToriiProvider', {
         });
       });
 
+      it('passes through provider settings', function(done) {
+        let provider = this.subject();
+        let authDataMock = sinon.spy();
+        let settingsMock = sinon.spy();
+        const firebaseMock = {
+          authWithOAuthPopup: sinon.stub().yields(null, authDataMock)
+        };
+        provider.set('firebase', firebaseMock);
+
+        Ember.run(function() {
+          provider.open({provider: 'successProvider', settings: settingsMock }).then(function(authData) {
+            expect(firebaseMock.authWithOAuthPopup.calledWith('successProvider', sinon.match.func, settingsMock)).to.be.true;
+
+            expect(authData).to.equal(authDataMock);
+            done();
+          });
+        });
+      });
+
+      it('calls firebase.authWithOAuthRedirect if options.redirect is true', function(done) {
+        let provider = this.subject();
+        let authDataMock = sinon.spy();
+        const firebaseMock = {
+          authWithOAuthRedirect: sinon.stub().yields(null, authDataMock)
+        };
+        provider.set('firebase', firebaseMock);
+
+        Ember.run(function() {
+          provider.open({provider: 'successProvider', redirect: true }).then(function(authData) {
+            expect(firebaseMock.authWithOAuthRedirect.calledWith('successProvider')).to.be.true;
+
+            expect(authData).to.equal(authDataMock);
+            done();
+          });
+        });
+      });
+
     }); // with an OAuth provider
 
 
