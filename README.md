@@ -23,6 +23,7 @@ Please consult this table when selecting your version of EmberFire:
 | beta.12 - beta.18 | 1.4.x     |
 | beta.19           | none      |
 | 1.13+             | 1.5.x     |
+| 2.0+              | 1.6.x     |
 | canary            | master    |
 
 *To install the `master` branch, use `ember install firebase/emberfire#master`*
