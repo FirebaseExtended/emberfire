@@ -132,42 +132,99 @@ describe('Integration: FirebaseAdapter - Deleting records', function() {
 
   });
 
-  describe('when a belongsTo relationship exists', function() {
-    var _ref, newPost, newUser, postId, userRef, userId;
+  describe('relationship integrity', function() {
+    var _ref, parent, child, childId, parentRef, parentId;
 
-    beforeEach(function(done) {
-      _ref = adapter._ref;
-      var reference = firebaseTestRef.child('blogs/tests/adapter/deleterecord/normalized');
-      adapter._ref = reference;
-      Ember.run(function() {
-        newUser = store.createRecord('user', {
-          firstName: 'Tom'
+    describe('when a hasMany relationship exists', function () {
+
+      beforeEach(function(done) {
+        _ref = adapter._ref;
+        var reference = firebaseTestRef.child('blogs/tests/adapter/deleterecord/normalized');
+        adapter._ref = reference;
+        Ember.run(function() {
+          parent = store.createRecord('treeNode', {
+            label: 'Parent'
+          });
+          parentId = parent.get('id');
+          parentRef = reference.child('treeNodes/' + parentId);
+
+          child = store.createRecord('treeNode', {
+            label: 'Child 1'
+          });
+          childId = child.get('id');
+
+          Ember.RSVP.Promise.cast(parent.get('children')).then(function(children) {
+            children.pushObject(child);
+            children.pushObject(store.createRecord('treeNode', {
+              label: 'Child 2'
+            }));
+            parent.save().then(function() {
+              done();
+            });
+          });
         });
-        newPost = store.createRecord('post', {
-          title: 'New Post'
+      });
+
+      it('removes entries from inverse side', function(done) {
+        parentRef.once('value', function(snapshot1) {
+          expect(snapshot1.val().children[childId]).to.exist;
+
+          child.destroyRecord().then(function () {
+            parentRef.once('value', function(snapshot2) {
+              var parentData = snapshot2.val();
+              expect(parentData.children[childId]).to.not.exist;
+              done();
+            });
+          });
+
         });
-        postId = newPost.get('id');
-        userId = newUser.get('id');
-        userRef = reference.child('users/' + userId);
-        Ember.RSVP.Promise.cast(newUser.get('posts')).then(function(posts) {
-          posts.pushObject(newPost);
-          newUser.save().then(function() {
+      });
+
+    }); // when a hasMany relationship exists
+
+    describe('when a belongsTo relationship exists', function () {
+
+      beforeEach(function(done) {
+        _ref = adapter._ref;
+        var reference = firebaseTestRef.child('blogs/tests/adapter/deleterecord/normalized');
+        adapter._ref = reference;
+        Ember.run(function() {
+          parent = store.createRecord('treeNode', {
+            label: 'Parent'
+          });
+          parentId = parent.get('id');
+          parentRef = reference.child('treeNodes/' + parentId);
+
+          child = store.createRecord('tree-node-config', {
+            sync: true,
+            updated: +new Date()
+          });
+          childId = child.get('id');
+
+          parent.set('config', child);
+          parent.save().then(function() {
             done();
           });
         });
       });
-    });
 
-    it('removes entries from inverse (hasMany) side', function(done) {
-      newPost.destroyRecord().then(function () {
-        userRef.once('value', function(snapshot) {
-          var userData = snapshot.val();
-          expect(userData.posts).to.not.exist;
-          done();
+      it('removes entries from inverse side', function(done) {
+        parentRef.once('value', function(snapshot1) {
+          expect(snapshot1.val().config).to.exist;
+
+          child.destroyRecord().then(function () {
+            parentRef.once('value', function(snapshot2) {
+              var parentData = snapshot2.val();
+              expect(parentData.config).to.not.exist;
+              done();
+            });
+          });
+
         });
       });
-    });
 
-  });
+    }); // when a hasMany relationship exists
+
+  }); // relationship integrity
 
 });
