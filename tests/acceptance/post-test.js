@@ -39,7 +39,7 @@ describe('Acceptance: /post/post_21', function() {
     });
   });
 
-  it('shows the post author', function(done) {
+  it('shows the post author', function() {
     visit('/post/post_21');
 
     andThen(function() {
