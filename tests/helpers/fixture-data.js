@@ -221,11 +221,11 @@ export default {
       "post_1_comment_1": {
         "body": "This is a comment",
         "published": 1395176007623,
-        "user": "tstirrat"
+        "user": "sara"
       },
       "post_1_comment_2": {
         "body": "This is another comment",
-        "published": 1395176007623,
+        "published": 1395176007625,
         "user": "tstirrat"
       }
     }, // comments
@@ -367,6 +367,10 @@ export default {
       "tstirrat": {
         "created": 1429978864377,
         "firstName": "Tim"
+      },
+      "sara": {
+        "created": 1429978864379,
+        "firstName": "Sara"
       }
     }
   }

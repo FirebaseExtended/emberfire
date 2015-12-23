@@ -12,7 +12,7 @@ import stubFirebase from '../helpers/stub-firebase';
 import unstubFirebase from '../helpers/unstub-firebase';
 import createTestRef from '../helpers/create-test-ref';
 
-describe('Acceptance: /post/post_21', function() {
+describe('Acceptance: /post/:id', function() {
   var application, ref;
 
   beforeEach(function() {
@@ -31,8 +31,8 @@ describe('Acceptance: /post/post_21', function() {
     Ember.run(application, 'destroy');
   });
 
-  it('can visit /post/post_21', function() {
-    visit('/post/post_21');
+  it('can visit /post/post_1', function() {
+    visit('/post/post_1');
 
     andThen(function() {
       expect(currentPath()).to.equal('post');
@@ -40,7 +40,7 @@ describe('Acceptance: /post/post_21', function() {
   });
 
   it('shows the post author', function() {
-    visit('/post/post_21');
+    visit('/post/post_1');
 
     andThen(function() {
       expect(find('.post-author').text().trim()).to.equal('tstirrat');
@@ -48,10 +48,70 @@ describe('Acceptance: /post/post_21', function() {
   });
 
   it('shows the post date', function() {
-    visit('/post/post_21');
+    visit('/post/post_1');
 
     andThen(function() {
       expect(find('.post-date').text().trim()).to.equal('March 21st, 2014');
     });
   });
+
+  it('shows the post title', function() {
+    visit('/post/post_1');
+
+    andThen(function() {
+      expect(find('.post-title').text().trim()).to.equal('Post 1');
+    });
+  });
+
+  it('shows the post body', function() {
+    visit('/post/post_1');
+
+    andThen(function() {
+      expect(find('.post-content').text().trim()).to.equal('Post 1 body');
+    });
+  });
+
+  it('shows all comments', function() {
+    visit('/post/post_1');
+
+    andThen(function() {
+      expect(find('.post-comment:not(.post-comment-new)').length).to.equal(2);
+    });
+  });
+
+  it('shows comment author', function() {
+    visit('/post/post_1');
+
+    andThen(function() {
+      expect(find('.post-comment:first .post-comment-author').text().trim()).to.equal('sara');
+    });
+  });
+
+  it('shows formatted comment date', function() {
+    visit('/post/post_1');
+
+    andThen(function() {
+      expect(find('.post-comment:first .post-comment-date').text().trim()).to.equal('March 19th, 2014 at 7:53:27 am');
+    });
+  });
+
+  describe('the new comment entry form', function () {
+
+    it('contains a username entry field', function() {
+      visit('/post/post_1');
+
+      andThen(function() {
+        expect(find('.post-comment-new input').length).to.equal(1);
+      });
+    });
+
+    it('contains a comment body entry field', function() {
+      visit('/post/post_1');
+
+      andThen(function() {
+        expect(find('.post-comment-new textarea').length).to.equal(1);
+      });
+    });
+
+  }); // the new comment entry form
 });
