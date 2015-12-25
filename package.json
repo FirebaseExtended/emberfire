@@ -42,9 +42,6 @@
     "ember-data": "global:DS",
     "firebase": "global:Firebase"
   },
-  "peerDependencies": {
-    "ember-cli": ">=1.13.1"
-  },
   "dependencies": {
     "chalk": "1.1.0",
     "ember-cli-babel": "5.0.0",
