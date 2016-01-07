@@ -1,5 +1,6 @@
 import Ember from 'ember';
 import DS from 'ember-data';
+import Waitable from '../mixins/waitable';
 import toPromise from '../utils/to-promise';
 import forEach from 'lodash/collection/forEach';
 import filter from 'lodash/collection/filter';
@@ -34,7 +35,7 @@ var uniq = function (arr) {
  * in realtime when changes are made to the Firebase by other clients or
  * otherwise.
  */
-export default DS.Adapter.extend(Ember.Evented, {
+export default DS.Adapter.extend(Ember.Evented, Waitable, {
 
   defaultSerializer: '-firebase',
 
@@ -56,6 +57,8 @@ export default DS.Adapter.extend(Ember.Evented, {
    * @constructor
    */
   init() {
+    this._super.apply(this, arguments);
+
     var firebase = this.get('firebase');
     if (!firebase || typeof firebase !== 'object') {
       throw new Error('Please set the `firebase` property on the adapter.');
@@ -108,23 +111,44 @@ export default DS.Adapter.extend(Ember.Evented, {
   findRecord(store, typeClass, id) {
     var ref = this._getCollectionRef(typeClass, id);
 
+    var log = `DS: FirebaseAdapter#findRecord ${typeClass.modelName} to ${ref.toString()}`;
+
+    return this._fetch(ref, log).then((snapshot) => {
+      var payload = this._assignIdToPayload(snapshot);
+      this._updateRecordCacheForType(typeClass, payload);
+      if (payload === null) {
+        var error = new Error(`no record was found at ${ref.toString()}`);
+            error.recordId = id;
+        throw error;
+      }
+
+      return payload;
+    });
+  },
+
+
+  /**
+   * Promise interface for once('value') that also handle test waiters.
+   *
+   * @param  {Firebase} ref
+   * @param  {String} log
+   * @return {Promise<DataSnapshot>}
+   * @private
+   */
+  _fetch(ref, log) {
+    this._incrementWaiters();
     return new Promise((resolve, reject) => {
+
       ref.once('value', (snapshot) => {
-        var payload = this._assignIdToPayload(snapshot);
-        this._updateRecordCacheForType(typeClass, payload);
-        if (payload === null) {
-          var error = new Error(`no record was found at ${ref.toString()}`);
-              error.recordId = id;
-          reject(error);
-        }
-        else {
-          resolve(payload);
-        }
-      },
-      function(err) {
-        reject(err);
+        this._decrementWaiters();
+        Ember.run(null, resolve, snapshot);
+
+      }, function(err) {
+        this._decrementWaiters();
+        Ember.run(null, reject, err);
       });
-    }, `DS: FirebaseAdapter#findRecord ${typeClass.modelName} to ${ref.toString()}`);
+
+    }, log);
   },
 
 
@@ -165,7 +189,9 @@ export default DS.Adapter.extend(Ember.Evented, {
       var called = false;
       ref.on('value', (snapshot) => {
         if (called) {
-          this._handleChildValue(store, typeClass, snapshot);
+          Ember.run(() => {
+            this._handleChildValue(store, typeClass, snapshot);
+          });
         }
         called = true;
       });
@@ -194,21 +220,21 @@ export default DS.Adapter.extend(Ember.Evented, {
   findAll(store, typeClass) {
     var ref = this._getCollectionRef(typeClass);
 
-    return new Promise((resolve, reject) => {
-      // Listen for child events on the type
-      ref.once('value', (snapshot) => {
-        if (!this._findAllHasEventsForType(typeClass)) {
-          this._findAllAddEventListeners(store, typeClass, ref);
-        }
-        var results = [];
-        snapshot.forEach((childSnapshot) => {
-          var payload = this._assignIdToPayload(childSnapshot);
-          this._updateRecordCacheForType(typeClass, payload);
-          results.push(payload);
-        });
-        resolve(results);
-      }, (error) => reject(error) );
-    }, `DS: FirebaseAdapter#findAll ${typeClass.modelName} to ${ref.toString()}`);
+    var log = `DS: FirebaseAdapter#findAll ${typeClass.modelName} to ${ref.toString()}`;
+
+    return this._fetch(ref, log).then((snapshot) => {
+      if (!this._findAllHasEventsForType(typeClass)) {
+        this._findAllAddEventListeners(store, typeClass, ref);
+      }
+      var results = [];
+      snapshot.forEach((childSnapshot) => {
+        var payload = this._assignIdToPayload(childSnapshot);
+        this._updateRecordCacheForType(typeClass, payload);
+        results.push(payload);
+      });
+
+      return results;
+    });
   },
 
 
@@ -218,7 +244,7 @@ export default DS.Adapter.extend(Ember.Evented, {
 
     ref = this.applyQueryToRef(ref, query);
 
-    ref.on('child_added', (snapshot) => {
+    ref.on('child_added', Ember.run.bind(this, function (snapshot) {
       var record = store.peekRecord(modelName, snapshot.key());
 
       if (!record || !record.__listening) {
@@ -231,18 +257,18 @@ export default DS.Adapter.extend(Ember.Evented, {
       if (record) {
         recordArray.get('content').addObject(record._internalModel);
       }
-    });
+    }));
 
     // `child_changed` is already handled by the record's
     // value listener after a store.push. `child_moved` is
     // a much less common case because it relates to priority
 
-    ref.on('child_removed', (snapshot) => {
+    ref.on('child_removed', Ember.run.bind(this, function (snapshot) {
       var record = store.peekRecord(modelName, snapshot.key());
       if (record) {
         recordArray.get('content').removeObject(record._internalModel);
       }
-    });
+    }));
 
     // clean up event handlers when the array is being destroyed
     // so that future firebase events wont keep trying to use a
@@ -252,21 +278,20 @@ export default DS.Adapter.extend(Ember.Evented, {
       ref.off('child_removed');
     };
 
-    return new Promise((resolve, reject) => {
-      // Listen for child events on the type
-      ref.once('value', (snapshot) => {
-        if (!this._findAllHasEventsForType(typeClass)) {
-          this._findAllAddEventListeners(store, typeClass, ref);
-        }
-        var results = [];
-        snapshot.forEach((childSnapshot) => {
-          var payload = this._assignIdToPayload(childSnapshot);
-          this._updateRecordCacheForType(typeClass, payload);
-          results.push(payload);
-        });
-        resolve(results);
-      }, (error) => reject(error) );
-    }, `DS: FirebaseAdapter#query ${modelName} with ${query}`);
+    var log = `DS: FirebaseAdapter#query ${modelName} with ${query}`;
+
+    return this._fetch(ref, log).then((snapshot) => {
+      if (!this._findAllHasEventsForType(typeClass)) {
+        this._findAllAddEventListeners(store, typeClass, ref);
+      }
+      var results = [];
+      snapshot.forEach((childSnapshot) => {
+        var payload = this._assignIdToPayload(childSnapshot);
+        this._updateRecordCacheForType(typeClass, payload);
+        results.push(payload);
+      });
+      return results;
+    });
   },
 
 
@@ -319,11 +344,11 @@ export default DS.Adapter.extend(Ember.Evented, {
     var modelName = typeClass.modelName;
     this._findAllMapForType[modelName] = true;
 
-    ref.on('child_added', (snapshot) => {
+    ref.on('child_added', Ember.run.bind(this, function (snapshot) {
       if (!store.hasRecordForId(modelName, this._getKey(snapshot))) {
         this._handleChildValue(store, typeClass, snapshot);
       }
-    });
+    }));
   },
 
 

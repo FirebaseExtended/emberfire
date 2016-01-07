@@ -1,11 +1,11 @@
 {{#if session.currentUser}}
-    <button {{action "signOut"}}>Sign Out</button>
+    <button class="sign-out" {{action "signOut"}}>Sign Out</button>
 {{else}}
-    <button {{action "signIn" "anonymous"}}>Sign in anonymously</button>
-    <button {{action "signIn" "twitter"}}>Sign in with Twitter</button>
-    <button {{action "signIn" "github"}}>Sign in with GitHub</button>
-    <button {{action "signIn" "facebook"}}>Sign in with Facebook</button>
-    <button {{action "signIn" "google"}}>Sign in with Google</button>
+    <button class="auth-as-anon"     {{action "signIn" "anonymous"}}>Sign in anonymously</button>
+    <button class="auth-as-twitter"  {{action "signIn" "twitter"}}>Sign in with Twitter</button>
+    <button class="auth-as-github"   {{action "signIn" "github"}}>Sign in with GitHub</button>
+    <button class="auth-as-facebook" {{action "signIn" "facebook"}}>Sign in with Facebook</button>
+    <button class="auth-as-google"   {{action "signIn" "google"}}>Sign in with Google</button>
 {{/if}}
 
 <div class="user-data">
@@ -13,7 +13,7 @@
     <table class="user-data-table">
         <tr>
             <td class="bold">session.isAuthenticated</td>
-            <td>
+            <td class="user-data-is-authenticated">
                 {{#if session.isAuthenticated}}
                     {{session.isAuthenticated}}
                 {{else}}
@@ -24,13 +24,13 @@
         {{#if session.currentUser}}
             <tr>
                 <td class="bold">session.provider</td>
-                <td>
+                <td class="user-data-provider">
                     {{session.provider}}
                 </td>
             </tr>
             <tr>
                 <td class="bold">session.uid</td>
-                <td>
+                <td class="user-data-uid">
                     {{session.uid}}
                 </td>
             </tr>

@@ -14,7 +14,7 @@ describeModule('torii-provider:firebase', 'FirebaseToriiProvider', {
         let provider = this.subject();
         let errorMock = sinon.spy();
         const firebaseMock = {
-          authWithOAuthPopup: sinon.stub().yields(errorMock)
+          authWithOAuthPopup: sinon.stub().yieldsAsync(errorMock)
         };
         provider.set('firebase', firebaseMock);
 
@@ -32,13 +32,50 @@ describeModule('torii-provider:firebase', 'FirebaseToriiProvider', {
         let provider = this.subject();
         let authDataMock = sinon.spy();
         const firebaseMock = {
-          authWithOAuthPopup: sinon.stub().yields(null, authDataMock)
+          authWithOAuthPopup: sinon.stub().yieldsAsync(null, authDataMock)
         };
         provider.set('firebase', firebaseMock);
 
         Ember.run(function() {
           provider.open({provider: 'successProvider'}).then(function(authData) {
             expect(firebaseMock.authWithOAuthPopup.calledWith('successProvider')).to.be.true;
+
+            expect(authData).to.equal(authDataMock);
+            done();
+          });
+        });
+      });
+
+      it('passes through provider settings', function(done) {
+        let provider = this.subject();
+        let authDataMock = sinon.spy();
+        let settingsMock = sinon.spy();
+        const firebaseMock = {
+          authWithOAuthPopup: sinon.stub().yieldsAsync(null, authDataMock)
+        };
+        provider.set('firebase', firebaseMock);
+
+        Ember.run(function() {
+          provider.open({provider: 'successProvider', settings: settingsMock }).then(function(authData) {
+            expect(firebaseMock.authWithOAuthPopup.calledWith('successProvider', sinon.match.func, settingsMock)).to.be.true;
+
+            expect(authData).to.equal(authDataMock);
+            done();
+          });
+        });
+      });
+
+      it('calls firebase.authWithOAuthRedirect if options.redirect is true', function(done) {
+        let provider = this.subject();
+        let authDataMock = sinon.spy();
+        const firebaseMock = {
+          authWithOAuthRedirect: sinon.stub().yieldsAsync(null, authDataMock)
+        };
+        provider.set('firebase', firebaseMock);
+
+        Ember.run(function() {
+          provider.open({provider: 'successProvider', redirect: true }).then(function(authData) {
+            expect(firebaseMock.authWithOAuthRedirect.calledWith('successProvider')).to.be.true;
 
             expect(authData).to.equal(authDataMock);
             done();
@@ -55,7 +92,7 @@ describeModule('torii-provider:firebase', 'FirebaseToriiProvider', {
         let provider = this.subject();
         let errorMock = sinon.spy();
         const firebaseMock = {
-          authWithPassword: sinon.stub().yields(errorMock)
+          authWithPassword: sinon.stub().yieldsAsync(errorMock)
         };
         provider.set('firebase', firebaseMock);
 
@@ -77,7 +114,7 @@ describeModule('torii-provider:firebase', 'FirebaseToriiProvider', {
         let provider = this.subject();
         let errorMock = sinon.spy();
         const firebaseMock = {
-          authWithPassword: sinon.stub().yields(errorMock)
+          authWithPassword: sinon.stub().yieldsAsync(errorMock)
         };
         provider.set('firebase', firebaseMock);
 
@@ -96,7 +133,7 @@ describeModule('torii-provider:firebase', 'FirebaseToriiProvider', {
         let provider = this.subject();
         let authDataMock = sinon.spy();
         const firebaseMock = {
-          authWithPassword: sinon.stub().yields(null, authDataMock)
+          authWithPassword: sinon.stub().yieldsAsync(null, authDataMock)
         };
         provider.set('firebase', firebaseMock);
 
@@ -118,7 +155,7 @@ describeModule('torii-provider:firebase', 'FirebaseToriiProvider', {
         let provider = this.subject();
         let authDataMock = sinon.spy();
         const firebaseMock = {
-          authWithPassword: sinon.stub().yields(null, authDataMock)
+          authWithPassword: sinon.stub().yieldsAsync(null, authDataMock)
         };
         provider.set('firebase', firebaseMock);
 
@@ -147,7 +184,7 @@ describeModule('torii-provider:firebase', 'FirebaseToriiProvider', {
         let provider = this.subject();
         let errorMock = sinon.spy();
         const firebaseMock = {
-          authAnonymously: sinon.stub().yields(errorMock)
+          authAnonymously: sinon.stub().yieldsAsync(errorMock)
         };
         provider.set('firebase', firebaseMock);
 
@@ -166,7 +203,7 @@ describeModule('torii-provider:firebase', 'FirebaseToriiProvider', {
         let provider = this.subject();
         let authDataMock = sinon.spy();
         const firebaseMock = {
-          authAnonymously: sinon.stub().yields(null, authDataMock)
+          authAnonymously: sinon.stub().yieldsAsync(null, authDataMock)
         };
         provider.set('firebase', firebaseMock);
 
@@ -187,7 +224,7 @@ describeModule('torii-provider:firebase', 'FirebaseToriiProvider', {
         let provider = this.subject();
         let errorMock = sinon.spy();
         const firebaseMock = {
-          authWithCustomToken: sinon.stub().yields(errorMock)
+          authWithCustomToken: sinon.stub().yieldsAsync(errorMock)
         };
         provider.set('firebase', firebaseMock);
 
@@ -207,7 +244,7 @@ describeModule('torii-provider:firebase', 'FirebaseToriiProvider', {
         let provider = this.subject();
         let errorMock = sinon.spy();
         const firebaseMock = {
-          authWithCustomToken: sinon.stub().yields(errorMock)
+          authWithCustomToken: sinon.stub().yieldsAsync(errorMock)
         };
         provider.set('firebase', firebaseMock);
 
@@ -226,7 +263,7 @@ describeModule('torii-provider:firebase', 'FirebaseToriiProvider', {
         let provider = this.subject();
         let authDataMock = sinon.spy();
         const firebaseMock = {
-          authWithCustomToken: sinon.stub().yields(null, authDataMock)
+          authWithCustomToken: sinon.stub().yieldsAsync(null, authDataMock)
         };
         provider.set('firebase', firebaseMock);
 
@@ -246,7 +283,7 @@ describeModule('torii-provider:firebase', 'FirebaseToriiProvider', {
         let provider = this.subject();
         let authDataMock = sinon.spy();
         const firebaseMock = {
-          authWithCustomToken: sinon.stub().yields(null, authDataMock)
+          authWithCustomToken: sinon.stub().yieldsAsync(null, authDataMock)
         };
         provider.set('firebase', firebaseMock);
 
