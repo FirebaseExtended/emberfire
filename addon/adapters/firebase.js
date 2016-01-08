@@ -35,7 +35,7 @@ var uniq = function (arr) {
  * in realtime when changes are made to the Firebase by other clients or
  * otherwise.
  */
-export default DS.Adapter.extend(Ember.Evented, Waitable, {
+export default DS.Adapter.extend(Waitable, {
 
   defaultSerializer: '-firebase',
 
