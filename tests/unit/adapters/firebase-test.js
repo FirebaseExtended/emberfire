@@ -5,7 +5,7 @@ import {
   it
 } from 'ember-mocha';
 
-import MockFirebase from 'mock-firebase';
+import MockFirebase from 'mockfirebase';
 import sinon from 'sinon';
 
 describeModule('adapter:firebase', 'FirebaseAdapter', {

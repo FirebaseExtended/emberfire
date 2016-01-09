@@ -8,6 +8,7 @@ import {
 import { expect } from 'chai';
 import Ember from 'ember';
 import startApp from '../helpers/start-app';
+import replaceAppRef from '../helpers/replace-app-ref';
 import stubFirebase from '../helpers/stub-firebase';
 import unstubFirebase from '../helpers/unstub-firebase';
 import createTestRef from '../helpers/create-test-ref';
@@ -20,10 +21,7 @@ describe('Acceptance: /posts', function() {
     application = startApp();
     ref = createTestRef('acceptance');
 
-    var store = application.__container__.lookup('service:store');
-    var adapter = store.adapterFor('application');
-    adapter._ref = ref;
-    adapter._queueFlushDelay = false;
+    replaceAppRef(application, ref);
   });
 
   afterEach(function() {
