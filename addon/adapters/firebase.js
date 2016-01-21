@@ -312,7 +312,7 @@ export default DS.Adapter.extend(Waitable, {
     }
 
     ['limitToFirst', 'limitToLast', 'startAt', 'endAt', 'equalTo'].forEach(function (key) {
-      if (query[key] || query[key] === '') {
+      if (query[key] || query[key] === '' || query[key] === false) {
         ref = ref[key](query[key]);
       }
     });

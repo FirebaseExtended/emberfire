@@ -104,6 +104,18 @@ describeModule('adapter:firebase', 'FirebaseAdapter', {
           assert(spy.calledWith(''));
         });
 
+        it(`calls ${key} and passes through value when 'false'`, function () {
+          var spy = sinon.spy(ref, key);
+
+          var query = {};
+
+          query[key] = false;
+
+          adapter.applyQueryToRef(ref, query);
+          assert(spy.calledOnce);
+          assert(spy.calledWith(false));
+        });
+
         it(`does not call ${key} when the value is null`, function () {
           var spy = sinon.spy(ref, key);
 
