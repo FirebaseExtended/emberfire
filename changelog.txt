@@ -1,3 +1,0 @@
-fixed - During acceptance testing, EmberFire now correctly waits for model fetching and querying.
-fixed - `store.query` now correctly handles `equalTo`, `startAt`, `endAt` values of `false`.
-fixed - Removed `peerDependency` so that emberfire can be installed with beta versions of `ember-cli` using `ember install`.
