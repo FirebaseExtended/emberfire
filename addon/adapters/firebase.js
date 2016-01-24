@@ -194,6 +194,8 @@ export default DS.Adapter.extend(Waitable, {
           });
         }
         called = true;
+      }, (error) => {
+        Ember.Logger.error(error);
       });
     }
   },
