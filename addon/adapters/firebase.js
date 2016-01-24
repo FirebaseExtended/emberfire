@@ -143,7 +143,7 @@ export default DS.Adapter.extend(Waitable, {
         this._decrementWaiters();
         Ember.run(null, resolve, snapshot);
 
-      }, function(err) {
+      }, (err) => {
         this._decrementWaiters();
         Ember.run(null, reject, err);
       });
