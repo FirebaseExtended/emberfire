@@ -23,10 +23,9 @@ describe('Integration: FirebaseAdapter - Deleting records', function() {
   });
 
   describe('when a record is created, then deleted locally', function() {
-    var _ref, newPost, postId, postRef;
+    var newPost, postId, postRef;
 
     beforeEach(function(done) {
-      _ref = adapter._ref;
       var reference = firebaseTestRef.child('blogs/tests/adapter/deleterecord/normalized');
       adapter._ref = reference;
       Ember.run(function() {
@@ -53,10 +52,9 @@ describe('Integration: FirebaseAdapter - Deleting records', function() {
   });
 
   describe('when a record is retrieved through `find` and then deleted', function() {
-    var _ref, post, postId, postRef;
+    var post, postId, postRef;
 
     beforeEach(function(done) {
-      _ref = adapter._ref;
       var reference = firebaseTestRef.child('blogs/normalized');
       adapter._ref = reference;
       Ember.run(function() {
@@ -133,12 +131,11 @@ describe('Integration: FirebaseAdapter - Deleting records', function() {
   });
 
   describe('relationship integrity', function() {
-    var _ref, parent, child, childId, parentRef, parentId;
+    var parent, child, childId, parentRef, parentId;
 
     describe('when a hasMany relationship exists', function () {
 
       beforeEach(function(done) {
-        _ref = adapter._ref;
         var reference = firebaseTestRef.child('blogs/tests/adapter/deleterecord/normalized');
         adapter._ref = reference;
         Ember.run(function() {
@@ -185,7 +182,6 @@ describe('Integration: FirebaseAdapter - Deleting records', function() {
     describe('when a belongsTo relationship exists', function () {
 
       beforeEach(function(done) {
-        _ref = adapter._ref;
         var reference = firebaseTestRef.child('blogs/tests/adapter/deleterecord/normalized');
         adapter._ref = reference;
         Ember.run(function() {
