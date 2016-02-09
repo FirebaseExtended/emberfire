@@ -190,6 +190,72 @@ export default DS.JSONSerializer.extend(DS.EmbeddedRecordsMixin, {
 
 
   /**
+   * Coerce a hasMany array into a boolean relationship hash map.
+   *
+   * Given by `snapshot.hasMany`:
+   *
+   * ```json
+   * [ "0", "1", "3" ]
+   * ```
+   *
+   * Stored in Firebase:
+   *
+   * ```json
+   * {
+   *   "0": true,
+   *   "1": true,
+   *   "3": true
+   * }
+   * ```
+   *
+   * @param {Array} arr   Input array
+   * @return {Object}     Boolean hash map
+   * @private
+   */
+  _convertIdArrayToBooleanHash(ids) {
+    var result = {};
+
+    ids.forEach(function(id) {
+      result[id] = true;
+    });
+
+    return result;
+  },
+
+  /**
+   * Coerce an embedded hasMany array into an object hash.
+   *
+   * Given by `snapshot.hasMany`:
+   *
+   * ```json
+   * [ { id: 'a' }, { id: 'b' }, { id: 'c' } ]
+   * ```
+   *
+   * Stored in Firebase:
+   *
+   * ```json
+   * {
+   *   "a": {},
+   *   "b": {},
+   *   "c": {}
+   * }
+   * ```
+   *
+   * @param {Array} arr   Input array
+   * @return {Object}     Embedded Object hash
+   * @private
+   */
+  _convertObjectArrayToHash(objects) {
+    var result = {};
+
+    objects.forEach(function(object) {
+      result[object.id] = object;
+    });
+
+    return result;
+  },
+
+  /**
    * Fix embedded array ids.
    *
    * Objects are stored in Firebase with their id in the key only:
@@ -235,29 +301,39 @@ export default DS.JSONSerializer.extend(DS.EmbeddedRecordsMixin, {
 
 
   /**
-   * Even when records are embedded, bypass EmbeddedRecordsMixin
-   * and invoke JSONSerializer's method which serializes to ids only.
-   *
-   * The adapter handles saving the embedded records via `r.save()`
-   * and ensures that dirty states and rollback work.
-   *
-   * Will not be neccesary when this issue is resolved:
-   *
-   * https://github.com/emberjs/data/issues/2487
+   * Overrides the normal bevahior to convert numeric hasMany arrays into
+   * boolean relationship hashes.
    *
    * @override
    */
-  serializeHasMany(snapshot, json, relationship) {
-    DS.JSONSerializer.prototype.serializeHasMany.call(this, snapshot, json, relationship);
-  },
+  serializeHasMany: function (snapshot, json, relationship) {
+    this._super(snapshot, json, relationship);
 
+    var key = relationship.key;
 
-  /**
-   * @see #serializeHasMany
-   * @override
-   */
-  serializeBelongsTo(snapshot, json, relationship) {
-    DS.JSONSerializer.prototype.serializeBelongsTo.call(this, snapshot, json, relationship);
+    if (this._shouldSerializeHasMany(snapshot, key, relationship)) {
+      var hasMany = snapshot.hasMany(key, { ids: true });
+      if (hasMany !== undefined) {
+        // if provided, use the mapping provided by `attrs` in
+        // the serializer
+        var payloadKey = this._getMappedKey(key, snapshot.type);
+        if (payloadKey === key && this.keyForRelationship) {
+          payloadKey = this.keyForRelationship(key, "hasMany", "serialize");
+        }
+
+        if (this.hasSerializeRecordsOption(key)) {
+          json[payloadKey] = this._convertObjectArrayToHash(json[payloadKey]);
+
+          // ensure if there are no relations, the property is cleared on server
+          if (Object.keys(json[payloadKey]).length === 0) {
+            json[payloadKey] = null;
+          }
+
+        } else {
+          json[payloadKey] = this._convertIdArrayToBooleanHash(hasMany);
+        }
+      }
+    }
   },
 
 
