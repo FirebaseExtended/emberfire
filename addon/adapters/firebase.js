@@ -422,6 +422,7 @@ export default DS.Adapter.extend(Waitable, {
 
       var relationshipsToSave = [];
 
+
       // first we remove all relationships data from the serialized record, we backup the
       // removed data so that we can save it at a later stage.
       snapshot.record.eachRelationship((key, relationship) => {
@@ -434,7 +435,7 @@ export default DS.Adapter.extend(Waitable, {
                 {
                   data:data,
                   relationship:relationship,
-                  embedded:isEmbedded
+                  isEmbedded:isEmbedded
                 }
               );
             }
