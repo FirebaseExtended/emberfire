@@ -155,6 +155,7 @@ describe('Integration: FirebaseAdapter - Deleting records', function() {
             children.pushObject(store.createRecord('treeNode', {
               label: 'Child 2'
             }));
+						console.log ("SAVING here");
             parent.save().then(function() {
               done();
             });

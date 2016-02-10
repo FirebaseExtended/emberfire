@@ -428,14 +428,15 @@ export default DS.Adapter.extend(Waitable, {
       snapshot.record.eachRelationship((key, relationship) => {
         const data = serializedRecord[key];
         const isEmbedded = this.isRelationshipEmbedded(store, typeClass.modelName, relationship);
-
-        if ( (relationship.kind === 'hasMany') || isEmbedded ) {
+        const hasMany = relationship.kind === 'hasMany';
+        if ( hasMany || isEmbedded ) {
             if (!Ember.isNone(data)) {
               relationshipsToSave.push(
                 {
                   data:data,
                   relationship:relationship,
-                  isEmbedded:isEmbedded
+                  isEmbedded:isEmbedded,
+                  hasMany:hasMany
                 }
               );
             }
@@ -459,14 +460,17 @@ export default DS.Adapter.extend(Waitable, {
               (relationshipToSave) => {
                 const data = relationshipToSave.data;
                 const relationship = relationshipToSave.relationship;
-                if (relationshipToSave.isEmbedded) {
-                  savedRelationships.push(
-                    this._saveEmbeddedBelongsToRecord(store, typeClass, relationship, data, recordRef)
-                  );
-                } else {
+                if (relationshipToSave.hasMany) {
                   savedRelationships.push(
                     this._saveHasManyRelationship(store, typeClass, relationship, data, recordRef, recordCache)
                   );
+                } else {
+                  // embedded belongsTo, we need to fill in the informations.
+                  if (relationshipToSave.isEmbedded) {
+                    savedRelationships.push(
+                      this._saveEmbeddedBelongsToRecord(store, typeClass, relationship, data, recordRef)
+                    );
+                  }
                 }
               }
             );
