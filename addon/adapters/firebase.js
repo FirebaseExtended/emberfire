@@ -444,15 +444,18 @@ export default DS.Adapter.extend(Waitable, {
           }
         }
       );
+      var reportError = (errors) => {
+        var error = new Error(`Some errors were encountered while saving ${typeClass} ${snapshot.id}`);
+        error.errors = errors;
+        reject(error);
+      };
       // now we update the record
       var recordPromise = this._updateRecord(recordRef, serializedRecord);
       recordPromise.then(
         () => {
           if (recordPromise.state === 'rejected') {
             // TODO: FIXME: Do we need to rollback ? I think we do.
-            var error = new Error(`Some errors were encountered while saving ${typeClass} ${snapshot.id}`);
-            error.errors = [recordPromise.reason];
-            reject(error);
+            reportError([recordPromise.reason]);
           } else {
             // and now we construct the list of promise to save relationships.
             var savedRelationships = Ember.A();
@@ -481,9 +484,7 @@ export default DS.Adapter.extend(Waitable, {
               () => {
                 var rejected = Ember.A(relationshipsPromise.value).filterBy('state', 'rejected');
                 if (rejected.length !== 0) {
-                  var error = new Error(`Some errors were encountered while saving ${typeClass} ${snapshot.id}`);
-                  error.errors = Ember.A(rejected).mapBy('reason');
-                  reject(error);
+                  reportError(Ember.A(rejected).mapBy('reason'));
                 } else {
                   resolve();
                 }
