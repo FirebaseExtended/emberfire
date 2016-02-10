@@ -418,42 +418,75 @@ export default DS.Adapter.extend(Waitable, {
     });
 
     return new Promise((resolve, reject) => {
-      var savedRelationships = Ember.A();
+
+
+      var relationshipsToSave = []
+
+      // first we remove all relationships data from the serialized record, we backup the
+      // removed data so that we can save it at a later stage.
       snapshot.record.eachRelationship((key, relationship) => {
-        var save;
-        if (relationship.kind === 'hasMany') {
-          if (serializedRecord[key]) {
-            save = this._saveHasManyRelationship(store, typeClass, relationship, serializedRecord[key], recordRef, recordCache);
-            savedRelationships.push(save);
-            // Remove the relationship from the serializedRecord because otherwise we would clobber the entire hasMany
+        const data = serializedRecord[key]
+        const isEmbedded = this.isRelationshipEmbedded(store, typeClass.modelName, relationship)
+
+        if ( (relationship.kind === 'hasMany') || isEmbedded ) {
+            if (!Ember.isNone(data)) {
+              relationshipsToSave.push(
+                {
+                  data:data,
+                  relationship:relationship,
+                  embedded:isEmbedded
+                }
+              )
+            }
             delete serializedRecord[key];
           }
-        } else {
-          if (this.isRelationshipEmbedded(store, typeClass.modelName, relationship) && serializedRecord[key]) {
-            save = this._saveEmbeddedBelongsToRecord(store, typeClass, relationship, serializedRecord[key], recordRef);
-            savedRelationships.push(save);
-            delete serializedRecord[key];
+        }
+      )
+      // now we update the record
+      var recordPromise = this._updateRecord(recordRef, serializedRecord)
+      recordPromise.then(
+        () => {
+          if (recordPromise.state === 'rejected') {
+            // TODO: FIXME: Do we need to rollback ? I think we do.
+            var error = new Error(`Some errors were encountered while saving ${typeClass} ${snapshot.id}`);
+            error.errors = [recordPromise.reason];
+            reject(error);
+          } else {
+            // and now we construct the list of promise to save relationships.
+            var savedRelationships = Ember.A();
+            relationshipsToSave.forEach(
+              (relationshipToSave) => {
+                const data = relationshipToSave.data
+                const relationship = relationshipToSave.relationship
+                if (relationshipToSave.isEmbedded) {
+                  savedRelationships.push(
+                    this._saveEmbeddedBelongsToRecord(store, typeClass, relationship, data, recordRef)
+                  )
+                } else {
+                  savedRelationships.push(
+                    this._saveHasManyRelationship(store, typeClass, relationship, data, recordRef, recordCache)
+                  );
+                }
+              }
+            )
+            // and wait for them to be all settled so that we can see if we had an error,
+            // TODO: FIXME: Do we need to rollback ? I think we do.
+            var relationshipsPromise = Ember.RSVP.allSettled(savedRelationships);
+            relationshipsPromise.then(
+              () => {
+                var rejected = Ember.A(relationshipsPromise.value).filterBy('state', 'rejected');
+                if (rejected.length !== 0) {
+                  var error = new Error(`Some errors were encountered while saving ${typeClass} ${snapshot.id}`);
+                  error.errors = Ember.A(rejected).mapBy('reason');
+                  reject(error);
+                } else {
+                  resolve();
+                }
+              }
+            )
           }
         }
-      });
-
-      var relationshipsPromise = Ember.RSVP.allSettled(savedRelationships);
-      var recordPromise = this._updateRecord(recordRef, serializedRecord);
-
-      Ember.RSVP.hashSettled({relationships: relationshipsPromise, record: recordPromise}).then((promises) => {
-        var rejected = Ember.A(promises.relationships.value).filterBy('state', 'rejected');
-        if (promises.record.state === 'rejected') {
-          rejected.push(promises.record);
-        }
-        // Throw an error if any of the relationships failed to save
-        if (rejected.length !== 0) {
-          var error = new Error(`Some errors were encountered while saving ${typeClass} ${snapshot.id}`);
-          error.errors = Ember.A(rejected).mapBy('reason');
-          reject(error);
-        } else {
-          resolve();
-        }
-      });
+      )
     }, `DS: FirebaseAdapter#updateRecord ${typeClass} to ${recordRef.toString()}`);
   },
 
