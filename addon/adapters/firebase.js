@@ -452,38 +452,34 @@ export default DS.Adapter.extend(Waitable, {
       var recordPromise = this._updateRecord(recordRef, serializedRecord);
       recordPromise.then(
         () => {
-          if (recordPromise.state === 'rejected') {
-            // TODO: FIXME: Do we need to rollback ? I think we do.
-            reportError([recordPromise.reason]);
+          // and now we construct the list of promise to save relationships.
+          var savedRelationships = relationshipsToSave.map(
+            (relationshipToSave) => {
+              const data = relationshipToSave.data;
+              const relationship = relationshipToSave.relationship;
+              if (relationshipToSave.hasMany) {
+                return this._saveHasManyRelationship(store, typeClass, relationship, data, recordRef, recordCache);
+              } else {
+                // embedded belongsTo, we need to fill in the informations.
+                if (relationshipToSave.isEmbedded) {
+                  return this._saveEmbeddedBelongsToRecord(store, typeClass, relationship, data, recordRef);
+                }
+              }
+            }
+          );
+          return Ember.RSVP.allSettled(savedRelationships);
+        }
+      ).catch(
+        (e) => {
+          reportError([e]);
+        }
+      ).then(
+        (results) => {
+          var rejected = Ember.A(results).filterBy('state', 'rejected');
+          if (rejected.length !== 0) {
+            reportError(rejected.mapBy('reason').toArray());
           } else {
-            // and now we construct the list of promise to save relationships.
-            var savedRelationships = relationshipsToSave.map(
-              (relationshipToSave) => {
-                const data = relationshipToSave.data;
-                const relationship = relationshipToSave.relationship;
-                if (relationshipToSave.hasMany) {
-                  return this._saveHasManyRelationship(store, typeClass, relationship, data, recordRef, recordCache);
-                } else {
-                  // embedded belongsTo, we need to fill in the informations.
-                  if (relationshipToSave.isEmbedded) {
-                    return this._saveEmbeddedBelongsToRecord(store, typeClass, relationship, data, recordRef);
-                  }
-                }
-              }
-            );
-            // and wait for them to be all settled so that we can see if we had an error,
-            // TODO: FIXME: Do we need to rollback ? I think we do.
-            var relationshipsPromise = Ember.RSVP.allSettled(savedRelationships);
-            relationshipsPromise.then(
-              () => {
-                var rejected = Ember.A(relationshipsPromise.value).filterBy('state', 'rejected');
-                if (rejected.length !== 0) {
-                  reportError(Ember.A(rejected).mapBy('reason'));
-                } else {
-                  resolve();
-                }
-              }
-            );
+            resolve();
           }
         }
       );
