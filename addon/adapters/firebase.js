@@ -426,24 +426,21 @@ export default DS.Adapter.extend(Waitable, {
       // first we remove all relationships data from the serialized record, we backup the
       // removed data so that we can save it at a later stage.
       snapshot.record.eachRelationship((key, relationship) => {
-        const data = serializedRecord[key];
-        const isEmbedded = this.isRelationshipEmbedded(store, typeClass.modelName, relationship);
-        const hasMany = relationship.kind === 'hasMany';
-        if (hasMany || isEmbedded) {
-            if (!Ember.isNone(data)) {
-              relationshipsToSave.push(
-                {
-                  data:data,
-                  relationship:relationship,
-                  isEmbedded:isEmbedded,
-                  hasMany:hasMany
-                }
-              );
-            }
-            delete serializedRecord[key];
+      const data = serializedRecord[key];
+      const isEmbedded = this.isRelationshipEmbedded(store, typeClass.modelName, relationship);
+      const hasMany = relationship.kind === 'hasMany';
+      if (hasMany || isEmbedded) {
+          if (!Ember.isNone(data)) {
+            relationshipsToSave.push({
+              data:data,
+              relationship:relationship,
+              isEmbedded:isEmbedded,
+              hasMany:hasMany
+            });
           }
+          delete serializedRecord[key];
         }
-      );
+      });
       var reportError = (errors) => {
         var error = new Error(`Some errors were encountered while saving ${typeClass} ${snapshot.id}`);
         error.errors = errors;
@@ -451,37 +448,32 @@ export default DS.Adapter.extend(Waitable, {
       };
       var recordPromise = this._updateRecord(recordRef, serializedRecord);
       recordPromise.then(() => {
-          // and now we construct the list of promise to save relationships.
-          var savedRelationships = relationshipsToSave.map(
-            (relationshipToSave) => {
-              const data = relationshipToSave.data;
-              const relationship = relationshipToSave.relationship;
-              if (relationshipToSave.hasMany) {
-                return this._saveHasManyRelationship(store, typeClass, relationship, data, recordRef, recordCache);
-              } else {
-                // embedded belongsTo, we need to fill in the informations.
-                if (relationshipToSave.isEmbedded) {
-                  return this._saveEmbeddedBelongsToRecord(store, typeClass, relationship, data, recordRef);
-                }
+        // and now we construct the list of promise to save relationships.
+        var savedRelationships = relationshipsToSave.map(
+          (relationshipToSave) => {
+            const data = relationshipToSave.data;
+            const relationship = relationshipToSave.relationship;
+            if (relationshipToSave.hasMany) {
+              return this._saveHasManyRelationship(store, typeClass, relationship, data, recordRef, recordCache);
+            } else {
+              // embedded belongsTo, we need to fill in the informations.
+              if (relationshipToSave.isEmbedded) {
+                return this._saveEmbeddedBelongsToRecord(store, typeClass, relationship, data, recordRef);
               }
             }
-          );
-          return Ember.RSVP.allSettled(savedRelationships);
-        }
-      ).catch(
-        (e) => {
-          reportError([e]);
-        }
-      ).then(
-        (results) => {
-          var rejected = Ember.A(results).filterBy('state', 'rejected');
-          if (rejected.length !== 0) {
-            reportError(rejected.mapBy('reason').toArray());
-          } else {
-            resolve();
           }
+        );
+        return Ember.RSVP.allSettled(savedRelationships);
+      }).catch((e) => {
+        reportError([e]);
+      }).then((results) => {
+        var rejected = Ember.A(results).filterBy('state', 'rejected');
+        if (rejected.length !== 0) {
+          reportError(rejected.mapBy('reason').toArray());
+        } else {
+          resolve();
         }
-      );
+      });
     }, `DS: FirebaseAdapter#updateRecord ${typeClass} to ${recordRef.toString()}`);
   },
 
