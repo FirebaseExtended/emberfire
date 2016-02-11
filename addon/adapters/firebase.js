@@ -450,8 +450,7 @@ export default DS.Adapter.extend(Waitable, {
         reject(error);
       };
       var recordPromise = this._updateRecord(recordRef, serializedRecord);
-      recordPromise.then(
-        () => {
+      recordPromise.then(() => {
           // and now we construct the list of promise to save relationships.
           var savedRelationships = relationshipsToSave.map(
             (relationshipToSave) => {
