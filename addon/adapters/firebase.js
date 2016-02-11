@@ -429,7 +429,7 @@ export default DS.Adapter.extend(Waitable, {
         const data = serializedRecord[key];
         const isEmbedded = this.isRelationshipEmbedded(store, typeClass.modelName, relationship);
         const hasMany = relationship.kind === 'hasMany';
-        if ( hasMany || isEmbedded ) {
+        if (hasMany || isEmbedded) {
             if (!Ember.isNone(data)) {
               relationshipsToSave.push(
                 {
@@ -449,7 +449,6 @@ export default DS.Adapter.extend(Waitable, {
         error.errors = errors;
         reject(error);
       };
-      // now we update the record
       var recordPromise = this._updateRecord(recordRef, serializedRecord);
       recordPromise.then(
         () => {
@@ -458,21 +457,16 @@ export default DS.Adapter.extend(Waitable, {
             reportError([recordPromise.reason]);
           } else {
             // and now we construct the list of promise to save relationships.
-            var savedRelationships = Ember.A();
-            relationshipsToSave.forEach(
+            var savedRelationships = relationshipsToSave.map(
               (relationshipToSave) => {
                 const data = relationshipToSave.data;
                 const relationship = relationshipToSave.relationship;
                 if (relationshipToSave.hasMany) {
-                  savedRelationships.push(
-                    this._saveHasManyRelationship(store, typeClass, relationship, data, recordRef, recordCache)
-                  );
+                  return this._saveHasManyRelationship(store, typeClass, relationship, data, recordRef, recordCache);
                 } else {
                   // embedded belongsTo, we need to fill in the informations.
                   if (relationshipToSave.isEmbedded) {
-                    savedRelationships.push(
-                      this._saveEmbeddedBelongsToRecord(store, typeClass, relationship, data, recordRef)
-                    );
+                    return this._saveEmbeddedBelongsToRecord(store, typeClass, relationship, data, recordRef);
                   }
                 }
               }
