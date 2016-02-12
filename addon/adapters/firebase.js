@@ -53,6 +53,8 @@ export default DS.Adapter.extend(Waitable, {
     this._findAllMapForType = {};
     // Used to batch records into the store
     this._queue = [];
+		// cahching of previous serialized data.
+		this._cachedPreviousSerialization = {};
   },
 
 
@@ -143,12 +145,14 @@ export default DS.Adapter.extend(Waitable, {
 
   recordWillUnload(store, record) {
     if (record.__listening) {
+			this._removeFromPreviousCache(record.get('id'));
       this.stopListening(store, record.constructor, record);
     }
   },
 
 
   recordWillDelete(store, record) {
+		this._removeFromPreviousCache(record.get('id'));
     record.eachRelationship((key, relationship) => {
       if (relationship.kind === 'belongsTo') {
         var parentRecord = record.get(relationship.key);
@@ -331,6 +335,20 @@ export default DS.Adapter.extend(Waitable, {
     }));
   },
 
+	_removeFromPreviousCache(id) {
+		if (this._cachedPreviousSerialization.hasOwnProperty(id)) {
+			delete this._cachedPreviousSerialization[id];
+		}
+	},
+	_getFromPreviousCache(id) {
+		if (this._cachedPreviousSerialization.hasOwnProperty(id)) {
+			return this._cachedPreviousSerialization[id];
+		}
+		return null;
+	},
+	_setPreviousCache(id, previous) {
+		this._cachedPreviousSerialization[id] = previous;
+	},
 
   /**
    * Push a new child record into the store
@@ -341,17 +359,20 @@ export default DS.Adapter.extend(Waitable, {
     if (store.isDestroying) {
       return;
     }
+		// reset cache
+
     var value = snapshot.val();
     if (value === null) {
       var id = this._getKey(snapshot);
       var record = store.peekRecord(typeClass.modelName, id);
+			this._removeFromPreviousCache(id);
       // TODO: refactor using ED
       if (!record.get('isDeleted')) {
         record.deleteRecord();
       }
     } else {
       var payload = this._assignIdToPayload(snapshot);
-
+			this._removeFromPreviousCache(payload.id);
       this._enqueue(function FirebaseAdapter$enqueueStorePush() {
         if (!store.isDestroying) {
           var normalizedData = store.normalize(typeClass.modelName, payload);
@@ -372,25 +393,21 @@ export default DS.Adapter.extend(Waitable, {
     });
   },
 
-  /**
-   * Modified serialized record to use multipath update so that relationships get
-   * update correctly
-   */
   _recurseGenerateMultiPathUpdate(serializedRecord) {
     for (var key in serializedRecord) {
-      if (serializedRecord.hasOwnProperty(key) && key !== "_") {
+      if (serializedRecord.hasOwnProperty(key)) {
         var data = serializedRecord[key];
         if ((typeof data === "function")) {
           delete serializedRecord[key];
         }
         else if (!Ember.isNone(data) && (typeof data === "object")) {
           for (var prop in data) {
-            if (data.hasOwnProperty(prop)) {
-              var sub = key + '/' + prop;
-              this._recurseGenerateMultiPathUpdate(data[prop]);
-              serializedRecord[sub] = data[prop];
-            }
-          }
+						if (data.hasOwnProperty(prop)) {
+							var sub = key + '/' + prop;
+							this._recurseGenerateMultiPathUpdate(data[prop]);
+							serializedRecord[sub] = data[prop];
+						}
+					}
           delete serializedRecord[key];
         }
       } else {
@@ -398,7 +415,21 @@ export default DS.Adapter.extend(Waitable, {
       }
     }
   },
-
+	_recurseGenerateMultiPathDelete(current, previous) {
+		for (var key in previous) {
+			if (previous.hasOwnProperty(key)) {
+				// if previous does not have the property, set it to null
+				if (!current.hasOwnProperty(key)) {
+					current[key] = null;
+				} else {
+					var dataPrevious = previous[key];
+					if (!Ember.isNone(dataPrevious) && (typeof dataPrevious === "object")) {
+            this._recurseGenerateMultiPathDelete(current[key], dataPrevious);
+	        }
+				}
+			}
+		}
+	},
   /**
    * Called by the store when a record is created/updated via the `save`
    * method on a model record instance.
@@ -411,17 +442,25 @@ export default DS.Adapter.extend(Waitable, {
    */
   updateRecord(store, typeClass, snapshot) {
     var recordRef = this._getAbsoluteRef(snapshot.record);
+		var previous  = this._getFromPreviousCache(snapshot.id);
 
-    var pathPieces = recordRef.path.toString().split('/');
+		var pathPieces = recordRef.path.toString().split('/');
     var lastPiece = pathPieces[pathPieces.length-1];
     var serializedRecord = snapshot.serialize({
       includeId: (lastPiece !== snapshot.id) // record has no firebase `key` in path
     });
-    console.log("BEFORE ======> ");
-    console.log(serializedRecord);
+
+		console.log("BEFORE ======> ");
+    console.log(JSON.stringify(serializedRecord, null, '\t'));
     this._recurseGenerateMultiPathUpdate(serializedRecord);
-    console.log("AFTER ======> ");
-    console.log(serializedRecord);
+		if (previous) {
+			console.log("what !");
+			this._recurseGenerateMultiPathDelete(serializedRecord, previous);
+		}
+		console.log("AFTER ======> ");
+    console.log(JSON.stringify(serializedRecord, null, '\t'));
+		this._setPreviousCache(snapshot.id, serializedRecord);
+
     return this._updateRecord(recordRef, serializedRecord).then(() => {
       return this._cleanEmbeddedChildren(store, typeClass, snapshot);
     }).then(() => {
