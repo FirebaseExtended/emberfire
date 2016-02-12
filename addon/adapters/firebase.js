@@ -378,20 +378,19 @@ export default DS.Adapter.extend(Waitable, {
    */
   _recurseGenerateMultiPathUpdate(serializedRecord) {
     for (var key in serializedRecord) {
-			if (serializedRecord.hasOwnProperty(key)) {
-	      var data = serializedRecord[key];
-	      if (!Ember.isNone(data) && (typeof data === "object")) {
-	        for (var prop in data) {
-							var sub = key + '/' + prop;
-		          this._recurseGenerateMultiPathUpdate(data[prop]);
-		          serializedRecord[sub] = data[prop];
-						}
-	        }
-	        delete serializedRecord[key];
-	      }
-			} else {
-				delete serializedRecord[key];
-			}
+      if (serializedRecord.hasOwnProperty(key)) {
+        var data = serializedRecord[key];
+        if (!Ember.isNone(data) && (typeof data === "object")) {
+          for (var prop in data) {
+            var sub = key + '/' + prop;
+            this._recurseGenerateMultiPathUpdate(data[prop]);
+            serializedRecord[sub] = data[prop];
+          }
+          delete serializedRecord[key];
+        }
+      } else {
+        delete serializedRecord[key];
+      }
     }
   },
 
@@ -413,11 +412,11 @@ export default DS.Adapter.extend(Waitable, {
     var serializedRecord = snapshot.serialize({
       includeId: (lastPiece !== snapshot.id) // record has no firebase `key` in path
     });
-		console.log("BEFORE ======> ");
-		console.log(serializedRecord);
+    console.log("BEFORE ======> ");
+    console.log(serializedRecord);
     this._recurseGenerateMultiPathUpdate(serializedRecord);
-		console.log("AFTER ======> ");
-		console.log(serializedRecord);
+    console.log("AFTER ======> ");
+    console.log(serializedRecord);
     return this._updateRecord(recordRef, serializedRecord).then(() => {
       return this._cleanEmbeddedChildren(store, typeClass, snapshot);
     }).then(() => {
