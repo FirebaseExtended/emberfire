@@ -372,6 +372,23 @@ export default DS.Adapter.extend(Waitable, {
     });
   },
 
+  /**
+   * Modified serialized record to use multipath update so that relationships get
+   * update correctly
+   */
+  _recurseGenerateMultiPathUpdate(serializedRecord) {
+    for (var key in serializedRecord) {
+      var data = serializedRecord[key];
+      if (!Ember.isNone(data) && (typeof data === "object")) {
+        for (var prop in data) {
+          var sub = key + '/' + prop;
+          this._recurseGenerateMultiPathUpdate(data[prop]);
+          serializedRecord[sub] = data[prop];
+        }
+        delete serializedRecord[key];
+      }
+    }
+  },
 
   /**
    * Called by the store when a record is created/updated via the `save`
@@ -391,7 +408,11 @@ export default DS.Adapter.extend(Waitable, {
     var serializedRecord = snapshot.serialize({
       includeId: (lastPiece !== snapshot.id) // record has no firebase `key` in path
     });
-
+		console.log("BEFORE ======> ");
+		console.log(JSON.stringify(serializedRecord));
+    this._recurseGenerateMultiPathUpdate(serializedRecord);
+		console.log("AFTER ======> ");
+		console.log(JSON.stringify(serializedRecord));
     return this._updateRecord(recordRef, serializedRecord).then(() => {
       return this._cleanEmbeddedChildren(store, typeClass, snapshot);
     }).then(() => {
