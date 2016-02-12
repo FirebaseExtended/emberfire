@@ -378,13 +378,18 @@ export default DS.Adapter.extend(Waitable, {
    */
   _recurseGenerateMultiPathUpdate(serializedRecord) {
     for (var key in serializedRecord) {
-      if (serializedRecord.hasOwnProperty(key)) {
+      if (serializedRecord.hasOwnProperty(key) && key !== "_") {
         var data = serializedRecord[key];
-        if (!Ember.isNone(data) && (typeof data === "object")) {
+        if ((typeof data === "function")) {
+          delete serializedRecord[key];
+        }
+        else if (!Ember.isNone(data) && (typeof data === "object")) {
           for (var prop in data) {
-            var sub = key + '/' + prop;
-            this._recurseGenerateMultiPathUpdate(data[prop]);
-            serializedRecord[sub] = data[prop];
+            if (data.hasOwnProperty(prop)) {
+              var sub = key + '/' + prop;
+              this._recurseGenerateMultiPathUpdate(data[prop]);
+              serializedRecord[sub] = data[prop];
+            }
           }
           delete serializedRecord[key];
         }
