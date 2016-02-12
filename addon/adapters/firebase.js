@@ -360,7 +360,6 @@ export default DS.Adapter.extend(Waitable, {
       return;
     }
 		// reset cache
-
     var value = snapshot.val();
     if (value === null) {
       var id = this._getKey(snapshot);
@@ -372,7 +371,6 @@ export default DS.Adapter.extend(Waitable, {
       }
     } else {
       var payload = this._assignIdToPayload(snapshot);
-			this._removeFromPreviousCache(payload.id);
       this._enqueue(function FirebaseAdapter$enqueueStorePush() {
         if (!store.isDestroying) {
           var normalizedData = store.normalize(typeClass.modelName, payload);
@@ -450,15 +448,10 @@ export default DS.Adapter.extend(Waitable, {
       includeId: (lastPiece !== snapshot.id) // record has no firebase `key` in path
     });
 
-		console.log("BEFORE ======> ");
-    console.log(JSON.stringify(serializedRecord, null, '\t'));
     this._recurseGenerateMultiPathUpdate(serializedRecord);
 		if (previous) {
-			console.log("what !");
 			this._recurseGenerateMultiPathDelete(serializedRecord, previous);
 		}
-		console.log("AFTER ======> ");
-    console.log(JSON.stringify(serializedRecord, null, '\t'));
 		this._setPreviousCache(snapshot.id, serializedRecord);
 
     return this._updateRecord(recordRef, serializedRecord).then(() => {
