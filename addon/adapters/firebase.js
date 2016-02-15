@@ -177,7 +177,14 @@ export default DS.Adapter.extend(Waitable, {
           Ember.run(() => {
             this._handleChildValue(store, typeClass, snapshot);
           });
-        }
+        } else {
+					Ember.run( () => {
+						var payload = this._assignIdToPayload(snapshot);
+						this._recurseGenerateMultiPathUpdate(payload, '', payload);
+						this._setPreviousCache(payload.id, payload);
+					});
+				}
+
         called = true;
       }, (error) => {
         Ember.Logger.error(error);
@@ -371,9 +378,13 @@ export default DS.Adapter.extend(Waitable, {
       }
     } else {
       var payload = this._assignIdToPayload(snapshot);
+			// FIXME: deep object copy, definitly not the best way of doing ...
+			var payloadCache = JSON.parse(JSON.stringify(payload));
+			this._recurseGenerateMultiPathUpdate(payloadCache, '', payloadCache);
+			this._setPreviousCache(payloadCache.id, payloadCache);
       this._enqueue(function FirebaseAdapter$enqueueStorePush() {
         if (!store.isDestroying) {
-          var normalizedData = store.normalize(typeClass.modelName, payload);
+					var normalizedData = store.normalize(typeClass.modelName, payload);
           store.push(normalizedData);
         }
       });
@@ -391,7 +402,7 @@ export default DS.Adapter.extend(Waitable, {
     });
   },
 
-  _recurseGenerateMultiPathUpdate(serializedRecord) {
+  _recurseGenerateMultiPathUpdate(base, basePath, serializedRecord) {
     for (var key in serializedRecord) {
       if (serializedRecord.hasOwnProperty(key)) {
         var data = serializedRecord[key];
@@ -401,9 +412,9 @@ export default DS.Adapter.extend(Waitable, {
         else if (!Ember.isNone(data) && (typeof data === "object")) {
           for (var prop in data) {
 						if (data.hasOwnProperty(prop)) {
-							var sub = key + '/' + prop;
-							this._recurseGenerateMultiPathUpdate(data[prop]);
-							serializedRecord[sub] = data[prop];
+							var sub = basePath + key + '/' + prop;
+							this._recurseGenerateMultiPathUpdate(base, sub + '/', data[prop]);
+							base[sub] = data[prop];
 						}
 					}
           delete serializedRecord[key];
@@ -447,8 +458,7 @@ export default DS.Adapter.extend(Waitable, {
     var serializedRecord = snapshot.serialize({
       includeId: (lastPiece !== snapshot.id) // record has no firebase `key` in path
     });
-
-    this._recurseGenerateMultiPathUpdate(serializedRecord);
+    this._recurseGenerateMultiPathUpdate(serializedRecord, "", serializedRecord);
 		if (previous) {
 			this._recurseGenerateMultiPathDelete(serializedRecord, previous);
 		}
