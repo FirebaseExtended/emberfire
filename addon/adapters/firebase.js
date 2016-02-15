@@ -180,8 +180,10 @@ export default DS.Adapter.extend(Waitable, {
         } else {
 					Ember.run( () => {
 						var payload = this._assignIdToPayload(snapshot);
-						this._recurseGenerateMultiPathUpdate(payload, '', payload);
-						this._setPreviousCache(payload.id, payload);
+						if (payload) {
+							this._recurseGenerateMultiPathUpdate(payload, '', payload);
+							this._setPreviousCache(payload.id, payload);
+						}
 					});
 				}
 
@@ -379,9 +381,11 @@ export default DS.Adapter.extend(Waitable, {
     } else {
       var payload = this._assignIdToPayload(snapshot);
 			// FIXME: deep object copy, definitly not the best way of doing ...
-			var payloadCache = JSON.parse(JSON.stringify(payload));
-			this._recurseGenerateMultiPathUpdate(payloadCache, '', payloadCache);
-			this._setPreviousCache(payloadCache.id, payloadCache);
+			if (payload) {
+				var payloadCache = JSON.parse(JSON.stringify(payload));
+				this._recurseGenerateMultiPathUpdate(payloadCache, '', payloadCache);
+				this._setPreviousCache(payloadCache.id, payloadCache);				
+			}
       this._enqueue(function FirebaseAdapter$enqueueStorePush() {
         if (!store.isDestroying) {
 					var normalizedData = store.normalize(typeClass.modelName, payload);
