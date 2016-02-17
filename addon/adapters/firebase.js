@@ -611,6 +611,7 @@ export default DS.Adapter.extend(Waitable, {
    */
   deleteRecord(store, typeClass, snapshot) {
     var ref = this._getAbsoluteRef(snapshot.record);
+    ref.off('value');
     return toPromise(ref.remove, ref);
   },
 
