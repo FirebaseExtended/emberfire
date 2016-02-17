@@ -41,9 +41,9 @@ export default Ember.Object.extend(Waitable, {
         let providerSettings = options.settings || {};
         if (options.redirect === true) {
           // promise will never resolve unless there is an error
-          return this._toPromise(ref, 'authWithOAuthRedirect', options.provider, providerSettings);
+          return this._toPromise(ref, 'authWithOAuthRedirect', provider, providerSettings);
         }
-        return this._toPromise(ref, 'authWithOAuthPopup', options.provider, providerSettings);
+        return this._toPromise(ref, 'authWithOAuthPopup', provider, providerSettings);
     }
   },
 
