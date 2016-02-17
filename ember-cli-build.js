@@ -37,7 +37,7 @@ module.exports = function(defaults) {
   app.import('vendor/mockfirebase/shim.js', {
     type: 'test',
     exports: {
-      'mock-firebase': [
+      'mockfirebase': [
         'default'
       ]
     }

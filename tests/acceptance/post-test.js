@@ -8,6 +8,7 @@ import {
 import { expect } from 'chai';
 import Ember from 'ember';
 import startApp from '../helpers/start-app';
+import replaceAppRef from '../helpers/replace-app-ref';
 import stubFirebase from '../helpers/stub-firebase';
 import unstubFirebase from '../helpers/unstub-firebase';
 import createTestRef from '../helpers/create-test-ref';
@@ -20,10 +21,7 @@ describe('Acceptance: /post/:id', function() {
     application = startApp();
     ref = createTestRef('acceptance');
 
-    var store = application.__container__.lookup('service:store');
-    var adapter = store.adapterFor('application');
-    adapter._ref = ref;
-    adapter._queueFlushDelay = false;
+    replaceAppRef(application, ref);
   });
 
   afterEach(function() {
@@ -92,6 +90,24 @@ describe('Acceptance: /post/:id', function() {
 
     andThen(function() {
       expect(find('.post-comment:first .post-comment-date').text().trim()).to.not.equal(''); // careful of timezones
+    });
+  });
+
+  it('updates properties if they change on the server', function() {
+    visit('/post/post_1');
+
+    andThen(function() {
+      expect(find('.post-title').text().trim()).to.equal('Post 1');
+    });
+
+    andThen(function() {
+      Ember.run(function() {
+        ref.child('posts/post_1/title').set('Post 1 UPDATED');
+      });
+    });
+
+    andThen(function() {
+      expect(find('.post-title').text().trim()).to.equal('Post 1 UPDATED');
     });
   });
 

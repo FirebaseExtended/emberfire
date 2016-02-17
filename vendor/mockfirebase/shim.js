@@ -1,6 +1,6 @@
 /* globals Firebase */
 
-define('mock-firebase', [], function() {
+define('mockfirebase', [], function() {
   "use strict";
 
   return {

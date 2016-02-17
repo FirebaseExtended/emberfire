@@ -15,15 +15,14 @@ import unstubFirebase from '../helpers/unstub-firebase';
 import createTestRef from '../helpers/create-test-ref';
 
 describe('Acceptance: /auth', function() {
-  var application, ref;
+  var application;
 
   beforeEach(function() {
     stubFirebase();
     application = startApp();
-    ref = createTestRef('acceptance');
 
     var provider = application.__container__.lookup('torii-provider:firebase');
-    provider.set('firebase', ref);
+    provider.set('firebase', createTestRef('acceptance'));
   });
 
   afterEach(function() {
