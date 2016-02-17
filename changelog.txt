@@ -1,2 +1,0 @@
-changed - Model relationships are now saved after the model. This will allow better interop with security and validation rules.
-feature - Exposed `replaceAppRef`, `stubFirebase` and `createOfflineRef` to help test your EmberFire app.
