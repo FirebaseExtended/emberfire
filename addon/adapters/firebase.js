@@ -410,7 +410,6 @@ export default DS.Adapter.extend(Waitable, {
   updateRecord(store, typeClass, snapshot) {
     var recordRef = this._getAbsoluteRef(snapshot.record);
     var recordCache = this._getRecordCache(typeClass, snapshot.id);
-
     var pathPieces = recordRef.path.toString().split('/');
     var lastPiece = pathPieces[pathPieces.length-1];
     var serializedRecord = snapshot.serialize({
@@ -418,11 +417,7 @@ export default DS.Adapter.extend(Waitable, {
     });
 
     return new Promise((resolve, reject) => {
-
-
       var relationshipsToSave = [];
-
-
       // first we remove all relationships data from the serialized record, we backup the
       // removed data so that we can save it at a later stage.
       snapshot.record.eachRelationship((key, relationship) => {
@@ -446,11 +441,9 @@ export default DS.Adapter.extend(Waitable, {
         error.errors = errors;
         reject(error);
       };
-      var recordPromise = this._updateRecord(recordRef, serializedRecord);
-      recordPromise.then(() => {
+      this._updateRecord(recordRef, serializedRecord).then(() => {
         // and now we construct the list of promise to save relationships.
-        var savedRelationships = relationshipsToSave.map(
-          (relationshipToSave) => {
+        var savedRelationships = relationshipsToSave.map((relationshipToSave) => {
             const data = relationshipToSave.data;
             const relationship = relationshipToSave.relationship;
             if (relationshipToSave.hasMany) {
