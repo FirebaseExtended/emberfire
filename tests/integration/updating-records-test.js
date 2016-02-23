@@ -305,7 +305,6 @@ describe('Integration: FirebaseAdapter - Updating records', function() {
           parentId = parentRecord.get('id');
           embeddedId = embeddedRecord.get('id');
           parentRecord.get('children').addObject(embeddedRecord);
-          // debugger;
           parentRecord.save().then(function() {
             reference.once('value', function(snapshot) {
               parentData = snapshot.val().treeNodes[parentId];
@@ -515,6 +514,63 @@ describe('Integration: FirebaseAdapter - Updating records', function() {
 
     }); // embedded belongsTo records
 
+    it('respects keyForRelationship on belongsTo', function(done) {
+      const reference = firebaseTestRef.child('nonStandardKeys');
+      adapter._ref = reference;
+      store.serializerFor('application').keyForRelationship = function(key) {
+        return Ember.String.capitalize(key);
+      };
+
+      Ember.run(function() {
+        let user = store.createRecord('user', {
+          firstName: 'John'
+        });
+
+        let newPost = store.createRecord('post', {
+          title: 'New Post',
+          user: user
+        });
+
+        newPost.save().then(() => {
+          reference.once('value', fbSnapshot => {
+            const postData = fbSnapshot.val().posts[newPost.get('id')];
+            expect(postData.User).to.equal(user.get('id'));
+            done();
+          });
+        });
+      });
+    });
+
+    it('respects keyForRelationship on hasMany', function(done) {
+      const reference = firebaseTestRef.child('nonStandardKeys');
+      adapter._ref = reference;
+      store.serializerFor('application').keyForRelationship = function(key) {
+        return Ember.String.capitalize(key);
+      };
+
+      Ember.run(function() {
+        let post = store.createRecord('post', {
+          title: 'New Post'
+        });
+
+        let comment = store.createRecord('comment', {
+          body: 'A comment'
+        });
+
+        post.save().then(() => {
+          return comment.save();
+        }).then(() => {
+          post.set('comments', [comment]);
+          return post.save();
+        }).then(() => {
+          reference.once('value', fbSnapshot => {
+            const postData = fbSnapshot.val().posts[post.get('id')];
+            expect(postData.Comments).to.have.all.keys([comment.get('id')]);
+            done();
+          });
+        });
+      });
+    });
   });
 
 });
