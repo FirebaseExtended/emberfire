@@ -1,0 +1,1 @@
+fixed - EmberFire now respects the serializer's `keyForRelationship` method.

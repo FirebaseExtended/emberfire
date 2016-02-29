@@ -1,4 +1,5 @@
 /* jshint expr:true */
+import Ember from 'ember';
 import { expect } from 'chai';
 import {
   describeModule,
@@ -251,6 +252,47 @@ describeModule(
           });
         });
 
+        it('respects keyForRelationship in belongsTo', function() {
+          let serializer = this.subject();
+          serializer.keyForRelationship = function(key) {
+            return Ember.String.capitalize(key);
+          };
+
+          let { data } = serializer.normalize(Post, {
+            id: 'post_1',
+            published: 1395162147646,
+            User: 'aputinski'
+          });
+
+          expect(data.relationships.user).to.deep.equal({
+            data: { type: 'user', id: 'aputinski' }
+          });
+        });
+
+        it('respects keyForRelationship in hasMany', function() {
+          let serializer = this.subject();
+          serializer.keyForRelationship = function(key) {
+            return Ember.String.capitalize(key);
+          };
+
+          let { data } = serializer.normalize(Post, {
+            id: 'post_1',
+            published: 1395162147646,
+            body: 'This is the first FireBlog post!',
+            title: 'Post 1',
+            Comments: {
+              comment_1: true,
+              comment_2: true
+            },
+          });
+
+          expect(data.relationships.comments).to.deep.equal({
+            data: [
+              { type: 'comment', id: 'comment_1' },
+              { type: 'comment', id: 'comment_2' }
+            ]
+          });
+        });
       }); // normalized relationships
 
       describe('invalid data', function () {

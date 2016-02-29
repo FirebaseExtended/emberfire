@@ -415,13 +415,15 @@ export default DS.Adapter.extend(Waitable, {
     var serializedRecord = snapshot.serialize({
       includeId: (lastPiece !== snapshot.id) // record has no firebase `key` in path
     });
+    const serializer = store.serializerFor(typeClass.modelName);
 
     return new Promise((resolve, reject) => {
       var relationshipsToSave = [];
       // first we remove all relationships data from the serialized record, we backup the
       // removed data so that we can save it at a later stage.
       snapshot.record.eachRelationship((key, relationship) => {
-      const data = serializedRecord[key];
+      const relationshipKey = serializer.keyForRelationship(key);
+      const data = serializedRecord[relationshipKey];
       const isEmbedded = this.isRelationshipEmbedded(store, typeClass.modelName, relationship);
       const hasMany = relationship.kind === 'hasMany';
       if (hasMany || isEmbedded) {
@@ -433,7 +435,7 @@ export default DS.Adapter.extend(Waitable, {
               hasMany:hasMany
             });
           }
-          delete serializedRecord[key];
+          delete serializedRecord[relationshipKey];
         }
       });
       var reportError = (errors) => {
@@ -544,7 +546,8 @@ export default DS.Adapter.extend(Waitable, {
    * version of the record
    */
   _saveHasManyRecord(store, typeClass, relationship, parentRef, id) {
-    var ref = this._getRelationshipRef(parentRef, relationship.key, id);
+    const serializer = store.serializerFor(typeClass.modelName);
+    var ref = this._getRelationshipRef(parentRef, serializer.keyForRelationship(relationship.key), id);
     var record = store.peekRecord(relationship.type, id);
     var isEmbedded = this.isRelationshipEmbedded(store, typeClass.modelName, relationship);
     if (isEmbedded) {

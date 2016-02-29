@@ -35,7 +35,6 @@ export default DS.JSONSerializer.extend(DS.EmbeddedRecordsMixin, {
    */
   extractRelationships(modelClass, payload) {
     this.normalizeRelationships(modelClass, payload);
-
     return this._super(modelClass, payload);
   },
 
@@ -93,17 +92,19 @@ export default DS.JSONSerializer.extend(DS.EmbeddedRecordsMixin, {
    */
   normalizeRelationships(modelClass, payload) {
     modelClass.eachRelationship((key, meta) => {
-      if (meta.kind === 'hasMany') {
-        if (payload.hasOwnProperty(key)) {
+      let relationshipKey = this.keyForRelationship(key, meta.kind, 'deserialize');
 
+      if (meta.kind === 'hasMany') {
+        if (payload.hasOwnProperty(relationshipKey)) {
+          let relationshipPayload = payload[relationshipKey];
           // embedded
           if (this.hasDeserializeRecordsOption(key)) {
-            if (typeof payload[key] === 'object' && !Ember.isArray(payload[key])) {
-              payload[key] = Object.keys(payload[key]).map((id) => {
-                return assign({ id: id }, payload[key][id]);
+            if (typeof relationshipPayload === 'object' && !Ember.isArray(relationshipPayload)) {
+              relationshipPayload = Object.keys(relationshipPayload).map((id) => {
+                return assign({ id: id }, relationshipPayload[id]);
               });
-            } else if (Ember.isArray(payload[key])) {
-              payload[key] = this._addNumericIdsToEmbeddedArray(payload[key]);
+            } else if (Ember.isArray(relationshipPayload)) {
+              relationshipPayload = this._addNumericIdsToEmbeddedArray(relationshipPayload);
             } else {
               throw new Error(`${modelClass.toString()} relationship ${meta.kind}('${meta.type}') must contain embedded records with an \`id\`. Example: { "${key}": { "${meta.type}_1": { "id": "${meta.type}_1" } } } instead got: ${JSON.stringify(payload[key])}`);
             }
@@ -111,15 +112,16 @@ export default DS.JSONSerializer.extend(DS.EmbeddedRecordsMixin, {
 
           // normalized
           else {
-            if (typeof payload[key] === 'object' && !Ember.isArray(payload[key])) {
-              payload[key] = Object.keys(payload[key]);
-            } else if (Ember.isArray(payload[key])) {
-              payload[key] = this._convertBooleanArrayToIds(payload[key]);
+            if (typeof relationshipPayload === 'object' && !Ember.isArray(relationshipPayload)) {
+              relationshipPayload = Object.keys(relationshipPayload);
+            } else if (Ember.isArray(relationshipPayload)) {
+              relationshipPayload = this._convertBooleanArrayToIds(relationshipPayload);
             } else {
               throw new Error(`${modelClass.toString()} relationship ${meta.kind}('${meta.type}') must be a key/value map. Example: { "${key}": { "${meta.type}_1": true } } instead got: ${JSON.stringify(payload[key])}`);
             }
           }
 
+          payload[relationshipKey] = relationshipPayload;
         }
 
         // hasMany property is not present
@@ -127,14 +129,14 @@ export default DS.JSONSerializer.extend(DS.EmbeddedRecordsMixin, {
         // (i.e. it will never send `comments: null`) so we need to
         // force the empty relationship
         else {
-          payload[key] = [];
+          payload[relationshipKey] = [];
         }
       }
 
       if (meta.kind === 'belongsTo') {
-        if (!payload.hasOwnProperty(key)) {
+        if (!payload.hasOwnProperty(relationshipKey)) {
           // server wont send property if it was made null elsewhere
-          payload[key] = null;
+          payload[relationshipKey] = null;
         }
       }
     });
