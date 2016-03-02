@@ -514,63 +514,199 @@ describe('Integration: FirebaseAdapter - Updating records', function() {
 
     }); // embedded belongsTo records
 
-    it('respects keyForRelationship on belongsTo', function(done) {
-      const reference = firebaseTestRef.child('nonStandardKeys');
-      adapter._ref = reference;
-      store.serializerFor('application').keyForRelationship = function(key) {
-        return Ember.String.capitalize(key);
-      };
+    describe('when keyForRelationship is overwritten in serializer', function() {
+      it('adds belongsTo', function(done) {
+        const reference = firebaseTestRef.child('CapitalizedRelations');
+        adapter._ref = reference;
+        store.serializerFor('application').keyForRelationship = function(key) {
+          return Ember.String.capitalize(key);
+        };
 
-      Ember.run(function() {
-        let user = store.createRecord('user', {
-          firstName: 'John'
-        });
+        Ember.run(function() {
+          let user = store.createRecord('user', {
+            firstName: 'John'
+          });
 
-        let newPost = store.createRecord('post', {
-          title: 'New Post',
-          user: user
-        });
+          let newPost = store.createRecord('post', {
+            title: 'New Post',
+            user: user
+          });
 
-        newPost.save().then(() => {
-          reference.once('value', fbSnapshot => {
-            const postData = fbSnapshot.val().posts[newPost.get('id')];
-            expect(postData.User).to.equal(user.get('id'));
-            done();
+          newPost.save().then(() => {
+            reference.once('value', fbSnapshot => {
+              const postData = fbSnapshot.val().posts[newPost.get('id')];
+              expect(postData.User).to.equal(user.get('id'));
+              done();
+            });
           });
         });
       });
-    });
 
-    it('respects keyForRelationship on hasMany', function(done) {
-      const reference = firebaseTestRef.child('nonStandardKeys');
-      adapter._ref = reference;
-      store.serializerFor('application').keyForRelationship = function(key) {
-        return Ember.String.capitalize(key);
-      };
+      it('adds hasMany', function(done) {
+        const reference = firebaseTestRef.child('CapitalizedRelations');
+        adapter._ref = reference;
+        store.serializerFor('application').keyForRelationship = function(key) {
+          return Ember.String.capitalize(key);
+        };
 
-      Ember.run(function() {
-        let post = store.createRecord('post', {
-          title: 'New Post'
+        Ember.run(function() {
+          let post = store.createRecord('post', {
+            title: 'New Post'
+          });
+
+          let comment = store.createRecord('comment', {
+            body: 'A comment'
+          });
+
+          post.save().then(() => {
+            return comment.save();
+          }).then(() => {
+            post.set('comments', [comment]);
+            return post.save();
+          }).then(() => {
+            reference.once('value', fbSnapshot => {
+              const postData = fbSnapshot.val().posts[post.get('id')];
+              expect(postData.Comments).to.have.all.keys([comment.get('id')]);
+              done();
+            });
+          });
         });
+      });
 
-        let comment = store.createRecord('comment', {
-          body: 'A comment'
+      it('removes hasMany', function(done) {
+        const reference = firebaseTestRef.child('CapitalizedRelations');
+        adapter._ref = reference;
+        store.serializerFor('application').keyForRelationship = function(key) {
+          return Ember.String.capitalize(key);
+        };
+
+        Ember.run(function() {
+          let post = store.createRecord('post', {
+            title: 'New Post'
+          });
+
+          let commentA = store.createRecord('comment', {
+            body: 'A comment'
+          });
+
+          let commentB = store.createRecord('comment', {
+            body: 'Another comment'
+          });
+
+          post.save().then(() => {
+            return Ember.RSVP.all([
+              commentA.save(),
+              commentB.save()
+            ]);
+          }).then(() => {
+            post.set('comments', [commentA, commentB]);
+            return post.save();
+          }).then(() => {
+            post.set('comments', [commentA]);
+            return post.save();
+          }).then(() => {
+            reference.once('value', fbSnapshot => {
+              const postData = fbSnapshot.val().posts[post.get('id')];
+              expect(postData.Comments).to.not.have.all.keys([commentB.get('id')]);
+              done();
+            });
+          });
         });
+      });
 
-        post.save().then(() => {
-          return comment.save();
-        }).then(() => {
-          post.set('comments', [comment]);
-          return post.save();
-        }).then(() => {
-          reference.once('value', fbSnapshot => {
-            const postData = fbSnapshot.val().posts[post.get('id')];
-            expect(postData.Comments).to.have.all.keys([comment.get('id')]);
-            done();
+      it('saves embedded hasMany', function(done) {
+        const reference = firebaseTestRef.child('CapitalizedRelations');
+        adapter._ref = reference;
+        store.serializerFor('tree-node').keyForRelationship = function(key) {
+          return Ember.String.capitalize(key);
+        };
+
+        Ember.run(function() {
+          let parentRecord = store.createRecord('tree-node', {
+            label: 'Parent Node'
+          });
+          let embeddedRecord = store.createRecord('tree-node', {
+            label: 'Child Node'
+          });
+
+          const parentId = parentRecord.get('id');
+          const embeddedId = embeddedRecord.get('id');
+          parentRecord.get('children').addObject(embeddedRecord);
+          parentRecord.save().then(function() {
+            reference.once('value', function(snapshot) {
+              const parentData = snapshot.val().treeNodes[parentId];
+              expect(parentData.Children).to.have.all.keys(embeddedId);
+              done();
+            });
+          });
+        });
+      });
+
+      it('removes embedded hasMany', function(done) {
+        const reference = firebaseTestRef.child('CapitalizedRelations');
+        adapter._ref = reference;
+        store.serializerFor('tree-node').keyForRelationship = function(key) {
+          return Ember.String.capitalize(key);
+        };
+
+        Ember.run(function() {
+          let parentRecord = store.createRecord('tree-node', {
+            label: 'Parent Node'
+          });
+
+          let embeddedRecordA = store.createRecord('tree-node', {
+            label: 'Child Node'
+          });
+
+          let embeddedRecordB = store.createRecord('tree-node', {
+            label: 'Another Child Node'
+          });
+
+          const parentId = parentRecord.get('id');
+          const embeddedId = embeddedRecordB.get('id');
+          parentRecord.get('children').addObjects([embeddedRecordA, embeddedRecordB]);
+          parentRecord.save().then(() => {
+            embeddedRecordB.destroyRecord();
+            return parentRecord.save();
+          }).then(function() {
+            reference.once('value', function(snapshot) {
+              const parentData = snapshot.val().treeNodes[parentId];
+              expect(parentData.Children).to.not.have.all.keys(embeddedId);
+              done();
+            });
+          });
+        });
+      });
+
+      it('saves embedded belongsTo', function(done) {
+        const reference = firebaseTestRef.child('CapitalizedRelations');
+        adapter._ref = reference;
+        store.serializerFor('tree-node').keyForRelationship = function(key) {
+          return Ember.String.capitalize(key);
+        };
+
+        Ember.run(function() {
+          let parentRecord = store.createRecord('tree-node', {
+            label: 'Parent'
+          });
+          let embeddedRecord = store.createRecord('tree-node-config', {
+            sync: true
+          });
+          const parentId = parentRecord.get('id');
+          const embeddedId = embeddedRecord.get('id');
+          parentRecord.set('config', embeddedRecord);
+          parentRecord.save().then(function() {
+            reference.once('value', function(data) {
+              const parentData = data.val().treeNodes[parentId];
+              expect(parentData.Config).to.deep.equal({
+                id: embeddedId,
+                sync: true
+              });
+              done();
+             });
           });
         });
       });
     });
   });
-
 });
