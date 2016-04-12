@@ -115,7 +115,7 @@ export default DS.Adapter.extend(Waitable, {
 
     return this._fetch(ref, log).then((snapshot) => {
       var payload = this._assignIdToPayload(snapshot);
-      this._updateRecordCacheForType(typeClass, payload);
+      this._updateRecordCacheForType(typeClass, payload, store);
       if (payload === null) {
         var error = new Error(`no record was found at ${ref.toString()}`);
             error.recordId = id;
@@ -174,7 +174,7 @@ export default DS.Adapter.extend(Waitable, {
         var inverseKey = record.inverseFor(relationship.key);
         if (inverseKey && parentRecord.get('id')) {
           var parentRef = this._getCollectionRef(inverseKey.type, parentRecord.get('id'));
-          this._removeHasManyRecord(store, parentRef, inverseKey.name, record.id);
+          this._removeHasManyRecord(store, parentRef, inverseKey.name, record.constructor, record.id);
         }
       }
     });
@@ -231,7 +231,7 @@ export default DS.Adapter.extend(Waitable, {
       var results = [];
       snapshot.forEach((childSnapshot) => {
         var payload = this._assignIdToPayload(childSnapshot);
-        this._updateRecordCacheForType(typeClass, payload);
+        this._updateRecordCacheForType(typeClass, payload, store);
         results.push(payload);
       });
 
@@ -252,7 +252,7 @@ export default DS.Adapter.extend(Waitable, {
       if (!record || !record.__listening) {
         var payload = this._assignIdToPayload(snapshot);
         var normalizedData = store.normalize(typeClass.modelName, payload);
-        this._updateRecordCacheForType(typeClass, payload);
+        this._updateRecordCacheForType(typeClass, payload, store);
         record = store.push(normalizedData);
       }
 
@@ -289,7 +289,7 @@ export default DS.Adapter.extend(Waitable, {
       var results = [];
       snapshot.forEach((childSnapshot) => {
         var payload = this._assignIdToPayload(childSnapshot);
-        this._updateRecordCacheForType(typeClass, payload);
+        this._updateRecordCacheForType(typeClass, payload, store);
         results.push(payload);
       });
       return results;
@@ -516,7 +516,7 @@ export default DS.Adapter.extend(Waitable, {
     });
 
     removedRecords = map(removedRecords, (id) => {
-      return this._removeHasManyRecord(store, recordRef, relationship.key, id);
+      return this._removeHasManyRecord(store, recordRef, relationship.key, typeClass, id);
     });
     // Combine all the saved records
     var savedRecords = dirtyRecords.concat(removedRecords);
@@ -589,8 +589,9 @@ export default DS.Adapter.extend(Waitable, {
   /**
    * Remove a relationship
    */
-  _removeHasManyRecord(store, parentRef, key, id) {
-    var ref = this._getRelationshipRef(parentRef, key, id);
+  _removeHasManyRecord(store, parentRef, key, typeClass, id) {
+    const relationshipKey = store.serializerFor(typeClass.modelName).keyForRelationship(key);
+    var ref = this._getRelationshipRef(parentRef, relationshipKey, id);
     return toPromise(ref.remove, ref, [], ref.toString());
   },
 
@@ -658,7 +659,8 @@ export default DS.Adapter.extend(Waitable, {
 
     if (embeddingParent) {
       var { record: parent, relationship } = embeddingParent;
-      var recordRef = this._getAbsoluteRef(parent).child(relationship.key);
+      const embeddedKey = parent.store.serializerFor(parent.modelName).keyForRelationship(relationship.key);
+      var recordRef = this._getAbsoluteRef(parent).child(embeddedKey);
 
       if (relationship.kind === 'hasMany') {
         recordRef = recordRef.child(record.id);
@@ -760,14 +762,15 @@ export default DS.Adapter.extend(Waitable, {
   /**
    * _updateHasManyCacheForType
    */
-  _updateRecordCacheForType(typeClass, payload) {
+  _updateRecordCacheForType(typeClass, payload, store) {
     if (!payload) { return; }
     var id = payload.id;
     var cache = this._getRecordCache(typeClass, id);
+    const serializer = store.serializerFor(typeClass.modelName);
     // Only cache relationships for now
     typeClass.eachRelationship((key, relationship) => {
       if (relationship.kind === 'hasMany') {
-        var ids = payload[key];
+        var ids = payload[serializer.keyForRelationship(key)];
         cache[key] = !Ember.isNone(ids) ? Ember.A(Object.keys(ids)) : Ember.A();
       }
     });
