@@ -4,7 +4,7 @@ import {
   describeModule,
   it
 } from 'ember-mocha';
-import Firebase from 'firebase';
+import firebase from 'firebase';
 
 describeModule(
   'emberfire@service:firebase',
@@ -13,7 +13,7 @@ describeModule(
   function() {
     it('exists', function() {
       const service = this.subject();
-      expect(service instanceof Firebase);
+      expect(service instanceof firebase.database.Reference);
     });
   }
 );

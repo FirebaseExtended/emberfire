@@ -343,4 +343,3 @@ describe('Integration: FirebaseAdapter - Updates from server', function() {
     });
   });
 });
-

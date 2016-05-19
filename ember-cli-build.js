@@ -15,8 +15,18 @@ module.exports = function(defaults) {
   */
   app.import('bower_components/normalize-css/normalize.css');
   app.import('bower_components/moment/moment.js');
+
   app.import('bower_components/blueimp-md5/js/md5.js');
   app.import('vendor/markdown/markdown.js');
+
+  app.import('bower_components/sinon-as-promised/index.js', {
+    type: 'test',
+    exports: {
+      'sinon-as-promised': [
+        'default'
+      ]
+    }
+  });
 
   app.import('bower_components/sinon/index.js', {
     type: 'test'

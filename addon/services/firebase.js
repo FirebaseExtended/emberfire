@@ -1,8 +1,10 @@
-import Firebase from 'firebase';
+import firebase from 'firebase';
 
 export default {
   create() {
-    return new Firebase(this.config.firebase);
+    firebase.initializeApp(this.config.firebase);
+    firebase.database().ref().remove();
+    return firebase.database().ref();
   },
 
   config: null,

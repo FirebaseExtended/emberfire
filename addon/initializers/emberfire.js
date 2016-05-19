@@ -1,6 +1,6 @@
 import Ember from 'ember';
 import DS from 'ember-data';
-import Firebase from 'firebase';
+import firebase from 'firebase';
 import FirebaseAdapter from '../adapters/firebase';
 import FirebaseSerializer from '../serializers/firebase';
 import forEach from 'lodash/collection/forEach';
@@ -8,8 +8,8 @@ import forEach from 'lodash/collection/forEach';
 var VERSION = '0.0.0';
 
 if (Ember.libraries) {
-  if (Firebase.SDK_VERSION) {
-    Ember.libraries.registerCoreLibrary('Firebase', Firebase.SDK_VERSION);
+  if (firebase.SDK_VERSION) {
+    Ember.libraries.registerCoreLibrary('Firebase', firebase.SDK_VERSION);
   }
 
   Ember.libraries.registerCoreLibrary('EmberFire', VERSION);

@@ -29,9 +29,8 @@ describe("Integration: FirebaseAdapter - Finding Records", function() {
   describe("#init()", function() {
     it("has a Firebase ref", function() {
       assert(adapter._ref !== undefined);
-      assert(adapter._ref.toString().match(/^https\:\/\/emberfire\-tests\.firebaseio\.com/g));
+      assert(adapter._ref.toString().match(/\.firebaseio\.com/g));
     });
-
   });
 
   describe("#_getCollectionRef()", function() {

@@ -7,7 +7,9 @@ import {
 } from 'mocha';
 import { expect } from 'chai';
 import sinon from 'sinon';
-import Firebase from 'firebase';
+import 'sinon-as-promised';
+
+import firebase from 'firebase';
 import startApp from '../helpers/start-app';
 import destroyApp from '../helpers/destroy-app';
 import stubFirebase from '../helpers/stub-firebase';
@@ -15,11 +17,12 @@ import unstubFirebase from '../helpers/unstub-firebase';
 import createTestRef from '../helpers/create-test-ref';
 
 describe('Acceptance: /auth', function() {
-  var application;
+  var application, auth;
 
   beforeEach(function() {
     stubFirebase();
     application = startApp();
+    auth = firebase.auth();
 
     var provider = application.__container__.lookup('emberfire@torii-provider:firebase');
     provider.set('firebase', createTestRef('acceptance'));
@@ -55,8 +58,8 @@ describe('Acceptance: /auth', function() {
     });
 
     it('creates a session when the auth method returns data', function () {
-      authMethod = sinon.stub(Firebase.prototype, 'authAnonymously')
-        .yieldsAsync(null, authData);
+      var stub = sinon.stub(firebase.auth.Auth.prototype, 'signInAnonymously');
+      authMethod = stub.resolves(authData);
 
       visit('/auth');
 
@@ -86,8 +89,8 @@ describe('Acceptance: /auth', function() {
         twitter: {}
       };
 
-      authMethod = sinon.stub(Firebase.prototype, 'authWithOAuthPopup')
-        .yieldsAsync(null, authData);
+      authMethod = sinon.stub(firebase.auth.Auth.prototype, 'signInWithPopup')
+        .resolves(authData);
     });
 
     afterEach(function() {
@@ -123,8 +126,8 @@ describe('Acceptance: /auth', function() {
         facebook: {}
       };
 
-      authMethod = sinon.stub(Firebase.prototype, 'authWithOAuthPopup')
-        .yieldsAsync(null, authData);
+      authMethod = sinon.stub(firebase.auth.Auth.prototype, 'signInWithPopup')
+        .resolves(authData);
     });
 
     afterEach(function() {
@@ -160,8 +163,8 @@ describe('Acceptance: /auth', function() {
         github: {}
       };
 
-      authMethod = sinon.stub(Firebase.prototype, 'authWithOAuthPopup')
-        .yieldsAsync(null, authData);
+      authMethod = sinon.stub(firebase.auth.Auth.prototype, 'signInWithPopup')
+        .resolves(authData);
     });
 
     afterEach(function() {
@@ -197,8 +200,8 @@ describe('Acceptance: /auth', function() {
         google: {}
       };
 
-      authMethod = sinon.stub(Firebase.prototype, 'authWithOAuthPopup')
-        .yieldsAsync(null, authData);
+      authMethod = sinon.stub(firebase.auth.Auth.prototype, 'signInWithPopup')
+        .resolves(authData);
     });
 
     afterEach(function() {

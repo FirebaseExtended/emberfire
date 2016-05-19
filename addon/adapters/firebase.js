@@ -64,7 +64,7 @@ export default DS.Adapter.extend(Waitable, {
       throw new Error('Please set the `firebase` property on the adapter.');
     }
     // If provided Firebase reference was a query (eg: limits), make it a ref.
-    this._ref = firebase.ref();
+    this._ref = firebase.ref;
     // Keep track of what types `.findAll()` has been called for
     this._findAllMapForType = {};
     // Keep a cache to check modified relationships against
@@ -247,7 +247,7 @@ export default DS.Adapter.extend(Waitable, {
     ref = this.applyQueryToRef(ref, query);
 
     ref.on('child_added', Ember.run.bind(this, function (snapshot) {
-      var record = store.peekRecord(modelName, snapshot.key());
+      var record = store.peekRecord(modelName, this._getKey(snapshot));
 
       if (!record || !record.__listening) {
         var payload = this._assignIdToPayload(snapshot);
@@ -266,7 +266,7 @@ export default DS.Adapter.extend(Waitable, {
     // a much less common case because it relates to priority
 
     ref.on('child_removed', Ember.run.bind(this, function (snapshot) {
-      var record = store.peekRecord(modelName, snapshot.key());
+      var record = store.peekRecord(modelName, this._getKey(snapshot));
       if (record) {
         recordArray.get('content').removeObject(record._internalModel);
       }
@@ -797,7 +797,15 @@ export default DS.Adapter.extend(Waitable, {
    * helper can be removed.
    */
   _getKey(refOrSnapshot) {
-    return (typeof refOrSnapshot.key === 'function') ? refOrSnapshot.key() : refOrSnapshot.name();
+    var key;
+    if (typeof refOrSnapshot.key === 'function') {
+      key = refOrSnapshot.key();
+    } else if (typeof refOrSnapshot.key === 'string') {
+      key = refOrSnapshot.key;
+    } else {
+      key = refOrSnapshot.name();
+    }
+    return key;
   },
 
 

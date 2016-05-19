@@ -23,6 +23,11 @@ module.exports = function(environment) {
         // e.g. 'with-controller': true
       }
     },
+    firebase: {
+      apiKey: "AIzaSyDOlKivprJ3SquwbMUoBB0uK7V_FjUWAqI",
+      authDomain: "topstory.firebaseapp.com",
+      databaseURL: "https://topstory.firebaseio.com"
+    },
 
     APP: {
       // Here you can pass flags/options to your application instance

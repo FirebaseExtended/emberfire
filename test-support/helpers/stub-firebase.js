@@ -1,4 +1,4 @@
-import Firebase from 'firebase';
+import firebase from 'firebase';
 
 /**
  * When a reference is in offline mode it will not call any callbacks
@@ -7,40 +7,37 @@ import Firebase from 'firebase';
  * the process and call the supplied callbacks immediately (asynchronously).
  */
 export default function stubFirebase() {
-
   // check for existing stubbing
-  if (!Firebase._unStub) {
+  if (!firebase._unStub) {
+    var originalSet = firebase.database.Reference.prototype.set;
+    var originalUpdate = firebase.database.Reference.prototype.update;
+    var originalRemove = firebase.database.Reference.prototype.remove;
 
-    var originalSet = Firebase.prototype.set;
-    var originalUpdate = Firebase.prototype.update;
-    var originalRemove = Firebase.prototype.remove;
-
-    Firebase._unStub = function () {
-      Firebase.prototype.set = originalSet;
-      Firebase.prototype.update = originalUpdate;
-      Firebase.prototype.remove = originalRemove;
+    firebase._unStub = function () {
+      firebase.database.Reference.prototype.set = originalSet;
+      firebase.database.Reference.prototype.update = originalUpdate;
+      firebase.database.Reference.prototype.remove = originalRemove;
     };
 
-    Firebase.prototype.set = function(data, cb) {
+    firebase.database.Reference.prototype.set = function(data, cb) {
       originalSet.call(this, data);
       if (typeof cb === 'function') {
         setTimeout(cb, 0);
       }
     };
 
-    Firebase.prototype.update = function(data, cb) {
+    firebase.database.Reference.prototype.update = function(data, cb) {
       originalUpdate.call(this, data);
       if (typeof cb === 'function') {
         setTimeout(cb, 0);
       }
     };
 
-    Firebase.prototype.remove = function(cb) {
+    firebase.database.Reference.prototype.remove = function(cb) {
       originalRemove.call(this);
       if (typeof cb === 'function') {
         setTimeout(cb, 0);
       }
     };
-
   }
 }

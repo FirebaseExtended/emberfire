@@ -1,8 +1,15 @@
 import Ember from 'ember';
 import Waitable from '../mixins/waitable';
+import firebase from 'firebase';
 
 export default Ember.Object.extend(Waitable, {
   firebase: Ember.inject.service(),
+  providers: {
+    twitter: new firebase.auth.TwitterAuthProvider(),
+    facebook: new firebase.auth.FacebookAuthProvider(),
+    github: new firebase.auth.GithubAuthProvider(),
+    google: new firebase.auth.GoogleAuthProvider(),
+  },
 
   open(options) {
     var provider = options.provider || options.authWith;
@@ -12,7 +19,7 @@ export default Ember.Object.extend(Waitable, {
       return reject(new Error('`provider` must be supplied'));
     }
 
-    var ref = this.get('firebase');
+    var auth = firebase.auth();
 
     switch (provider) {
       case 'password':
@@ -20,30 +27,26 @@ export default Ember.Object.extend(Waitable, {
           return reject(new Error('`email` and `password` must be supplied'));
         }
 
-        return this._toPromise(ref, 'authWithPassword', {
-          email: options.email,
-          password: options.password,
-        });
-
+        return auth.signInWithEmailAndPassword(options.email, options.password);
 
       case 'custom':
         if (!options.token) {
           return reject(new Error('A token must be supplied'));
         }
 
-        return this._toPromise(ref, 'authWithCustomToken', options.token);
+        return auth.signInWithCustomToken(options.token);
 
       case 'anonymous':
-        return this._toPromise(ref, 'authAnonymously');
+        return auth.signInAnonymously();
 
       // oauth providers e.g. 'twitter'
       default:
-        let providerSettings = options.settings || {};
+        console.log(this.providers[provider], provider);
         if (options.redirect === true) {
           // promise will never resolve unless there is an error
-          return this._toPromise(ref, 'authWithOAuthRedirect', provider, providerSettings);
+          return auth.signInWithRedirect(this.providers[provider]);
         }
-        return this._toPromise(ref, 'authWithOAuthPopup', provider, providerSettings);
+        return auth.signInWithPopup(this.providers[provider]);
     }
   },
 
