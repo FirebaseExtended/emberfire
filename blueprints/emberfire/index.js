@@ -24,10 +24,10 @@ module.exports = {
 
     return this.addBowerPackagesToProject([ {name: 'firebase', target: "^2.1.0"} ])
     .then(function() {
-      return self.addToConfig('firebase', '\'' + firebaseUrl + '\'');
+      return self.addToConfig('firebase', '{ databaseURL: \'' + firebaseUrl + '\' }');
     })
     .then(function () {
-      return self.addToConfig('contentSecurityPolicy', '{ \'connect-src\': "\'self\' https://auth.firebase.com wss://*.firebaseio.com" }');
+      return self.addToConfig('contentSecurityPolicy', '{ \'connect-src\': "\'self\' https://*.googleapis.com wss://*.firebaseio.com" }');
     })
     .then(function () {
       var output = EOL;

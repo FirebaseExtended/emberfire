@@ -6,15 +6,22 @@ module.exports = function(environment) {
     environment: environment,
     baseURL: '/',
     locationType: 'auto',
-    firebase: 'https://emberfire-demo.firebaseio.com',
+    firebase: {
+      apiKey: 'AIzaSyCDX4pswUWqt2cti13L-k3XnDKzCivM89A',
+      authDomain: 'emberfire-demo.firebaseapp.com',
+      databaseURL: 'https://emberfire-demo.firebaseio.com',
+      storageBucket: 'firebase-emberfire-demo.appspot.com',
+    },
     torii: {
       sessionServiceName: 'session'
     },
     contentSecurityPolicy: {
+      'script-src': '\'self\' \'unsafe-eval\' apis.google.com',
       'style-src': '\'self\' \'unsafe-inline\' fonts.googleapis.com',
       'font-src': '\'self\' fonts.gstatic.com',
+      'frame-src': '\'self\' https://*.firebaseapp.com',
       'img-src': '\'self\' *.gravatar.com s3.amazonaws.com',
-      'connect-src': '\'self\' wss://*.firebaseio.com https://auth.firebase.com'
+      'connect-src': '\'self\' wss://*.firebaseio.com https://*.googleapis.com'
     },
     EmberENV: {
       EXTEND_PROTOTYPES: false,
@@ -22,11 +29,6 @@ module.exports = function(environment) {
         // Here you can enable experimental features on an ember canary build
         // e.g. 'with-controller': true
       }
-    },
-    firebase: {
-      apiKey: "AIzaSyDOlKivprJ3SquwbMUoBB0uK7V_FjUWAqI",
-      authDomain: "topstory.firebaseapp.com",
-      databaseURL: "https://topstory.firebaseio.com"
     },
 
     APP: {

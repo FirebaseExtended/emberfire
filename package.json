@@ -2,7 +2,7 @@
   "name": "emberfire",
   "description": "The officially supported Ember binding for Firebase",
   "version": "0.0.0",
-  "author": "Firebase <support@firebase.com> (https://www.firebase.com/)",
+  "author": "Firebase <firebase-support@google.com> (https://firebase.google.com/)",
   "homepage": "https://github.com/firebase/emberfire/",
   "directories": {
     "doc": "doc",
@@ -40,7 +40,7 @@
   "browserify-shim": {
     "ember": "global:Ember",
     "ember-data": "global:DS",
-    "firebase": "global:Firebase"
+    "firebase": "global:firebase"
   },
   "dependencies": {
     "chalk": "1.1.3",
@@ -75,6 +75,7 @@
     "browserify-shim": "3.8.12",
     "browserify": "10.2.6",
     "del": "1.2.0",
+    "ember-sinon": "0.5.1",
     "glob": "5.0.13",
     "gulp": "3.9.1",
     "gulp-concat": "2.6.0",

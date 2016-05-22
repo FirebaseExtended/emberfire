@@ -5,8 +5,12 @@ import {
   it
 } from 'ember-mocha';
 
-import MockFirebase from 'mockfirebase';
+import firebase from 'firebase';
+
 import sinon from 'sinon';
+import stubFirebase from 'dummy/tests/helpers/stub-firebase';
+import unstubFirebase from 'dummy/tests/helpers/unstub-firebase';
+import createOfflineRef from 'dummy/tests/helpers/create-offline-ref';
 
 describeModule('emberfire@adapter:firebase', 'FirebaseAdapter', {
     // Specify the other units that are required for this test.
@@ -14,7 +18,18 @@ describeModule('emberfire@adapter:firebase', 'FirebaseAdapter', {
   },
   function() {
 
+    beforeEach(function() {
+      stubFirebase();
+      const ref = createOfflineRef();
+      this.registry.register('service:firebase', ref, {instantiate: false, singleton: true});
+    });
+
+    afterEach(function() {
+      unstubFirebase();
+    });
+
     describe('#init', function () {
+
 
       it('throws an error when the firebase property is not supplied', function() {
         assert.throws(function() {
@@ -25,106 +40,101 @@ describeModule('emberfire@adapter:firebase', 'FirebaseAdapter', {
     }); // #init
 
     describe('#applyQueryToRef', function () {
-      var mockFirebase, adapter, ref;
+      var adapter, ref, stub;
 
       beforeEach(function () {
-        mockFirebase = new MockFirebase('https://emberfire-demo.firebaseio.com');
-        adapter = this.subject({
-          firebase: mockFirebase
-        });
-        ref = mockFirebase.ref();
-        // mock ref doesnt support the new query stuff, yet
-        ref.orderByKey = function () { return this; };
-        ref.orderByPriority = function () { return this; };
-        ref.orderByValue = function () { return this; };
-        ref.orderByChild = function () { return this; };
-        ref.limitToFirst = function () { return this; };
-        ref.limitToLast = function () { return this; };
-        ref.startAt = function () { return this; };
-        ref.endAt = function () { return this; };
-        ref.equalTo = function () { return this; };
+        adapter = this.subject();
+        ref = adapter._ref;
+      });
+
+      afterEach(function() {
+        if (stub.restore) {
+          stub.restore();
+        }
       });
 
       it('defaults to orderByKey when orderBy is not supplied', function () {
-        var spy = sinon.spy(ref, 'orderByKey');
+        stub = sinon.stub(ref, 'orderByKey');
 
         adapter.applyQueryToRef(ref, {});
-        assert(spy.calledOnce, 'orderByKey should be called');
+        assert(stub.calledOnce, 'orderByKey should be called');
       });
 
       it('defaults to orderByKey when orderBy is an empty string', function () {
-        var spy = sinon.spy(ref, 'orderByKey');
+        stub = sinon.stub(ref, 'orderByKey');
 
         adapter.applyQueryToRef(ref, { orderBy: '' });
-        assert(spy.calledOnce, 'orderByKey should be called');
+        assert(stub.calledOnce, 'orderByKey should be called');
       });
 
       ['key', 'value', 'priority'].forEach(function (k) {
         var upperK = Ember.String.capitalize(k);
 
         it(`orderBy: "_${k}" calls orderBy${upperK}`, function () {
-          var spy = sinon.spy(ref, 'orderBy' + upperK);
+          stub = sinon.stub(ref, 'orderBy' + upperK);
 
           adapter.applyQueryToRef(ref, { orderBy: '_' + k });
-          assert(spy.calledOnce, `orderBy${upperK} should be called`);
+          assert(stub.calledOnce, `orderBy${upperK} should be called`);
         });
 
       });
 
       it('orderBy: `x` calls orderByChild(x)', function () {
-        var spy = sinon.spy(ref, 'orderByChild');
+        stub = sinon.stub(ref, 'orderByChild');
 
         adapter.applyQueryToRef(ref, { orderBy: 'x' });
-        assert(spy.calledWith('x'), 'orderByChild should be called with `x`');
+        assert(stub.calledWith('x'), 'orderByChild should be called with `x`');
       });
 
-      ['limitToFirst', 'limitToLast', 'startAt', 'endAt', 'equalTo'].forEach(function (key) {
+      ['limitToFirst', 'limitToLast', 'startAt', 'endAt', 'equalTo'].forEach(function (method) {
 
-        it(`calls ${key} and passes through value when specified`, function () {
-          var spy = sinon.spy(ref, key);
+        var queryMethodStub;
 
-          var query = {};
-
-          query[key] = 'value';
-
-          adapter.applyQueryToRef(ref, query);
-          assert(spy.calledOnce);
-          assert(spy.calledWith('value'));
+        beforeEach(function() {
+          queryMethodStub = sinon.stub(firebase.database.Query.prototype, method);
         });
 
-        it(`calls ${key} and passes through value when empty string`, function () {
-          var spy = sinon.spy(ref, key);
-
-          var query = {};
-
-          query[key] = '';
-
-          adapter.applyQueryToRef(ref, query);
-          assert(spy.calledOnce);
-          assert(spy.calledWith(''));
+        afterEach(function() {
+          queryMethodStub.restore();
         });
 
-        it(`calls ${key} and passes through value when 'false'`, function () {
-          var spy = sinon.spy(ref, key);
-
+        it(`calls ${method} and passes through value when specified`, function () {
           var query = {};
 
-          query[key] = false;
+          query[method] = 'value';
 
           adapter.applyQueryToRef(ref, query);
-          assert(spy.calledOnce);
-          assert(spy.calledWith(false));
+          assert(queryMethodStub.calledOnce);
+          assert(queryMethodStub.calledWith('value'));
         });
 
-        it(`does not call ${key} when the value is null`, function () {
-          var spy = sinon.spy(ref, key);
-
+        it(`calls ${method} and passes through value when empty string`, function () {
           var query = {};
 
-          query[key] = null;
+          query[method] = '';
 
           adapter.applyQueryToRef(ref, query);
-          assert(spy.called === false, `${key} should not be called`);
+          assert(queryMethodStub.calledOnce);
+          assert(queryMethodStub.calledWith(''));
+        });
+
+        it(`calls ${method} and passes through value when 'false'`, function () {
+          var query = {};
+
+          query[method] = false;
+
+          adapter.applyQueryToRef(ref, query);
+          assert(queryMethodStub.calledOnce);
+          assert(queryMethodStub.calledWith(false));
+        });
+
+        it(`does not call ${method} when the value is null`, function () {
+          var query = {};
+
+          query[method] = null;
+
+          adapter.applyQueryToRef(ref, query);
+          assert(queryMethodStub.called === false, `${method} should not be called`);
         });
 
       }); // forEach
@@ -137,7 +147,6 @@ describeModule('emberfire@adapter:firebase', 'FirebaseAdapter', {
 
       beforeEach(function() {
         adapter = this.subject({
-          firebase: new MockFirebase('https://emberfire-demo.firebaseio.com'),
           _queueFlushDelay: 1
         });
         spy = sinon.spy(adapter, "_queueScheduleFlush");
@@ -162,7 +171,6 @@ describeModule('emberfire@adapter:firebase', 'FirebaseAdapter', {
 
       beforeEach(function() {
         adapter = this.subject({
-          firebase: new MockFirebase('https://emberfire-demo.firebaseio.com'),
           _queueFlushDelay: 1
         });
         queueScheduleFlushSpy = sinon.spy(adapter, "_queueScheduleFlush");

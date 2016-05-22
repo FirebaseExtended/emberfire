@@ -19,40 +19,5 @@ module.exports = function(defaults) {
   app.import('bower_components/blueimp-md5/js/md5.js');
   app.import('vendor/markdown/markdown.js');
 
-  app.import('bower_components/sinon-as-promised/index.js', {
-    type: 'test',
-    exports: {
-      'sinon-as-promised': [
-        'default'
-      ]
-    }
-  });
-
-  app.import('bower_components/sinon/index.js', {
-    type: 'test'
-  });
-
-  app.import('vendor/sinon/shim.js', {
-    type: 'test',
-    exports: {
-      'sinon': [
-        'default'
-      ]
-    }
-  });
-
-  app.import('bower_components/mockfirebase/browser/mockfirebase.js', {
-    type: 'test'
-  });
-
-  app.import('vendor/mockfirebase/shim.js', {
-    type: 'test',
-    exports: {
-      'mockfirebase': [
-        'default'
-      ]
-    }
-  });
-
   return app.toTree();
 };

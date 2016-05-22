@@ -30,7 +30,7 @@
     "package.json"
   ],
   "dependencies": {
-    "firebase": "2.x.x"
+    "firebase": "3.x.x"
   },
   "devDependencies": {
     "ember": "2.5.1",
@@ -39,7 +39,6 @@
     "ember-mocha": "0.8.11",
     "moment": "2.10.3",
     "blueimp-md5": "1.1.0",
-    "normalize-css": "3.0.3",
-    "sinon": "http://sinonjs.org/releases/sinon-1.16.1.js"
+    "normalize-css": "3.0.3"
   }
 }

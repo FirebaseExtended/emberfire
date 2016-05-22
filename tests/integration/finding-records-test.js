@@ -6,19 +6,21 @@ import sinon from 'sinon';
 import stubFirebase from 'dummy/tests/helpers/stub-firebase';
 import unstubFirebase from 'dummy/tests/helpers/unstub-firebase';
 import createTestRef from 'dummy/tests/helpers/create-test-ref';
+import replaceAppRef from 'dummy/tests/helpers/replace-app-ref';
 
-describe("Integration: FirebaseAdapter - Finding Records", function() {
+const { run } = Ember;
+
+describe('Integration: FirebaseAdapter - Finding Records', function() {
   var app, store, adapter;
 
   beforeEach(function() {
     stubFirebase();
 
     app = startApp();
+    replaceAppRef(app, createTestRef('blogs/normalized'));
 
-    store = app.__container__.lookup("service:store");
+    store = app.__container__.lookup('service:store');
     adapter = store.adapterFor('application');
-    adapter._ref = createTestRef("blogs/normalized");
-    adapter._queueFlushDelay = false;
   });
 
   afterEach(function() {
@@ -26,35 +28,34 @@ describe("Integration: FirebaseAdapter - Finding Records", function() {
     destroyApp(app);
   });
 
-  describe("#init()", function() {
-    it("has a Firebase ref", function() {
-      assert(adapter._ref !== undefined);
-      assert(adapter._ref.toString().match(/\.firebaseio\.com/g));
+  describe('#init()', function() {
+    it('has a Firebase ref', function() {
+      assert.ok(adapter._ref !== undefined, 'ref is defined');
     });
   });
 
-  describe("#_getCollectionRef()", function() {
-    it("returns the correct Firebase ref for a type", function() {
-      var ref = adapter._getCollectionRef(store.modelFor("post"));
-      assert(ref.toString().match(/blogs\/normalized\/posts$/g));
+  describe('#_getCollectionRef()', function() {
+    it('returns the correct Firebase ref for a type', function() {
+      var ref = adapter._getCollectionRef(store.modelFor('post'));
+      assert.ok(ref.toString().match(/blogs\/normalized\/posts$/g));
     });
 
-    it("returns the correct Firebase ref for a type and id", function() {
-      var ref = adapter._getCollectionRef(store.modelFor("post"), "post_1");
-      assert(ref.toString().match(/blogs\/normalized\/posts\/post_1$/g));
+    it('returns the correct Firebase ref for a type and id', function() {
+      var ref = adapter._getCollectionRef(store.modelFor('post'), 'post_1');
+      assert.ok(ref.toString().match(/blogs\/normalized\/posts\/post_1$/g));
     });
 
   });
 
 
-  describe("#find()", function() {
+  describe('#find()', function() {
 
     var getRefSpy, findPromise, findRef;
 
     beforeEach(function(done) {
-      getRefSpy = sinon.spy(adapter, "_getCollectionRef");
-      Ember.run(function () {
-        findPromise =  adapter.findRecord(store, store.modelFor("post"), "post_1");
+      getRefSpy = sinon.spy(adapter, '_getCollectionRef');
+      run(() => {
+        findPromise =  adapter.findRecord(store, store.modelFor('post'), 'post_1');
 
         findPromise.then(() => {
           findRef = getRefSpy.getCall(0).returnValue;
@@ -67,53 +68,53 @@ describe("Integration: FirebaseAdapter - Finding Records", function() {
       getRefSpy.restore();
     });
 
-    it("creates a single Firebase reference", function() {
-      assert(getRefSpy.calledOnce);
+    it('creates a single Firebase reference', function() {
+      assert.ok(getRefSpy.calledOnce);
     });
 
-    it("creates the correct Firebase reference", function() {
-      assert(findRef.toString().match(/blogs\/normalized\/posts\/post_1$/g));
+    it('creates the correct Firebase reference', function() {
+      assert.ok(findRef.toString().match(/blogs\/normalized\/posts\/post_1$/g));
     });
 
-    it("returns an object", function() {
-      assert.equal(typeof findPromise, "object");
+    it('returns an object', function() {
+      assert.equal(typeof findPromise, 'object');
     });
 
-    it("returns a promise", function() {
-      assert.equal(typeof findPromise.then, "function");
+    it('returns a promise', function() {
+      assert.equal(typeof findPromise.then, 'function');
     });
 
-    it("resolves with the correct payload", function(done) {
-      Ember.run(function() {
+    it('resolves with the correct payload', function(done) {
+      run(() => {
         findPromise.then(function(payload) {
-          assert.equal(payload.id, "post_1");
+          assert.equal(payload.id, 'post_1');
           done();
         });
       });
     });
 
-    it("throws an error for records that don't exist", function(done) {
-      Ember.run(function() {
-         adapter.findRecord(store, store.modelFor("post"), "foobar").then(function() {}, function(error) {
-          assert(error instanceof Error);
+    it('throws an error for records that don\'t exist', function(done) {
+      run(() => {
+         adapter.findRecord(store, store.modelFor('post'), 'foobar').then(function() {}, function(error) {
+          assert.ok(error instanceof Error);
           done();
         });
       });
     });
   });
 
-  describe("#findAll()", function() {
+  describe('#findAll()', function() {
 
     var getRefSpy, findAllAddEventListenersSpy, handleChildValueSpy;
     var findAllPromise, findAllRef;
 
     beforeEach(function(done) {
-      getRefSpy = sinon.spy(adapter, "_getCollectionRef");
-      findAllAddEventListenersSpy = sinon.spy(adapter, "_findAllAddEventListeners");
-      handleChildValueSpy = sinon.spy(adapter, "_handleChildValue");
+      getRefSpy = sinon.spy(adapter, '_getCollectionRef');
+      findAllAddEventListenersSpy = sinon.spy(adapter, '_findAllAddEventListeners');
+      handleChildValueSpy = sinon.spy(adapter, '_handleChildValue');
 
-      Ember.run(function () {
-        findAllPromise = adapter.findAll(store, store.modelFor("post"));
+      run(() => {
+        findAllPromise = adapter.findAll(store, store.modelFor('post'));
 
         findAllPromise.then(() => {
           findAllRef = getRefSpy.getCall(0).returnValue;
@@ -128,50 +129,54 @@ describe("Integration: FirebaseAdapter - Finding Records", function() {
       handleChildValueSpy.restore();
     });
 
-    it("creates the correct Firebase reference", function() {
-      assert(findAllRef.toString().match(/blogs\/normalized\/posts$/g));
+    it('creates the correct Firebase reference', function() {
+      assert.ok(findAllRef.toString().match(/blogs\/normalized\/posts$/g));
     });
 
-    it("returns an object", function() {
-      assert.equal(typeof findAllPromise, "object");
+    it('returns an object', function() {
+      assert.equal(typeof findAllPromise, 'object');
     });
 
-    it("returns a promise", function() {
-      assert.equal(typeof findAllPromise.then, "function");
+    it('returns a promise', function() {
+      assert.equal(typeof findAllPromise.then, 'function');
     });
 
-    it("resolves with the correct payload", function(done) {
-      Ember.run(function() {
+    it('resolves with the correct payload', function(done) {
+      run(() => {
         findAllPromise.then(function(payload) {
-          assert(Ember.isArray(payload));
+          assert.ok(Ember.isArray(payload));
           assert.equal(payload.length, 3);
           done();
         });
       });
     });
 
-    it("only adds event listeners once per type", function(done) {
-      adapter.findAll(store, store.modelFor("post")).then(function() {
+    it('only adds event listeners once per type', function(done) {
+      adapter.findAll(store, store.modelFor('post')).then(function() {
         assert.equal(findAllAddEventListenersSpy.callCount, 1);
         done();
       });
     });
 
-    it("adds new child values to the store", function() {
-      Ember.run(function(){
+    it('adds new child values to the store', function(done) {
+      run(() => {
         findAllRef.child('post_3').set({
           published: 1395162147646,
-          body: "This is the third FireBlog post!",
-          title: "Post 3"
+          body: 'This is the third FireBlog post!',
+          title: 'Post 3'
+        }, () => {
+          run.later(() => {
+            assert.ok(store.hasRecordForId('post', 'post_3'));
+            done();
+          }, 50);
         });
       });
-      assert(store.hasRecordForId('post', 'post_3'));
     });
 
-    it("handles empty collections", function(done) {
-      Ember.run(function() {
-        adapter.findAll(store, store.modelFor("post")).then(function(posts) {
-          assert(Ember.isArray(posts));
+    it('handles empty collections', function(done) {
+      run(() => {
+        adapter.findAll(store, store.modelFor('post')).then(function(posts) {
+          assert.ok(Ember.isArray(posts));
           done();
         });
       });

@@ -3,89 +3,82 @@ import Waitable from '../mixins/waitable';
 import firebase from 'firebase';
 
 export default Ember.Object.extend(Waitable, {
-  firebase: Ember.inject.service(),
+  firebaseApp: Ember.inject.service(),
+
   providers: {
-    twitter: new firebase.auth.TwitterAuthProvider(),
-    facebook: new firebase.auth.FacebookAuthProvider(),
-    github: new firebase.auth.GithubAuthProvider(),
-    google: new firebase.auth.GoogleAuthProvider(),
+    twitter: firebase.auth.TwitterAuthProvider,
+    facebook: firebase.auth.FacebookAuthProvider,
+    github: firebase.auth.GithubAuthProvider,
+    google: firebase.auth.GoogleAuthProvider,
   },
 
   open(options) {
-    var provider = options.provider || options.authWith;
+    var providerId = options.provider;
     var reject = Ember.RSVP.reject;
 
-    if (!provider) {
+    if (!providerId) {
       return reject(new Error('`provider` must be supplied'));
     }
 
-    var auth = firebase.auth();
+    var auth = this.get('firebaseApp').auth();
 
-    switch (provider) {
+    switch (providerId) {
       case 'password':
-        if (!options.email && !options.password) {
-          return reject(new Error('`email` and `password` must be supplied'));
+        if (!options.email || !options.password) {
+          return this.waitFor_(reject(new Error('`email` and `password` must be supplied')));
         }
 
-        return auth.signInWithEmailAndPassword(options.email, options.password);
+        return this.waitFor_(auth.signInWithEmailAndPassword(options.email, options.password));
 
       case 'custom':
         if (!options.token) {
-          return reject(new Error('A token must be supplied'));
+          return this.waitFor_(reject(new Error('A token must be supplied')));
         }
 
-        return auth.signInWithCustomToken(options.token);
+        return this.waitFor_(auth.signInWithCustomToken(options.token));
 
       case 'anonymous':
-        return auth.signInAnonymously();
+        return this.waitFor_(auth.signInAnonymously());
 
       // oauth providers e.g. 'twitter'
       default:
-        console.log(this.providers[provider], provider);
-        if (options.redirect === true) {
-          // promise will never resolve unless there is an error
-          return auth.signInWithRedirect(this.providers[provider]);
+        const ProviderClass = this.providers[providerId];
+        if (!ProviderClass) {
+          return this.waitFor_(reject(new Error('Unknown provider')));
         }
-        return auth.signInWithPopup(this.providers[provider]);
+
+        const provider = new ProviderClass();
+
+        if (options.options && options.options.scopes) {
+          options.options.scopes.forEach((s) => provider.addScope(s));
+        }
+
+        if (options.redirect === true) {
+          // promise will never resolve unless there is an error (due to redirect)
+          return this.waitFor_(auth.signInWithRedirect(provider));
+        }
+        return this.waitFor_(auth.signInWithPopup(provider));
     }
   },
 
 
   /**
-   * Promisify auth methods, and
-   * @param  {Firebase} ref
-   * @param  {String} method
-   * @param  {Object|String} [param]
-   * @param  {Object} [options]
-   * @return {Promise}
+   * Wraps a promise in test waiters.
+   *
+   * @param {!Promise} promise
+   * @return {!Promise}
    */
-  _toPromise(ref, method, param, options) {
+  waitFor_(promise) {
     this._incrementWaiters();
-
-    return new Ember.RSVP.Promise((resolve, reject) => {
-
-      var onComplete = (error, authData) => {
-        this._decrementWaiters();
-        if (error) {
-          reject(error);
-        } else {
-          resolve(authData);
-        }
-      };
-
-      var args = [];
-
-      if (typeof param !== 'undefined') {
-        args.push(param);
+    return promise.then((result) => {
+      this._decrementWaiters();
+      if (result.user) {
+        return result.user;
       }
-
-      args.push(onComplete);
-
-      if (typeof options !== 'undefined') {
-        args.push(options);
-      }
-
-      ref[method].apply(ref, args);
+      return result;
+    }).catch((err) => {
+      this._decrementWaiters();
+      return Ember.RSVP.reject(err);
     });
   }
 });

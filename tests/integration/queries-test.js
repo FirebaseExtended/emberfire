@@ -6,7 +6,7 @@ import stubFirebase from 'dummy/tests/helpers/stub-firebase';
 import unstubFirebase from 'dummy/tests/helpers/unstub-firebase';
 import createTestRef from 'dummy/tests/helpers/create-test-ref';
 
-describe('Integration: FirebaseAdapter - Queries', function() {
+xdescribe('Integration: FirebaseAdapter - Queries', function() {
   var app, store, adapter, queryArray, ref;
 
   beforeEach(function(done) {

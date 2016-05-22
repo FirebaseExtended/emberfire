@@ -7,30 +7,44 @@ import {
 } from 'mocha';
 import { expect } from 'chai';
 import sinon from 'sinon';
-import 'sinon-as-promised';
 
-import firebase from 'firebase';
 import startApp from '../helpers/start-app';
 import destroyApp from '../helpers/destroy-app';
 import stubFirebase from '../helpers/stub-firebase';
 import unstubFirebase from '../helpers/unstub-firebase';
 import createTestRef from '../helpers/create-test-ref';
+import replaceAppRef from '../helpers/replace-app-ref';
+import replaceFirebaseAppService from '../helpers/replace-firebase-app-service';
 
 describe('Acceptance: /auth', function() {
-  var application, auth;
+  let application;
+  let signInWithPopupStub;
+
+  const authMock = {
+    signInAnonymously() {},
+    signInWithPopup() {}
+  };
+
+  const firebaseAppMock = {
+    auth() {
+      console.log('auth()');
+      return authMock;
+    }
+  };
 
   beforeEach(function() {
     stubFirebase();
-    application = startApp();
-    auth = firebase.auth();
+    signInWithPopupStub = sinon.stub(authMock, 'signInWithPopup');
 
-    var provider = application.__container__.lookup('emberfire@torii-provider:firebase');
-    provider.set('firebase', createTestRef('acceptance'));
+    application = startApp();
+    replaceFirebaseAppService(application, firebaseAppMock);
+    replaceAppRef(application, createTestRef('acceptance'));
   });
 
   afterEach(function() {
-    unstubFirebase();
+    signInWithPopupStub.restore();
     destroyApp(application);
+    unstubFirebase();
   });
 
   it('can visit /auth', function() {
@@ -43,24 +57,25 @@ describe('Acceptance: /auth', function() {
 
   describe('anonymous auth', function () {
 
-    var authMethod, authData;
+    let authData, signInAnonymouslyStub;
 
     beforeEach(function() {
       authData = {
-        provider: 'anonymous',
         uid: 'uid1234',
-        anonymous: {}
+        isAnonymous: true,
+        providerData: []
       };
+
+      signInAnonymouslyStub =
+          sinon.stub(authMock, 'signInAnonymously')
+              .returns(Ember.RSVP.resolve(authData));
     });
 
     afterEach(function() {
-      authMethod.restore();
+      signInAnonymouslyStub.restore();
     });
 
     it('creates a session when the auth method returns data', function () {
-      var stub = sinon.stub(firebase.auth.Auth.prototype, 'signInAnonymously');
-      authMethod = stub.resolves(authData);
-
       visit('/auth');
 
       andThen(function() {
@@ -70,9 +85,10 @@ describe('Acceptance: /auth', function() {
       click('.auth-as-anon');
 
       andThen(function() {
+        console.log(authData);
         expect(find('.user-data-is-authenticated').text().trim()).to.equal('true');
-        expect(find('.user-data-provider').text().trim()).to.equal(authData.provider);
-        expect(find('.user-data-uid').text().trim()).to.equal(authData.uid);
+        expect(find('.user-data-provider').text().trim()).to.equal('anonymous');
+        expect(find('.user-data-uid').text().trim()).to.equal('uid1234');
       });
     });
 
@@ -80,21 +96,15 @@ describe('Acceptance: /auth', function() {
 
   describe('twitter auth', function () {
 
-    var authMethod, authData;
+    let authData;
 
     beforeEach(function() {
       authData = {
-        provider: 'twitter',
         uid: 'twitter:uid1234',
-        twitter: {}
+        providerData: [{providerId: 'twitter.com'}],
       };
 
-      authMethod = sinon.stub(firebase.auth.Auth.prototype, 'signInWithPopup')
-        .resolves(authData);
-    });
-
-    afterEach(function() {
-      authMethod.restore();
+      signInWithPopupStub.returns(Ember.RSVP.Promise.resolve(authData));
     });
 
     it('creates a session when the auth method returns data', function () {
@@ -108,7 +118,7 @@ describe('Acceptance: /auth', function() {
 
       andThen(function() {
         expect(find('.user-data-is-authenticated').text().trim()).to.equal('true');
-        expect(find('.user-data-provider').text().trim()).to.equal(authData.provider);
+        expect(find('.user-data-provider').text().trim()).to.equal('twitter.com');
         expect(find('.user-data-uid').text().trim()).to.equal(authData.uid);
       });
     });
@@ -117,21 +127,15 @@ describe('Acceptance: /auth', function() {
 
   describe('facebook auth', function () {
 
-    var authMethod, authData;
+    let authData;
 
     beforeEach(function() {
       authData = {
-        provider: 'facebook',
-        uid: 'facebook:uid1234',
-        facebook: {}
+        uid: 'uid1234',
+        providerData: [{providerId: 'facebook.com'}],
       };
 
-      authMethod = sinon.stub(firebase.auth.Auth.prototype, 'signInWithPopup')
-        .resolves(authData);
-    });
-
-    afterEach(function() {
-      authMethod.restore();
+      signInWithPopupStub.returns(Ember.RSVP.Promise.resolve(authData));
     });
 
     it('creates a session when the auth method returns data', function () {
@@ -145,7 +149,7 @@ describe('Acceptance: /auth', function() {
 
       andThen(function() {
         expect(find('.user-data-is-authenticated').text().trim()).to.equal('true');
-        expect(find('.user-data-provider').text().trim()).to.equal(authData.provider);
+        expect(find('.user-data-provider').text().trim()).to.equal('facebook.com');
         expect(find('.user-data-uid').text().trim()).to.equal(authData.uid);
       });
     });
@@ -154,21 +158,15 @@ describe('Acceptance: /auth', function() {
 
   describe('github auth', function () {
 
-    var authMethod, authData;
+    let authData;
 
     beforeEach(function() {
       authData = {
-        provider: 'github',
-        uid: 'github:uid1234',
-        github: {}
+        uid: 'uid1234',
+        providerData: [{providerId: 'github.com'}],
       };
 
-      authMethod = sinon.stub(firebase.auth.Auth.prototype, 'signInWithPopup')
-        .resolves(authData);
-    });
-
-    afterEach(function() {
-      authMethod.restore();
+      signInWithPopupStub.returns(Ember.RSVP.Promise.resolve(authData));
     });
 
     it('creates a session when the auth method returns data', function () {
@@ -182,7 +180,7 @@ describe('Acceptance: /auth', function() {
 
       andThen(function() {
         expect(find('.user-data-is-authenticated').text().trim()).to.equal('true');
-        expect(find('.user-data-provider').text().trim()).to.equal(authData.provider);
+        expect(find('.user-data-provider').text().trim()).to.equal('github.com');
         expect(find('.user-data-uid').text().trim()).to.equal(authData.uid);
       });
     });
@@ -191,21 +189,15 @@ describe('Acceptance: /auth', function() {
 
   describe('google auth', function () {
 
-    var authMethod, authData;
+    let authData;
 
     beforeEach(function() {
       authData = {
-        provider: 'google',
-        uid: 'google:uid1234',
-        google: {}
+        uid: 'uid1234',
+        providerData: [{providerId: 'google.com'}],
       };
 
-      authMethod = sinon.stub(firebase.auth.Auth.prototype, 'signInWithPopup')
-        .resolves(authData);
-    });
-
-    afterEach(function() {
-      authMethod.restore();
+      signInWithPopupStub.returns(Ember.RSVP.Promise.resolve(authData));
     });
 
     it('creates a session when the auth method returns data', function () {
@@ -219,7 +211,7 @@ describe('Acceptance: /auth', function() {
 
       andThen(function() {
         expect(find('.user-data-is-authenticated').text().trim()).to.equal('true');
-        expect(find('.user-data-provider').text().trim()).to.equal(authData.provider);
+        expect(find('.user-data-provider').text().trim()).to.equal('google.com');
         expect(find('.user-data-uid').text().trim()).to.equal(authData.uid);
       });
     });

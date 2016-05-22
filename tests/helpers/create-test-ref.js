@@ -1,5 +1,5 @@
-import createOfflineRef from './create-offline-ref';
 import FIREBASE_FIXTURE_DATA from './fixture-data';
+import createOfflineRef from './create-offline-ref';
 
 
 export default function createTestRef(child) {

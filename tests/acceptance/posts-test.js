@@ -1,6 +1,6 @@
 /* jshint expr:true */
 import {
-  describe,
+  // describe,
   it,
   beforeEach,
   afterEach
@@ -13,15 +13,16 @@ import stubFirebase from '../helpers/stub-firebase';
 import unstubFirebase from '../helpers/unstub-firebase';
 import createTestRef from '../helpers/create-test-ref';
 
+const { run } = Ember;
+
 describe('Acceptance: /posts', function() {
-  var application, ref;
+  var application;
 
   beforeEach(function() {
     stubFirebase();
     application = startApp();
-    ref = createTestRef('acceptance');
 
-    replaceAppRef(application, ref);
+    replaceAppRef(application, createTestRef('acceptance'));
   });
 
   afterEach(function() {
