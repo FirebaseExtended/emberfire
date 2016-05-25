@@ -7,7 +7,7 @@ import {
 import Firebase from 'firebase';
 
 describeModule(
-  'service:firebase',
+  'emberfire@service:firebase',
   'FirebaseService',
   { },
   function() {

@@ -30,19 +30,13 @@
     "package.json"
   ],
   "dependencies": {
-    "firebase": "2.x.x",
-    "ember-data": ">=1.13.6"
+    "firebase": "2.x.x"
   },
   "devDependencies": {
-    "ember": "2.0.2",
-    "ember-cli-shims": "ember-cli/ember-cli-shims#0.0.3",
-    "ember-cli-test-loader": "ember-cli-test-loader#0.1.3",
-    "ember-load-initializers": "ember-cli/ember-load-initializers#0.1.5",
-    "ember-mocha": "0.8.2",
-    "ember-test-helpers": "0.5.9",
-    "ember-resolver": "^0.1.18",
-    "jquery": "2.1.4",
-    "loader.js": "ember-cli/loader.js#3.2.1",
+    "ember": "2.5.1",
+    "ember-cli-shims": "0.1.1",
+    "ember-cli-test-loader": "0.2.2",
+    "ember-mocha": "0.8.11",
     "moment": "2.10.3",
     "blueimp-md5": "1.1.0",
     "normalize-css": "3.0.3",
@@ -50,6 +44,6 @@
     "mockfirebase": "0.11.0"
   },
   "resolutions": {
-    "ember" : "2.0.2"
+    "ember" : "2.5.1"
   }
 }

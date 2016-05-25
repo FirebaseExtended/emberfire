@@ -6,8 +6,8 @@ import {
   afterEach
 } from 'mocha';
 import { expect } from 'chai';
-import Ember from 'ember';
 import startApp from '../helpers/start-app';
+import destroyApp from '../helpers/destroy-app';
 import replaceAppRef from '../helpers/replace-app-ref';
 import stubFirebase from '../helpers/stub-firebase';
 import unstubFirebase from '../helpers/unstub-firebase';
@@ -26,7 +26,7 @@ describe('Acceptance: /posts', function() {
 
   afterEach(function() {
     unstubFirebase();
-    Ember.run(application, 'destroy');
+    destroyApp(application);
   });
 
   it('can visit /posts', function() {

@@ -6,10 +6,10 @@ import {
   afterEach
 } from 'mocha';
 import { expect } from 'chai';
-import Ember from 'ember';
 import sinon from 'sinon';
 import Firebase from 'firebase';
 import startApp from '../helpers/start-app';
+import destroyApp from '../helpers/destroy-app';
 import stubFirebase from '../helpers/stub-firebase';
 import unstubFirebase from '../helpers/unstub-firebase';
 import createTestRef from '../helpers/create-test-ref';
@@ -21,13 +21,13 @@ describe('Acceptance: /auth', function() {
     stubFirebase();
     application = startApp();
 
-    var provider = application.__container__.lookup('torii-provider:firebase');
+    var provider = application.__container__.lookup('emberfire@torii-provider:firebase');
     provider.set('firebase', createTestRef('acceptance'));
   });
 
   afterEach(function() {
     unstubFirebase();
-    Ember.run(application, 'destroy');
+    destroyApp(application);
   });
 
   it('can visit /auth', function() {

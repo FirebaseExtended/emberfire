@@ -8,7 +8,7 @@ import {
 import MockFirebase from 'mockfirebase';
 import sinon from 'sinon';
 
-describeModule('adapter:firebase', 'FirebaseAdapter', {
+describeModule('emberfire@adapter:firebase', 'FirebaseAdapter', {
     // Specify the other units that are required for this test.
     // needs: ['serializer:foo']
   },

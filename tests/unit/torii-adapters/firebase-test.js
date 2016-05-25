@@ -2,7 +2,7 @@ import Ember from 'ember';
 import { describeModule, it } from 'ember-mocha';
 import sinon from 'sinon';
 
-describeModule('torii-adapter:firebase', 'FirebaseToriiAdapter', {
+describeModule('emberfire@torii-adapter:firebase', 'FirebaseToriiAdapter', {
   needs: ['service:firebase'],
 }, function() {
 

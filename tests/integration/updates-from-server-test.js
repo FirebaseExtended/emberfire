@@ -1,5 +1,6 @@
 import Ember from 'ember';
 import startApp from 'dummy/tests/helpers/start-app';
+import destroyApp from 'dummy/tests/helpers/destroy-app';
 import { it } from 'ember-mocha';
 import stubFirebase from 'dummy/tests/helpers/stub-firebase';
 import unstubFirebase from 'dummy/tests/helpers/unstub-firebase';
@@ -25,7 +26,7 @@ describe('Integration: FirebaseAdapter - Updates from server', function() {
 
   afterEach(function() {
     unstubFirebase();
-    Ember.run(app, 'destroy');
+    destroyApp(app);
   });
 
   describe('A locally created (and saved) record', function() {
