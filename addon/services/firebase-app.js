@@ -3,15 +3,20 @@ import firebase from 'firebase';
 export const DEFAULT_NAME = '[EmberFire default app]';
 
 export default {
-  create() {
-    if (!this.config.firebase || typeof this.config.firebase !== 'object') {
+  create(application) {
+    const config = application.container.lookupFactory('config:environment');
+    if (!config || typeof config.firebase !== 'object') {
       throw new Error('Please set the `firebase` property in your environment config.');
     }
 
-    let app = firebase.app(DEFAULT_NAME);
+    let app;
+
+    if (firebase.apps.length) {
+      app = firebase.apps.find((a) => a.name === DEFAULT_NAME);
+    }
 
     if (!app) {
-      app = firebase.initializeApp(this.config.firebase, DEFAULT_NAME);
+      app = firebase.initializeApp(config.firebase, DEFAULT_NAME);
     }
 
     return app;
