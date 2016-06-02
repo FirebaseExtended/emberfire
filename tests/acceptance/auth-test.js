@@ -5,9 +5,9 @@ import {
   beforeEach,
   afterEach
 } from 'mocha';
+import Ember from 'ember';
 import { expect } from 'chai';
 import sinon from 'sinon';
-
 import startApp from '../helpers/start-app';
 import destroyApp from '../helpers/destroy-app';
 import stubFirebase from '../helpers/stub-firebase';
@@ -27,7 +27,6 @@ describe('Acceptance: /auth', function() {
 
   const firebaseAppMock = {
     auth() {
-      console.log('auth()');
       return authMock;
     }
   };
@@ -85,7 +84,6 @@ describe('Acceptance: /auth', function() {
       click('.auth-as-anon');
 
       andThen(function() {
-        console.log(authData);
         expect(find('.user-data-is-authenticated').text().trim()).to.equal('true');
         expect(find('.user-data-provider').text().trim()).to.equal('anonymous');
         expect(find('.user-data-uid').text().trim()).to.equal('uid1234');

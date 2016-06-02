@@ -13,8 +13,6 @@ import stubFirebase from '../helpers/stub-firebase';
 import unstubFirebase from '../helpers/unstub-firebase';
 import createTestRef from '../helpers/create-test-ref';
 
-const { run } = Ember;
-
 describe('Acceptance: /posts', function() {
   var application;
 
