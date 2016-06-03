@@ -18,7 +18,12 @@ gulp.task('clean-dist', function (cb) {
   del(['dist/'], cb);
 });
 
-gulp.task('build-legacy', ['lint'], function() {
+gulp.task('test-page', ['clean-dist'], function() {
+  return gulp.src('vendor/legacy/index.html')
+    .pipe(gulp.dest('dist'));
+});
+
+gulp.task('build-legacy', ['lint', 'clean-dist'], function() {
   var b = browserify(['vendor/legacy/emberfire.js'], {
     debug: true
   });
@@ -32,7 +37,7 @@ gulp.task('build-legacy', ['lint'], function() {
     .pipe(gulp.dest('dist'));
 });
 
-gulp.task('build-legacy-minified', ['build-legacy'], function() {
+gulp.task('build-legacy-minified', ['build-legacy', 'test-page'], function() {
   return gulp.src('dist/emberfire.js')
     .pipe($.rename('emberfire.min.js'))
     .pipe($.uglify())
@@ -43,6 +48,6 @@ gulp.task('build-legacy-minified', ['build-legacy'], function() {
     .pipe(gulp.dest('dist'));
 });
 
-gulp.task('legacy', ['clean-dist', 'build-legacy-minified']);
+gulp.task('legacy', ['build-legacy-minified']);
 
 gulp.task('default', ['legacy']);
