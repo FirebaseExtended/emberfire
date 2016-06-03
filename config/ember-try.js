@@ -2,57 +2,49 @@
 module.exports = {
   scenarios: [
     {
-      name: 'ember-data-1.13.x',
-      dependencies: {
-        'ember-data': '^1.13.11'
-      },
-      resolutions: {
-        'ember-data': '^1.13.11'
+      name: 'ember-data-2.3.x',
+      npm: {
+        devDependencies: {
+          'ember-data': '~2.3.0'
+        }
       }
     },
     {
-      name: 'ember-data-2.0.x',
-      dependencies: {
-        'ember-data': '2.0.x'
-      },
-      resolutions: {
-        'ember-data': '2.0.x'
+      name: 'ember-data-2.4.x',
+      npm: {
+        devDependencies: {
+          'ember-data': '~2.4.0'
+        }
       }
     },
     {
-      name: 'ember-data-2.1.x',
-      dependencies: {
-        'ember-data': '2.1.x'
-      },
-      resolutions: {
-        'ember-data': '2.1.x'
-      }
-    },
-    {
-      name: 'ember-data-2.2.x',
-      dependencies: {
-        'ember-data': '2.2.x'
-      },
-      resolutions: {
-        'ember-data': '2.2.x'
+      name: 'ember-data-2.5.x',
+      npm: {
+        devDependencies: {
+          'ember-data': '~2.5.0'
+        }
       }
     },
     {
       name: 'ember-data-beta',
-      dependencies: {
-        'ember-data': 'components/ember-data#beta'
-      },
-      resolutions: {
-        'ember-data': 'beta'
+      bower: {
+        dependencies: {
+          'ember-data': 'components/ember-data#beta'
+        },
+        resolutions: {
+          'ember-data': 'components/ember-data#beta'
+        }
       }
     },
     {
       name: 'ember-data-canary',
-      dependencies: {
-        'ember-data': 'components/ember-data#canary'
-      },
-      resolutions: {
-        'ember-data': 'canary'
+      bower: {
+        dependencies: {
+          'ember-data': 'components/ember-data#canary'
+        },
+        resolutions: {
+          'ember-data': 'components/ember-data#canary'
+        }
       }
     }
   ]
