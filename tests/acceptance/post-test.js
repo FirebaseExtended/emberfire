@@ -8,6 +8,7 @@ import {
 import { expect } from 'chai';
 import Ember from 'ember';
 import startApp from '../helpers/start-app';
+import destroyApp from '../helpers/destroy-app';
 import replaceAppRef from '../helpers/replace-app-ref';
 import stubFirebase from '../helpers/stub-firebase';
 import unstubFirebase from '../helpers/unstub-firebase';
@@ -26,7 +27,7 @@ describe('Acceptance: /post/:id', function() {
 
   afterEach(function() {
     unstubFirebase();
-    Ember.run(application, 'destroy');
+    destroyApp(application);
   });
 
   it('can visit /post/post_1', function() {

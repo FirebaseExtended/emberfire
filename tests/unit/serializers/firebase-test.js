@@ -12,7 +12,7 @@ import User from 'dummy/models/user';
 import assign from 'lodash/object/assign';
 
 describeModule(
-  'serializer:firebase',
+  'emberfire@serializer:firebase',
   'FirebaseSerializer',
   {
     // Specify the other units that are required for this test.

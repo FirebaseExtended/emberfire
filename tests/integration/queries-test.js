@@ -1,5 +1,6 @@
 import Ember from 'ember';
 import startApp from 'dummy/tests/helpers/start-app';
+import destroyApp from 'dummy/tests/helpers/destroy-app';
 import { it } from 'ember-mocha';
 import stubFirebase from 'dummy/tests/helpers/stub-firebase';
 import unstubFirebase from 'dummy/tests/helpers/unstub-firebase';
@@ -34,7 +35,7 @@ describe('Integration: FirebaseAdapter - Queries', function() {
 
   afterEach(function() {
     unstubFirebase();
-    Ember.run(app, 'destroy');
+    destroyApp(app);
   });
 
   it('creates the correct Firebase reference', function() {

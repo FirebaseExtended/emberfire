@@ -1,5 +1,6 @@
 import Ember from 'ember';
 import startApp from 'dummy/tests/helpers/start-app';
+import destroyApp from 'dummy/tests/helpers/destroy-app';
 import { it } from 'ember-mocha';
 import sinon from 'sinon';
 import stubFirebase from 'dummy/tests/helpers/stub-firebase';
@@ -22,7 +23,7 @@ describe("Integration: FirebaseAdapter - Finding Records", function() {
 
   afterEach(function() {
     unstubFirebase();
-    Ember.run(app, 'destroy');
+    destroyApp(app);
   });
 
   describe("#init()", function() {
