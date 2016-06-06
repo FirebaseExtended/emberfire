@@ -6,21 +6,24 @@ export default Ember.Route.extend({
       .catch(() => undefined); // ignore empty sessions
   },
   actions: {
-    signIn(provider, emailOrToken, password) {
+    signIn(provider, param1, param2) {
       let authPromise;
       if (provider === 'password') {
         authPromise = this.get('session').open('firebase', {
           provider: provider,
-          email: emailOrToken,
-          password: password
+          email: param1,
+          password: param2
         });
       } else if (provider === 'custom') {
         authPromise = this.get('session').open('firebase', {
           provider: provider,
-          token: emailOrToken
+          token: param1
         });
       } else {
-        authPromise = this.get('session').open('firebase', { provider: provider });
+        authPromise = this.get('session').open('firebase', {
+          provider: provider,
+          redirect: param1
+        });
       }
 
       authPromise.then(result => console.log('session.open result:', result))

@@ -24,15 +24,48 @@ export default Ember.Object.extend({
    * @return {Promise}
    */
   fetch() {
+    return this.fetchAuthState_()
+      .then((user) => {
+        if (!user) {
+          return this.fetchRedirectState_();
+        }
+        return user;
+      })
+      .then((user) => {
+        if (!user) {
+          return Ember.RSVP.reject(new Error('No session available'));
+        }
+        return this.open(user);
+      })
+      .catch((err) => Ember.RSVP.reject(err));
+  },
+
+
+  /**
+   * Fetches the redirect user, if any.
+   *
+   * @return {!Promise<?firebase.User>}
+   * @private
+   */
+  fetchRedirectState_() {
+    let auth = this.get('firebaseApp').auth();
+    return auth.getRedirectResult()
+      .then(result => result.user);
+  },
+
+
+  /**
+   * Promisifies the first value of onAuthStateChanged
+   *
+   * @return {!Promise<?firebase.User>}
+   * @private
+   */
+  fetchAuthState_() {
     return new Ember.RSVP.Promise((resolve, reject) => {
       let auth = this.get('firebaseApp').auth();
       const unsub = auth.onAuthStateChanged((user) => {
         unsub();
-        if (!user) {
-          reject(new Error('No session available'));
-          return;
-        }
-        resolve(this.open(user));
+        resolve(user);
       },
       (err) => {
         unsub();
