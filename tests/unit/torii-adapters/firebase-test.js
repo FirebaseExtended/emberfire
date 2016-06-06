@@ -1,5 +1,6 @@
 import Ember from 'ember';
 import { describeModule, it } from 'ember-mocha';
+import { expect } from 'chai';
 import sinon from 'sinon';
 
 const { run } = Ember;
@@ -35,7 +36,7 @@ describeModule('emberfire@torii-adapter:firebase', 'FirebaseToriiAdapter', {}, f
 
       run(function() {
         const result = adapter.open(currentUser);
-        assert.ok(result instanceof Ember.RSVP.Promise, 'returns a promise');
+        expect(result).to.be.an.instanceof(Ember.RSVP.Promise);
       });
     });
 
@@ -49,8 +50,8 @@ describeModule('emberfire@torii-adapter:firebase', 'FirebaseToriiAdapter', {}, f
       run(function() {
         const result = adapter.open(currentUser);
         result.then(function(session) {
-          assert.equal(session.provider, 'p', 'provider is correct');
-          assert.deepEqual(session.currentUser, currentUser);
+          expect(session.provider).to.be.equal('p', 'provider is correct');
+          expect(session.currentUser).to.be.equal(currentUser);
           done();
         });
       });
@@ -67,7 +68,7 @@ describeModule('emberfire@torii-adapter:firebase', 'FirebaseToriiAdapter', {}, f
       run(function() {
         const result = adapter.open(currentUser);
         result.then(function(session) {
-          assert.equal(session.provider, 'anonymous', 'provider is correct');
+          expect(session.provider).to.be.equal('anonymous', 'provider is correct');
           done();
         });
       });
@@ -84,7 +85,7 @@ describeModule('emberfire@torii-adapter:firebase', 'FirebaseToriiAdapter', {}, f
       run(function() {
         const result = adapter.open(currentUser);
         result.then(function(session) {
-          assert.equal(session.provider, 'custom', 'provider is correct');
+          expect(session.provider).to.be.equal('custom', 'provider is correct');
           done();
         });
       });
@@ -102,7 +103,7 @@ describeModule('emberfire@torii-adapter:firebase', 'FirebaseToriiAdapter', {}, f
       run(function() {
         const result = adapter.open(currentUser);
         result.then(function(session) {
-          assert.equal(session.uid, 'xx', 'uid is present');
+          expect(session.uid).to.be.equal('xx', 'uid is present');
           done();
         });
       });
@@ -119,9 +120,9 @@ describeModule('emberfire@torii-adapter:firebase', 'FirebaseToriiAdapter', {}, f
 
       run(function() {
         const result = adapter.open(currentUser);
-        assert.ok(result instanceof Ember.RSVP.Promise, 'return is a promise');
+        expect(result).to.be.an.instanceof(Ember.RSVP.Promise, 'return is a promise');
         result.then(function(session) {
-          assert.deepEqual(session.currentUser, currentUser);
+          expect(session.currentUser).to.be.equal(currentUser);
           done();
         });
       });
@@ -148,9 +149,9 @@ describeModule('emberfire@torii-adapter:firebase', 'FirebaseToriiAdapter', {}, f
       run(function() {
         const result = adapter.fetch();
         result.then(function(session) {
-          assert.equal(session.provider, 'twitter.com', 'provider is passed to resolved value');
-          assert.equal(session.uid, 'bob', 'uid is passed to resolved value');
-          assert.deepEqual(session.currentUser, currentUser);
+          expect(session.provider).to.be.equal('twitter.com', 'provider is passed to resolved value');
+          expect(session.uid).to.be.equal('bob', 'uid is passed to resolved value');
+          expect(session.currentUser).to.be.equal(currentUser);
           authStateStub.restore();
           redirectStub.restore();
           done();
@@ -173,9 +174,9 @@ describeModule('emberfire@torii-adapter:firebase', 'FirebaseToriiAdapter', {}, f
       run(function() {
         const result = adapter.fetch();
         result.then(function(session) {
-          assert.equal(session.provider, 'twitter.com', 'provider is passed to resolved value');
-          assert.equal(session.uid, 'bob', 'uid is passed to resolved value');
-          assert.deepEqual(session.currentUser, currentUser);
+          expect(session.provider).to.be.equal('twitter.com', 'provider is passed to resolved value');
+          expect(session.uid).to.be.equal('bob', 'uid is passed to resolved value');
+          expect(session.currentUser).to.be.equal(currentUser);
           redirectStub.restore();
           authStateStub.restore();
           done();
@@ -198,8 +199,8 @@ describeModule('emberfire@torii-adapter:firebase', 'FirebaseToriiAdapter', {}, f
       run(function() {
         const result = adapter.fetch();
         result.then(function(session) {
-          assert.equal(session.uid, 'bob', 'uid is passed to resolved value');
-          assert.ok(redirectStub.notCalled, 'redir check should not be called');
+          expect(session.uid).to.be.equal('bob', 'uid is passed to resolved value');
+          expect(redirectStub.notCalled).to.be.ok;
           redirectStub.restore();
           authStateStub.restore();
           done();
@@ -222,7 +223,7 @@ describeModule('emberfire@torii-adapter:firebase', 'FirebaseToriiAdapter', {}, f
       run(function() {
         const result = adapter.fetch();
         result.then(function(error) {
-          assert.ok(redirectStub.called, 'redir check should be called');
+          expect(redirectStub.called).to.be.ok;
           redirectStub.restore();
           authStateStub.restore();
           done();
@@ -244,7 +245,7 @@ describeModule('emberfire@torii-adapter:firebase', 'FirebaseToriiAdapter', {}, f
       run(function() {
         const result = adapter.fetch();
         result.catch(function(error) {
-          assert.ok(true, 'rejected');
+          expect(true).to.be.ok;
           redirectStub.restore();
           authStateStub.restore();
           done();
@@ -266,7 +267,7 @@ describeModule('emberfire@torii-adapter:firebase', 'FirebaseToriiAdapter', {}, f
       run(function() {
         const result = adapter.fetch();
         result.catch(function(reason) {
-          assert.equal(reason.message, 'No session available', 'provides fail reason');
+          expect(reason.message).to.be.equal('No session available', 'provides fail reason');
           authStateStub.restore();
           redirectStub.restore();
           done();
@@ -288,7 +289,7 @@ describeModule('emberfire@torii-adapter:firebase', 'FirebaseToriiAdapter', {}, f
       run(function() {
         const result = adapter.fetch();
         result.catch(function(reason) {
-          assert.equal(reason, 'error', 'provides fail reason');
+          expect(reason).to.be.equal('error', 'provides fail reason');
           authStateStub.restore();
           redirectStub.restore();
           done();
@@ -311,7 +312,7 @@ describeModule('emberfire@torii-adapter:firebase', 'FirebaseToriiAdapter', {}, f
       run(function() {
         const result = adapter.fetch();
         result.then(function(session) {
-          assert(unsub.called, 'unsub called');
+          expect(unsub.called).to.be.ok;
           authStateStub.restore();
           redirectStub.restore();
           done();
@@ -334,7 +335,7 @@ describeModule('emberfire@torii-adapter:firebase', 'FirebaseToriiAdapter', {}, f
       run(function() {
         const result = adapter.fetch();
         result.catch(function(reason) {
-          assert(unsub.called, 'unsub called');
+          expect(unsub.called).to.be.ok;
           authStateStub.restore();
           redirectStub.restore();
           done();
@@ -355,7 +356,7 @@ describeModule('emberfire@torii-adapter:firebase', 'FirebaseToriiAdapter', {}, f
       const adapter = this.subject();
       run(function() {
         const result = adapter.close();
-        assert.ok(result instanceof Ember.RSVP.Promise, 'return is a promise');
+        expect(result).to.be.an.instanceof(Ember.RSVP.Promise, 'return is a promise');
         signOutStub.restore();
       });
     });
@@ -368,7 +369,7 @@ describeModule('emberfire@torii-adapter:firebase', 'FirebaseToriiAdapter', {}, f
       const adapter = this.subject();
       run(function() {
         adapter.close();
-        assert.ok(signOutStub.calledOnce, 'signOut was called');
+        expect(signOutStub.calledOnce).to.be.ok;
         signOutStub.restore();
       });
     });
