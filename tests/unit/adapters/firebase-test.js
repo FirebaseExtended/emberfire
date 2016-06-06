@@ -1,16 +1,15 @@
 /* jshint expr:true */
 import Ember from 'ember';
-import {
-  describeModule,
-  it
-} from 'ember-mocha';
-
+import { describeModule, it } from 'ember-mocha';
+import { expect } from 'chai';
 import firebase from 'firebase';
 
 import sinon from 'sinon';
 import stubFirebase from 'dummy/tests/helpers/stub-firebase';
 import unstubFirebase from 'dummy/tests/helpers/unstub-firebase';
 import createOfflineRef from 'dummy/tests/helpers/create-offline-ref';
+
+const { run } = Ember;
 
 describeModule('emberfire@adapter:firebase', 'FirebaseAdapter', {
     // Specify the other units that are required for this test.
@@ -27,17 +26,6 @@ describeModule('emberfire@adapter:firebase', 'FirebaseAdapter', {
     afterEach(function() {
       unstubFirebase();
     });
-
-    describe('#init', function () {
-
-
-      it('throws an error when the firebase property is not supplied', function() {
-        assert.throws(function() {
-          this.subject();
-        });
-      });
-
-    }); // #init
 
     describe('#applyQueryToRef', function () {
       var adapter, ref, stub;
@@ -57,14 +45,14 @@ describeModule('emberfire@adapter:firebase', 'FirebaseAdapter', {
         stub = sinon.stub(ref, 'orderByKey');
 
         adapter.applyQueryToRef(ref, {});
-        assert(stub.calledOnce, 'orderByKey should be called');
+        expect(stub.calledOnce, 'orderByKey should be called').to.be.ok;
       });
 
       it('defaults to orderByKey when orderBy is an empty string', function () {
         stub = sinon.stub(ref, 'orderByKey');
 
         adapter.applyQueryToRef(ref, { orderBy: '' });
-        assert(stub.calledOnce, 'orderByKey should be called');
+        expect(stub.calledOnce, 'orderByKey should be called').to.be.ok;
       });
 
       ['key', 'value', 'priority'].forEach(function (k) {
@@ -74,7 +62,7 @@ describeModule('emberfire@adapter:firebase', 'FirebaseAdapter', {
           stub = sinon.stub(ref, 'orderBy' + upperK);
 
           adapter.applyQueryToRef(ref, { orderBy: '_' + k });
-          assert(stub.calledOnce, `orderBy${upperK} should be called`);
+          expect(stub.calledOnce, `orderBy${upperK} should be called`).to.be.ok;
         });
 
       });
@@ -83,7 +71,7 @@ describeModule('emberfire@adapter:firebase', 'FirebaseAdapter', {
         stub = sinon.stub(ref, 'orderByChild');
 
         adapter.applyQueryToRef(ref, { orderBy: 'x' });
-        assert(stub.calledWith('x'), 'orderByChild should be called with `x`');
+        expect(stub.calledWith('x'), 'orderByChild should be called with `x`').to.be.ok;
       });
 
       ['limitToFirst', 'limitToLast', 'startAt', 'endAt', 'equalTo'].forEach(function (method) {
@@ -104,8 +92,8 @@ describeModule('emberfire@adapter:firebase', 'FirebaseAdapter', {
           query[method] = 'value';
 
           adapter.applyQueryToRef(ref, query);
-          assert(queryMethodStub.calledOnce);
-          assert(queryMethodStub.calledWith('value'));
+          expect(queryMethodStub.calledOnce).to.be.ok;
+          expect(queryMethodStub.calledWith('value')).to.be.ok;
         });
 
         it(`calls ${method} and passes through value when empty string`, function () {
@@ -114,8 +102,8 @@ describeModule('emberfire@adapter:firebase', 'FirebaseAdapter', {
           query[method] = '';
 
           adapter.applyQueryToRef(ref, query);
-          assert(queryMethodStub.calledOnce);
-          assert(queryMethodStub.calledWith(''));
+          expect(queryMethodStub.calledOnce).to.be.ok;
+          expect(queryMethodStub.calledWith('')).to.be.ok;
         });
 
         it(`calls ${method} and passes through value when 'false'`, function () {
@@ -124,8 +112,8 @@ describeModule('emberfire@adapter:firebase', 'FirebaseAdapter', {
           query[method] = false;
 
           adapter.applyQueryToRef(ref, query);
-          assert(queryMethodStub.calledOnce);
-          assert(queryMethodStub.calledWith(false));
+          expect(queryMethodStub.calledOnce).to.be.ok;
+          expect(queryMethodStub.calledWith(false)).to.be.ok;
         });
 
         it(`does not call ${method} when the value is null`, function () {
@@ -134,7 +122,7 @@ describeModule('emberfire@adapter:firebase', 'FirebaseAdapter', {
           query[method] = null;
 
           adapter.applyQueryToRef(ref, query);
-          assert(queryMethodStub.called === false, `${method} should not be called`);
+          expect(queryMethodStub.called === false, `${method} should not be called`).to.be.ok;
         });
 
       }); // forEach
@@ -158,8 +146,8 @@ describeModule('emberfire@adapter:firebase', 'FirebaseAdapter', {
 
       it("schedules a #_queueFlush", function(done) {
         adapter._queueScheduleFlush();
-        Ember.run.later(this, function() {
-          assert.equal(spy.callCount, 1);
+        run.later(this, function() {
+          expect(spy.callCount).to.equal(1);
           done();
         }, adapter._queueFlushDelay * 2);
       });
@@ -185,27 +173,27 @@ describeModule('emberfire@adapter:firebase', 'FirebaseAdapter', {
 
       it("pushes a new item into the _queue", function() {
         adapter._enqueue(callbackSpy, ['foo']);
-        assert.equal(adapter._queue.length, 1);
+        expect(adapter._queue.length).to.equal(1);
       });
 
       it("schedules a _queueFlush()", function() {
         adapter._enqueue(callbackSpy, ['foo']);
-        assert.equal(queueScheduleFlushSpy.callCount, 1);
+        expect(queueScheduleFlushSpy.callCount).to.equal(1);
       });
 
       it("flushes the _queue", function(done) {
         adapter._enqueue(callbackSpy, ['foo']);
-        Ember.run.later(this, function() {
-          assert.equal(queueFlushSpy.callCount, 1);
+        run.later(this, function() {
+          expect(queueFlushSpy.callCount).to.equal(1);
           done();
         }, adapter._queueFlushDelay * 2);
       });
 
       it("applys the callback with the correct arguments", function(done) {
         adapter._enqueue(callbackSpy, ['foo']);
-        Ember.run.later(this, function() {
-          assert.equal(callbackSpy.callCount, 1);
-          assert.equal(callbackSpy.getCall(0).args[0], 'foo');
+        run.later(this, function() {
+          expect(callbackSpy.callCount).to.equal(1);
+          expect(callbackSpy.getCall(0).args[0]).to.equal('foo');
           done();
         }, adapter._queueFlushDelay * 2);
       });
