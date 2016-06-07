@@ -1,7 +1,7 @@
 /* jshint expr:true */
 import { expect } from 'chai';
 import {
-  describeModule
+  describeModule, it
 } from 'ember-mocha';
 import firebase from 'firebase';
 import sinon from 'sinon';
@@ -11,23 +11,54 @@ describeModule(
   'FirebaseService',
   { },
   function() {
-    xit('is a firebase reference', function() {
-      const appMock = sinon.spy();
-      const refMock = sinon.spy();
-      const databaseMock = { ref() { return refMock; } };
 
-      const initializeAppStub =
+    const configMock = {
+      firebase: {
+        blah: 'a'
+      }
+    };
+
+    const emberAppMock = {
+      container: {
+        lookupFactory() {
+          return configMock;
+        }
+      }
+    };
+
+    const firebaseAppMock = {
+      name: '[EmberFire default app]',
+      database() {
+        return databaseMock;
+      }
+    };
+
+    const databaseMock = {
+      ref() { return refMock; }
+    };
+
+    const refMock = {};
+
+    let initializeAppStub;
+
+    beforeEach(() => {
+      initializeAppStub =
           sinon.stub(firebase, 'initializeApp')
-              .returns(appMock);
-      const databaseStub =
-          sinon.stub(firebase, 'database')
-              .returns(databaseMock);
+              .returns(firebaseAppMock);
+    });
 
-
-      const service = this.subject();
-      expect(service).to.be.equal(refMock);
+    afterEach(() => {
       initializeAppStub.restore();
-      databaseStub.restore();
+    });
+
+    it('is the database reference', function() {
+      const service = this.subject(emberAppMock);
+      expect(service).to.be.equal(refMock);
+    });
+
+    it('initializes the app with the environment config', function() {
+      this.subject(emberAppMock);
+      expect(initializeAppStub.calledWith(configMock.firebase)).to.be.true;
     });
   }
 );

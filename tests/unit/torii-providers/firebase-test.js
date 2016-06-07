@@ -19,9 +19,6 @@ describeModule('emberfire@torii-provider:firebase', 'FirebaseToriiProvider', {},
   };
 
   class ProviderMock {
-    constructor() {
-      console.log('mock');
-    }
     addScope(scope) {}
   }
 

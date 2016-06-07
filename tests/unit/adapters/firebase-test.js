@@ -8,6 +8,7 @@ import sinon from 'sinon';
 import stubFirebase from 'dummy/tests/helpers/stub-firebase';
 import unstubFirebase from 'dummy/tests/helpers/unstub-firebase';
 import createOfflineRef from 'dummy/tests/helpers/create-offline-ref';
+import destroyFirebaseApps from 'dummy/tests/helpers/destroy-firebase-apps';
 
 const { run } = Ember;
 
@@ -25,6 +26,7 @@ describeModule('emberfire@adapter:firebase', 'FirebaseAdapter', {
 
     afterEach(function() {
       unstubFirebase();
+      destroyFirebaseApps();
     });
 
     describe('#applyQueryToRef', function () {

@@ -1,6 +1,6 @@
 import firebase from 'firebase';
 
-const DEFAULT_NAME = '[EmberFire offline test app]';
+export const DEFAULT_NAME = '[EmberFire offline test app]';
 
 /**
  * Creates an offline firebase reference with optional initial data and url.
