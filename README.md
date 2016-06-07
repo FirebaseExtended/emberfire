@@ -9,22 +9,21 @@ EmberFire is the officially supported adapter for using
 [Firebase](http://www.firebase.com/?utm_medium=web&utm_source=emberfire) with
 [Ember Data](https://github.com/emberjs/data).
 
-**IMPORTANT NOTICE:** *If you require embedded records, there is a [bug](https://github.com/emberjs/data/issues/3549) in Ember Data that prevents them from working in `1.13.0 - 1.13.5`, you will need to use `1.13.6` or higher*
-
 **Join the [Firebase + Ember Google Group](https://groups.google.com/forum/#!forum/firebase-ember)
 to ask technical questions, share apps you've built, and chat with other developers in the community.**
 
 ## Compatibility
 
-Please consult this table when selecting your version of EmberFire:
+Please consult this table when selecting your version of EmberFire and Firebase:
 
-| Ember Data        | EmberFire |
-| ------------------| ----------|
-| beta.12 - beta.18 | 1.4.x     |
-| beta.19           | none      |
-| 1.13+             | 1.5.x     |
-| 2.0+              | 1.6.x     |
-| canary            | master    |
+| Ember Data        | EmberFire | Firebase SDK |
+| ------------------| ----------|--------------|
+| beta.12 - beta.18 | 1.4.x     | 2.x          |
+| beta.19           | none      | 2.x          |
+| 1.13+             | 1.5.x     | 2.x          |
+| 2.0 - 2.2         | 1.6.x     | 2.x          |
+| 2.3+              | 2.0.x     | 3.x          |
+| canary            | master    | 3.x          |
 
 *To install the `master` branch, use `ember install firebase/emberfire#master`*
 
@@ -36,16 +35,26 @@ To install EmberFire as an addon with ember-cli, run the following command withi
 $ ember install emberfire
 ```
 
-This will create a `app/adapters/application.js`. All you need to do is update your Firebase database url in `config/environment.js` and allow connections to the Firebase servers:
+This will create a `app/adapters/application.js`. All you need to do is update your Firebase property in `config/environment.js` with the initializeApp config found on https://console.firebase.google.com/ (click the WEB SETUP button on the Firebase Auth panel):
 
 ```js
 // config/environment.js
   var ENV = {
     // ...
-    firebase: 'https://YOUR-FIREBASE-NAME.firebaseio.com/',
+    firebase: {
+      apiKey: 'xyz',
+      authDomain: 'YOUR-FIREBASE-APP.firebaseapp.com',
+      databaseURL: 'https://YOUR-FIREBASE-APP.firebaseio.com',
+      storageBucket: 'YOUR-FIREBASE-APP.appspot.com',
+    }
     // ...
     contentSecurityPolicy: {
-      'connect-src': "'self' https://auth.firebase.com wss://*.firebaseio.com"
+      'script-src': '\'self\' \'unsafe-eval\' apis.google.com',
+      'style-src': '\'self\' \'unsafe-inline\' fonts.googleapis.com',
+      'font-src': '\'self\' fonts.gstatic.com',
+      'frame-src': '\'self\' https://*.firebaseapp.com',
+      'img-src': '\'self\' *.gravatar.com s3.amazonaws.com',
+      'connect-src': '\'self\' wss://*.firebaseio.com https://*.googleapis.com'
     }
     // ...
 ```
@@ -105,12 +114,12 @@ From your *app* workdir
 
 ##### Running tests against a specific version of ember-data
 
-* `ember try <scenario>` where  `<scenario>` is one of the scenarios in `config/ember-try.js`
+* `ember try:one <scenario>` where  `<scenario>` is one of the scenarios in `config/ember-try.js`
 
 Example:
 
 ```
-ember try ember-data-canary
+ember try:one ember-data-canary
 ```
 
 ### Running the FireBlog demo app

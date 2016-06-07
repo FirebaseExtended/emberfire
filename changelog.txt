@@ -1,1 +1,2 @@
+important - EmberFire is updated to use the 3.0 Firebase SDK and will only be compatible with projects migrated to the new console.firebase.google.com. Please update your config/environment.js to use the new `firebase.initializeApp` configuration object.
 fixed - `keyForRelationship` now works for embedded records.
