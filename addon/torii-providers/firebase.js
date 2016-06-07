@@ -1,16 +1,9 @@
 import Ember from 'ember';
 import Waitable from '../mixins/waitable';
-import firebase from 'firebase';
+
 
 export default Ember.Object.extend(Waitable, {
   firebaseApp: Ember.inject.service(),
-
-  providers: {
-    twitter: firebase.auth.TwitterAuthProvider,
-    facebook: firebase.auth.FacebookAuthProvider,
-    github: firebase.auth.GithubAuthProvider,
-    google: firebase.auth.GoogleAuthProvider,
-  },
 
   open(options) {
     var providerId = options.provider;
@@ -42,15 +35,15 @@ export default Ember.Object.extend(Waitable, {
 
       // oauth providers e.g. 'twitter'
       default:
-        const ProviderClass = this.providers[providerId];
+        const ProviderClass = this.container.lookupFactory(`firebase-auth-provider:${providerId}`);
         if (!ProviderClass) {
           return this.waitFor_(reject(new Error('Unknown provider')));
         }
 
         const provider = new ProviderClass();
 
-        if (options.options && options.options.scopes) {
-          options.options.scopes.forEach((s) => provider.addScope(s));
+        if (options.settings && options.settings.scope) {
+          options.settings.scope.split(',').forEach((s) => provider.addScope(s));
         }
 
         if (options.redirect === true) {

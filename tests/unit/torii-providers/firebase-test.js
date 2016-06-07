@@ -2,6 +2,8 @@ import Ember from 'ember';
 import { describeModule, it } from 'ember-mocha';
 import sinon from 'sinon';
 
+const { run } = Ember;
+
 describeModule('emberfire@torii-provider:firebase', 'FirebaseToriiProvider', {}, function() {
 
   const firebaseAppMock = {
@@ -16,9 +18,18 @@ describeModule('emberfire@torii-provider:firebase', 'FirebaseToriiProvider', {},
     signInWithRedirect() {},
   };
 
+  class ProviderMock {
+    constructor() {
+      console.log('mock');
+    }
+    addScope(scope) {}
+  }
+
   beforeEach(function() {
-    this.registry.register(
-        'service:firebaseApp', firebaseAppMock, {instantiate: false, singleton: true});
+    this.registry.register('service:firebaseApp', firebaseAppMock,
+        {instantiate: false, singleton: true});
+    this.registry.register('firebase-auth-provider:google', ProviderMock,
+        {instantiate: false, singleton: false});
   });
 
   describe('#open', function() {
@@ -27,7 +38,7 @@ describeModule('emberfire@torii-provider:firebase', 'FirebaseToriiProvider', {},
 
       it('errors when supplying an invalid provider', function(done) {
         let provider = this.subject();
-        Ember.run(function() {
+        run(function() {
           provider.open({provider: 'errorProvider'}).catch(function(error) {
             expect(error.message).to.equal('Unknown provider');
             done();
@@ -42,8 +53,8 @@ describeModule('emberfire@torii-provider:firebase', 'FirebaseToriiProvider', {},
                 .returns(Ember.RSVP.reject(errorMock));
 
         let provider = this.subject();
-        Ember.run(function() {
-          provider.open({provider: 'twitter'}).catch(function(error) {
+        run(function() {
+          provider.open({provider: 'google'}).catch(function(error) {
             expect(error).to.equal(errorMock);
             stub.restore();
             done();
@@ -51,16 +62,22 @@ describeModule('emberfire@torii-provider:firebase', 'FirebaseToriiProvider', {},
         });
       });
 
-      xit('instantiates the correct auth provider', function(done) {
-        let errorMock = sinon.spy();
+      it('instantiates the correct auth provider', function(done) {
+        class OtherProvider {}
+
+        let userMock = sinon.spy();
         const stub =
             sinon.stub(authMock, 'signInWithPopup')
-                .returns(Ember.RSVP.reject(errorMock));
+                .returns(Ember.RSVP.resolve(userMock));
+
+        this.registry.register(
+            'firebase-auth-provider:other', OtherProvider,
+                {instantiate: false, singleton: false});
 
         let provider = this.subject();
-        Ember.run(function() {
-          provider.open({provider: 'twitter'}).then(function(error) {
-            // expect(stub.getCall(0)).to.equal(true);
+        run(function() {
+          provider.open({provider: 'other'}).then(function(error) {
+            expect(stub.args[0][0]).to.be.an.instanceof(OtherProvider);
             stub.restore();
             done();
           });
@@ -74,7 +91,7 @@ describeModule('emberfire@torii-provider:firebase', 'FirebaseToriiProvider', {},
                 .returns(Ember.RSVP.resolve(userMock));
 
         let provider = this.subject();
-        Ember.run(function() {
+        run(function() {
           provider.open({provider: 'google'}).then(function(result) {
             expect(result).to.deep.equal(userMock);
             stub.restore();
@@ -90,7 +107,7 @@ describeModule('emberfire@torii-provider:firebase', 'FirebaseToriiProvider', {},
                 .returns(Ember.RSVP.resolve({user: user}));
 
         let provider = this.subject();
-        Ember.run(function() {
+        run(function() {
           provider.open({provider: 'google'}).then(function(result) {
             expect(result).to.deep.equal(user);
             stub.restore();
@@ -99,19 +116,26 @@ describeModule('emberfire@torii-provider:firebase', 'FirebaseToriiProvider', {},
         });
       });
 
-      // TODO: test/handle some specific provider settings
-      xit('passes through provider settings', function(done) {
+      it('handles CSV formatted scopes', function(done) {
         const userMock = sinon.spy();
         const stub =
             sinon.stub(authMock, 'signInWithPopup')
                 .returns(Ember.RSVP.resolve(userMock));
 
-        let provider = this.subject();
-        Ember.run(function() {
-          provider.open({provider: 'google', settings: {}}).then(function(result) {
-            expect(stub.calledWith('google', sinon.match.func, {})).to.be.true;
+        const addScopeStub =
+            sinon.stub(ProviderMock.prototype, 'addScope');
 
-            expect(result).to.equal(userMock);
+        let provider = this.subject();
+
+        const settings = {
+          scope: 'user,public_profile'
+        };
+
+        run(function() {
+          provider.open({provider: 'google', settings}).then(function(result) {
+            expect(addScopeStub.calledWith('user')).to.be.true;
+            expect(addScopeStub.calledWith('public_profile')).to.be.true;
+            addScopeStub.restore();
             stub.restore();
             done();
           });
@@ -125,8 +149,8 @@ describeModule('emberfire@torii-provider:firebase', 'FirebaseToriiProvider', {},
                 .returns(Ember.RSVP.resolve(userMock));
 
         let provider = this.subject();
-        Ember.run(function() {
-          provider.open({provider: 'facebook', redirect: true }).then(function(result) {
+        run(function() {
+          provider.open({provider: 'google', redirect: true }).then(function(result) {
             expect(stub.called).to.be.true;
             expect(result).to.equal(userMock);
             stub.restore();
@@ -147,7 +171,7 @@ describeModule('emberfire@torii-provider:firebase', 'FirebaseToriiProvider', {},
                 .returns(Ember.RSVP.resolve(userMock));
 
         let provider = this.subject();
-        Ember.run(function() {
+        run(function() {
           provider.open({
             provider: 'password',
             email: 'email',
@@ -167,7 +191,7 @@ describeModule('emberfire@torii-provider:firebase', 'FirebaseToriiProvider', {},
                 .returns(Ember.RSVP.reject(errorMock));
 
         let provider = this.subject();
-        Ember.run(function() {
+        run(function() {
           provider.open({
             provider: 'password',
             email: 'email',
@@ -182,7 +206,7 @@ describeModule('emberfire@torii-provider:firebase', 'FirebaseToriiProvider', {},
 
       it('errors when `email` is not supplied', function(done) {
         let provider = this.subject();
-        Ember.run(function() {
+        run(function() {
           provider.open({
             provider: 'password',
             password: 'password'
@@ -196,7 +220,7 @@ describeModule('emberfire@torii-provider:firebase', 'FirebaseToriiProvider', {},
 
       it('errors when `password` is not supplied', function(done) {
         let provider = this.subject();
-        Ember.run(function() {
+        run(function() {
           provider.open({
             provider: 'password',
             email: 'email'
@@ -215,7 +239,7 @@ describeModule('emberfire@torii-provider:firebase', 'FirebaseToriiProvider', {},
                 .returns(Ember.RSVP.resolve(userMock));
 
         let provider = this.subject();
-        Ember.run(function() {
+        run(function() {
           provider.open({
             provider: 'password',
             email: 'email',
@@ -239,7 +263,7 @@ describeModule('emberfire@torii-provider:firebase', 'FirebaseToriiProvider', {},
                 .returns(Ember.RSVP.reject(errorMock));
 
         let provider = this.subject();
-        Ember.run(function() {
+        run(function() {
           provider.open({
             provider: 'anonymous'
           }).catch(function(error) {
@@ -258,7 +282,7 @@ describeModule('emberfire@torii-provider:firebase', 'FirebaseToriiProvider', {},
                 .returns(Ember.RSVP.resolve(userMock));
 
         let provider = this.subject();
-        Ember.run(function() {
+        run(function() {
           provider.open({
             provider: 'anonymous'
           }).then(function(result) {
@@ -280,7 +304,7 @@ describeModule('emberfire@torii-provider:firebase', 'FirebaseToriiProvider', {},
                 .returns(Ember.RSVP.reject(errorMock));
 
         let provider = this.subject();
-        Ember.run(function() {
+        run(function() {
           provider.open({
             provider: 'custom',
             token: 'token'
@@ -300,7 +324,7 @@ describeModule('emberfire@torii-provider:firebase', 'FirebaseToriiProvider', {},
                 .returns(Ember.RSVP.resolve(userMock));
 
         let provider = this.subject();
-        Ember.run(function() {
+        run(function() {
           provider.open({
             provider: 'custom',
             token: 'token'
@@ -315,7 +339,7 @@ describeModule('emberfire@torii-provider:firebase', 'FirebaseToriiProvider', {},
 
       it('errors when a token is not supplied', function(done) {
         let provider = this.subject();
-        Ember.run(function() {
+        run(function() {
           provider.open({
             provider: 'custom'
           }).catch(function(error) {
@@ -332,7 +356,7 @@ describeModule('emberfire@torii-provider:firebase', 'FirebaseToriiProvider', {},
                 .returns(Ember.RSVP.resolve(userMock));
 
         let provider = this.subject();
-        Ember.run(function() {
+        run(function() {
           provider.open({
             provider: 'custom',
             token: 'token'

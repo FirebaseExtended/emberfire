@@ -27,6 +27,16 @@ export default {
     application.register('adapter:-firebase', FirebaseAdapter);
     application.register('serializer:-firebase', FirebaseSerializer);
 
+    const providerSettings = {instantiate: false, singleton: false};
+    application.register('firebase-auth-provider:twitter',
+        firebase.auth.TwitterAuthProvider, providerSettings);
+    application.register('firebase-auth-provider:facebook',
+        firebase.auth.FacebookAuthProvider, providerSettings);
+    application.register('firebase-auth-provider:github',
+        firebase.auth.GithubAuthProvider, providerSettings);
+    application.register('firebase-auth-provider:google',
+        firebase.auth.GoogleAuthProvider, providerSettings);
+
     // Monkeypatch the store until ED gives us a good way to listen to push events
     if (!DS.Store.prototype._emberfirePatched) {
       DS.Store.reopen({
