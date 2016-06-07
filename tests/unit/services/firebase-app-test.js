@@ -7,8 +7,8 @@ import firebase from 'firebase';
 import sinon from 'sinon';
 
 describeModule(
-  'emberfire@service:firebase',
-  'FirebaseService',
+  'emberfire@service:firebase-app',
+  'FirebaseAppService',
   { },
   function() {
 
@@ -57,9 +57,9 @@ describeModule(
       initializeAppStub.restore();
     });
 
-    it('is the database reference', function() {
+    it('is the firebase app', function() {
       const service = this.subject(emberAppMock);
-      expect(service).to.be.equal(refMock);
+      expect(service).to.be.equal(firebaseAppMock);
     });
 
     it('initializes the app with the environment config', function() {

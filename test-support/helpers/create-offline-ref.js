@@ -29,11 +29,9 @@ export default function createOfflineRef(initialData,
 
   let app;
 
-  if (firebase.apps.length) {
-    app = firebase.apps.find((a) => a.name === DEFAULT_NAME);
-  }
-
-  if (!app) {
+  try {
+    app = firebase.app(DEFAULT_NAME);
+  } catch (e) {
     app = firebase.initializeApp(config, DEFAULT_NAME);
   }
 
