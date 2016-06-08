@@ -24,7 +24,7 @@ module.exports = {
 
     return this.addBowerPackagesToProject([ {name: 'firebase', target: "^3.0.0"} ])
     .then(function() {
-      return self.addToConfig('firebase', '{ databaseURL: \'' + firebaseUrl + '\' }');
+      return self.addToConfig('firebase', '{ /* Get your config from the project overview button "Add Firebase to your web app" at https://console.firebase.google.com/ */ }');
     })
     .then(function () {
       return self.addToConfig('contentSecurityPolicy', '{ \'connect-src\': "\'self\' https://*.googleapis.com wss://*.firebaseio.com" }');

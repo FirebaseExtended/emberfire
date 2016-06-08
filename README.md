@@ -35,7 +35,7 @@ To install EmberFire as an addon with ember-cli, run the following command withi
 $ ember install emberfire
 ```
 
-This will create a `app/adapters/application.js`. All you need to do is update your Firebase property in `config/environment.js` with the initializeApp config found on https://console.firebase.google.com/ (click the WEB SETUP button on the Firebase Auth panel):
+This will create a `app/adapters/application.js`. All you need to do is update your Firebase property in `config/environment.js` with the initializeApp config found on [the Firebase console](https://console.firebase.google.com/) (select your project and choose "Add Firebase to your web app" from the overview page):
 
 ```js
 // config/environment.js
