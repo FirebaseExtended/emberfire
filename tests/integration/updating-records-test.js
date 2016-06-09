@@ -6,17 +6,22 @@ import { it } from 'ember-mocha';
 import stubFirebase from 'dummy/tests/helpers/stub-firebase';
 import unstubFirebase from 'dummy/tests/helpers/unstub-firebase';
 import createTestRef from 'dummy/tests/helpers/create-test-ref';
+import replaceAppRef from 'dummy/tests/helpers/replace-app-ref';
+
+const { run } = Ember;
 
 describe('Integration: FirebaseAdapter - Updating records', function() {
   var app, store, adapter, firebaseTestRef;
 
   var setupAdapter = function() {
     app = startApp();
+    replaceAppRef(app, createTestRef('blogs/normalized'));
+
+    firebaseTestRef = createTestRef('blogs/tests/adapter/updaterecord');
+
     store = app.__container__.lookup('service:store');
     adapter = store.adapterFor('application');
-    adapter._ref = createTestRef('blogs/normalized');
     adapter._queueFlushDelay = false;
-    firebaseTestRef = createTestRef('blogs/tests/adapter/updaterecord');
   };
 
   beforeEach(function () {
@@ -37,7 +42,7 @@ describe('Integration: FirebaseAdapter - Updating records', function() {
       beforeEach(function(done) {
         reference = firebaseTestRef.child('normalized');
         adapter._ref = reference;
-        Ember.run(function() {
+        run(() => {
           newComment = store.createRecord('comment', {
             body: 'This is a new comment'
           });
@@ -54,7 +59,7 @@ describe('Integration: FirebaseAdapter - Updating records', function() {
       describe('when the child record has been saved', function () {
 
         it('writes the hasMany relationship link', function(done) {
-          Ember.run(function () {
+          run(() => {
             newComment.save().then(function (c) {
               Ember.RSVP.Promise.cast(newPost.get('comments')).then(function(comments) {
                 comments.pushObject(newComment);
@@ -81,7 +86,7 @@ describe('Integration: FirebaseAdapter - Updating records', function() {
         describe('and the child is dirty', function () {
 
           it('writes the hasMany relationship link', function(done) {
-            Ember.run(function () {
+            run(() => {
               newComment.save().then(function () {
                 newComment.set('body', 'dirty this record!');
                 expect(newComment.get('hasDirtyAttributes')).to.equal(true, 'the item should be dirty');
@@ -112,7 +117,7 @@ describe('Integration: FirebaseAdapter - Updating records', function() {
         var secondComment, secondCommentId;
 
         beforeEach(function (done) {
-          Ember.run(function () {
+          run(() => {
             secondComment = store.createRecord('comment', {
               body: 'This is a new comment'
             });
@@ -184,7 +189,7 @@ describe('Integration: FirebaseAdapter - Updating records', function() {
       beforeEach(function(done) {
         var reference = firebaseTestRef.child('normalized');
         adapter._ref = reference;
-        Ember.run(function() {
+        run(() => {
           newComment = store.createRecord('comment', {
             id: 1,
             body: 'This is a new comment'
@@ -236,7 +241,7 @@ describe('Integration: FirebaseAdapter - Updating records', function() {
 
         adapter._ref = firebaseTestRef.child('normalized');
 
-        Ember.run(function() {
+        run(() => {
           newUser = store.createRecord('user');
           newComment = store.createRecord('comment', {
             body: 'This is a new comment'
@@ -266,7 +271,7 @@ describe('Integration: FirebaseAdapter - Updating records', function() {
       });
 
       it('adds a comment without removing old posts', function(done) {
-        Ember.run(function() {
+        run(() => {
           newUser.get('comments').then(function(comments) {
             var posts;
             comments.addObject(newComment);
@@ -296,7 +301,7 @@ describe('Integration: FirebaseAdapter - Updating records', function() {
       beforeEach(function(done) {
         reference = firebaseTestRef.child('embedded');
         adapter._ref = reference;
-        Ember.run(function() {
+        run(() => {
           parentRecord = store.createRecord('tree-node', {
             label: 'Parent Node'
           });
@@ -339,42 +344,50 @@ describe('Integration: FirebaseAdapter - Updating records', function() {
       });
 
       it('become `dirty` when editing', function() {
-        embeddedRecord.set('label', 'new label');
-        expect(embeddedRecord.get('hasDirtyAttributes')).to.equal(true, 'The embedded record should be `dirty`');
+        run(() => {
+          embeddedRecord.set('label', 'new label');
+          expect(embeddedRecord.get('hasDirtyAttributes')).to.equal(true, 'The embedded record should be `dirty`');
+        });
       });
 
       it('are not `dirty` after re-saving', function(done) {
-        embeddedRecord.set('label', 'new label');
-        parentRecord.save().then(function () {
-          embeddedRecord.ref().once('value', function(snapshot) {
-            embeddedData = snapshot.val();
-            expect(embeddedData.label).to.equal('new label');
-            expect(embeddedRecord.get('hasDirtyAttributes')).to.equal(false, 'record should not be dirty');
-            done();
+        run(() => {
+          embeddedRecord.set('label', 'new label');
+          parentRecord.save().then(function () {
+            embeddedRecord.ref().once('value', function(snapshot) {
+              embeddedData = snapshot.val();
+              expect(embeddedData.label).to.equal('new label');
+              expect(embeddedRecord.get('hasDirtyAttributes')).to.equal(false, 'record should not be dirty');
+              done();
+            });
           });
         });
       });
 
       it('rollback to a clean state', function() {
-        embeddedRecord.set('label', 'new label');
-        expect(embeddedRecord.get('hasDirtyAttributes')).to.equal(true, 'The embedded record should be `dirty`');
+        run(() => {
+          embeddedRecord.set('label', 'new label');
+          expect(embeddedRecord.get('hasDirtyAttributes')).to.equal(true, 'The embedded record should be `dirty`');
 
-        embeddedRecord.rollbackAttributes();
-        expect(embeddedRecord.get('hasDirtyAttributes')).to.equal(false, 'The embedded record should not be `dirty`');
+          embeddedRecord.rollbackAttributes();
+          expect(embeddedRecord.get('hasDirtyAttributes')).to.equal(false, 'The embedded record should not be `dirty`');
+        });
       });
 
       it('rollback to their last saved state', function() {
-        embeddedRecord.set('label', 'new label');
-        expect(embeddedRecord.get('hasDirtyAttributes')).to.equal(true, 'The embedded record should be `dirty`');
+        run(() => {
+          embeddedRecord.set('label', 'new label');
+          expect(embeddedRecord.get('hasDirtyAttributes')).to.equal(true, 'The embedded record should be `dirty`');
 
-        embeddedRecord.rollbackAttributes();
-        expect(embeddedRecord.get('label')).to.equal('Child Node');
+          embeddedRecord.rollbackAttributes();
+          expect(embeddedRecord.get('label')).to.equal('Child Node');
+        });
       });
 
       describe('when invoking .save() directly', function () {
 
         it('update on the server at the correct location', function(done) {
-          Ember.run(() => {
+          run(() => {
             embeddedRecord.set('label', 'Updated');
             embeddedRecord.save().then(() => {
               embeddedRecord.ref().once('value', function (snap) {
@@ -386,7 +399,7 @@ describe('Integration: FirebaseAdapter - Updating records', function() {
         });
 
         it('do not duplicate data on the server', function(done) {
-          Ember.run(() => {
+          run(() => {
             embeddedRecord.save().then(() => {
               reference.once('value', function (snap) {
                 expect(snap.val().children).to.not.exist;
@@ -408,7 +421,7 @@ describe('Integration: FirebaseAdapter - Updating records', function() {
       beforeEach(function(done) {
         reference = firebaseTestRef.child('embedded');
         adapter._ref = reference;
-        Ember.run(function() {
+        run(() => {
           parentRecord = store.createRecord('tree-node', {
             label: 'Parent'
           });
@@ -455,41 +468,49 @@ describe('Integration: FirebaseAdapter - Updating records', function() {
       });
 
       it('become `dirty` when editing', function() {
-        embeddedRecord.set('sync', false);
-        expect(embeddedRecord.get('hasDirtyAttributes')).to.equal(true, 'The embedded record should be `dirty`');
+        run(() => {
+          embeddedRecord.set('sync', false);
+          expect(embeddedRecord.get('hasDirtyAttributes')).to.equal(true, 'The embedded record should be `dirty`');
+        });
       });
 
       it('are not `dirty` after re-saving', function(done) {
-        embeddedRecord.set('sync', false);
-        parentRecord.save().then(function () {
-          embeddedRecord.ref().once('value', function(snapshot) {
-            expect(snapshot.val().sync).to.be.false;
-            expect(embeddedRecord.get('hasDirtyAttributes')).to.equal(false, 'record should not be dirty');
-            done();
+        run(() => {
+          embeddedRecord.set('sync', false);
+          parentRecord.save().then(function () {
+            embeddedRecord.ref().once('value', function(snapshot) {
+              expect(snapshot.val().sync).to.be.false;
+              expect(embeddedRecord.get('hasDirtyAttributes')).to.equal(false, 'record should not be dirty');
+              done();
+            });
           });
         });
       });
 
       it('rollback to a clean state', function() {
-        embeddedRecord.set('sync', false);
-        expect(embeddedRecord.get('hasDirtyAttributes')).to.equal(true, 'The embedded record should be `dirty`');
+        run(() => {
+          embeddedRecord.set('sync', false);
+          expect(embeddedRecord.get('hasDirtyAttributes')).to.equal(true, 'The embedded record should be `dirty`');
 
-        embeddedRecord.rollbackAttributes();
-        expect(embeddedRecord.get('hasDirtyAttributes')).to.equal(false, 'The embedded record should not be `dirty`');
+          embeddedRecord.rollbackAttributes();
+          expect(embeddedRecord.get('hasDirtyAttributes')).to.equal(false, 'The embedded record should not be `dirty`');
+        });
       });
 
       it('rollback to their last saved state', function() {
-        embeddedRecord.set('sync', false);
-        expect(embeddedRecord.get('hasDirtyAttributes')).to.equal(true, 'The embedded record should be `dirty`');
+        run(() => {
+          embeddedRecord.set('sync', false);
+          expect(embeddedRecord.get('hasDirtyAttributes')).to.equal(true, 'The embedded record should be `dirty`');
 
-        embeddedRecord.rollbackAttributes();
-        expect(embeddedRecord.get('sync')).to.be.true;
+          embeddedRecord.rollbackAttributes();
+          expect(embeddedRecord.get('sync')).to.be.true;
+        });
       });
 
       describe('when invoking .save() directly', function () {
 
         it('update on the server at the correct location', function(done) {
-          Ember.run(() => {
+          run(() => {
             embeddedRecord.set('sync', false);
             embeddedRecord.save().then(() => {
               embeddedRecord.ref().once('value', function (snap) {
@@ -501,7 +522,7 @@ describe('Integration: FirebaseAdapter - Updating records', function() {
         });
 
         it('do not duplicate data on the server', function(done) {
-          Ember.run(() => {
+          run(() => {
             embeddedRecord.save().then(() => {
               reference.once('value', function (snap) {
                 expect(snap.val().treeNodeConfigs).to.not.exist;
@@ -523,7 +544,7 @@ describe('Integration: FirebaseAdapter - Updating records', function() {
           return Ember.String.capitalize(key);
         };
 
-        Ember.run(function() {
+        run(() => {
           let user = store.createRecord('user', {
             firstName: 'John'
           });
@@ -550,7 +571,7 @@ describe('Integration: FirebaseAdapter - Updating records', function() {
           return Ember.String.capitalize(key);
         };
 
-        Ember.run(function() {
+        run(() => {
           let post = store.createRecord('post', {
             title: 'New Post'
           });
@@ -581,7 +602,7 @@ describe('Integration: FirebaseAdapter - Updating records', function() {
           return Ember.String.capitalize(key);
         };
 
-        Ember.run(function() {
+        run(() => {
           let post = store.createRecord('post', {
             title: 'New Post'
           });
@@ -622,7 +643,7 @@ describe('Integration: FirebaseAdapter - Updating records', function() {
           return Ember.String.capitalize(key);
         };
 
-        Ember.run(function() {
+        run(() => {
           let parentRecord = store.createRecord('tree-node', {
             label: 'Parent Node'
           });
@@ -650,7 +671,7 @@ describe('Integration: FirebaseAdapter - Updating records', function() {
           return Ember.String.capitalize(key);
         };
 
-        Ember.run(function() {
+        run(() => {
           let parentRecord = store.createRecord('tree-node', {
             label: 'Parent Node'
           });
@@ -686,7 +707,7 @@ describe('Integration: FirebaseAdapter - Updating records', function() {
           return Ember.String.capitalize(key);
         };
 
-        Ember.run(function() {
+        run(() => {
           let parentRecord = store.createRecord('tree-node', {
             label: 'Parent'
           });

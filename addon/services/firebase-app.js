@@ -17,7 +17,7 @@ export default {
       app = firebase.initializeApp(config.firebase, DEFAULT_NAME);
     }
 
-    return app.database().ref();
+    return app;
   },
 
   config: null,

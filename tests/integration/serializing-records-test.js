@@ -6,17 +6,20 @@ import { it } from 'ember-mocha';
 import stubFirebase from 'dummy/tests/helpers/stub-firebase';
 import unstubFirebase from 'dummy/tests/helpers/unstub-firebase';
 import createTestRef from 'dummy/tests/helpers/create-test-ref';
+import replaceAppRef from 'dummy/tests/helpers/replace-app-ref';
 
 describe('Integration: FirebaseSerializer - Serializing records', function() {
   var app, store, adapter, firebaseTestRef;
 
   var setupAdapter = function() {
     app = startApp();
+    replaceAppRef(app, createTestRef('blogs/normalized'));
+
+    firebaseTestRef = createTestRef('blogs/tests/adapter/updaterecord');
+
     store = app.__container__.lookup('service:store');
     adapter = store.adapterFor('application');
-    adapter._ref = createTestRef('blogs/normalized');
     adapter._queueFlushDelay = false;
-    firebaseTestRef = createTestRef('blogs/tests/adapter/updaterecord');
   };
 
   beforeEach(function () {

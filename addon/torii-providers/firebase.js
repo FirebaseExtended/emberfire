@@ -1,88 +1,77 @@
 import Ember from 'ember';
 import Waitable from '../mixins/waitable';
 
+
 export default Ember.Object.extend(Waitable, {
-  firebase: Ember.inject.service(),
+  firebaseApp: Ember.inject.service(),
 
   open(options) {
-    var provider = options.provider || options.authWith;
+    var providerId = options.provider;
     var reject = Ember.RSVP.reject;
 
-    if (!provider) {
+    if (!providerId) {
       return reject(new Error('`provider` must be supplied'));
     }
 
-    var ref = this.get('firebase');
+    var auth = this.get('firebaseApp').auth();
 
-    switch (provider) {
+    switch (providerId) {
       case 'password':
-        if (!options.email && !options.password) {
-          return reject(new Error('`email` and `password` must be supplied'));
+        if (!options.email || !options.password) {
+          return this.waitFor_(reject(new Error('`email` and `password` must be supplied')));
         }
 
-        return this._toPromise(ref, 'authWithPassword', {
-          email: options.email,
-          password: options.password,
-        });
-
+        return this.waitFor_(auth.signInWithEmailAndPassword(options.email, options.password));
 
       case 'custom':
         if (!options.token) {
-          return reject(new Error('A token must be supplied'));
+          return this.waitFor_(reject(new Error('A token must be supplied')));
         }
 
-        return this._toPromise(ref, 'authWithCustomToken', options.token);
+        return this.waitFor_(auth.signInWithCustomToken(options.token));
 
       case 'anonymous':
-        return this._toPromise(ref, 'authAnonymously');
+        return this.waitFor_(auth.signInAnonymously());
 
       // oauth providers e.g. 'twitter'
       default:
-        let providerSettings = options.settings || {};
-        if (options.redirect === true) {
-          // promise will never resolve unless there is an error
-          return this._toPromise(ref, 'authWithOAuthRedirect', provider, providerSettings);
+        const ProviderClass = this.container.lookupFactory(`firebase-auth-provider:${providerId}`);
+        if (!ProviderClass) {
+          return this.waitFor_(reject(new Error('Unknown provider')));
         }
-        return this._toPromise(ref, 'authWithOAuthPopup', provider, providerSettings);
+
+        const provider = new ProviderClass();
+
+        if (options.settings && options.settings.scope) {
+          options.settings.scope.split(',').forEach((s) => provider.addScope(s));
+        }
+
+        if (options.redirect === true) {
+          // promise will never resolve unless there is an error (due to redirect)
+          return this.waitFor_(auth.signInWithRedirect(provider));
+        }
+        return this.waitFor_(auth.signInWithPopup(provider));
     }
   },
 
 
   /**
-   * Promisify auth methods, and
-   * @param  {Firebase} ref
-   * @param  {String} method
-   * @param  {Object|String} [param]
-   * @param  {Object} [options]
-   * @return {Promise}
+   * Wraps a promise in test waiters.
+   *
+   * @param {!Promise} promise
+   * @return {!Promise}
    */
-  _toPromise(ref, method, param, options) {
+  waitFor_(promise) {
     this._incrementWaiters();
-
-    return new Ember.RSVP.Promise((resolve, reject) => {
-
-      var onComplete = (error, authData) => {
-        this._decrementWaiters();
-        if (error) {
-          reject(error);
-        } else {
-          resolve(authData);
-        }
-      };
-
-      var args = [];
-
-      if (typeof param !== 'undefined') {
-        args.push(param);
+    return promise.then((result) => {
+      this._decrementWaiters();
+      if (result.user) {
+        return result.user;
       }
-
-      args.push(onComplete);
-
-      if (typeof options !== 'undefined') {
-        args.push(options);
-      }
-
-      ref[method].apply(ref, args);
+      return result;
+    }).catch((err) => {
+      this._decrementWaiters();
+      return Ember.RSVP.reject(err);
     });
   }
 });

@@ -1,6 +1,6 @@
 import Ember from 'ember';
 import DS from 'ember-data';
-import Firebase from 'firebase';
+import firebase from 'firebase';
 import FirebaseAdapter from '../adapters/firebase';
 import FirebaseSerializer from '../serializers/firebase';
 import forEach from 'lodash/collection/forEach';
@@ -8,8 +8,8 @@ import forEach from 'lodash/collection/forEach';
 var VERSION = '0.0.0';
 
 if (Ember.libraries) {
-  if (Firebase.SDK_VERSION) {
-    Ember.libraries.registerCoreLibrary('Firebase', Firebase.SDK_VERSION);
+  if (firebase.SDK_VERSION) {
+    Ember.libraries.registerCoreLibrary('Firebase', firebase.SDK_VERSION);
   }
 
   Ember.libraries.registerCoreLibrary('EmberFire', VERSION);
@@ -26,6 +26,16 @@ export default {
 
     application.register('adapter:-firebase', FirebaseAdapter);
     application.register('serializer:-firebase', FirebaseSerializer);
+
+    const providerSettings = {instantiate: false, singleton: false};
+    application.register('firebase-auth-provider:twitter',
+        firebase.auth.TwitterAuthProvider, providerSettings);
+    application.register('firebase-auth-provider:facebook',
+        firebase.auth.FacebookAuthProvider, providerSettings);
+    application.register('firebase-auth-provider:github',
+        firebase.auth.GithubAuthProvider, providerSettings);
+    application.register('firebase-auth-provider:google',
+        firebase.auth.GoogleAuthProvider, providerSettings);
 
     // Monkeypatch the store until ED gives us a good way to listen to push events
     if (!DS.Store.prototype._emberfirePatched) {

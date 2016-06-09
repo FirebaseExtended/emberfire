@@ -1,19 +1,19 @@
 import Ember from 'ember';
 
 export default Ember.Object.extend({
-
+  firebaseApp: Ember.inject.service(),
 
   /**
    * Extacts session information from authentication response
    *
-   * @param {object} authentication - hash containing response payload
+   * @param {!firebase.User} user
    * @return {Promise}
    */
-  open(authentication) {
+  open(user) {
     return Ember.RSVP.resolve({
-      provider: authentication.provider,
-      uid: authentication.uid,
-      currentUser: authentication[authentication.provider]
+      provider: this.extractProviderId_(user),
+      uid: user.uid,
+      currentUser: user
     });
   },
 
@@ -24,15 +24,54 @@ export default Ember.Object.extend({
    * @return {Promise}
    */
   fetch() {
-    let firebase = this.get('firebase');
+    return this.fetchAuthState_()
+      .then((user) => {
+        if (!user) {
+          return this.fetchRedirectState_();
+        }
+        return user;
+      })
+      .then((user) => {
+        if (!user) {
+          return Ember.RSVP.reject(new Error('No session available'));
+        }
+        return this.open(user);
+      })
+      .catch((err) => Ember.RSVP.reject(err));
+  },
+
+
+  /**
+   * Fetches the redirect user, if any.
+   *
+   * @return {!Promise<?firebase.User>}
+   * @private
+   */
+  fetchRedirectState_() {
+    let auth = this.get('firebaseApp').auth();
+    return auth.getRedirectResult()
+      .then(result => result.user);
+  },
+
+
+  /**
+   * Promisifies the first value of onAuthStateChanged
+   *
+   * @return {!Promise<?firebase.User>}
+   * @private
+   */
+  fetchAuthState_() {
     return new Ember.RSVP.Promise((resolve, reject) => {
-      let auth = firebase.getAuth();
-      if (!auth) {
-        reject("No session available");
-      } else {
-        resolve(this.open(auth));
-      }
-    }, "Firebase Torii Adapter#fetch Firebase session");
+      let auth = this.get('firebaseApp').auth();
+      const unsub = auth.onAuthStateChanged((user) => {
+        unsub();
+        resolve(user);
+      },
+      (err) => {
+        unsub();
+        reject(err);
+      });
+    });
   },
 
 
@@ -42,8 +81,24 @@ export default Ember.Object.extend({
    * @return {Promise}
    */
   close() {
-    let firebase = this.get('firebase');
-    firebase.unauth();
-    return Ember.RSVP.resolve();
+    return this.get('firebaseApp').auth().signOut();
+  },
+
+  /**
+   * Extracts the provider id from the firebase user
+   *
+   * @param {!firebase.User} user
+   * @private
+   */
+  extractProviderId_(user) {
+    if (user.isAnonymous) {
+      return 'anonymous';
+    }
+
+    if (user.providerData && user.providerData.length) {
+      return user.providerData[0].providerId;
+    }
+
+    return 'custom';
   }
 });

@@ -5,6 +5,9 @@ import { it } from 'ember-mocha';
 import stubFirebase from 'dummy/tests/helpers/stub-firebase';
 import unstubFirebase from 'dummy/tests/helpers/unstub-firebase';
 import createTestRef from 'dummy/tests/helpers/create-test-ref';
+import replaceAppRef from 'dummy/tests/helpers/replace-app-ref';
+
+const { run } = Ember;
 
 describe('Integration: FirebaseAdapter - Deleting records', function() {
   var app, store, adapter, firebaseTestRef;
@@ -14,6 +17,7 @@ describe('Integration: FirebaseAdapter - Deleting records', function() {
     app = startApp();
 
     firebaseTestRef = createTestRef();
+    replaceAppRef(app, firebaseTestRef);
     store = app.__container__.lookup('service:store');
     adapter = store.adapterFor('application');
   });
@@ -27,9 +31,9 @@ describe('Integration: FirebaseAdapter - Deleting records', function() {
     var newPost, postId, postRef;
 
     beforeEach(function(done) {
-      var reference = firebaseTestRef.child('blogs/tests/adapter/deleterecord/normalized');
+      const reference = firebaseTestRef.child('blogs/tests/adapter/deleterecord/normalized');
       adapter._ref = reference;
-      Ember.run(function() {
+      run(() => {
         newPost = store.createRecord('post', {
           title: 'New Post'
         });
@@ -58,7 +62,7 @@ describe('Integration: FirebaseAdapter - Deleting records', function() {
     beforeEach(function(done) {
       var reference = firebaseTestRef.child('blogs/normalized');
       adapter._ref = reference;
-      Ember.run(function() {
+      run(() => {
         store.findRecord('post', 'post_1').then(function(p) {
           post = p;
           postId = post.get('id');
@@ -85,7 +89,7 @@ describe('Integration: FirebaseAdapter - Deleting records', function() {
     beforeEach(function(done) {
       reference = firebaseTestRef.child('blogs/embedded');
       adapter._ref = reference;
-      Ember.run(function() {
+      run(() => {
         store.findRecord('tree-node', 'node_1').then(function(parentRecord) {
           embeddedRecord = parentRecord.get('children').objectAt(0);
           done();
@@ -111,7 +115,7 @@ describe('Integration: FirebaseAdapter - Deleting records', function() {
     beforeEach(function(done) {
       reference = firebaseTestRef.child('blogs/embedded');
       adapter._ref = reference;
-      Ember.run(function() {
+      run(() => {
         store.findRecord('tree-node', 'node_4').then(function(post) {
           embeddedRecord = post.get('children').objectAt(0).get('config');
           done();
@@ -139,7 +143,7 @@ describe('Integration: FirebaseAdapter - Deleting records', function() {
       beforeEach(function(done) {
         var reference = firebaseTestRef.child('blogs/tests/adapter/deleterecord/normalized');
         adapter._ref = reference;
-        Ember.run(function() {
+        run(() => {
           parent = store.createRecord('treeNode', {
             label: 'Parent'
           });
@@ -167,11 +171,13 @@ describe('Integration: FirebaseAdapter - Deleting records', function() {
         parentRef.once('value', function(snapshot1) {
           expect(snapshot1.val().children[childId]).to.exist;
 
-          child.destroyRecord().then(function () {
-            parentRef.once('value', function(snapshot2) {
-              var parentData = snapshot2.val();
-              expect(parentData.children[childId]).to.not.exist;
-              done();
+          run(() => {
+            child.destroyRecord().then(function () {
+              parentRef.once('value', function(snapshot2) {
+                var parentData = snapshot2.val();
+                expect(parentData.children[childId]).to.not.exist;
+                done();
+              });
             });
           });
 
@@ -185,7 +191,7 @@ describe('Integration: FirebaseAdapter - Deleting records', function() {
       beforeEach(function(done) {
         var reference = firebaseTestRef.child('blogs/tests/adapter/deleterecord/normalized');
         adapter._ref = reference;
-        Ember.run(function() {
+        run(() => {
           parent = store.createRecord('treeNode', {
             label: 'Parent'
           });
@@ -209,11 +215,13 @@ describe('Integration: FirebaseAdapter - Deleting records', function() {
         parentRef.once('value', function(snapshot1) {
           expect(snapshot1.val().config).to.exist;
 
-          child.destroyRecord().then(function () {
-            parentRef.once('value', function(snapshot2) {
-              var parentData = snapshot2.val();
-              expect(parentData.config).to.not.exist;
-              done();
+          run(() => {
+            child.destroyRecord().then(function () {
+              parentRef.once('value', function(snapshot2) {
+                var parentData = snapshot2.val();
+                expect(parentData.config).to.not.exist;
+                done();
+              });
             });
           });
 

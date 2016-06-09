@@ -5,17 +5,20 @@ import { it } from 'ember-mocha';
 import stubFirebase from 'dummy/tests/helpers/stub-firebase';
 import unstubFirebase from 'dummy/tests/helpers/unstub-firebase';
 import createTestRef from 'dummy/tests/helpers/create-test-ref';
+import replaceAppRef from 'dummy/tests/helpers/replace-app-ref';
+
+const { run } = Ember;
 
 describe('Integration: FirebaseAdapter - Updates from server', function() {
   var app, store, adapter, firebaseTestRef;
 
   var setupAdapter = function() {
     app = startApp();
+    replaceAppRef(app, createTestRef('blogs/normalized'));
 
     firebaseTestRef = createTestRef();
     store = app.__container__.lookup('service:store');
     adapter = store.adapterFor('application');
-    adapter._ref = createTestRef('blogs/normalized');
     adapter._queueFlushDelay = false;
   };
 
@@ -35,7 +38,7 @@ describe('Integration: FirebaseAdapter - Updates from server', function() {
     beforeEach(function(done) {
       var reference = firebaseTestRef.child('blogs/tests/adapter/updaterecord/normalized');
       adapter._ref = reference;
-      Ember.run(function() {
+      run(() => {
         newPost = store.createRecord('post', {
           title: 'New Post'
         });
@@ -65,7 +68,7 @@ describe('Integration: FirebaseAdapter - Updates from server', function() {
 
     beforeEach(function(done) {
       reference = adapter._ref;
-      Ember.run(function() {
+      run(() => {
         store.findRecord('post', 'post_1').then(function(post) {
           newPost = post;
           done();
@@ -100,7 +103,7 @@ describe('Integration: FirebaseAdapter - Updates from server', function() {
     beforeEach(function(done) {
       reference = firebaseTestRef.child('blogs/embedded');
       adapter._ref = reference;
-      Ember.run(function() {
+      run(() => {
         store.findRecord('tree-node', 'node_1').then(function(post) {
           embeddedRecord = post.get('children').objectAt(0);
           done();
@@ -133,7 +136,7 @@ describe('Integration: FirebaseAdapter - Updates from server', function() {
     beforeEach(function(done) {
       reference = firebaseTestRef.child('blogs/embedded');
       adapter._ref = reference;
-      Ember.run(function() {
+      run(() => {
         store.findRecord('tree-node', 'node_3').then(function(post) {
           embeddedRecord = post.get('config');
           done();
@@ -166,7 +169,7 @@ describe('Integration: FirebaseAdapter - Updates from server', function() {
     beforeEach(function(done) {
       reference = firebaseTestRef.child('blogs/embedded');
       adapter._ref = reference;
-      Ember.run(function() {
+      run(() => {
         store.findRecord('tree-node', 'node_4').then(function(post) {
           embeddedRecord = post.get('children').objectAt(0).get('config');
           done();
@@ -198,7 +201,7 @@ describe('Integration: FirebaseAdapter - Updates from server', function() {
 
     beforeEach(function(done) {
       var reference = adapter._ref;
-      Ember.run(function() {
+      run(() => {
         store.findRecord('comment', 'comment_1').then(function(comment) {
           comment.set('user', null);
           comment.save().then(function(){
@@ -221,7 +224,7 @@ describe('Integration: FirebaseAdapter - Updates from server', function() {
 
     beforeEach(function(done) {
       var reference = adapter._ref;
-      Ember.run(function() {
+      run(() => {
         store.findRecord('comment', 'comment_1').then(function(comment) {
           currentComment = comment;
           reference.child('comments/comment_1').set(null, function() {
@@ -241,7 +244,7 @@ describe('Integration: FirebaseAdapter - Updates from server', function() {
 
     beforeEach(function(done) {
       reference = adapter._ref;
-      Ember.run(function() {
+      run(() => {
         store.findRecord('post', 'post_1').then(function(post) {
           currentPost = post;
           done();
@@ -252,7 +255,7 @@ describe('Integration: FirebaseAdapter - Updates from server', function() {
 
     it('removes the correct client side association when removed on server', function(done) {
       expect(currentPost.get('comments.length') === 2, 'should have 2 related comments');
-      Ember.run(function () {
+      run(() => {
         reference.child('posts/post_1/comments/comment_1').remove(function() {
           expect(currentPost.get('comments.firstObject.id')).to.equal('comment_2', 'only comment_2 should remain');
           done();
@@ -262,7 +265,7 @@ describe('Integration: FirebaseAdapter - Updates from server', function() {
 
     it('removes all client side associations when entire property is removed', function(done) {
       expect(currentPost.get('comments.length') === 2, 'should have 2 related comments');
-      Ember.run(function () {
+      run(() => {
         reference.child('posts/post_1/comments').remove(function() {
           expect(currentPost.get('comments.length')).to.equal(0, 'all related comments should be removed');
           done();
@@ -277,7 +280,7 @@ describe('Integration: FirebaseAdapter - Updates from server', function() {
 
     beforeEach(function(done) {
       reference = adapter._ref;
-      Ember.run(function() {
+      run(() => {
         store.findRecord('comment', 'comment_1').then(function(comment) {
           currentComment = comment;
           done();
@@ -288,7 +291,7 @@ describe('Integration: FirebaseAdapter - Updates from server', function() {
 
     it('removes the client side association when removed on server', function(done) {
       expect(currentComment.get('user.id')).to.exist;
-      Ember.run(function () {
+      run(() => {
         reference.child('comments/comment_1/user').remove(function() {
           expect(currentComment.get('user.id')).to.not.exist;
           done();
@@ -303,7 +306,7 @@ describe('Integration: FirebaseAdapter - Updates from server', function() {
 
     beforeEach(function(done) {
       reference = adapter._ref;
-      Ember.run(function() {
+      run(() => {
         store.findRecord('comment', 'comment_2').then(function(comment) {
           comment.destroyRecord().then(function() {
             done();
@@ -325,7 +328,7 @@ describe('Integration: FirebaseAdapter - Updates from server', function() {
 
     beforeEach(function(done) {
       reference = adapter._ref;
-      Ember.run(function() {
+      run(() => {
         store.findRecord('comment', 'comment_3').then(function(comment) {
           comment.set('body', 'Updated');
           comment.save().then(function() {
@@ -343,4 +346,3 @@ describe('Integration: FirebaseAdapter - Updates from server', function() {
     });
   });
 });
-

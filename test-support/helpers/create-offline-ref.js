@@ -1,23 +1,43 @@
-import Firebase from 'firebase';
+import firebase from 'firebase';
 
+export const DEFAULT_NAME = '[EmberFire offline test app]';
 
 /**
- * Creates an offline Firebase reference with optional initial data and url.
+ * Creates an offline firebase reference with optional initial data and url.
  *
- * Be sure to `stubFirebase()` and `unstubFirebase()` in your tests!
+ * Be sure to `stubfirebase()` and `unstubfirebase()` in your tests!
  *
- * @param  {Object} [initialData]
- * @param  {String} [url]
- * @return {Firebase}
+ * @param  {!Object} [initialData]
+ * @param  {string} [url]
+ * @param  {string} [apiKey]
+ * @return {!firebase.database.Reference}
  */
-export default function createOfflineRef(initialData, url = 'https://emberfire-tests.firebaseio.com') {
+export default function createOfflineRef(initialData,
+    url = 'https://emberfire-tests-2c814.firebaseio.com',
+    apiKey = 'AIzaSyC9-ndBb1WR05rRF1msVQDV6EBqB752m6o') {
 
-  if (!Firebase._unStub) {
+  if (!firebase._unStub) {
     throw new Error('Please use stubFirebase() before calling this method');
   }
 
-  var ref = new Firebase(url);
-  Firebase.goOffline(); // must be called after the ref is created
+  const config = {
+    apiKey: apiKey,
+    authDomain: 'emberfire-tests-2c814.firebaseapp.com',
+    databaseURL: url,
+    storageBucket: '',
+  };
+
+  let app;
+
+  try {
+    app = firebase.app(DEFAULT_NAME);
+  } catch (e) {
+    app = firebase.initializeApp(config, DEFAULT_NAME);
+  }
+
+  const ref = app.database().ref();
+
+  app.database().goOffline(); // must be called after the ref is created
 
   if (initialData) {
     ref.set(initialData);

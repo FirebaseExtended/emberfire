@@ -1,8 +1,8 @@
-import Firebase from 'firebase';
+import firebase from 'firebase';
 
 export default function unstubFirebase() {
-  if (typeof Firebase._unStub === 'function') {
-    Firebase._unStub();
-    delete Firebase._unStub;
+  if (typeof firebase._unStub === 'function') {
+    firebase._unStub();
+    delete firebase._unStub;
   }
 }

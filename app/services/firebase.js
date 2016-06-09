@@ -1,6 +1,3 @@
-import Firebase from 'emberfire/services/firebase';
-import config from '../config/environment';
+import firebase from 'emberfire/services/firebase';
 
-Firebase.config = config;
-
-export default Firebase;
+export default firebase;
