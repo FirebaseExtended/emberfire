@@ -46,7 +46,10 @@ module.exports = {
 
       out += "Example:" + EOL +
           EOL +
-          g("  // config/environment.js") + EOL +
+          g("// config/environment.js") + EOL +
+          "var ENV = {" + EOL +
+          "  locationType: 'auto'," + EOL +
+          g("  // ...") + EOL +
           "  firebase: {" + EOL +
           "    apiKey: 'xyz'," + EOL +
           "    authDomain: 'YOUR-FIREBASE-APP.firebaseapp.com'," + EOL +
