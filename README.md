@@ -35,28 +35,23 @@ To install EmberFire as an addon with ember-cli, run the following command withi
 $ ember install emberfire
 ```
 
-This will create a `app/adapters/application.js`. All you need to do is update your Firebase property in `config/environment.js` with the initializeApp config found on [the Firebase console](https://console.firebase.google.com/) (select your project and choose "Add Firebase to your web app" from the overview page):
+This will create a `app/adapters/application.js`. All you need to do is update your Firebase property in `config/environment.js` with the initializeApp config found on [the Firebase console](https://console.firebase.google.com/) (select your project and click [Add Firebase to your web app] on the overview page):
 
 ```js
 // config/environment.js
-  var ENV = {
-    // ...
-    firebase: {
-      apiKey: 'xyz',
-      authDomain: 'YOUR-FIREBASE-APP.firebaseapp.com',
-      databaseURL: 'https://YOUR-FIREBASE-APP.firebaseio.com',
-      storageBucket: 'YOUR-FIREBASE-APP.appspot.com',
-    }
-    // ...
-    contentSecurityPolicy: {
-      'script-src': '\'self\' \'unsafe-eval\' apis.google.com',
-      'style-src': '\'self\' \'unsafe-inline\' fonts.googleapis.com',
-      'font-src': '\'self\' fonts.gstatic.com',
-      'frame-src': '\'self\' https://*.firebaseapp.com',
-      'img-src': '\'self\' *.gravatar.com s3.amazonaws.com',
-      'connect-src': '\'self\' wss://*.firebaseio.com https://*.googleapis.com'
-    }
-    // ...
+var ENV = {
+  firebase: {
+    apiKey: 'xyz',
+    authDomain: 'YOUR-FIREBASE-APP.firebaseapp.com',
+    databaseURL: 'https://YOUR-FIREBASE-APP.firebaseio.com',
+    storageBucket: 'YOUR-FIREBASE-APP.appspot.com',
+  },
+  // if using ember-cli-content-security-policy
+  contentSecurityPolicy: {
+    'script-src': '\'self\' \'unsafe-eval\' apis.google.com',
+    'frame-src': '\'self\' https://*.firebaseapp.com',
+    'connect-src': '\'self\' wss://*.firebaseio.com https://*.googleapis.com'
+  },
 ```
 
 Your Firebase data will now be synced with the Ember Data store. For detailed EmberFire documentation, check out the [quickstart](https://firebase.com/docs/web/libraries/ember/quickstart.html) or [guide](https://firebase.com/docs/web/libraries/ember/guide.html) in the Firebase docs.
