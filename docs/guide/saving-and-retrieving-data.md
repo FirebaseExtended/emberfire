@@ -103,7 +103,7 @@ $ ember generate template posts
 ```handlebars
 <!-- app/templates/posts.hbs -->
 <section>
-{{#each post in model}}
+{{#each model as |post|}}
   <div>{{post.title}}</div>
   <div>{{post.body}}</div>
 {{/each}}

@@ -9,7 +9,6 @@ Install the 2.0 version of emberfire:
 ember install emberfire@2.0.0
 ```
 
-
 ## Upgrade to the Firebase `3.x.x` SDK
 
 Ensure you're using a `3.x.x` version of the Firebase SDK in your `bower.json`.
@@ -34,6 +33,19 @@ Version `2.x.x` of the Firebase SDK is no longer supported with EmberFire versio
 
 Consult the Firebase [web / Node.js migration guide](https://firebase.google.com/support/guides/firebase-web)
 for more details on what has changed in the Firebase `3.x.x` SDK.
+
+## PhantomJS compatibility
+
+Firebase 3.0 SDK does not yet work in PhantomJS 1.x or 2.x. For `ember-cli` Update your `testem.js` file to replace `PhantomJS` in the `launch_in_ci` block with a true browser like Chrome or Firefox. Firefox works in Travis. Chrome is available via the name `Chromium`, but doesn't appear to work.
+
+```
+// testem.js
+  module.exports = {
+  // ...
+  "launch_in_ci": [
+    "Firefox"
+  ],
+```
 
 ## New configuration format
 

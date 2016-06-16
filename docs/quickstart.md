@@ -92,7 +92,7 @@ To display our posts, we can loop through them in our template:
 ```handlebars
 <!-- app/templates/posts.hbs -->
 <section>
-{{#each post in model}}
+{{#each model as |post|}}
 <div>
   <div>{{post.title}}</div>
   <div>{{post.body}}</div>
