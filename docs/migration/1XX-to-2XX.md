@@ -15,7 +15,7 @@ Firebase SDK is no longer supported with EmberFire version `2.x.x`.
 | 2.x.x | 1.x.x |
 
 Consult the Firebase [web / Node.js migration guide](https://firebase.google.com/support/guides/firebase-web)
-for details on how to upgrade to the Firebase `3.x.x` SDK.
+for more details on what has changed in the Firebase `3.x.x` SDK.
 
 ## New configuration format
 
@@ -47,7 +47,7 @@ You can find these details by selecting a project in the [Firebase Console](http
 
 ## Torii auth response payload changes
 
-Although the Torii authentication interface remains the same, the payload returned will differ slightly.
+Although the Torii authentication interface remains the same, the payload returned will differ slightly. The new `payload.currentUser` returns a [firebase.User](https://firebase.google.com/docs/reference/js/firebase.User) object.
 
 Please familiarize yourself with the changes to Firebase Authentication in the [Firebase Authentication guide](https://firebase.google.com/docs/auth/).
 
@@ -80,7 +80,7 @@ After:
 let result = {
   provider: 'twitter.com', // provider strings changed
   uid: '2425352',
-  // now returns a [firebase.User](https://firebase.google.com/docs/reference/js/firebase.User)
+  // now returns a firebase.User
   currentUser: {
     uid: '2425352',
     email: 'email@email.com',
