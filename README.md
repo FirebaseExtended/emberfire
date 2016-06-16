@@ -56,8 +56,6 @@ Please consult this table when selecting your version of EmberFire and Firebase 
 
 | Ember Data        | EmberFire | Firebase SDK |
 | ------------------| ----------|--------------|
-| beta.12 - beta.18 | 1.4.x     | 2.x          |
-| beta.19           | none      | 2.x          |
 | 1.13+             | 1.5.x     | 2.x          |
 | 2.0 - 2.2         | 1.6.x     | 2.x          |
 | 2.3+              | 2.0.x     | 3.x          |
