@@ -58,6 +58,8 @@ Please consult this table when selecting your version of EmberFire and Firebase 
 
 *To install the `master` branch, use `ember install firebase/emberfire#master`*
 
+Also note that due to the Firebase 3.0 SDK, you cannot run tests with PhantomJS 1.0 or 2.0.
+
 
 ## Documentation
 
