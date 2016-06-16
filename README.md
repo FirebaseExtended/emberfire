@@ -44,6 +44,7 @@ var ENV = {
   }
 ```
 
+Get these values from the [Firebase Console](https://console.firebase.google.com/) by clicking the **[Add Firebase to your web app]** button on the project overview page.
 
 ## Compatibility
 
