@@ -67,6 +67,17 @@ In `app/templates/application.hbs` we'll call our `signIn` action when a user cl
 
 Authentication with Facebook, GitHub, and Google work similarly once you've enabled them in the Firebase Console.
 
+To request custom scopes from the identity provider, provide a comma separated list of scopes:
+
+```js
+this.get('session').open('firebase', {
+  provider: 'github',
+  settings: {
+    scope: 'user,gist',
+  }
+});
+```
+
 To use Firebase's email & password authentication, use `password` as the provider and pass it the user's email and password:
 
 ```js
