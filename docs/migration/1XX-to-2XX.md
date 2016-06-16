@@ -4,7 +4,7 @@ This migration document covers all the major breaking changes mentioned in the [
 change log](https://github.com/firebase/emberfire/releases/tag/v2.0.0).
 
 
-## Upgrade to the Firebase `3.x.x` SDK
+### Upgrade to the Firebase `3.x.x` SDK
 
 Ensure you're using a `3.x.x` version of the Firebase SDK in your project. Version `2.x.x` of the
 Firebase SDK is no longer supported with EmberFire version `2.x.x`.
@@ -17,7 +17,7 @@ Firebase SDK is no longer supported with EmberFire version `2.x.x`.
 Consult the Firebase [web / Node.js migration guide](https://firebase.google.com/support/guides/firebase-web)
 for more details on what has changed in the Firebase `3.x.x` SDK.
 
-## New configuration format
+### New configuration format
 
 Use the new firebase 3.0 SDK `initializeApp` config format in `config/environment.js`
 
@@ -44,7 +44,7 @@ var ENV = {
 
 You can find these details by selecting a project in the [Firebase Console](https://console.firebase.google.com/) and clicking **[Add Firebase to your web app]** on the overview page.
 
-## Remove `firebase` property from your adapters:
+### Remove `firebase` property from your adapters:
 
 FirebaseAdapter now automatically picks up the base Firebase db reference from the `firebase` service. You should remove any overrides in your adapters, especially in `adapters/application.js`.
 
@@ -74,7 +74,7 @@ export default FirebaseAdapter.extend({
 If you need per-type adapter overrides, for example you want to use a different firebase DB entirely for a specific model, you can still override the `firebase` property when extending the adapter.
 
 
-## Torii auth response payload changes
+### Torii auth response payload changes
 
 Although the Torii authentication interface remains the same, the payload returned will differ slightly. The payload's `currentUser` is now a [firebase.User](https://firebase.google.com/docs/reference/js/firebase.User) object.
 
