@@ -35,9 +35,6 @@ before_install:
   - export DISPLAY=:99.0
   - sh -e /etc/init.d/xvfb start
   - sleep 3 # wait for xfvb to start up
-  - touch /tmp/can-i-write-here
-  - ls /tmp | grep "testem" | wc -l
-  # - rm -rf /tmp/testem.chromium
   - ./node_modules/ember-cli/node_modules/testem/testem.js launchers
 
 install:

@@ -1,4 +1,4 @@
-# Contributing to EmberFire
+# Contributing | EmberFire
 
 Thank you for contributing to the Firebase community!
 
@@ -75,6 +75,43 @@ If you'd like to contribute to EmberFire, run the following commands to get your
 ### Setup
 
 * `git clone` this repository
-* `npm install -g ember-cli bower gulp phantomjs`
+* `npm install -g ember-cli bower gulp`
 * `npm install`
 * `bower install`
+
+### Running tests
+
+* `ember test` OR
+* `ember test --server`
+
+##### Running tests against a specific version of ember-data
+
+* `ember try:one <scenario>` where  `<scenario>` is one of the scenarios in `config/ember-try.js`
+
+Example:
+
+```
+ember try:one ember-data-canary
+```
+
+### Running the FireBlog demo app
+
+* `ember server`
+* Visit your app at [http://localhost:4200](http://localhost:4200).
+
+### Using your local EmberFire workdir in another local project
+
+From your `emberfire` workdir
+
+* `npm link`
+* `npm prune --production` (removes dev dependencies, these can trip you up!)
+
+From your *app* workdir
+
+* `npm link emberfire`
+* Update your `package.json` so that `emberfire` is in `devDependencies` and is set to version `0.0.0`
+
+  ```
+  "devDependencies": {
+    "emberfire": "0.0.0"
+  ```
