@@ -9,12 +9,50 @@ EmberFire is the officially supported adapter for using
 [Firebase](http://www.firebase.com/?utm_medium=web&utm_source=emberfire) with
 [Ember Data](https://github.com/emberjs/data).
 
-**Join the [Firebase + Ember Google Group](https://groups.google.com/forum/#!forum/firebase-ember)
-to ask technical questions, share apps you've built, and chat with other developers in the community.**
+Join our [Firebase + Ember Google Group](https://groups.google.com/forum/#!forum/firebase-ember)
+to ask technical questions, share apps you've built, and chat with other developers in the community.
+
+
+## Table of Contents
+
+ * [Getting Started With Firebase](#getting-started-with-firebase)
+ * [Installation](#installation)
+ * [Compatibility](#compatibility)
+ * [Documentation](#documentation)
+ * [Migration Guides](#migration-guides)
+ * [Contributing](#contributing)
+
+
+## Getting Started With Firebase
+
+EmberFire requires [Firebase](https://firebase.google.com/) in order to authenticate users and sync
+and store data. Firebase is a suite of integrated products designed to help you develop your app,
+grow your user base, and earn money. You can [sign up here for a free account](https://console.firebase.google.com/).
+
+
+## Installation
+
+```bash
+$ ember install emberfire
+```
+
+Update `config/environment.js`
+
+```js
+// config/environment.js
+var ENV = {
+  firebase: {
+    apiKey: 'xyz',
+    authDomain: 'YOUR-FIREBASE-APP.firebaseapp.com',
+    databaseURL: 'https://YOUR-FIREBASE-APP.firebaseio.com',
+    storageBucket: 'YOUR-FIREBASE-APP.appspot.com',
+  }
+```
+
 
 ## Compatibility
 
-Please consult this table when selecting your version of EmberFire and Firebase:
+Please consult this table when selecting your version of EmberFire and Firebase SDK:
 
 | Ember Data        | EmberFire | Firebase SDK |
 | ------------------| ----------|--------------|
@@ -27,97 +65,19 @@ Please consult this table when selecting your version of EmberFire and Firebase:
 
 *To install the `master` branch, use `ember install firebase/emberfire#master`*
 
-## Installation
 
-To install EmberFire as an addon with ember-cli, run the following command within your app's directory:
+## Documentation
 
-```bash
-$ ember install emberfire
-```
-
-This will create a `app/adapters/application.js`. All you need to do is update your Firebase property in `config/environment.js` with the initializeApp config found on [the Firebase console](https://console.firebase.google.com/) (select your project and click [Add Firebase to your web app] on the overview page):
-
-```js
-// config/environment.js
-var ENV = {
-  firebase: {
-    apiKey: 'xyz',
-    authDomain: 'YOUR-FIREBASE-APP.firebaseapp.com',
-    databaseURL: 'https://YOUR-FIREBASE-APP.firebaseio.com',
-    storageBucket: 'YOUR-FIREBASE-APP.appspot.com',
-  },
-  // if using ember-cli-content-security-policy
-  contentSecurityPolicy: {
-    'script-src': '\'self\' \'unsafe-eval\' apis.google.com',
-    'frame-src': '\'self\' https://*.firebaseapp.com',
-    'connect-src': '\'self\' wss://*.firebaseio.com https://*.googleapis.com'
-  },
-```
-
-Your Firebase data will now be synced with the Ember Data store. For detailed EmberFire documentation, check out the [quickstart](https://firebase.com/docs/web/libraries/ember/quickstart.html) or [guide](https://firebase.com/docs/web/libraries/ember/guide.html) in the Firebase docs.
-
-### Nested Addon Usage Caveat
-
-To publish an addon that exports functionality driven by EmberFire,
-note that EmberFire must be listed in the `dependencies` for NPM
-and not the `devDependencies`.
-
-When consuming an addon that consumes EmberFire, running the
-initializing generator by hand is required.
-
-```sh
-ember generate ../node_modules/your-addon/node_modules/emberfire/blueprints/emberfire
-```
+* [Quickstart](docs/quickstart.md)
+* [Guide](docs/guide/README.md)
 
 
-## Using EmberFire without ember-cli
+## Migration Guides
 
-EmberFire also works without ember-cli. See the [Firebase documentation](https://firebase.com/docs/web/libraries/ember/guide.html#section-without-ember-cli) for instructions on getting started.
+* [Migrating from EmberFire `1.x.x` to `2.x.x`](docs/migration/1XX-to-2XX.md)
 
-## Contributing to EmberFire
 
-If you'd like to contribute to EmberFire, run the following commands to get your environment set up:
+## Contributing
 
-### Setup
-
-* `git clone` this repository
-* `npm install -g ember-cli bower gulp phantomjs`
-* `npm install`
-* `bower install`
-
-### Using your local EmberFire workdir in another local project
-
-From your `emberfire` workdir
-
-* `npm link`
-* `npm prune --production` (removes dev dependencies, these can trip you up!)
-
-From your *app* workdir
-
-* `npm link emberfire`
-* Update your `package.json` so that `emberfire` is in `devDependencies` and is set to version `0.0.0`
-
-  ```
-  "devDependencies": {
-    "emberfire": "0.0.0"
-  ```
-
-### Running tests
-
-* `ember test` OR
-* `ember test --server`
-
-##### Running tests against a specific version of ember-data
-
-* `ember try:one <scenario>` where  `<scenario>` is one of the scenarios in `config/ember-try.js`
-
-Example:
-
-```
-ember try:one ember-data-canary
-```
-
-### Running the FireBlog demo app
-
-* `ember server`
-* Visit your app at [http://localhost:4200](http://localhost:4200).
+If you'd like to contribute to EmberFire, please first read through our [contribution
+guidelines](.github/CONTRIBUTING.md). Local setup instructions are available [here](.github/CONTRIBUTING.md#local-setup).

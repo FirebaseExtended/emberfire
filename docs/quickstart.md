@@ -12,7 +12,7 @@ $ ember new your-app-name
 $ cd your-app-name
 ```
 
-# 3. Install EmberFire as an ember-cli addon
+# 3. Install EmberFire
 
 To install EmberFire, simply run the following command within your ember-cli app directory:
 
