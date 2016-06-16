@@ -3,11 +3,29 @@
 This migration document covers all the major breaking changes mentioned in the [EmberFire `2.0.0`
 change log](https://github.com/firebase/emberfire/releases/tag/v2.0.0).
 
+Install the 2.0 version of emberfire:
+
+```
+ember install emberfire@2.0.0
+```
+
 
 ## Upgrade to the Firebase `3.x.x` SDK
 
-Ensure you're using a `3.x.x` version of the Firebase SDK in your project. Version `2.x.x` of the
-Firebase SDK is no longer supported with EmberFire version `2.x.x`.
+Ensure you're using a `3.x.x` version of the Firebase SDK in your `bower.json`.
+
+```
+  "dependencies": {
+    "ember": "~2.5.0",
+    "ember-cli-shims": "0.1.1",
+    "ember-cli-test-loader": "0.2.2",
+    "ember-qunit-notifications": "0.1.0",
+    "firebase": "^3.0.0"
+  }
+}
+```
+
+Version `2.x.x` of the Firebase SDK is no longer supported with EmberFire version `2.x.x`.
 
 | SDK Version | EmberFire Version Supported |
 |-------------|-------------------------------|
