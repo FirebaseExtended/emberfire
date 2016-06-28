@@ -211,6 +211,20 @@ export default {
           }
         },
 
+        // hasMany with inverse belongsTo
+        node_5: {
+          created: 1395162147646,
+          user: 'tstirrat',
+          label: 'Node 5 (hasMany with inverse belongsTo)',
+          children: {
+            node_5_1: {
+              created: 1395162147646,
+              label: 'Node 5.1',
+              parent: 'node_5'
+            }
+          }
+        }
+
       },
     }
   },

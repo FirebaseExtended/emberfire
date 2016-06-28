@@ -2,6 +2,7 @@ import Ember from 'ember';
 import DS from 'ember-data';
 import Waitable from '../mixins/waitable';
 import toPromise from '../utils/to-promise';
+import assign from 'lodash/object/assign';
 import forEach from 'lodash/collection/forEach';
 import filter from 'lodash/collection/filter';
 import map from 'lodash/collection/map';
@@ -679,15 +680,21 @@ export default DS.Adapter.extend(Waitable, {
    * @return {Object}
    */
   getFirstEmbeddingParent(internalModel) {
-    var embeddingParentRel = find(internalModel._implicitRelationships, (implicitRel) => {
-      var members = implicitRel.members.toArray();
+    var relationships = assign(
+      {},
+      internalModel._implicitRelationships,
+      internalModel._relationships.initializedRelationships
+    );
+
+    var embeddingParentRel = find(relationships, (rel) => {
+      var members = rel.members.toArray();
       var parent = members[0];
 
-      if (!parent) {
+      if (!parent || !rel.inverseKey) {
         return false;
       }
 
-      var parentRel = parent._relationships.get(implicitRel.inverseKey);
+      var parentRel = parent._relationships.get(rel.inverseKey);
       return this.isRelationshipEmbedded(this.store, parent.type.modelName, parentRel.relationshipMeta);
     });
 
