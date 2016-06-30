@@ -1,0 +1,1 @@
+fixed - Fix embedded `hasMany` relationships when an inverse belongsTo relationship is defined on children (#402)
