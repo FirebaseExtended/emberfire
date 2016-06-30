@@ -1,4 +1,5 @@
 import Ember from 'ember';
+import DS from 'ember-data';
 import startApp from 'dummy/tests/helpers/start-app';
 import destroyApp from 'dummy/tests/helpers/destroy-app';
 import { it } from 'ember-mocha';
@@ -126,6 +127,52 @@ describe('Integration: FirebaseAdapter - Updates from server', function() {
       var refPath = embeddedRecord.ref().path.toString();
       var expectedPath = `/blogs/embedded/treeNodes/node_1/children/node_1_1`;
       expect(refPath).to.equal(expectedPath);
+    });
+
+  });
+
+  describe('An embedded (hasMany) with inverse belongsTo record coming from the server', function() {
+    var embeddedRecord, parentRecord, reference;
+
+    beforeEach(function(done) {
+      app.TreeNode = DS.Model.extend({
+        label: DS.attr('string'),
+        created: DS.attr('number'),
+        children: DS.hasMany('tree-node', { async: false, inverse: 'parent' }),
+        parent: DS.belongsTo('tree-node', { inverse: 'children' })
+      });
+
+      reference = firebaseTestRef.child('blogs/embedded');
+      adapter._ref = reference;
+
+      run(() => {
+        store.findRecord('tree-node', 'node_5').then(function(parent) {
+          parentRecord = parent;
+          embeddedRecord = parent.get('children').objectAt(0);
+          done();
+        });
+      });
+    });
+
+    afterEach(function() {
+      delete app.TreeNode;
+    });
+
+    it('receives server updates', function(done) {
+      reference.child('treeNodes/node_5/children/node_5_1/label').set('Updated', function() {
+        expect(embeddedRecord.get('label')).to.equal('Updated', 'property should change');
+        done();
+      });
+    });
+
+    it('has the correct .ref()', function() {
+      var refPath = embeddedRecord.ref().path.toString();
+      var expectedPath = `/blogs/embedded/treeNodes/node_5/children/node_5_1`;
+      expect(refPath).to.equal(expectedPath);
+    });
+
+    it('has parent object access', function() {
+      expect(embeddedRecord.get("parent.id")).to.equal(parentRecord.get("id"));
     });
 
   });
