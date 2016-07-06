@@ -22,7 +22,7 @@ $ ember install emberfire
 
 This will add Firebase as a dependency in our `bower.json` file and it will generate `app/adapters/application.js` with the following content:
 
-```
+```js
 import FirebaseAdapter from 'emberfire/adapters/firebase';
 export default FirebaseAdapter.extend({
 });
