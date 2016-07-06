@@ -5,6 +5,9 @@ import {
 } from 'ember-mocha';
 import firebase from 'firebase';
 import sinon from 'sinon';
+import Ember from 'ember';
+
+const { setOwner } = Ember;
 
 describeModule(
   'emberfire@service:firebase-app',
@@ -19,10 +22,8 @@ describeModule(
     };
 
     const emberAppMock = {
-      container: {
-        lookupFactory() {
-          return configMock;
-        }
+      _lookupFactory() {
+        return configMock;
       }
     };
 
@@ -58,19 +59,22 @@ describeModule(
     });
 
     it('is the firebase app', function() {
-      const service = this.subject(emberAppMock);
+      setOwner(this, emberAppMock); // set owner context to mock app
+      const service = this.subject(this);
       expect(service).to.be.equal(firebaseAppMock);
     });
 
     it('initializes the app with the environment config', function() {
-      this.subject(emberAppMock);
+      setOwner(this, emberAppMock); // set owner context to mock app
+      this.subject(this);
       expect(initializeAppStub.calledWith(configMock.firebase)).to.be.true;
     });
 
     it('uses existing app if already present', function() {
       appStub.returns(firebaseAppMock);
 
-      this.subject(emberAppMock);
+      setOwner(this, emberAppMock); // set owner context to mock app
+      this.subject(this);
       expect(initializeAppStub.notCalled).to.be.true;
     });
   }

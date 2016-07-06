@@ -1,10 +1,13 @@
 import firebase from 'firebase';
+import Ember from 'ember';
+
+const { getOwner } = Ember;
 
 export const DEFAULT_NAME = '[EmberFire default app]';
 
 export default {
   create(application) {
-    const config = application.container.lookupFactory('config:environment');
+    const config = getOwner(application)._lookupFactory('config:environment');
     if (!config || typeof config.firebase !== 'object') {
       throw new Error('Please set the `firebase` property in your environment config.');
     }
