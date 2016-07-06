@@ -38,7 +38,7 @@ for more details on what has changed in the Firebase `3.x.x` SDK.
 
 Firebase 3.0 SDK does not yet work in PhantomJS 1.x or 2.x. For `ember-cli` Update your `testem.js` file to replace `PhantomJS` in the `launch_in_ci` block with a true browser like Chrome or Firefox. Firefox works in Travis. Chrome is available via the name `Chromium`, but doesn't appear to work.
 
-```
+```js
 // testem.js
   module.exports = {
   // ...
@@ -147,6 +147,50 @@ let result = {
     isAnonymous: false,
     refreshToken: '234234',
     // ...
+  }
+}
+```
+
+## Update auth methods
+
+The new SDK [changed a number of authentication methods](https://firebase.google.com/docs/reference/js/firebase.auth.Auth). They have been updated to use promise interfaces and are located on the `firebaseApp.auth` object.
+
+Before:
+
+```js
+firebase: Ember.inject.service(),
+
+actions: {
+  createUser(email, pass) {
+    const ref = this.get('firebase');
+    ref.createUser({email: email, password: pass), (err, authData) => {
+      if (!err) {
+        const user = this.store.createRecord('user', {
+          id: authData.uid,
+          email: authData.email
+        });
+        user.save();
+      }
+    });
+  }
+}
+```
+
+After:
+
+```js
+firebaseApp: Ember.inject.service(),
+
+actions: {
+  createUser(email, pass) {
+    const auth = this.get('firebaseApp').auth();
+    auth.createUserWithEmailAndPassword(email, pass).then((userResponse) => {
+      const user = this.store.createRecord('user', {
+        id: userResponse.uid,
+        email: userResponse.email
+      });
+      return user.save();
+    });
   }
 }
 ```
