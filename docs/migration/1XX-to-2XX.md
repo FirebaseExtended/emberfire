@@ -153,7 +153,7 @@ let result = {
 
 ## Update auth methods
 
-The new SDK [changed a number of authentication methods](https://firebase.google.com/docs/reference/js/firebase.auth.Auth). They have been updated to use promise interfaces and are located on the `firebaseApp.auth` object.
+The new SDK [changed a number of authentication methods](https://firebase.google.com/docs/reference/js/firebase.auth.Auth). They have been updated to use promise interfaces and are located on the `firebaseApp.auth()` object.
 
 Before:
 
