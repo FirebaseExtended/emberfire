@@ -7,3 +7,4 @@
 1. [User Authentication](authentication.md) - EmberFire handles user authentication and session management for you.
 1. [Using EmberFire without Ember CLI](without-ember-cli.md) - Using EmberFire in projects where you cannot use ember-cli
 1. [Deploying to Firebase Hosting](deploying-to-firebase-hosting.md) - Deploying your app to Firebase Hosting
+1. [Acceptance testing](acceptance-testing.md) - Acceptance testing with EmberFire
