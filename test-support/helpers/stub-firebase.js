@@ -1,10 +1,16 @@
 import firebase from 'firebase';
 
 /**
- * When a reference is in offline mode it will not call any callbacks
- * until it goes online and resyncs. The ref will have already
- * updated its internal cache with the changed values so we shortcut
- * the process and call the supplied callbacks immediately (asynchronously).
+ * Offline references maintain a local cache of their data and can respond to
+ * value lookups and queries. We set fixture data at the root level of the
+ * reference, so that the entire data structure is "known" in the local cache.
+ *
+ * While the reference is in offline mode, any `set`, `update` or `remove`
+ * operations would usually not fire their completion callbacks. Ordinarily
+ * these callbacks would wait until the reference has gone online and
+ * synchronized with the server. For testing, we know that all data will be in
+ * the local cache so we shortcut this process with `stubFirebase()` and invoke
+ * the callbacks immediately.
  */
 export default function stubFirebase() {
   // check for existing stubbing

@@ -1,13 +1,13 @@
-# Acceptance testing
+# Testing
 
 Firebase backed Ember applications can be tested by:
 
- - Setting up a stubbed Firebase instance with initial fixture data
- - Defining ways in which a stubbed Firebase instance should respond to new data
+ - Setting up an offline Firebase reference with fixture data
+ - Defining ways in which the app should respond to data changes
 
-## Loading fixture data
+## Acceptance Testing
 
-You can generate an example acceptance test from a blueprint by running
+You can generate an example acceptance test by running
 
     ember generate emberfire-acceptance-test books
 
@@ -41,16 +41,15 @@ test('visiting /books', function(assert) {
 
 // tests/fixtures/firebase/books.js
 export default {
-  1 : {
+  "-KMQgixTre1RNk-q-doB": {
     "section" : "information",
     "title" : "Water Colours with Ease"
   },
-  2 : {
+  "-KMQglKpLM8vW3iQPnMR": {
     "type" : "self-help",
     "job" : "Thoughts and Feelings"
   }
 };
-
 ```
 
 Note that the fixture data should match the format that Firebase uses for storing data. This can be

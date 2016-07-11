@@ -38,4 +38,4 @@ $ firebase deploy
 
 Note that you can use any hosting service you'd like to deploy your Ember app, you don't need to use Firebase Hosting.
 
-Next: [Acceptance testing](acceptance-testing.md)
+Next: [Testing](testing.md)
