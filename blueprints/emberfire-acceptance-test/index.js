@@ -1,16 +1,21 @@
 /*jshint node:true*/
 
-var acceptanceBlueprint = require('ember-cli/blueprints/acceptance-test');
-var mochaDefined = require('../')
 var path = require('path');
+
+var acceptanceBlueprint;
+
+try {
+  acceptanceBlueprint = require('ember-cli-mocha/blueprints/acceptance-test');
+} catch(e) {
+  acceptanceBlueprint = require('ember-cli/blueprints/acceptance-test');
+}
 
 var emberfireAcceptanceBlueprint = {
   description: 'Generates an acceptance test for a Firebase backed feature.',
 
-  filesPath() {
+  filesPath: function() {
     var blueprintPath = 'qunit-files';
 
-    // console.log(this.project);
     if (this.project && this.project.addons) {
       var addonNames = this.project.addons.map(function(addon) {
         return addon.name;
