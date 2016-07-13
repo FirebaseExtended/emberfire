@@ -1,25 +1,11 @@
 /* jshint expr:true */
-import {
-  describe,
-  it,
-  beforeEach,
-  afterEach
-} from 'mocha';
+import { it } from 'mocha';
 import { expect } from 'chai';
+import describeEmberfireAcceptance from '../helpers/describe-emberfire-acceptance';
 import startApp from '../helpers/start-app';
 <% if (destroyAppExists) { %>import destroyApp from '../helpers/destroy-app';<% } else { %>import Ember from 'ember';<% } %>
 
-describe('Acceptance: <%= classifiedModuleName %>', function() {
-  let application;
-
-  beforeEach(function() {
-    application = startApp();
-  });
-
-  afterEach(function() {
-    <% if (destroyAppExists) { %>destroyApp(application);<% } else { %>Ember.run(application, 'destroy');<% } %>
-  });
-
+describeEmberfireAcceptance('Acceptance: <%= classifiedModuleName %>', function() {
   it('can visit /<%= dasherizedModuleName %>', function() {
     visit('/<%= dasherizedModuleName %>');
 

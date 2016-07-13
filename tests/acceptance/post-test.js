@@ -1,35 +1,11 @@
 /* jshint expr:true */
-import {
-  describe,
-  it,
-  beforeEach,
-  afterEach
-} from 'mocha';
+import { it } from 'mocha';
 import { expect } from 'chai';
 import Ember from 'ember';
-import startApp from '../helpers/start-app';
-import destroyApp from '../helpers/destroy-app';
-import replaceAppRef from '../helpers/replace-app-ref';
-import stubFirebase from '../helpers/stub-firebase';
-import unstubFirebase from '../helpers/unstub-firebase';
-import createTestRef from '../helpers/create-test-ref';
 
-describe('Acceptance: /post/:id', function() {
-  var application, ref;
+import describeEmberfireAcceptance from '../helpers/describe-emberfire-acceptance';
 
-  beforeEach(function() {
-    stubFirebase();
-    application = startApp();
-    ref = createTestRef('acceptance');
-
-    replaceAppRef(application, ref);
-  });
-
-  afterEach(function() {
-    unstubFirebase();
-    destroyApp(application);
-  });
-
+describeEmberfireAcceptance('Acceptance: /post/:id', function(ref) {
   it('can visit /post/post_1', function() {
     visit('/post/post_1');
 
@@ -101,9 +77,9 @@ describe('Acceptance: /post/:id', function() {
       expect(find('.post-title').text().trim()).to.equal('Post 1');
     });
 
-    andThen(function() {
-      Ember.run(function() {
-        ref.child('posts/post_1/title').set('Post 1 UPDATED');
+    andThen(() => {
+      Ember.run(() => {
+        this.ref.child('posts/post_1/title').set('Post 1 UPDATED');
       });
     });
 
