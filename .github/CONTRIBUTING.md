@@ -21,7 +21,7 @@ which just ask about usage will be closed. Here are some resources to get help:
 If our docs and examples don't help, you can reach us through one of the following channels:
 
 - Ask a question with the #firebase and #emberfire tags on Stack Overflow: https://stackoverflow.com/questions/ask?tags=emberfire,firebase
-- Start a new thread on the Firebase Ember Google Group: https://groups.google.com/forum/#!forum/firebase-ember
+- Start a new thread on the Firebase Google Group: https://groups.google.com/forum/#!forum/firebase-talk
 - Join the Firebase Slack community: https://firebase-community.slack.com
 
 **Please avoid double posting across multiple channels!**
