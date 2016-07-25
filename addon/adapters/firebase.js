@@ -60,7 +60,7 @@ export default DS.Adapter.extend(Waitable, {
   init() {
     this._super.apply(this, arguments);
 
-    var ref = this.get('firebase');
+    var ref = this.get('firebase').database ? this.get('firebase').database().ref() : this.get('firebase');
     if (!ref) {
       throw new Error('Please set the `firebase` property in the environment config.');
     }
