@@ -1,6 +1,6 @@
 # Saving and retrieving data
 
-First, let's create a model for our posts. Each post will have a title, body and timestamp. We'll use the timestamp property to display the most recent post first:
+_As an example resource_, we will use "posts" for a blog. Let's create a model and describe what data a "post" will include. Each post will have a title, body, and a timestamp _which we can use to display the most recent post first_. We can use this CLI shorthand to quickly generate that file.
 
 ```
 $ ember generate model post title:string body:string timestamp:number
@@ -15,11 +15,12 @@ export default DS.Model.extend({
 });
 ```
 
-To add blog posts to our app, we'll create a template with a form for submitting blog posts:
+To add blog posts to our app, we'll need a route and a template with a form for submitting blog posts:
 
 ```
-$ ember generate template posts
+$ ember generate route posts
 ```
+This will generate a route and template for posts
 
 ```handlebars
 <!-- app/templates/posts.hbs -->
@@ -81,27 +82,21 @@ Notice that our data is stored under a posts path. EmberFire will automatically 
 
 To retrieve the post data from the database, we just need to add a model hook to our posts route:
 
-```
-$ ember generate route posts
-```
-
 ```js
 // app/routes/posts.js
 export default Ember.Route.extend({
   model: function() {
-    return this.store.find('post');
+    return this.store.findAll('post');
   }
 });
 ```
 
 Now we have access to all of our posts, and can display them in our template:
 
-```js
-$ ember generate template posts
-```
-
 ```handlebars
 <!-- app/templates/posts.hbs -->
+// form from above... 
+
 <section>
 {{#each model as |post|}}
   <div>{{post.title}}</div>
