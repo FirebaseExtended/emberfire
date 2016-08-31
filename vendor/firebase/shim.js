@@ -1,9 +1,16 @@
 /* globals Firebase */
 
-define('firebase', [], function() {
-  "use strict";
+(function() {
+  function FakeFirebase() {
+    var error = "Firebase is not available. Either the bower package is missing or your app is in Fastboot Mode.";
 
-  return {
-    'default': firebase
-  };
-});
+    throw Error(error);
+  }
+
+  function vendorModule() {
+    'use strict';
+    return {'default': self['firebase'] || FakeFirebase};
+  }
+
+  define('firebase', [], vendorModule);
+})();

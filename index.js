@@ -13,7 +13,9 @@ module.exports = {
     }
     this.app = app;
 
-    this.app.import(app.bowerDirectory + '/firebase/firebase.js');
+    if (!process.env.EMBER_CLI_FASTBOOT) {
+      this.app.import(app.bowerDirectory + '/firebase/firebase.js');
+    }
 
     app.import('vendor/firebase/shim.js', {
       type: 'vendor',
