@@ -380,7 +380,7 @@ export default DS.Adapter.extend(Waitable, {
           var normalizedData = store.normalize(typeClass.modelName, payload);
           store.push(normalizedData);
         }
-      });
+      }, undefined, payload);
     }
   },
 
@@ -746,12 +746,25 @@ export default DS.Adapter.extend(Waitable, {
    * Push a new function into the _queue and then schedule a
    * flush if the item is the first to be pushed
    */
-  _enqueue(callback, args) {
+  _enqueue(callback, args, payload) {
     //Only do the queueing if we scheduled a delay
     if (this._queueFlushDelay) {
-      var length = this._queue.push([callback, args]);
-      if (length === 1) {
-        this._queueScheduleFlush();
+      var enqueue = true;
+      if ((this._queue.length > 0) && payload) {
+        const previous = this._queue[this._queue.length - 1];
+        const previousPayload = previous[2];
+        if (previousPayload && previousPayload.id && (payload.id === previousPayload.id)) {
+          for (var attr in payload) { 
+            previousPayload[attr] = payload[attr]; 
+          }
+          enqueue = false;
+        }
+      }
+      if (enqueue) {
+        var length = this._queue.push([callback, args, payload]);
+        if (length === 1) {
+          this._queueScheduleFlush();
+        }
       }
     } else {
       callback.apply(null, args);

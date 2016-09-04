@@ -35,12 +35,12 @@ before_install:
   - export DISPLAY=:99.0
   - sh -e /etc/init.d/xvfb start
   - sleep 3 # wait for xfvb to start up
-  - ./node_modules/ember-cli/node_modules/testem/testem.js launchers
 
 install:
   - npm install
   - bower install
 
 script:
+  - ./node_modules/ember-cli/node_modules/testem/testem.js launchers
   - npm run legacy
   - ember try:one $EMBER_TRY_SCENARIO --skip-cleanup
