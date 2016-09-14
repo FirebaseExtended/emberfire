@@ -131,4 +131,39 @@ describe('Acceptance: /post/:id', function() {
     });
 
   }); // the new comment entry form
+
+  describe('adding a comment', function () {
+
+    const COMMENT_SELECTOR =
+        '.post-comments .post-comment:not(.post-comment-new)';
+
+    beforeEach(() => {
+      visit('/post/post_2');
+
+      andThen(function() {
+        expect(find(COMMENT_SELECTOR).length).to.equal(0);
+      });
+
+      fillIn('.post-comment-new [placeholder=Username]', 'kanye');
+      fillIn('.post-comment-new > textarea', 'comment');
+      click('.post-comment-new > button');
+    });
+
+    it('appends a comment to the comment list', function() {
+      andThen(function() {
+        expect(find(COMMENT_SELECTOR).length).to.equal(1);
+      });
+    });
+
+    it('appends the correct comment details', function() {
+      andThen(function() {
+        const comment = find(COMMENT_SELECTOR);
+        expect(comment.find('.post-comment-author').text().trim())
+            .to.equal('kanye');
+        expect(comment.find('.post-comment-body > p').text().trim())
+            .to.equal('comment');
+      });
+    });
+
+  }); // adding a comment
 });

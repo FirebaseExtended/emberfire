@@ -1,1 +1,2 @@
 fixed - Fixes container deprecation warnings by using `Ember.getOwner()`
+fixed - Acceptance tests will now wait for `record.save()` operations.

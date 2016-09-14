@@ -481,7 +481,16 @@ export default DS.Adapter.extend(Waitable, {
    * @return {Promise}
    */
   _updateRecord(recordRef, serializedRecord) {
-    return toPromise(recordRef.update, recordRef, [serializedRecord]);
+    this._incrementWaiters();
+    return toPromise(recordRef.update, recordRef, [serializedRecord])
+      .then((result) => {
+        this._decrementWaiters();
+        return result;
+      })
+      .catch((e) => {
+        this._decrementWaiters();
+        return Ember.RSVP.reject(e);
+      });
   },
 
 

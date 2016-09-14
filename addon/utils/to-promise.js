@@ -8,9 +8,9 @@ export default function(fn, context, _args, errorMsg) {
         if (errorMsg && typeof error === 'object') {
           error.location = errorMsg;
         }
-        reject(error);
+        Ember.run(null, reject, error);
       } else {
-        resolve();
+        Ember.run(null, resolve);
       }
     };
     args.push(callback);
