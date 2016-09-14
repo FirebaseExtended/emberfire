@@ -728,17 +728,21 @@ export default DS.Adapter.extend(Waitable, {
 
 
   /**
-   * Called after the first item is pushed into the _queue
+   * Schedules a `_flushQueue` for later.
+   *
+   * @private
    */
-  _queueScheduleFlush() {
-    Ember.run.later(this, this._queueFlush, this._queueFlushDelay);
+  _flushLater() {
+    Ember.run.later(this, this._flushQueue, this._queueFlushDelay);
   },
 
 
   /**
-   * Call each function in the _queue and the reset the _queue
+   * Flush all delayed `store.push` payloads in `this._queuedPayloads`.
+   *
+   * @private
    */
-  _queueFlush() {
+  _flushQueue() {
     const store = this.get('store');
     if (store.isDestroying) {
       return;
@@ -762,6 +766,7 @@ export default DS.Adapter.extend(Waitable, {
    * @param {string} modelName
    * @param {string} id
    * @param {!Object<string, *>} payload
+   * @private
    */
   _pushLater(modelName, id, payload) {
     const store = this.get('store');
@@ -782,7 +787,7 @@ export default DS.Adapter.extend(Waitable, {
 
     // if this is the first item to be queued, schedule a flush
     if (this._queue.length === 1) {
-      this._queueScheduleFlush();
+      this._flushLater();
     }
   },
 

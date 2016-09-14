@@ -132,33 +132,35 @@ describeModule('emberfire@adapter:firebase', 'FirebaseAdapter', {
 
     }); // #applyQueryToRef
 
-    describe("#_queueScheduleFlush", function() {
+    describe("#_flushLater", function() {
 
-      var adapter, spy;
+      var adapter, flushQueueSpy;
 
       beforeEach(function() {
         adapter = this.subject({
           _queueFlushDelay: 1
         });
-        spy = sinon.spy(adapter, "_queueScheduleFlush");
+        flushQueueSpy = sinon.spy(adapter, "_flushQueue");
       });
 
       afterEach(function() {
-        spy.restore();
+        flushQueueSpy.restore();
       });
 
-      it("schedules a #_queueFlush", function(done) {
-        adapter._queueScheduleFlush();
+      it("schedules a #_flushQueue", function(done) {
+        adapter._flushLater();
         run.later(this, function() {
-          expect(spy.callCount).to.equal(1);
+          expect(flushQueueSpy.callCount).to.equal(1);
           done();
         }, adapter._queueFlushDelay * 2);
       });
 
-    }); // #_queueScheduleFlush
+    }); // #_flushLater
 
     describe("#_pushLater", function() {
-      var adapter, queueScheduleFlushSpy, queueFlushSpy;
+      var adapter, queueScheduleFlushSpy, flushQueueSpy;
+      let store;
+      let storePushSpy;
 
       beforeEach(function() {
         adapter = this.subject({
@@ -172,13 +174,16 @@ describeModule('emberfire@adapter:firebase', 'FirebaseAdapter', {
         this.registry.register('model:user', User, {instantiate: false, singleton: false});
         this.registry.register('adapter:user', adapter, {instantiate: false, singleton: false});
 
-        queueScheduleFlushSpy = sinon.spy(adapter, "_queueScheduleFlush");
-        queueFlushSpy = sinon.spy(adapter, "_queueFlush");
+        queueScheduleFlushSpy = sinon.spy(adapter, "_flushLater");
+        flushQueueSpy = sinon.spy(adapter, "_flushQueue");
+        store = adapter.get('store');
+        storePushSpy = sinon.spy(store, 'push');
       });
 
       afterEach(function() {
         queueScheduleFlushSpy.restore();
-        queueFlushSpy.restore();
+        flushQueueSpy.restore();
+        storePushSpy.restore();
       });
 
       it("pushes a new item into the _queue", function() {
@@ -186,7 +191,7 @@ describeModule('emberfire@adapter:firebase', 'FirebaseAdapter', {
         expect(adapter._queue.length).to.equal(1);
       });
 
-      it("schedules a _queueFlush()", function() {
+      it("schedules a _flushQueue()", function() {
         adapter._pushLater('user', '12345', {id: '12345', name: 'Tim'});
         expect(queueScheduleFlushSpy.callCount).to.equal(1);
       });
@@ -194,7 +199,7 @@ describeModule('emberfire@adapter:firebase', 'FirebaseAdapter', {
       it("flushes the _queue", function(done) {
         adapter._pushLater('user', '12345', {id: '12345', name: 'Tim'});
         run.later(this, function() {
-          expect(queueFlushSpy.callCount).to.equal(1);
+          expect(flushQueueSpy.callCount).to.equal(1);
           done();
         }, adapter._queueFlushDelay * 2);
       });
@@ -206,15 +211,28 @@ describeModule('emberfire@adapter:firebase', 'FirebaseAdapter', {
         adapter._pushLater('user', '12556', {id: '12556', name: 'Tam'});
         adapter._pushLater('user', '12557', {id: '12557', name: 'Tum'});
         run.later(this, function() {
-          expect(queueFlushSpy.callCount).to.equal(1);
+          expect(flushQueueSpy.callCount).to.equal(1);
           done();
         }, adapter._queueFlushDelay * 2);
       });
 
+      it("pushes immediately if adapter._queueFlushDelay == 0", function() {
+        run(function() {
+          adapter._queueFlushDelay = 0;
+          adapter._pushLater('user', '12345', {id: '12345', name: 'Tim'});
+
+          expect(storePushSpy.callCount).to.equal(1);
+          expect(storePushSpy.getCall(0).args[0].data).to.deep.equal({
+            id: '12345',
+            type: 'user',
+            attributes: {name: 'Tim'},
+            relationships: {},
+          });
+        });
+      });
+
       it("calls store.push later with normalized data", function(done) {
         adapter._pushLater('user', '12345', {id: '12345', name: 'Tim'});
-        const store = adapter.get('store');
-        const storePushSpy = sinon.spy(store, 'push');
 
         run.later(this, function() {
           expect(storePushSpy.getCall(0).args[0].data)
@@ -232,8 +250,7 @@ describeModule('emberfire@adapter:firebase', 'FirebaseAdapter', {
         adapter._pushLater('user', '12345', {id: '12345', name: 'Tim'});
         adapter._pushLater('user', '12555', {id: '12555', name: 'Tom'});
         adapter._pushLater('user', '12345', {id: '12345', name: 'Tim'});
-        const store = adapter.get('store');
-        const storePushSpy = sinon.spy(store, 'push');
+
         run.later(this, function() {
           expect(storePushSpy.callCount).to.equal(2);
           expect(storePushSpy.getCall(0).args[0].data.attributes)
