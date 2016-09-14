@@ -158,7 +158,7 @@ describeModule('emberfire@adapter:firebase', 'FirebaseAdapter', {
     }); // #_flushLater
 
     describe("#_pushLater", function() {
-      var adapter, queueScheduleFlushSpy, flushQueueSpy;
+      var adapter, flushLaterSpy, flushQueueSpy;
       let store;
       let storePushSpy;
 
@@ -174,14 +174,14 @@ describeModule('emberfire@adapter:firebase', 'FirebaseAdapter', {
         this.registry.register('model:user', User, {instantiate: false, singleton: false});
         this.registry.register('adapter:user', adapter, {instantiate: false, singleton: false});
 
-        queueScheduleFlushSpy = sinon.spy(adapter, "_flushLater");
+        flushLaterSpy = sinon.spy(adapter, "_flushLater");
         flushQueueSpy = sinon.spy(adapter, "_flushQueue");
         store = adapter.get('store');
         storePushSpy = sinon.spy(store, 'push');
       });
 
       afterEach(function() {
-        queueScheduleFlushSpy.restore();
+        flushLaterSpy.restore();
         flushQueueSpy.restore();
         storePushSpy.restore();
       });
@@ -193,7 +193,7 @@ describeModule('emberfire@adapter:firebase', 'FirebaseAdapter', {
 
       it("schedules a _flushQueue()", function() {
         adapter._pushLater('user', '12345', {id: '12345', name: 'Tim'});
-        expect(queueScheduleFlushSpy.callCount).to.equal(1);
+        expect(flushLaterSpy.callCount).to.equal(1);
       });
 
       it("flushes the _queue", function(done) {
