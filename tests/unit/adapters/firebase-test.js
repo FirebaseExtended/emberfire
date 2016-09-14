@@ -1,5 +1,6 @@
 /* jshint expr:true */
 import Ember from 'ember';
+import DS from 'ember-data';
 import { describeModule, it } from 'ember-mocha';
 import { expect } from 'chai';
 import firebase from 'firebase';
@@ -156,16 +157,23 @@ describeModule('emberfire@adapter:firebase', 'FirebaseAdapter', {
 
     }); // #_queueScheduleFlush
 
-    describe("#_enqueue", function() {
-      var adapter, queueScheduleFlushSpy, queueFlushSpy, callbackSpy;
+    describe("#_pushLater", function() {
+      var adapter, queueScheduleFlushSpy, queueFlushSpy;
 
       beforeEach(function() {
         adapter = this.subject({
           _queueFlushDelay: 1
         });
+
+        const User = DS.Model.extend({
+          name: DS.attr('string'),
+        });
+
+        this.registry.register('model:user', User, {instantiate: false, singleton: false});
+        this.registry.register('adapter:user', adapter, {instantiate: false, singleton: false});
+
         queueScheduleFlushSpy = sinon.spy(adapter, "_queueScheduleFlush");
         queueFlushSpy = sinon.spy(adapter, "_queueFlush");
-        callbackSpy = sinon.spy();
       });
 
       afterEach(function() {
@@ -174,32 +182,68 @@ describeModule('emberfire@adapter:firebase', 'FirebaseAdapter', {
       });
 
       it("pushes a new item into the _queue", function() {
-        adapter._enqueue(callbackSpy, ['foo']);
+        adapter._pushLater('user', '12345', {id: '12345', name: 'Tim'});
         expect(adapter._queue.length).to.equal(1);
       });
 
       it("schedules a _queueFlush()", function() {
-        adapter._enqueue(callbackSpy, ['foo']);
+        adapter._pushLater('user', '12345', {id: '12345', name: 'Tim'});
         expect(queueScheduleFlushSpy.callCount).to.equal(1);
       });
 
       it("flushes the _queue", function(done) {
-        adapter._enqueue(callbackSpy, ['foo']);
+        adapter._pushLater('user', '12345', {id: '12345', name: 'Tim'});
         run.later(this, function() {
           expect(queueFlushSpy.callCount).to.equal(1);
           done();
         }, adapter._queueFlushDelay * 2);
       });
 
-      it("applys the callback with the correct arguments", function(done) {
-        adapter._enqueue(callbackSpy, ['foo']);
+      it("only flushes once for multiple pushes", function(done) {
+        adapter._queueFlushDelay = 20;
+        adapter._pushLater('user', '12345', {id: '12345', name: 'Tim'});
+        adapter._pushLater('user', '12555', {id: '12555', name: 'Tom'});
+        adapter._pushLater('user', '12556', {id: '12556', name: 'Tam'});
+        adapter._pushLater('user', '12557', {id: '12557', name: 'Tum'});
         run.later(this, function() {
-          expect(callbackSpy.callCount).to.equal(1);
-          expect(callbackSpy.getCall(0).args[0]).to.equal('foo');
+          expect(queueFlushSpy.callCount).to.equal(1);
           done();
         }, adapter._queueFlushDelay * 2);
       });
 
-    }); // #_enqueue
+      it("calls store.push later with normalized data", function(done) {
+        adapter._pushLater('user', '12345', {id: '12345', name: 'Tim'});
+        const store = adapter.get('store');
+        const storePushSpy = sinon.spy(store, 'push');
+
+        run.later(this, function() {
+          expect(storePushSpy.getCall(0).args[0].data)
+              .to.deep.equal({
+                id: '12345',
+                type: 'user',
+                attributes: {name: 'Tim'},
+                relationships: {},
+              });
+          done();
+        }, adapter._queueFlushDelay * 2);
+      });
+
+      it("only pushes once, per record, per flush", function(done) {
+        adapter._pushLater('user', '12345', {id: '12345', name: 'Tim'});
+        adapter._pushLater('user', '12555', {id: '12555', name: 'Tom'});
+        adapter._pushLater('user', '12345', {id: '12345', name: 'Tim'});
+        const store = adapter.get('store');
+        const storePushSpy = sinon.spy(store, 'push');
+        run.later(this, function() {
+          expect(storePushSpy.callCount).to.equal(2);
+          expect(storePushSpy.getCall(0).args[0].data.attributes)
+              .to.deep.equal({name: 'Tom'});
+          expect(storePushSpy.getCall(1).args[0].data.attributes)
+              .to.deep.equal({name: 'Tim'});
+          done();
+        }, adapter._queueFlushDelay * 2);
+      });
+
+    }); // #_pushLater
 
 });
