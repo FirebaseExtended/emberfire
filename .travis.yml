@@ -35,7 +35,7 @@ before_install:
   - export DISPLAY=:99.0
   - sh -e /etc/init.d/xvfb start
   - sleep 3 # wait for xfvb to start up
-  - ./node_modules/ember-cli/node_modules/testem/testem.js launchers
+  # - ./node_modules/ember-cli/node_modules/testem/testem.js launchers
 
 install:
   - npm install

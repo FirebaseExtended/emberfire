@@ -4,7 +4,7 @@ EmberFire is the officially supported adapter for using
 [Firebase](http://www.firebase.com/?utm_medium=web&utm_source=emberfire) with
 [Ember Data](https://github.com/emberjs/data).
 
-Join our [Firebase + Ember Google Group](https://groups.google.com/forum/#!forum/firebase-ember)
+Join our [Firebase Google Group](https://groups.google.com/forum/#!forum/firebase-talk)
 to ask technical questions, share apps you've built, and chat with other developers in the community.
 
 
