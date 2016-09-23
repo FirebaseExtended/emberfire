@@ -76,4 +76,4 @@ Also note that due to the Firebase 3.0 SDK, you cannot run tests with PhantomJS 
 ## Contributing
 
 If you'd like to contribute to EmberFire, please first read through our [contribution
-guidelines](CONTRIBUTING.md). Local setup instructions are available [here](CONTRIBUTING.md#local-setup).
+guidelines](.github/CONTRIBUTING.md). Local setup instructions are available [here](.github/CONTRIBUTING.md#local-setup).
