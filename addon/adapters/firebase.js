@@ -38,6 +38,7 @@ var uniq = function (arr) {
  */
 export default DS.Adapter.extend(Waitable, {
   firebase: Ember.inject.service(),
+  store: Ember.inject.service(),
   defaultSerializer: '-firebase',
 
 
@@ -72,6 +73,8 @@ export default DS.Adapter.extend(Waitable, {
     this._recordCacheForType = {};
     // Used to batch records into the store
     this._queue = [];
+    // Payloads to push later
+    this._queuedPayloads = {};
   },
 
 
@@ -373,14 +376,8 @@ export default DS.Adapter.extend(Waitable, {
         record.deleteRecord();
       }
     } else {
-      var payload = this._assignIdToPayload(snapshot);
-
-      this._enqueue(function FirebaseAdapter$enqueueStorePush() {
-        if (!store.isDestroying) {
-          var normalizedData = store.normalize(typeClass.modelName, payload);
-          store.push(normalizedData);
-        }
-      });
+      const payload = this._assignIdToPayload(snapshot);
+      this._pushLater(typeClass.modelName, payload.id, payload);
     }
   },
 
@@ -731,39 +728,66 @@ export default DS.Adapter.extend(Waitable, {
 
 
   /**
-   * Called after the first item is pushed into the _queue
+   * Schedules a `_flushQueue` for later.
+   *
+   * @private
    */
-  _queueScheduleFlush() {
-    Ember.run.later(this, this._queueFlush, this._queueFlushDelay);
+  _flushLater() {
+    Ember.run.later(this, this._flushQueue, this._queueFlushDelay);
   },
 
 
   /**
-   * Call each function in the _queue and the reset the _queue
+   * Flush all delayed `store.push` payloads in `this._queuedPayloads`.
+   *
+   * @private
    */
-  _queueFlush() {
-    forEach(this._queue, function FirebaseAdapter$flushQueueItem(queueItem) {
-      var fn = queueItem[0];
-      var args = queueItem[1];
-      fn.apply(null, args);
+  _flushQueue() {
+    const store = this.get('store');
+    if (store.isDestroying) {
+      return;
+    }
+
+    forEach(this._queue, (key) => {
+      const { payload, modelName } = this._queuedPayloads[key];
+      const normalizedData = store.normalize(modelName, payload);
+      store.push(normalizedData);
     });
+    this._queuedPayloads = {};
     this._queue.length = 0;
   },
 
 
   /**
-   * Push a new function into the _queue and then schedule a
-   * flush if the item is the first to be pushed
+   * Schedule a payload push for later. This will only push at most one payload
+   * per record. When trying to push to the same record multiple times, only the
+   * last push will be kept.
+   *
+   * @param {string} modelName
+   * @param {string} id
+   * @param {!Object<string, *>} payload
+   * @private
    */
-  _enqueue(callback, args) {
-    //Only do the queueing if we scheduled a delay
-    if (this._queueFlushDelay) {
-      var length = this._queue.push([callback, args]);
-      if (length === 1) {
-        this._queueScheduleFlush();
-      }
-    } else {
-      callback.apply(null, args);
+  _pushLater(modelName, id, payload) {
+    const store = this.get('store');
+    if (!this._queueFlushDelay) {
+      const normalizedData = store.normalize(modelName, payload);
+      store.push(normalizedData);
+      return;
+    }
+
+    const key = `${modelName}-${id}`;
+    if (this._queuedPayloads[key]) {
+      // remove from original place in queue (will be added to end)
+      const oldPosition = indexOf(this._queue, key);
+      this._queue.splice(oldPosition, 1);
+    }
+    this._queuedPayloads[key] = { payload, modelName };
+    this._queue.push(key);
+
+    // if this is the first item to be queued, schedule a flush
+    if (this._queue.length === 1) {
+      this._flushLater();
     }
   },
 
