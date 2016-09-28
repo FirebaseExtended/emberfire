@@ -17,9 +17,10 @@ cache:
     - node_modules
 
 env:
-  - EMBER_TRY_SCENARIO=ember-data-2.3.x
-  - EMBER_TRY_SCENARIO=ember-data-2.4.x
   - EMBER_TRY_SCENARIO=ember-data-2.5.x
+  - EMBER_TRY_SCENARIO=ember-data-2.6.x
+  - EMBER_TRY_SCENARIO=ember-data-2.7.x
+  - EMBER_TRY_SCENARIO=ember-data-2.8.x
   - EMBER_TRY_SCENARIO=ember-data-beta
   - EMBER_TRY_SCENARIO=ember-data-canary
 
