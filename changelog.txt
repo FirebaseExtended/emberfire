@@ -1,2 +1,3 @@
-fixed - Fixes container deprecation warnings by using `Ember.getOwner()`
-fixed - Acceptance tests will now wait for `record.save()` operations.
+fixed - Fixes container deprecation warnings by using `Ember.getOwner()` (#406)
+fixed - Acceptance tests will now wait for `record.save()` operations. (#413)
+fixed - reduces duplicate store update events when records are updated more than once in short succession (#421, #425)
