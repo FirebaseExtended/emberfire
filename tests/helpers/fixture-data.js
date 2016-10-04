@@ -117,7 +117,7 @@ export default {
           title: 'Post 2'
         },
         post_3: {
-          published: 1395162147646,
+          published: 1475574906524,
           user: 'tstirrat',
           body: 'This is the third FireBlog post!',
           comments: {
