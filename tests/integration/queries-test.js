@@ -84,4 +84,25 @@ describe('Integration: FirebaseAdapter - Queries', function() {
     });
   });
 
+  describe('when combining limits and filters in queries', function () {
+    it('resolves with the correct payload', function(done) {
+      var query = {
+        orderBy: 'published',
+        equalTo: 1395162147646,
+        limitToLast: 1,
+      };
+
+      queryArray = store.recordArrayManager.createAdapterPopulatedRecordArray(store.modelFor('post'), query);
+
+      run(function () {
+        adapter.query(store, store.modelFor('post'), query, queryArray)
+          .then(() => {
+            expect(queryArray.get('length')).to.equal(1, 'array should have length of 1');
+            expect(queryArray.get('content').mapBy('id')).to.eql(['post_2'], 'array should contain post_2 only');
+            done();
+          });
+      });
+    });
+  });
+
 });
