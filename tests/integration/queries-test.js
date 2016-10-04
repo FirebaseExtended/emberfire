@@ -94,7 +94,7 @@ describe('Integration: FirebaseAdapter - Queries', function() {
 
       queryArray = store.recordArrayManager.createAdapterPopulatedRecordArray(store.modelFor('post'), query);
 
-      run(function () {
+      run(() => {
         adapter.query(store, store.modelFor('post'), query, queryArray)
           .then(() => {
             expect(queryArray.get('length')).to.equal(1, 'array should have length of 1');
