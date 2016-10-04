@@ -1,0 +1,1 @@
+fixed - `store.query` now allows the combination of limits and filters (#435 - @rmmmp)
