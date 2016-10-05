@@ -1,0 +1,1 @@
+fixed - Emberfire now works with Ember FastBoot for unauthenticated read and write operations.
