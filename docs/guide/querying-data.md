@@ -21,6 +21,6 @@ In the above example, if the Real-time database implemented security rules which
 
 We suggest changing your "schema" in cases were you want to restrict access and `findAll`. You can change the path the data is stored in the database by overriding `pathForType`.
 
-You can learn more about how we are planning to approach this problem in our ("Allow paths in ids" proposal)[https://github.com/firebase/emberfire/issues/432].
+You can learn more about how we are planning to approach this problem in our ["Allow paths in ids" proposal](https://github.com/firebase/emberfire/issues/432).
 
 Next: [Relationships](relationships.md)
