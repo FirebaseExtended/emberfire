@@ -11,11 +11,9 @@ You can generate an example acceptance test by running
 
     ember generate emberfire-acceptance-test books
 
-This will generate an example acceptance test which you can use to specify fixture data and
-expectations.
+This will generate an example acceptance test which you can use to specify fixture data and expectations.
 
-The following example sets up a local Firebase instance with some test data and asserts that
-they are rendered to the page.
+The provided `moduleForEmberFireAcceptance` creates a special offline Firebase reference which is initialized with the data provided in `fixtureData`. Using this method you can check that the data from Firebase is correctly rendered on the page.
 
 ```js
 // tests/acceptance/books-test.js
@@ -34,7 +32,7 @@ moduleForEmberfireAcceptance('Acceptance | books', {
 test('visiting /books', function(assert) {
   visit('/books');
 
-  andThen(function() {
+  andThen(() => {
     assert.equal(find(('.book-panel')).length, 2);
   });
 });
