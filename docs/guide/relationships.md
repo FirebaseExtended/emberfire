@@ -2,7 +2,7 @@
 
 EmberFire can handle relationships in two different ways: `async` and `embedded`, and currently supports `hasMany` and `belongsTo` relationships.
 
-Unless have a reason and understand the implications we suggest using `inverse: null` in your relationships and saving both sides manually (see [Saving Async Relationship Data](#saving-relationships) below) due to the nature of the Real-time Database.
+Unless have a reason and understand the implications we suggest using `inverse: null` in your relationships and saving both sides manually (see [Saving Async Relationship Data](#saving-async-relationship-data) below) due to the nature of the Real-time Database.
 
 ## Async
 
@@ -39,7 +39,7 @@ In this example, comments will be fetched from `https://your-firebase.firebaseio
 > **DEFINING BOTH SIDES OF A RELATIONSHIP**
 > You only need to define an async hasMany - belongsTo relationship on both sides if you need to access the data in both ways (e.g. `somePost.comments` and `someComment.post`). When you do define both sides of a relationship, be sure to save both sides when making changes.
 
-### Saving Async Relationship Data {#saving-relationships}
+### Saving Async Relationship Data
 
 When saving async `hasMany` to `belongsTo` relationships in EmberFire, both sides of the relationship should be saved. To do this in our blog example, we'll push the comment to the store, save the comment, and finally saved the parent post:
 
