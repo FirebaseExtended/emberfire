@@ -11,7 +11,7 @@
   "scripts": {
     "start": "ember server",
     "build": "ember build",
-    "test": "ember try:testall",
+    "test": "ember try:testall && ember fastboot:test",
     "legacy": "gulp legacy"
   },
   "repository": {
@@ -52,11 +52,17 @@
     "firebase": "^3.4.1"
   },
   "devDependencies": {
+    "babelify": "6.4.0",
     "broccoli-asset-rev": "^2.4.2",
+    "browserify": "10.2.6",
+    "browserify-shim": "3.8.12",
+    "chai": "3.5.0",
+    "del": "1.2.0",
     "ember-ajax": "0.7.1",
     "ember-cli": "2.5.1",
     "ember-cli-app-version": "^1.0.0",
     "ember-cli-dependency-checker": "^1.2.0",
+    "ember-cli-fastboot": "1.0.0-beta.9",
     "ember-cli-htmlbars": "^1.0.3",
     "ember-cli-htmlbars-inline-precompile": "^0.3.1",
     "ember-cli-inject-live-reload": "^1.4.0",
@@ -68,16 +74,11 @@
     "ember-data": "^2.5.0",
     "ember-disable-prototype-extensions": "^1.1.0",
     "ember-export-application-global": "^1.0.5",
+    "ember-fastboot-addon-tests": "0.1.0",
     "ember-load-initializers": "^0.5.1",
     "ember-resolver": "^2.0.3",
-    "ember-try": "^0.2.2",
-    "loader.js": "^4.0.1",
-
-    "babelify": "6.4.0",
-    "browserify-shim": "3.8.12",
-    "browserify": "10.2.6",
-    "del": "1.2.0",
     "ember-sinon": "0.5.1",
+    "ember-try": "^0.2.2",
     "glob": "5.0.13",
     "gulp": "3.9.1",
     "gulp-concat": "2.6.0",
@@ -88,6 +89,7 @@
     "gulp-sourcemaps": "1.6.0",
     "gulp-uglify": "1.5.3",
     "gulp-util": "3.0.7",
+    "loader.js": "^4.0.1",
     "lodash": "3.10.1",
     "sinon": "^1.17.3",
     "torii": "0.8.0",

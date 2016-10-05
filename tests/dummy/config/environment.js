@@ -15,6 +15,9 @@ module.exports = function(environment) {
     torii: {
       sessionServiceName: 'session'
     },
+    fastboot: {
+      hostWhitelist: [/^localhost:\d+$/]
+    },
     contentSecurityPolicy: {
       'script-src': '\'self\' \'unsafe-eval\' apis.google.com',
       'style-src': '\'self\' \'unsafe-inline\' fonts.googleapis.com',
