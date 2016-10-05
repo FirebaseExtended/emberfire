@@ -2,6 +2,8 @@
 
 EmberFire can handle relationships in two different ways: `async` and `embedded`, and currently supports `hasMany` and `belongsTo` relationships.
 
+Unless have a reason and understand the implications we suggest using `inverse: null` in your relationships and saving both sides manually (see [Saving Async Relationship Data](#saving-relationships) below) due to the nature of the Real-time Database.
+
 ## Async
 
 Any relationship that is flagged as `async: true` tells the adapter to immediately fetch the record from the Ember Data store, or look up the record in Firebase.
@@ -10,7 +12,7 @@ Any relationship that is flagged as `async: true` tells the adapter to immediate
 // app/models/post.js
 import DS from 'ember-data';
 export default DS.Model.extend({
-  comments: DS.hasMany('comment', { async: true })
+  comments: DS.hasMany('comment', { async: true, inverse: null })
 });
 ```
 
@@ -37,7 +39,7 @@ In this example, comments will be fetched from `https://your-firebase.firebaseio
 > **DEFINING BOTH SIDES OF A RELATIONSHIP**
 > You only need to define an async hasMany - belongsTo relationship on both sides if you need to access the data in both ways (e.g. `somePost.comments` and `someComment.post`). When you do define both sides of a relationship, be sure to save both sides when making changes.
 
-### Saving Async Relationship Data
+### Saving Async Relationship Data {#saving-relationships}
 
 When saving async `hasMany` to `belongsTo` relationships in EmberFire, both sides of the relationship should be saved. To do this in our blog example, we'll push the comment to the store, save the comment, and finally saved the parent post:
 
@@ -104,8 +106,8 @@ To define embedded records, we can do the following in our **Post** model:
 // app/models/post.js
 import DS from 'ember-data';
 export default DS.Model.extend({
-  comments: DS.hasMany('comment', { async: false }),
-  metaData: DS.belongsTo('post', { async: false })
+  comments: DS.hasMany('comment', { async: false, inverse: null }),
+  metaData: DS.belongsTo('post', { async: false, inverse: null })
 });
 ```
 
