@@ -10,7 +10,7 @@
 
 ## Additional Resources
 
-1. [Using FirebaseUI auth](https://gist.github.com/steven-ferguson/8eddf63123fa74066e9d92f7e829d8e9) - @steven-ferguson came up with a Gist showing how to integrate Emberfire with [FirebaseUI Auth](https://github.com/firebase/firebaseui-web)
+1. [Using FirebaseUI auth](https://gist.github.com/steven-ferguson/8eddf63123fa74066e9d92f7e829d8e9) - [@steven-ferguson](https://github.com/steven-ferguson) shows how to integrate [FirebaseUI Auth](https://github.com/firebase/firebaseui-web)
 1. [Using EmberFire with Fastboot](fastboot-support.md) - Details on Fastboot support
-1. [Acceptance Testing](https://github.com/firebase/emberfire/pull/409) - Currently a work in progress, this pull request will give standard acceptance testing patterns for EmberFire projects
+1. [Acceptance Testing WIP](https://github.com/firebase/emberfire/pull/409) - This pull request will give standard acceptance testing patterns to EmberFire projects
 1. [Paths in ids proposal](https://github.com/firebase/emberfire/issues/432) - Proposal to allow more complex querying / data-structures in EmberFire
