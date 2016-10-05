@@ -45,4 +45,4 @@ install:
 
 script:
   - npm run legacy
-  - if [ $EMBER_FASTBOOT == "true" ]; then npm test; else; ember try:one $EMBER_TRY_SCENARIO --skip-cleanup; fi
+  - if [ $EMBER_FASTBOOT == "true" ]; then ember fastboot:test; else; ember try:one $EMBER_TRY_SCENARIO --skip-cleanup; fi
