@@ -19,7 +19,7 @@ We can combine `orderBy` with `limitToFirst`, `startAt`, `endAt`, and `equalTo` 
 
 In the above example, if the Real-time database implemented security rules which restricted access to some posts then the query would fail.
 
-We suggest changing your "schema" in cases were you want to restrict access and `findAll`. You can change the path the data is stored in the database by overriding `pathForType`.
+We suggest changing your "schema" in cases were you want to restrict access to `findAll`. You can change the path the data is stored in the database by overriding `pathForType` in the adapter.
 
 You can learn more about how we are planning to approach this problem in our ["Allow paths in ids" proposal](https://github.com/firebase/emberfire/issues/432).
 
