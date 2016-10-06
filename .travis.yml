@@ -23,7 +23,7 @@ env:
   - EMBER_TRY_SCENARIO=ember-data-2.8.x
   - EMBER_TRY_SCENARIO=ember-data-beta
   - EMBER_TRY_SCENARIO=ember-data-canary
-  - EMBER_FASTBOOT=true
+  - EMBER_FASTBOOT=release
 
 matrix:
   fast_finish: true
@@ -45,4 +45,4 @@ install:
 
 script:
   - npm run legacy
-  - if [ $EMBER_FASTBOOT == "true" ]; then ember fastboot:test; else; ember try:one $EMBER_TRY_SCENARIO --skip-cleanup; fi
+  - if [ "$EMBER_FASTBOOT" == "true" ]; then ember fastboot:test --ember-version $EMBER_FASTBOOT; else; ember try:one $EMBER_TRY_SCENARIO --skip-cleanup; fi
