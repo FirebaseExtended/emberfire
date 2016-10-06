@@ -23,12 +23,15 @@ env:
   - EMBER_TRY_SCENARIO=ember-data-2.8.x
   - EMBER_TRY_SCENARIO=ember-data-beta
   - EMBER_TRY_SCENARIO=ember-data-canary
-  - EMBER_FASTBOOT=release
+  - EMBER_FASTBOOT=2.8.0
+  - EMBER_FASTBOOT=canary
 
 matrix:
   fast_finish: true
   allow_failures:
-    - env: EMBER_TRY_SCENARIO=ember-data-canary
+    - env:
+      - EMBER_TRY_SCENARIO=ember-data-canary
+      - EMBER_FASTBOOT=canary
 
 before_install:
   - npm config set spin false
@@ -45,4 +48,4 @@ install:
 
 script:
   - npm run legacy
-  - if [ "$EMBER_FASTBOOT" == "true" ]; then ember fastboot:test --ember-version $EMBER_FASTBOOT; else; ember try:one $EMBER_TRY_SCENARIO --skip-cleanup; fi
+  - if [ "$EMBER_FASTBOOT" ]; then ember fastboot:test --ember-version $EMBER_FASTBOOT; else ember try:one $EMBER_TRY_SCENARIO --skip-cleanup; fi
