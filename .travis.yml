@@ -23,7 +23,11 @@ env:
   - EMBER_TRY_SCENARIO=ember-data-2.8.x
   - EMBER_TRY_SCENARIO=ember-data-beta
   - EMBER_TRY_SCENARIO=ember-data-canary
+  - EMBER_FASTBOOT=2.5.0
+  - EMBER_FASTBOOT=2.6.0
+  - EMBER_FASTBOOT=2.7.0
   - EMBER_FASTBOOT=2.8.0
+  - EMBER_FASTBOOT=beta
   - EMBER_FASTBOOT=canary
 
 matrix:
