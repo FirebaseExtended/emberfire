@@ -317,7 +317,7 @@ export default DS.Adapter.extend(Waitable, {
       ref = ref.orderByChild(query.orderBy);
     }
 
-    ['limitToFirst', 'limitToLast', 'startAt', 'endAt', 'equalTo'].forEach(function (key) {
+    ['startAt', 'endAt', 'equalTo', 'limitToFirst', 'limitToLast'].forEach(function (key) {
       if (query[key] || query[key] === '' || query[key] === false) {
         ref = ref[key](query[key]);
       }
