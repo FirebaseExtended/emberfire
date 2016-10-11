@@ -5,6 +5,9 @@ node_js:
 
 addons:
   firefox: latest
+  code_climate:
+    repo_token:
+      secure: gQhPZkdkqJi1XbgJpe23Ji90VQCuXLV1yOp0L1JH+Hx4L19L+mn3gEbB99bFa/Lbh4ASwpuapHy6w2VUn6mzHknbD8r0me7g5bebGFcDyPf+EOVHEzAScnFHrKIqjK/sCbvcI7xWvDpzg9kT9UTBAdVfiJYEYiPEnKskPy8FIE0=
 
 sudo: false
 
@@ -45,3 +48,6 @@ install:
 script:
   - npm run legacy
   - ember try:one $EMBER_TRY_SCENARIO --skip-cleanup
+
+after_script:
+  - codeclimate-test-reporter < lcov.info
