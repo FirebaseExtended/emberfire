@@ -23,7 +23,7 @@ env:
   - EMBER_TRY_SCENARIO=ember-data-2.5.x
   - EMBER_TRY_SCENARIO=ember-data-2.6.x
   - EMBER_TRY_SCENARIO=ember-data-2.7.x
-  - EMBER_TRY_SCENARIO=ember-data-2.8.x
+  - EMBER_TRY_SCENARIO=ember-data-2.8.x COVERAGE=true
   - EMBER_TRY_SCENARIO=ember-data-beta
   - EMBER_TRY_SCENARIO=ember-data-canary
 
@@ -51,4 +51,4 @@ script:
   - ember try:one $EMBER_TRY_SCENARIO --skip-cleanup
 
 after_script:
-  - codeclimate-test-reporter < lcov.info
+  - if [ "$COVERAGE" ]; then codeclimate-test-reporter < coverage/lcov.info
