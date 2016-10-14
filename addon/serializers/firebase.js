@@ -1,6 +1,7 @@
 import Ember from 'ember';
 import DS from 'ember-data';
 import assign from 'lodash/object/assign';
+import firebase from 'firebase';
 
 /**
  * The Firebase serializer helps normalize relationships and can be extended on
