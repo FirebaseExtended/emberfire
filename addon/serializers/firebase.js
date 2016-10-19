@@ -1,6 +1,7 @@
 import Ember from 'ember';
 import DS from 'ember-data';
 import assign from 'lodash/object/assign';
+import firebase from 'firebase';
 
 /**
  * The Firebase serializer helps normalize relationships and can be extended on
@@ -8,6 +9,30 @@ import assign from 'lodash/object/assign';
  */
 export default DS.JSONSerializer.extend(DS.EmbeddedRecordsMixin, {
   isNewSerializerAPI: true,
+
+  /**
+   * Firebase have a special value for a date 'firebase.database.ServerValue.TIMESTAMP'
+   * that tells it to insert server time. We need to make sure the value is not scrapped
+   * by the data attribute transforms.
+   *
+   * @override
+   */
+  serializeAttribute(snapshot, json, key, attribute) {
+    var value = snapshot.attr(key);
+    this._super(snapshot, json, key, attribute);
+    if (this._canSerialize(key)) {
+      if (value === firebase.database.ServerValue.TIMESTAMP) {
+
+        var payloadKey = this._getMappedKey(key, snapshot.type);
+
+        if (payloadKey === key && this.keyForAttribute) {
+          payloadKey = this.keyForAttribute(key, 'serialize');
+        }
+        // do not transform
+        json[payloadKey] = value;
+      }
+    }
+  },
 
 
   /**
