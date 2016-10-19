@@ -88,4 +88,13 @@ this.get('session').open('firebase', {
 });
 ```
 
-Next: [Using EmberFire Without ember-cli](without-ember-cli.md)
+
+### Continue reading
+
+1. [Installation](installation.md)
+1. [Saving and Retrieving Data](saving-and-retrieving-data.md)
+1. [Querying Data](querying-data.md)
+1. [Relationships](relationships.md)
+1. **User Authentication**
+1. [Using EmberFire without Ember CLI](without-ember-cli.md)
+1. [Deploying to Firebase Hosting](deploying-to-firebase-hosting.md)
