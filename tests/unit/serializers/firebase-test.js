@@ -5,8 +5,10 @@ import {
   describeModule,
   it
 } from 'ember-mocha';
+import firebase from 'firebase';
 
 import Post from 'dummy/models/post';
+import WithDate from 'dummy/models/with-date';
 import Comment from 'dummy/models/comment';
 import User from 'dummy/models/user';
 import assign from 'lodash/object/assign';
@@ -164,8 +166,28 @@ describeModule(
       });
 
     }); // #_addNumericIdsToEmbeddedArray
-
     describe('#normalize', function () {
+      describe('handling of ServerValue.TIMESTAMP', function() {
+        var withDatePayload;
+
+        beforeEach(function() {
+          WithDate.modelName = 'with-date';
+          withDatePayload = {
+            published: firebase.database.ServerValue.TIMESTAMP
+          };
+        });
+
+        afterEach(function() {
+          delete WithDate.modelName;
+        });
+
+        it('set published to server time', function() {
+          var serializer = this.subject();
+          var { data } = serializer.normalize(WithDate, withDatePayload);
+          expect(data.published).to.not.be.a('null');
+        });
+
+      });
 
       describe('normalized relationships', function() {
 
