@@ -1,6 +1,6 @@
 # Saving and retrieving data
 
-_As an example resource_, we will use "posts" for a blog. Let's create a model and describe what data a "post" will include. Each post will have a title, body, and a timestamp _which we can use to display the most recent post first_. We can use this CLI shorthand to quickly generate that file.
+_As an example resource_, we will use "posts" for a blog. Let's create a model and describe what data a "post" will include. Each post will have a title, body, and a timestamp. We can use this CLI shorthand to quickly generate that file.
 
 ```
 $ ember generate model post title:string body:string timestamp:number
@@ -38,7 +38,7 @@ This will generate a route and template for posts
 </ul>
 ```
 
-We haven't written the publishPost action yet, so let's do that now in our PostsController:
+We haven't written the `publishPost` action yet, so let's do that now in our controller:
 
 ```
 $ ember generate controller posts
@@ -62,9 +62,11 @@ export default Ember.ArrayController.extend({
 });
 ```
 
-We used an ArrayController to sort our posts by timestamp. In our publishPost action, we create a new post in the data store with the title and body entered in our Handlebars template. Simply calling newPost.save() will save our post to the data store and automatically create a record in the database.
+We used an **ArrayController** to sort our posts by timestamp. In our `publishPost` action, we create a new post in the data store with the title and body entered in our Handlebars template. Simply calling `newPost.save()` will save our post to the data store and automatically create a record in the database.
 
-EmberFire uses Firebase's push() function under the hood, which creates a unique timestamp-based ID for each record that is added to the database. Our data now looks like this:
+> **Note:** By default Firebase requires users be authenticated before they can read and write to the database. If you have not authenticated your users, you will receive errors . If you want to allow reading/writing to the database form unauthenticated users, check out the [security rules](security-rules.md) section.
+
+EmberFire uses Firebase's `push()` function under the hood, which creates a unique timestamp-based ID for each record that is added to the database. Our data now looks like this:
 
 ```json
 {
@@ -94,8 +96,7 @@ export default Ember.Route.extend({
 Now we have access to all of our posts, and can display them in our template:
 
 ```handlebars
-<!-- app/templates/posts.hbs -->
-// form from above... 
+<!-- app/templates/posts.hbs from above -->
 
 <section>
 {{#each model as |post|}}
@@ -105,4 +106,14 @@ Now we have access to all of our posts, and can display them in our template:
 </section>
 ```
 
-Next: [Querying Data](querying-data.md)
+
+### Continue reading
+
+1. [Installation](installation.md)
+1. [User Authentication](authentication.md)
+1. **Saving and Retrieving Data**
+1. [Querying Data](querying-data.md)
+1. [Relationships](relationships.md)
+1. [Security Rules](security-rules.md)
+1. [Using EmberFire without Ember CLI](without-ember-cli.md)
+1. [Deploying to Firebase Hosting](deploying-to-firebase-hosting.md)
