@@ -27,10 +27,10 @@ You can learn more about how we are planning to approach this problem in our ["A
 ### Continue reading
 
 1. [Installation](installation.md)
+1. [User Authentication](authentication.md)
 1. [Saving and Retrieving Data](saving-and-retrieving-data.md)
 1. **Querying Data**
 1. [Relationships](relationships.md)
-1. [User Authentication](authentication.md)
+1. [Security Rules](security-rules.md)
 1. [Using EmberFire without Ember CLI](without-ember-cli.md)
 1. [Deploying to Firebase Hosting](deploying-to-firebase-hosting.md)
-
