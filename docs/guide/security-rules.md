@@ -64,7 +64,7 @@ syntax.
 
 Emberfire writes `hasMany` relationships in a separate payload. If you have 
 validations to check `hasMany` links in the write payload, these might fail. 
-See firebase/emberfire#305 for more  details.
+See [#305](firebase/emberfire#305) for more  details.
 
 ## Querying data
 
