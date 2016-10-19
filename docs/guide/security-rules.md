@@ -57,6 +57,14 @@ user's data:
 Its a good idea to think about security rules as early as possible, because the
 way in which you need to secure data might require certain structures.
 
+Check out the [Bolt compiler](https://github.com/firebase/bolt) for a nice rules
+syntax.
+
+## Validation
+
+Emberfire writes `hasMany` relationships in a separate payload. If you have 
+validations to check `hasMany` links in the write payload, these might fail. 
+See firebase/emberfire#305 for more  details.
 
 ## Querying data
 
