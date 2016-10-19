@@ -49,7 +49,7 @@ Your database data will now be synced with the Ember Data store.
 
 Now that your data is being synced with the Ember Data store, calling `save()` on a model will store your data in your database. To demonstrate, let's build a blogging app. The data for our app will be stored at the Firebase database URL we initialized in the previous step. 
 
-First, we must update our security rules. By default, Firebase uses security rules that require the client to be authenticated. For the sake of this guide, we will skip the authentication ([read more about it here](docs/guide/authentication.md)). Let's update the security rules to allow unauthenticated users to write data to the database.
+First, we must update our security rules. By default, Firebase uses security rules that require the client to be authenticated. For the sake of this guide, we will skip the authentication ([read more about it here](guide/authentication.md)). Let's update the security rules to allow unauthenticated users to write data to the database.
 
 Open the [security rules](https://console.firebase.google.com/project/_/database/rules) panel and save the following rules:
 
