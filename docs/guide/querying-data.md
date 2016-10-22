@@ -5,7 +5,7 @@ In our posts template, let's say we want to display the ten most recent blog pos
 ```js
 export default Ember.Route.extend({
   model: function() {
-    return this.store.find('post', {
+    return this.store.query('post', {
       orderBy: 'published',
       limitToLast: 10
     });
