@@ -9,22 +9,33 @@ import destroyApp from '../helpers/destroy-app';
 
 import stubFirebase from '../helpers/stub-firebase';
 import unstubFirebase from '../helpers/unstub-firebase';
-import createTestRef from '../helpers/create-test-ref';
+import createOfflineRef from '../helpers/create-offline-ref';
 import replaceAppRef from '../helpers/replace-app-ref';
 
-export default function describeEmberfireAcceptance(title, tests) {
+export default function describeEmberfireAcceptance(title, testsOrOptions, tests) {
+  let options;
+
+  if (typeof testsOrOptions == 'function') {
+    tests = testsOrOptions;
+    options = {};
+  } else {
+    options = testsOrOptions;
+  }
+
+  let fixtureData = options.fixtureData || {};
+
   describe(title, function() {
-    let application;
 
     beforeEach(function() {
       stubFirebase();
-      application = startApp();
-      this.ref = createTestRef('acceptance')
-      replaceAppRef(application, this.ref);
+      this.application = startApp();
+      this.ref = createOfflineRef(fixtureData);
+      replaceAppRef(this.application, this.ref);
     });
 
     afterEach(function() {
-      destroyApp(application);
+      destroyApp(this.application);
+      this.application = null;
       unstubFirebase();
     });
 

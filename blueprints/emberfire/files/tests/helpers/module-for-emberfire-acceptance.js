@@ -10,8 +10,8 @@ export default function(name, options = {}) {
   moduleForAcceptance(name, {
     beforeEach() {
       stubFirebase();
-      this.firebaseReference = createOfflineRef(fixtureData);
-      replaceAppRef(this.application, this.firebaseReference);
+      this.ref = createOfflineRef(fixtureData);
+      replaceAppRef(this.application, this.ref);
 
       if (options.beforeEach) {
         options.beforeEach.apply(this, arguments);

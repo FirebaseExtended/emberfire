@@ -1,11 +1,13 @@
 /* jshint expr:true */
-import { it } from 'mocha';
+import { beforeEach, describe, it } from 'mocha';
 import { expect } from 'chai';
 import Ember from 'ember';
-
+import FIXTURE_DATA from './fixture-data';
 import describeEmberfireAcceptance from '../helpers/describe-emberfire-acceptance';
 
-describeEmberfireAcceptance('Acceptance: /post/:id', function(ref) {
+describeEmberfireAcceptance(
+    'Acceptance: /post/:id', {fixtureData: FIXTURE_DATA}, function() {
+
   it('can visit /post/post_1', function() {
     visit('/post/post_1');
 

@@ -1,33 +1,11 @@
 /* jshint expr:true */
-import {
-  describe,
-  it,
-  beforeEach,
-  afterEach
-} from 'mocha';
+import { beforeEach, describe, it } from 'mocha';
 import { expect } from 'chai';
-import startApp from '../../helpers/start-app';
-import destroyApp from '../../helpers/destroy-app';
-import replaceAppRef from '../../helpers/replace-app-ref';
-import stubFirebase from '../../helpers/stub-firebase';
-import unstubFirebase from '../../helpers/unstub-firebase';
-import createTestRef from '../../helpers/create-test-ref';
+import FIXTURE_DATA from '../fixture-data';
+import describeEmberfireAcceptance from '../../helpers/describe-emberfire-acceptance';
 
-describe('Acceptance: /posts/new', function() {
-  var application, ref;
-
-  beforeEach(function() {
-    stubFirebase();
-    application = startApp();
-    ref = createTestRef('acceptance');
-
-    replaceAppRef(application, ref);
-  });
-
-  afterEach(function() {
-    unstubFirebase();
-    destroyApp(application);
-  });
+describeEmberfireAcceptance(
+    'Acceptance: /posts/new', {fixtureData: FIXTURE_DATA}, function() {
 
   it('can visit /posts/new', function() {
     visit('/posts/new');

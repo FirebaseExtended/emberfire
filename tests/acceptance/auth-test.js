@@ -8,16 +8,10 @@ import {
 import Ember from 'ember';
 import { expect } from 'chai';
 import sinon from 'sinon';
-import startApp from '../helpers/start-app';
-import destroyApp from '../helpers/destroy-app';
-import stubFirebase from '../helpers/stub-firebase';
-import unstubFirebase from '../helpers/unstub-firebase';
-import createTestRef from '../helpers/create-test-ref';
-import replaceAppRef from '../helpers/replace-app-ref';
+import describeEmberfireAcceptance from '../helpers/describe-emberfire-acceptance';
 import replaceFirebaseAppService from '../helpers/replace-firebase-app-service';
 
-describe('Acceptance: /auth', function() {
-  let application;
+describeEmberfireAcceptance('Acceptance: /auth', function() {
   let signInWithPopupStub;
 
   const authMock = {
@@ -32,18 +26,12 @@ describe('Acceptance: /auth', function() {
   };
 
   beforeEach(function() {
-    stubFirebase();
     signInWithPopupStub = sinon.stub(authMock, 'signInWithPopup');
-
-    application = startApp();
-    replaceFirebaseAppService(application, firebaseAppMock);
-    replaceAppRef(application, createTestRef('acceptance'));
+    replaceFirebaseAppService(this.application, firebaseAppMock);
   });
 
   afterEach(function() {
     signInWithPopupStub.restore();
-    destroyApp(application);
-    unstubFirebase();
   });
 
   it('can visit /auth', function() {
