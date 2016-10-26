@@ -52,3 +52,16 @@ export default {
 
 Note that the fixture data should match the format that Firebase uses for storing data. This can be
 JSON data exported from a Firebase instance.
+
+
+### Continue reading
+
+1. [Installation](installation.md)
+1. [User Authentication](authentication.md)
+1. [Saving and Retrieving Data](saving-and-retrieving-data.md)
+1. [Querying Data](querying-data.md)
+1. [Relationships](relationships.md)
+1. [Security Rules](security-rules.md)
+1. [Using EmberFire without Ember CLI](without-ember-cli.md)
+1. [Deploying to Firebase Hosting](deploying-to-firebase-hosting.md)
+1. **Testing**

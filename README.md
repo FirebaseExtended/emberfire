@@ -1,10 +1,10 @@
-# EmberFire [![Build Status](https://travis-ci.org/firebase/emberfire.svg?branch=master)](https://travis-ci.org/firebase/emberfire) [![Version](https://badge.fury.io/gh/firebase%2Femberfire.svg)](http://badge.fury.io/gh/firebase%2Femberfire) [![Monthly Downloads](http://img.shields.io/npm/dm/emberfire.svg?style=flat)](https://www.npmjs.org/package/emberfire) [![Ember Observer Score](http://emberobserver.com/badges/emberfire.svg)](http://emberobserver.com/addons/emberfire)
+# EmberFire [![Build Status](https://travis-ci.org/firebase/emberfire.svg?branch=master)](https://travis-ci.org/firebase/emberfire) [![Test Coverage](https://codeclimate.com/github/firebase/emberfire/badges/coverage.svg)](https://codeclimate.com/github/firebase/emberfire/coverage) [![Version](https://badge.fury.io/gh/firebase%2Femberfire.svg)](http://badge.fury.io/gh/firebase%2Femberfire) [![Monthly Downloads](http://img.shields.io/npm/dm/emberfire.svg?style=flat)](https://www.npmjs.org/package/emberfire) [![Ember Observer Score](http://emberobserver.com/badges/emberfire.svg)](http://emberobserver.com/addons/emberfire) [![Code Climate](https://codeclimate.com/github/firebase/emberfire/badges/gpa.svg)](https://codeclimate.com/github/firebase/emberfire)
 
 EmberFire is the officially supported adapter for using
 [Firebase](http://www.firebase.com/?utm_medium=web&utm_source=emberfire) with
 [Ember Data](https://github.com/emberjs/data).
 
-Join our [Firebase + Ember Google Group](https://groups.google.com/forum/#!forum/firebase-ember)
+Join our [Firebase Google Group](https://groups.google.com/forum/#!forum/firebase-talk)
 to ask technical questions, share apps you've built, and chat with other developers in the community.
 
 
@@ -76,4 +76,4 @@ Also note that due to the Firebase 3.0 SDK, you cannot run tests with PhantomJS 
 ## Contributing
 
 If you'd like to contribute to EmberFire, please first read through our [contribution
-guidelines](CONTRIBUTING.md). Local setup instructions are available [here](CONTRIBUTING.md#local-setup).
+guidelines](.github/CONTRIBUTING.md). Local setup instructions are available [here](.github/CONTRIBUTING.md#local-setup).

@@ -29,7 +29,10 @@
     "ember-addon"
   ],
   "ember-addon": {
-    "configPath": "tests/dummy/config"
+    "configPath": "tests/dummy/config",
+    "fastBootDependencies": [
+      "firebase"
+    ]
   },
   "browserify": {
     "transform": [
@@ -45,7 +48,8 @@
   "dependencies": {
     "chalk": "1.1.3",
     "ember-cli-babel": "5.1.6",
-    "ember-lodash": "0.0.7"
+    "ember-lodash": "0.0.7",
+    "firebase": "^3.4.1"
   },
   "devDependencies": {
     "broccoli-asset-rev": "^2.4.2",
@@ -72,7 +76,9 @@
     "babelify": "6.4.0",
     "browserify-shim": "3.8.12",
     "browserify": "10.2.6",
+    "codeclimate-test-reporter": "^0.3.3",
     "del": "1.2.0",
+    "ember-cli-code-coverage": "^0.3.2",
     "ember-sinon": "0.5.1",
     "glob": "5.0.13",
     "gulp": "3.9.1",

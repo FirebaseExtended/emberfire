@@ -53,16 +53,16 @@ module.exports = {
           "  firebase: {" + EOL +
           "    apiKey: 'xyz'," + EOL +
           "    authDomain: 'YOUR-FIREBASE-APP.firebaseapp.com'," + EOL +
-          "    databaseURL: 'https://YOUR-FIREBASE-APP.firebaseapp.com'," + EOL +
+          "    databaseURL: 'https://YOUR-FIREBASE-APP.firebaseio.com'," + EOL +
           "    storageBucket: 'YOUR-FIREBASE-APP.appspot.com'," + EOL +
           "  }," + EOL +
           EOL +
           EOL +
           g("  // if using ember-cli-content-security-policy") + EOL +
           "  contentSecurityPolicy: {" + EOL +
-          "    'script-src': '\'self\' \'unsafe-eval\' apis.google.com'," + EOL +
-          "    'frame-src': '\'self\' https://*.firebaseapp.com'," + EOL +
-          "    'connect-src': '\'self\' wss://*.firebaseio.com https://*.googleapis.com'" + EOL +
+          "    'script-src': \"'self' 'unsafe-eval' apis.google.com\"," + EOL +
+          "    'frame-src': \"'self' https://*.firebaseapp.com\"," + EOL +
+          "    'connect-src': \"'self' wss://*.firebaseio.com https://*.googleapis.com\"" + EOL +
           "  }," + EOL +
           EOL;
 

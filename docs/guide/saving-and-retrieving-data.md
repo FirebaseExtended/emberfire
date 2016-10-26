@@ -1,6 +1,6 @@
 # Saving and retrieving data
 
-First, let's create a model for our posts. Each post will have a title, body and timestamp. We'll use the timestamp property to display the most recent post first:
+_As an example resource_, we will use "posts" for a blog. Let's create a model and describe what data a "post" will include. Each post will have a title, body, and a timestamp. We can use this CLI shorthand to quickly generate that file.
 
 ```
 $ ember generate model post title:string body:string timestamp:number
@@ -15,11 +15,12 @@ export default DS.Model.extend({
 });
 ```
 
-To add blog posts to our app, we'll create a template with a form for submitting blog posts:
+To add blog posts to our app, we'll need a route and a template with a form for submitting blog posts:
 
 ```
-$ ember generate template posts
+$ ember generate route posts
 ```
+This will generate a route and template for posts
 
 ```handlebars
 <!-- app/templates/posts.hbs -->
@@ -37,7 +38,7 @@ $ ember generate template posts
 </ul>
 ```
 
-We haven't written the publishPost action yet, so let's do that now in our PostsController:
+We haven't written the `publishPost` action yet, so let's do that now in our controller:
 
 ```
 $ ember generate controller posts
@@ -61,9 +62,11 @@ export default Ember.ArrayController.extend({
 });
 ```
 
-We used an ArrayController to sort our posts by timestamp. In our publishPost action, we create a new post in the data store with the title and body entered in our Handlebars template. Simply calling newPost.save() will save our post to the data store and automatically create a record in the database.
+We used an **ArrayController** to sort our posts by timestamp. In our `publishPost` action, we create a new post in the data store with the title and body entered in our Handlebars template. Simply calling `newPost.save()` will save our post to the data store and automatically create a record in the database.
 
-EmberFire uses Firebase's push() function under the hood, which creates a unique timestamp-based ID for each record that is added to the database. Our data now looks like this:
+> **Note:** By default Firebase requires users be authenticated before they can read and write to the database. If you have not authenticated your users, you will receive errors . If you want to allow reading/writing to the database form unauthenticated users, check out the [security rules](security-rules.md) section.
+
+EmberFire uses Firebase's `push()` function under the hood, which creates a unique timestamp-based ID for each record that is added to the database. Our data now looks like this:
 
 ```json
 {
@@ -81,27 +84,20 @@ Notice that our data is stored under a posts path. EmberFire will automatically 
 
 To retrieve the post data from the database, we just need to add a model hook to our posts route:
 
-```
-$ ember generate route posts
-```
-
 ```js
 // app/routes/posts.js
 export default Ember.Route.extend({
   model: function() {
-    return this.store.find('post');
+    return this.store.findAll('post');
   }
 });
 ```
 
 Now we have access to all of our posts, and can display them in our template:
 
-```js
-$ ember generate template posts
-```
-
 ```handlebars
-<!-- app/templates/posts.hbs -->
+<!-- app/templates/posts.hbs from above -->
+
 <section>
 {{#each model as |post|}}
   <div>{{post.title}}</div>
@@ -110,4 +106,15 @@ $ ember generate template posts
 </section>
 ```
 
-Next: [Querying Data](querying-data.md)
+
+### Continue reading
+
+1. [Installation](installation.md)
+1. [User Authentication](authentication.md)
+1. **Saving and Retrieving Data**
+1. [Querying Data](querying-data.md)
+1. [Relationships](relationships.md)
+1. [Security Rules](security-rules.md)
+1. [Using EmberFire without Ember CLI](without-ember-cli.md)
+1. [Deploying to Firebase Hosting](deploying-to-firebase-hosting.md)
+1. [Testing](testing.md)

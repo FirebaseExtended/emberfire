@@ -1,1 +1,1 @@
-fixed - Fixes container deprecation warnings by using `Ember.getOwner()`
+fixed - ServerValue.TIMESTAMP is now correctly handled (#448)
