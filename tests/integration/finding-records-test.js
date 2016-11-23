@@ -1,7 +1,7 @@
 import Ember from 'ember';
 import startApp from 'dummy/tests/helpers/start-app';
 import destroyApp from 'dummy/tests/helpers/destroy-app';
-import { it } from 'ember-mocha';
+import { it } from 'mocha';
 import { expect } from 'chai';
 import sinon from 'sinon';
 import stubFirebase from 'dummy/tests/helpers/stub-firebase';

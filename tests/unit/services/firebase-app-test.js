@@ -1,8 +1,7 @@
 /* jshint expr:true */
 import { expect } from 'chai';
-import {
-  describeModule, it
-} from 'ember-mocha';
+import { it } from 'mocha';
+import { describeModule } from 'ember-mocha';
 import firebase from 'firebase';
 import sinon from 'sinon';
 import Ember from 'ember';

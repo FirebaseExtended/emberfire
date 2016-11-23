@@ -1,10 +1,8 @@
 /* jshint expr:true */
 import Ember from 'ember';
 import { expect } from 'chai';
-import {
-  describeModule,
-  it
-} from 'ember-mocha';
+import { it } from 'mocha';
+import {describeModule} from 'ember-mocha';
 import firebase from 'firebase';
 
 import Post from 'dummy/models/post';

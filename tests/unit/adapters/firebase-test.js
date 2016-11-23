@@ -1,7 +1,8 @@
 /* jshint expr:true */
 import Ember from 'ember';
 import DS from 'ember-data';
-import { describeModule, it } from 'ember-mocha';
+import { it } from 'mocha';
+import { describeModule } from 'ember-mocha';
 import { expect } from 'chai';
 import firebase from 'firebase';
 
