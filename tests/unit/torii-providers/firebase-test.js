@@ -1,10 +1,12 @@
 import Ember from 'ember';
-import { describeModule, it } from 'ember-mocha';
+import { it, describe } from 'mocha';
+import { setupTest } from 'ember-mocha';
 import sinon from 'sinon';
 
 const { run } = Ember;
 
-describeModule('emberfire@torii-provider:firebase', 'FirebaseToriiProvider', {}, function() {
+describe('FirebaseToriiProvider', function() {
+  setupTest('emberfire@torii-provider:firebase');
 
   const firebaseAppMock = {
     auth() { return authMock; }

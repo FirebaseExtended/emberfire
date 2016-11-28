@@ -1,11 +1,13 @@
 import Ember from 'ember';
-import { describeModule, it } from 'ember-mocha';
+import { it, describe } from 'mocha';
+import { setupTest } from 'ember-mocha';
 import { expect } from 'chai';
 import sinon from 'sinon';
 
 const { run } = Ember;
 
-describeModule('emberfire@torii-adapter:firebase', 'FirebaseToriiAdapter', {}, function() {
+describe('FirebaseToriiAdapter', function() {
+  setupTest('emberfire@torii-adapter:firebase');
 
   const firebaseAppMock = {
     auth() { return authMock; }
@@ -375,5 +377,4 @@ describeModule('emberfire@torii-adapter:firebase', 'FirebaseToriiAdapter', {}, f
     });
 
   });  // #close
-
 });
