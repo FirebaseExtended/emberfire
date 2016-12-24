@@ -5,16 +5,6 @@ import FirebaseAdapter from '../adapters/firebase';
 import FirebaseSerializer from '../serializers/firebase';
 import forEach from 'lodash/collection/forEach';
 
-var VERSION = '0.0.0';
-
-if (Ember.libraries) {
-  if (firebase.SDK_VERSION) {
-    Ember.libraries.registerCoreLibrary('Firebase', firebase.SDK_VERSION);
-  }
-
-  Ember.libraries.registerCoreLibrary('EmberFire', VERSION);
-}
-
 export default {
   name: 'emberfire',
   before: 'ember-data',
@@ -115,5 +105,14 @@ export default {
 
     DS.FirebaseAdapter = FirebaseAdapter;
     DS.FirebaseSerializer = FirebaseSerializer;
+    
+    if (Ember.libraries) {
+      if (firebase.SDK_VERSION) {
+        Ember.libraries.registerCoreLibrary('Firebase', firebase.SDK_VERSION);
+      }
+      const config = application.resolveRegistration('config:environment');
+      Ember.libraries.registerCoreLibrary('EmberFire', config.EMBERFIRE_VERSION);
+    }
+
   }
 };
