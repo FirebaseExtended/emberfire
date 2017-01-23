@@ -2,7 +2,6 @@
 'use strict';
 
 var path = require('path');
-var resolve = require('resolve');
 var Webpack = require('broccoli-webpack');
 var mergeTrees = require('broccoli-merge-trees');
 
@@ -24,8 +23,19 @@ module.exports = {
   treeForVendor: function(tree) {
     var trees = [];
 
+    var firebase;
+
+    try {
+      var resolve = require('resolve');
+      firebase = resolve.sync('firebase/package.json', {
+        basedir: this.project.root
+      });
+    } catch (e) {
+      firebase = require.resolve('firebase/package.json');
+    }
+
     trees.push(new Webpack([
-      path.dirname(require.resolve('firebase'))
+      path.dirname(firebase)
     ], {
       entry: './firebase-browser.js',
       output: {
