@@ -42,14 +42,7 @@ export default {
       DS.Store.reopen({
         _emberfirePatched: true,
 
-        push() {
-          var result = this._super.apply(this, arguments);
-          var records = result;
-
-          if (!Ember.isArray(result)) {
-            records = [result];
-          }
-
+        _emberfireHandleRecordPush(records) {
           forEach(records, (record) => {
             var modelName = record.constructor.modelName;
             var adapter = this.adapterFor(modelName);
@@ -57,8 +50,31 @@ export default {
               adapter.recordWasPushed(this, modelName, record);
             }
           });
+        },
 
+        push() {
+          var result = this._super.apply(this, arguments);
+          var records = result;
+
+          if (!Ember.isArray(result)) {
+            records = [result];
+          }
+          this._emberfireHandleRecordPush(records);
           return result;
+        },
+
+        _push() {
+          var pushed = this._super.apply(this, arguments);
+          var records;
+          if (Array.isArray(pushed)) {
+            records = pushed.map(function(internalModel) {
+              return internalModel.getRecord();
+            });
+          } else {
+            records = [pushed.getRecord()];
+          }
+          this._emberfireHandleRecordPush(records);
+          return pushed;
         },
 
         recordWillUnload(record) {
