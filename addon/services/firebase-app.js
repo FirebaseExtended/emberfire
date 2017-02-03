@@ -3,8 +3,6 @@ import Ember from 'ember';
 
 const { getOwner } = Ember;
 
-export const DEFAULT_NAME = '[EmberFire default app]';
-
 export default {
   create(application) {
     const config = getOwner(application)._lookupFactory('config:environment');
@@ -15,9 +13,9 @@ export default {
     let app;
 
     try {
-      app = firebase.app(DEFAULT_NAME);
+      app = firebase.app();
     } catch (e) {
-      app = firebase.initializeApp(config.firebase, DEFAULT_NAME);
+      app = firebase.initializeApp(config.firebase);
     }
 
     return app;
