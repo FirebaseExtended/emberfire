@@ -1,6 +1,10 @@
 /* jshint node: true */
 'use strict';
 
+var path = require('path');
+var Webpack = require('broccoli-webpack');
+var mergeTrees = require('broccoli-merge-trees');
+
 module.exports = {
   name: 'emberfire',
 
@@ -13,13 +17,38 @@ module.exports = {
     }
     this.app = app;
 
-    if (!process.env.EMBER_CLI_FASTBOOT) {
-      this.app.import(app.bowerDirectory + '/firebase/firebase.js');
+    this.app.import('vendor/firebase.amd.js');
+  },
+
+  treeForVendor: function(tree) {
+    var trees = [];
+
+    var firebase;
+
+    try {
+      var resolve = require('resolve');
+      firebase = resolve.sync('firebase/package.json', {
+        basedir: this.project.root
+      });
+    } catch (e) {
+      firebase = require.resolve('firebase/package.json');
     }
 
-    app.import('vendor/firebase/shim.js', {
-      type: 'vendor',
-      exports: { 'firebase': ['default'] }
-    });
+    trees.push(new Webpack([
+      path.dirname(firebase)
+    ], {
+      entry: './firebase-browser.js',
+      output: {
+        library: 'firebase',
+        libraryTarget: 'amd',
+        filename: 'firebase.amd.js'
+      }
+    }));
+
+    if (tree) {
+      trees.push(tree);
+    }
+
+    return mergeTrees(trees, { overwrite: true });
   }
 };
