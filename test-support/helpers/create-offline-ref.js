@@ -1,7 +1,5 @@
 import firebase from 'firebase';
 
-export const DEFAULT_NAME = '[EmberFire offline test app]';
-
 /**
  * Creates an offline firebase reference with optional initial data and url.
  *
@@ -30,9 +28,9 @@ export default function createOfflineRef(initialData,
   let app;
 
   try {
-    app = firebase.app(DEFAULT_NAME);
+    app = firebase.app();
   } catch (e) {
-    app = firebase.initializeApp(config, DEFAULT_NAME);
+    app = firebase.initializeApp(config);
   }
 
   const ref = app.database().ref();

@@ -145,11 +145,11 @@ export default DS.Adapter.extend(Waitable, {
 
       ref.once('value', (snapshot) => {
         this._decrementWaiters();
-        Ember.run(null, resolve, snapshot);
+        Ember.run.scheduleOnce('afterRender', this, resolve, snapshot);
 
       }, (err) => {
         this._decrementWaiters();
-        Ember.run(null, reject, err);
+        Ember.run.scheduleOnce('afterRender', this, reject, err);
       });
 
     }, log);
@@ -504,7 +504,7 @@ export default DS.Adapter.extend(Waitable, {
 
     // Added
     var addedRecords = filter(ids, (id) => {
-      return !idsCache.contains(id);
+      return !idsCache.includes(id);
     });
 
     // Dirty
