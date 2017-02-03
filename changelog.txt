@@ -1,6 +1,0 @@
-fixed - Update "ember-cli-mocha" to v0.12.0 (#456)
-fixed - Change instances of contains to include (#464)
-fixed - override _push in Store, fixes ember-data 2.11 (#483)
-fixed - use scheduleOnce instead of firing immediately (#481)
-fixed - acceptance test permission (#477)
-changed - remove firebase from bower (#470)
