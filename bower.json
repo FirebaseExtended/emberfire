@@ -29,9 +29,6 @@
     "Brocfile.js",
     "package.json"
   ],
-  "dependencies": {
-    "firebase": "3.x.x"
-  },
   "devDependencies": {
     "ember": "2.5.1",
     "ember-cli-shims": "0.1.1",
