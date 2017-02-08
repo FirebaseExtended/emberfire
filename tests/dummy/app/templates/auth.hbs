@@ -1,27 +1,32 @@
-{{#if session.currentUser}}
+{{#if session.isAuthenticated}}
     <button class="sign-out" {{action "signOut"}}>Sign Out</button>
-{{else}}
+{{/if}}
+{{#unless (eq session.provider 'anonymous')}}
   <div>
-    <button class="auth-as-twitter"  {{action "signIn" "twitter" redirect}}>Sign in with Twitter</button>
-    <button class="auth-as-github"   {{action "signIn" "github" redirect}}>Sign in with GitHub</button>
-    <button class="auth-as-facebook" {{action "signIn" "facebook" redirect}}>Sign in with Facebook</button>
-    <button class="auth-as-google"   {{action "signIn" "google" redirect}}>Sign in with Google</button>
+    <button class="auth-as-anon" {{action "signIn" "anonymous"}}>Sign in anonymously</button>
+  </div>
+{{/unless}}
+
+  <div>
+    {{#unless (inProviderId session.currentUser.providerData 'twitter.com')}}<button class="auth-as-twitter"  {{action "signIn" "twitter" redirect}}>Sign in with Twitter</button>{{/unless}}
+    {{#unless (inProviderId session.currentUser.providerData 'github.com')}}<button class="auth-as-github"   {{action "signIn" "github" redirect}}>Sign in with GitHub</button>{{/unless}}
+    {{#unless (inProviderId session.currentUser.providerData 'facebook.com')}}<button class="auth-as-facebook" {{action "signIn" "facebook" redirect}}>Sign in with Facebook</button>{{/unless}}
+    {{#unless (inProviderId session.currentUser.providerData 'google.com')}}<button class="auth-as-google"   {{action "signIn" "google" redirect}}>Sign in with Google</button>{{/unless}}
   </div>
   <div>Redirect? {{input type="checkbox" checked=redirect}}</div>
+   {{#unless (inProviderId session.currentUser.providerData 'password')}}
   <div>
     {{input type="text" value=email placeholder="email"}}
     {{input type="text" value=password placeholder="password"}}
     <button class="auth-as-password" {{action "signIn" "password" email password}}>Sign in with Email</button>
   </div>
+  {{/unless}}
+  {{#unless (inProviderId session.currentUser.providerData 'custom')}}
   <div>
     {{input type="text" value=token placeholder="token"}}
     <button class="auth-as-custom" {{action "signIn" "custom" token}}>Sign in with Token</button>
   </div>
-  <div>
-    <button class="auth-as-anon" {{action "signIn" "anonymous"}}>Sign in anonymously</button>
-  </div>
-
-{{/if}}
+ {{/unless}}
 
 <div class="user-data">
     <h3>User Data</h3>

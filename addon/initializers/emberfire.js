@@ -4,6 +4,8 @@ import firebase from 'firebase';
 import FirebaseAdapter from '../adapters/firebase';
 import FirebaseSerializer from '../serializers/firebase';
 import forEach from 'lodash/collection/forEach';
+import torii from 'torii/services/torii-session';
+import createStateMachine from '../session/state-machine';
 
 var VERSION = '0.0.0';
 
@@ -38,8 +40,7 @@ export default {
         firebase.auth.GoogleAuthProvider, providerSettings);
 
     // Monkeypatch the store until ED gives us a good way to listen to push events
-    if (!DS.Store.prototype._emberfirePatched) {
-      DS.Store.reopen({
+    if (!DS.Store.prototype._emberfirePatched) {     DS.Store.reopen({
         _emberfirePatched: true,
 
         _emberfireHandleRecordPush(records) {
@@ -128,6 +129,18 @@ export default {
         }
       });
     }
+
+  if (!torii.prototype._emberfirePatched) {
+      torii.reopen({
+        _emberfirePatched: true,
+        stateMachine : Ember.computed(function(){
+    return createStateMachine(this);
+  })
+
+       
+      });
+    }
+
 
     DS.FirebaseAdapter = FirebaseAdapter;
     DS.FirebaseSerializer = FirebaseSerializer;
