@@ -64,7 +64,7 @@ export default Ember.ArrayController.extend({
 
 We used an **ArrayController** to sort our posts by timestamp. In our `publishPost` action, we create a new post in the data store with the title and body entered in our Handlebars template. Simply calling `newPost.save()` will save our post to the data store and automatically create a record in the database.
 
-> **Note:** By default Firebase requires users be authenticated before they can read and write to the database. If you have not authenticated your users, you will receive errors . If you want to allow reading/writing to the database form unauthenticated users, check out the [security rules](security-rules.md) section.
+> **Note:** By default Firebase requires users be authenticated before they can read and write to the database. If you have not authenticated your users, you will receive errors . If you want to allow reading/writing to the database from unauthenticated users, check out the [security rules](security-rules.md) section.
 
 EmberFire uses Firebase's `push()` function under the hood, which creates a unique timestamp-based ID for each record that is added to the database. Our data now looks like this:
 
@@ -80,7 +80,7 @@ EmberFire uses Firebase's `push()` function under the hood, which creates a uniq
 }
 ```
 
-Notice that our data is stored under a posts path. EmberFire will automatically try to determine the correct Firebase reference based on the model name. Since we have a Post model, all of our posts our automatically stored under a posts path in the database.
+Notice that our data is stored under a posts path. EmberFire will automatically try to determine the correct Firebase reference based on the model name. Since we have a Post model, all of our posts are automatically stored under a posts path in the database.
 
 To retrieve the post data from the database, we just need to add a model hook to our posts route:
 
