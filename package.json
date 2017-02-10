@@ -43,7 +43,9 @@
   "browserify-shim": {
     "ember": "global:Ember",
     "ember-data": "global:DS",
-    "firebase": "global:firebase"
+    "firebase": "global:firebase",
+    "torii/services/torii-session": "global:torii",
+    "torii/lib/state-machine": "global:StateMachine"
   },
   "dependencies": {
     "broccoli-merge-trees": "^1.2.1",
