@@ -1,6 +1,10 @@
 /*jshint node:true*/
 'use strict';
 
-module.exports = function(/* environment, appConfig */) {
-  return { };
+var version = require('../package.json').version;
+
+module.exports = function(environment /*, appConfig */) {
+  return {
+    EMBERFIRE_VERSION: version
+  };
 };
