@@ -291,6 +291,14 @@ export default DS.JSONSerializer.extend(DS.EmbeddedRecordsMixin, {
   /**
    * @override
    */
+  shouldSerializeHasMany(snapshot, key, relationship) {
+    return this._canSerialize(key);
+  },
+
+  /**
+   * @override
+   * @deprecated
+   */
   _shouldSerializeHasMany(snapshot, key, relationship) {
     return this._canSerialize(key);
   }
