@@ -18,7 +18,7 @@ describe('FirebaseService', function() {
   };
 
   const emberAppMock = {
-    _lookupFactory() {
+    resolveRegistration() {
       return configMock;
     }
   };

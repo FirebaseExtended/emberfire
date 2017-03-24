@@ -27,7 +27,7 @@ describe('Integration: FirebaseAdapter - Queries', function() {
 
     var query = { limitToLast: 3 };
 
-    queryArray = store.recordArrayManager.createAdapterPopulatedRecordArray(store.modelFor('post'), query);
+    queryArray = store.recordArrayManager.createAdapterPopulatedRecordArray('post', query);
 
     run(function () {
       adapter.query(store, store.modelFor('post'), query, queryArray)
@@ -92,7 +92,7 @@ describe('Integration: FirebaseAdapter - Queries', function() {
         limitToLast: 1,
       };
 
-      queryArray = store.recordArrayManager.createAdapterPopulatedRecordArray(store.modelFor('post'), query);
+      queryArray = store.recordArrayManager.createAdapterPopulatedRecordArray('post', query);
 
       run(() => {
         adapter.query(store, store.modelFor('post'), query, queryArray)

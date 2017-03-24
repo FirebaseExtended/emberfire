@@ -5,7 +5,7 @@ const { getOwner } = Ember;
 
 export default {
   create(application) {
-    const config = getOwner(application)._lookupFactory('config:environment');
+    const config = getOwner(application).resolveRegistration('config:environment');
     if (!config || typeof config.firebase !== 'object') {
       throw new Error('Please set the `firebase` property in your environment config.');
     }
