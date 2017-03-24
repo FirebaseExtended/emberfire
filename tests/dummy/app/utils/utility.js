@@ -11,11 +11,15 @@ export default Ember.Object.extend({
   getUserByUsername: function(username) {
     var store = this.get('store');
     username = username.replace(/[^a-zA-Z0-9 -]/g, '');
-    return this.get('store').find('user', username).then(function(user) {
+    return store.findRecord('user', username).then(function(user) {
       return user;
     }, function() {
-      // HACK: `find()` creates an entry in store.typeMapFor().idToRecord which prevents `createRecord()` from working
-      delete store.typeMapFor(store.modelFor('user')).idToRecord[username];
+      // HACK: `findRecord()` creates an entry in internal models which prevents `createRecord()` from working
+      if (typeof store.typeMapFor === 'function') {
+        delete store.typeMapFor(store.modelFor('user')).idToRecord[username];
+      } else if (typeof store._internalModelsFor === 'function') {
+        store._internalModelsFor('user').remove('user', username);
+      }
       // A user couldn't be found, so create a new user
       var user = store.createRecord('user', {
         id: username,
