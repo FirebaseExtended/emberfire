@@ -2,14 +2,6 @@
 module.exports = {
   scenarios: [
     {
-      name: 'ember-data-2.8.x',
-      npm: {
-        devDependencies: {
-          'ember-data': '~2.8.0'
-        }
-      }
-    },
-    {
       name: 'ember-data-2.9.x',
       npm: {
         devDependencies: {
