@@ -2,14 +2,6 @@
 module.exports = {
   scenarios: [
     {
-      name: 'ember-data-2.8.x',
-      npm: {
-        devDependencies: {
-          'ember-data': '~2.8.0'
-        }
-      }
-    },
-    {
       name: 'ember-data-2.9.x',
       npm: {
         devDependencies: {
@@ -34,24 +26,26 @@ module.exports = {
       }
     },
     {
+      name: 'ember-data-2.12.x',
+      npm: {
+        devDependencies: {
+          'ember-data': '~2.12.0'
+        }
+      }
+    },
+    {
       name: 'ember-data-beta',
-      bower: {
-        dependencies: {
-          'ember-data': 'components/ember-data#beta'
-        },
-        resolutions: {
-          'ember-data': 'components/ember-data#beta'
+      npm: {
+        devDependencies: {
+          'ember-data': 'emberjs/data#beta'
         }
       }
     },
     {
       name: 'ember-data-canary',
-      bower: {
-        dependencies: {
-          'ember-data': 'components/ember-data#canary'
-        },
-        resolutions: {
-          'ember-data': 'components/ember-data#canary'
+      npm: {
+        devDependencies: {
+          'ember-data': 'emberjs/data#master'
         }
       }
     }
