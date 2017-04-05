@@ -36,7 +36,7 @@ export default Ember.Object.extend(Waitable, {
 
       // oauth providers e.g. 'twitter'
       default:
-        const ProviderClass = getOwner(this).lookup(`firebase-auth-provider:${providerId}`);
+        const ProviderClass = getOwner(this).resolveRegistration(`firebase-auth-provider:${providerId}`);
         if (!ProviderClass) {
           return this.waitFor_(reject(new Error('Unknown provider')));
         }
