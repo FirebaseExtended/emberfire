@@ -145,11 +145,10 @@ export default DS.Adapter.extend(Waitable, {
 
       ref.once('value', (snapshot) => {
         this._decrementWaiters();
-        Ember.run.scheduleOnce('afterRender', this, resolve, snapshot);
-
+        Ember.run(null, resolve, snapshot);
       }, (err) => {
         this._decrementWaiters();
-        Ember.run.scheduleOnce('afterRender', this, reject, err);
+        Ember.run(null, reject, err);
       });
 
     }, log);
