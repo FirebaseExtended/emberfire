@@ -21,7 +21,7 @@ This will inject a `session` property into our routes and controllers.
 In order to use Torii, we need to create a `app/torii-adapters/application.js` adapter file with the following code:
 
 ```js
-import ToriiFirebaseAdapter from 'emberfire/torii-adapters/firebase';
+import ToriiFirebaseAdapter from 'emberfire/torii-providers/firebase';
 export default ToriiFirebaseAdapter.extend({
 });
 ```
