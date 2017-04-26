@@ -1,0 +1,4 @@
+fixed - reverted scheduleOnce #481 due to acceptance test failures (484)
+fixed - deprecations for Ember/Ember-Data 2.12 (#492)
+fixed - embedded hasmany delete bug (#487)
+fixed - resolveRegistration to lookup firebase auth providers. (#498)
