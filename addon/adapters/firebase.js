@@ -688,7 +688,7 @@ export default DS.Adapter.extend(Waitable, {
     let relationshipKeys = Object.keys(relationships);
 
     for (let i = 0; i < relationshipKeys.length; i++) {
-      let rel = relationships[i];
+      let rel = relationships[relationshipKeys[i]];
       let members = rel.members.toArray();
       let parent = members[0];
 
@@ -817,10 +817,11 @@ export default DS.Adapter.extend(Waitable, {
           const isEmbedded = this.isRelationshipEmbedded(store, typeClass.modelName, relationship);
           if (isEmbedded) {
             const relationshipTypeClass = store.modelFor(relationship.type);
-            relationshipPayload.forEach((obj, id) => {
+            for (let id in relationshipPayload) {
+              let obj = relationshipPayload[id];
               obj.id = id;
               this._updateRecordCacheForType(relationshipTypeClass, obj, store);
-            });
+            }
           } else {
             const ids = Object.keys(relationshipPayload);
             cache[key] = Ember.A(ids);
