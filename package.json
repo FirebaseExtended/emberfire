@@ -1,7 +1,7 @@
 {
   "name": "emberfire",
   "description": "The officially supported Ember binding for Firebase",
-  "version": "2.0.6",
+  "version": "2.0.7",
   "author": "Firebase (https://firebase.google.com/)",
   "homepage": "https://github.com/firebase/emberfire/",
   "directories": {

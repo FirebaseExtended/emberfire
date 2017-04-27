@@ -55,7 +55,6 @@ export default Ember.Object.extend(Waitable, {
           }
           return this.waitFor_(currentUser.linkWithPopup(provider));
       }
-
     }
     else {
       switch (providerId) {
@@ -95,6 +94,8 @@ export default Ember.Object.extend(Waitable, {
           }
           return this.waitFor_(auth.signInWithPopup(provider));
       }
+
+
     }
   },
 
