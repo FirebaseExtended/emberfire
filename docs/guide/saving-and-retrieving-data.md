@@ -46,7 +46,7 @@ $ ember generate controller posts
 
 ```js
 // app/controllers/posts.js
-export default Ember.ArrayController.extend({
+export default Ember.Controller.extend({
   sortProperties: ['timestamp'],
   sortAscending: false, // sorts post by timestamp
   actions: {
@@ -62,7 +62,7 @@ export default Ember.ArrayController.extend({
 });
 ```
 
-We used an **ArrayController** to sort our posts by timestamp. In our `publishPost` action, we create a new post in the data store with the title and body entered in our Handlebars template. Simply calling `newPost.save()` will save our post to the data store and automatically create a record in the database.
+In our `publishPost` action, we create a new post in the data store with the title and body entered in our Handlebars template. Simply calling `newPost.save()` will save our post to the data store and automatically create a record in the database.
 
 > **Note:** By default Firebase requires users be authenticated before they can read and write to the database. If you have not authenticated your users, you will receive errors . If you want to allow reading/writing to the database from unauthenticated users, check out the [security rules](security-rules.md) section.
 
