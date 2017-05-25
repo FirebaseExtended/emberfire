@@ -36,7 +36,25 @@ describe('Acceptance: JSONAPIAdapter still works', function() {
     visit('/widgets');
 
     andThen(function() {
-      expect(find('.widget').text()).to.equal('WIDGET 1');
+      expect(find('[data-test-widget=1] .name').text()).to.equal('WIDGET 1');
+    });
+  });
+
+  it('can create widgets', function() {
+    visit('/widgets');
+    click('[data-test-create-widget]');
+
+    andThen(function() {
+      expect(find('[data-test-widget=2] .name').text()).to.equal('WIDGET 2');
+    });
+  });
+
+  it('can update a widget with sideloaded data', function() {
+    visit('/widgets');
+    click('[data-test-update-widget=1]');
+
+    andThen(function() {
+      expect(find('[data-test-widget=1] .name').text()).to.equal('WIDGET 1 - UPDATED');
     });
   });
 

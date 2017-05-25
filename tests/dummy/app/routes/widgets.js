@@ -10,5 +10,9 @@ export default Ember.Route.extend({
       let widget = this.store.createRecord('widget');
       widget.save();
     },
+
+    updateWidget(widget) {
+      widget.save();
+    },
   },
 });

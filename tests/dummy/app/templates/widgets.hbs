@@ -1,3 +1,8 @@
 {{#each model as |widget|}}
-  <div class="widget">{{widget.name}}</div>
+  <div class="widget" data-test-widget={{widget.id}}>
+    <span class="name">{{widget.name}}</span>
+    <sup><a {{action 'updateWidget' widget}} data-test-update-widget={{widget.id}}>update</a></sup>
+  </div>
 {{/each}}
+
+<button {{action 'createWidget'}} data-test-create-widget>Create Widget</button>
