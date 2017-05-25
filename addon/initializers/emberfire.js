@@ -65,12 +65,12 @@ export default {
 
         _push() {
           var pushed = this._super.apply(this, arguments);
-          var records;
+          var records = [];
           if (Array.isArray(pushed)) {
             records = pushed.map(function(internalModel) {
               return internalModel.getRecord();
             });
-          } else {
+          } else if (pushed) {
             records = [pushed.getRecord()];
           }
           this._emberfireHandleRecordPush(records);
