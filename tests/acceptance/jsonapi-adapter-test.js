@@ -58,6 +58,15 @@ describe('Acceptance: JSONAPIAdapter still works', function() {
     });
   });
 
+  it('can handle pushing a response with empty data', function() {
+    visit('/widgets/current');
+
+    andThen(function() {
+      var textIgnoringWhitespace = find('[data-test-current-widget]').text().replace(/\s+/g, ' ');
+      expect(textIgnoringWhitespace).to.equal(' Currently: there is no current widget ');
+    });
+  });
+
 });
 
 
