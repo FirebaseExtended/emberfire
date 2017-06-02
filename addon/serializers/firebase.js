@@ -1,6 +1,6 @@
 import Ember from 'ember';
 import DS from 'ember-data';
-import assign from 'lodash/object/assign';
+import assign from 'lodash/assign';
 import firebase from 'firebase';
 
 /**

@@ -2,13 +2,13 @@ import Ember from 'ember';
 import DS from 'ember-data';
 import Waitable from '../mixins/waitable';
 import toPromise from '../utils/to-promise';
-import assign from 'lodash/object/assign';
-import forEach from 'lodash/collection/forEach';
-import filter from 'lodash/collection/filter';
-import map from 'lodash/collection/map';
-import includes from 'lodash/collection/includes';
-import indexOf from 'lodash/array/indexOf';
-import find from 'lodash/collection/find';
+import assign from 'lodash/assign';
+import forEach from 'lodash/forEach';
+import filter from 'lodash/filter';
+import map from 'lodash/map';
+import includes from 'lodash/includes';
+import indexOf from 'lodash/indexOf';
+import find from 'lodash/find';
 
 var Promise = Ember.RSVP.Promise;
 

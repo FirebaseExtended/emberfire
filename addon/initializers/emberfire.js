@@ -3,7 +3,7 @@ import DS from 'ember-data';
 import firebase from 'firebase';
 import FirebaseAdapter from '../adapters/firebase';
 import FirebaseSerializer from '../serializers/firebase';
-import forEach from 'lodash/collection/forEach';
+import forEach from 'lodash/forEach';
 
 var VERSION = '0.0.0';
 

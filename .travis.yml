@@ -15,9 +15,7 @@ branches:
   only:
     - master # otherwise pull requests get built twice
 
-cache:
-  directories:
-    - node_modules
+cache: false
 
 env:
   - EMBER_TRY_SCENARIO=ember-data-2.9.x
