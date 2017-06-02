@@ -316,8 +316,27 @@ export default DS.Adapter.extend(Waitable, {
       ref = ref.orderByChild(query.orderBy);
     }
 
-    ['startAt', 'endAt', 'equalTo', 'limitToFirst', 'limitToLast'].forEach(function (key) {
-      if (query[key] || query[key] === '' || query[key] === false) {
+    ref = this._applyRangesToRef(ref, query);
+    ref = this._applyLimitsToRef(ref, query);
+
+    return ref;
+  },
+
+  _applyRangesToRef(ref, query) {
+    const methods = ['equalTo', 'startAt', 'endAt'];
+    methods.forEach(key => {
+      if (query[key] !== undefined) {
+        ref = ref[key](query[key]);
+      }
+    });
+
+    return ref;
+  },
+
+  _applyLimitsToRef(ref, query) {
+    const methods = ['limitToFirst', 'limitToLast'];
+    methods.forEach(key => {
+      if (Number.isInteger(query[key])) {
         ref = ref[key](query[key]);
       }
     });

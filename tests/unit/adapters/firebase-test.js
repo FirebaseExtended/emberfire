@@ -90,45 +90,86 @@ describe('FirebaseAdapter', function() {
         queryMethodStub.restore();
       });
 
-      it(`calls ${method} and passes through value when specified`, function () {
-        var query = {};
+      if (method === 'limitToFirst' || method === 'limitToLast') {
+        it(`calls ${method} and passes through value when an integer`, function () {
+          var query = {};
 
-        query[method] = 'value';
+          query[method] = 10;
 
-        adapter.applyQueryToRef(ref, query);
-        expect(queryMethodStub.calledOnce).to.be.ok;
-        expect(queryMethodStub.calledWith('value')).to.be.ok;
-      });
+          adapter.applyQueryToRef(ref, query);
+          expect(queryMethodStub.calledOnce).to.be.ok;
+          expect(queryMethodStub.calledWith(10)).to.be.ok;
+        });
 
-      it(`calls ${method} and passes through value when empty string`, function () {
-        var query = {};
+        it(`does not call ${method} when the value is null`, function () {
+          var query = {};
 
-        query[method] = '';
+          query[method] = null;
 
-        adapter.applyQueryToRef(ref, query);
-        expect(queryMethodStub.calledOnce).to.be.ok;
-        expect(queryMethodStub.calledWith('')).to.be.ok;
-      });
+          adapter.applyQueryToRef(ref, query);
+          expect(queryMethodStub.called === false, `${method} should not be called`).to.be.ok;
+        });
 
-      it(`calls ${method} and passes through value when 'false'`, function () {
-        var query = {};
+        it(`does not call ${method} when value is a string`, function () {
+          var query = {};
 
-        query[method] = false;
+          query[method] = 'value';
 
-        adapter.applyQueryToRef(ref, query);
-        expect(queryMethodStub.calledOnce).to.be.ok;
-        expect(queryMethodStub.calledWith(false)).to.be.ok;
-      });
+          adapter.applyQueryToRef(ref, query);
+          expect(queryMethodStub.called === false, `${method} should not be called`).to.be.ok;
+        });
 
-      it(`does not call ${method} when the value is null`, function () {
-        var query = {};
+        it(`does not call ${method} when value is 'false'`, function () {
+          var query = {};
 
-        query[method] = null;
+          query[method] = false;
 
-        adapter.applyQueryToRef(ref, query);
-        expect(queryMethodStub.called === false, `${method} should not be called`).to.be.ok;
-      });
+          adapter.applyQueryToRef(ref, query);
+          expect(queryMethodStub.called === false, `${method} should not be called`).to.be.ok;
+        });
 
+      } else {
+        it(`calls ${method} when the value is null`, function () {
+          var query = {};
+
+          query[method] = null;
+
+          adapter.applyQueryToRef(ref, query);
+          expect(queryMethodStub.calledOnce).to.be.ok;
+          expect(queryMethodStub.calledWith(null)).to.be.ok;
+        });
+
+        it(`calls ${method} and passes through value when specified`, function () {
+          var query = {};
+
+          query[method] = 'value';
+
+          adapter.applyQueryToRef(ref, query);
+          expect(queryMethodStub.calledOnce).to.be.ok;
+          expect(queryMethodStub.calledWith('value')).to.be.ok;
+        });
+
+        it(`calls ${method} and passes through value when empty string`, function () {
+          var query = {};
+
+          query[method] = '';
+
+          adapter.applyQueryToRef(ref, query);
+          expect(queryMethodStub.calledOnce).to.be.ok;
+          expect(queryMethodStub.calledWith('')).to.be.ok;
+        });
+
+        it(`calls ${method} and passes through value when 'false'`, function () {
+          var query = {};
+
+          query[method] = false;
+
+          adapter.applyQueryToRef(ref, query);
+          expect(queryMethodStub.calledOnce).to.be.ok;
+          expect(queryMethodStub.calledWith(false)).to.be.ok;
+        });
+
+      }
     }); // forEach
 
   }); // #applyQueryToRef
