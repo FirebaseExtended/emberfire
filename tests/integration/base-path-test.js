@@ -32,7 +32,6 @@ describe('Integration: FirebaseAdapter - Base Path', function() {
   describe('#_getCollectionRef()', function() {
     it('returns the correct Firebase ref for a type', function() {
       var ref = adapter._getCollectionRef(store.modelFor('post'));
-      console.log(ref.toString());
       expect(ref.toString()).to.match(/base\/path\/posts$/g);
     });
 
