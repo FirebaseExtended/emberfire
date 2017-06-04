@@ -17,8 +17,11 @@ export default {
     } catch (e) {
       app = firebase.initializeApp(config.firebase);
     }
-
-    return app.database().ref();
+    if (config.firebase.basePath) {
+      return app.database().ref(config.firebase.basePath);
+    } else {
+      return app.database().ref();
+    }
   },
 
   config: null,
