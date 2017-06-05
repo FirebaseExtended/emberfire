@@ -42,13 +42,15 @@ export default {
         _emberfirePatched: true,
 
         _emberfireHandleRecordPush(records) {
-          records.forEach((record) => {
-            var modelName = record.constructor.modelName;
-            var adapter = this.adapterFor(modelName);
-            if (adapter.recordWasPushed) {
-              adapter.recordWasPushed(this, modelName, record);
-            }
-          });
+          if (typeof records !== 'undefined') {
+            records.forEach((record) => {
+              var modelName = record.constructor.modelName;
+              var adapter = this.adapterFor(modelName);
+              if (adapter.recordWasPushed) {
+                adapter.recordWasPushed(this, modelName, record);
+              }
+            });
+          }
         },
 
         push() {
