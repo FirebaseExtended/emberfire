@@ -43,7 +43,7 @@ before_install:
   # - ./node_modules/ember-cli/node_modules/testem/testem.js launchers
 
 install:
-  - npm install
+  - yarn install
   - bower install
 
 script:

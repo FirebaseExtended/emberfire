@@ -57,9 +57,14 @@ export default {
           var result = this._super.apply(this, arguments);
           var records = result;
 
+          if (records === null) {
+            return null;
+          }
+
           if (!Ember.isArray(result)) {
             records = [result];
           }
+
           this._emberfireHandleRecordPush(records);
           return result;
         },
@@ -71,7 +76,7 @@ export default {
             records = pushed.map(function(internalModel) {
               return internalModel.getRecord();
             });
-          } else {
+          } else if (pushed) {
             records = [pushed.getRecord()];
           }
           this._emberfireHandleRecordPush(records);
