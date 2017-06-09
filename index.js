@@ -18,6 +18,7 @@ module.exports = {
     this.app = app;
 
     this.app.import('vendor/firebase.amd.js');
+    this.app.import('vendor/shims/firebase.js');
   },
 
   treeForVendor: function(tree) {
