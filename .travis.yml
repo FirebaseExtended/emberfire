@@ -4,7 +4,7 @@ node_js:
   - "4"
 
 addons:
-  firefox: "51" # lock firefox version until testem/firefox fix https://github.com/testem/testem/issues/1084
+  firefox: "51.0" # lock firefox version until testem/firefox fix https://github.com/testem/testem/issues/1084
   code_climate:
     repo_token:
       secure: gQhPZkdkqJi1XbgJpe23Ji90VQCuXLV1yOp0L1JH+Hx4L19L+mn3gEbB99bFa/Lbh4ASwpuapHy6w2VUn6mzHknbD8r0me7g5bebGFcDyPf+EOVHEzAScnFHrKIqjK/sCbvcI7xWvDpzg9kT9UTBAdVfiJYEYiPEnKskPy8FIE0=
