@@ -48,7 +48,7 @@ install:
 
 script:
   - npm run legacy
-  - ember try:one $EMBER_TRY_SCENARIO --skip-cleanup
+  - ember try:one $EMBER_TRY_SCENARIO
 
 after_script:
   - if [ "$COVERAGE" ]; then sed 's/SF:modules\/emberfire\//SF:addon\//g' coverage/lcov.info > coverage/lcov.info.fixed; fi

@@ -3,7 +3,6 @@ import DS from 'ember-data';
 import firebase from 'firebase';
 import FirebaseAdapter from '../adapters/firebase';
 import FirebaseSerializer from '../serializers/firebase';
-import forEach from 'lodash/collection/forEach';
 
 var VERSION = '0.0.0';
 
@@ -43,13 +42,15 @@ export default {
         _emberfirePatched: true,
 
         _emberfireHandleRecordPush(records) {
-          forEach(records, (record) => {
-            var modelName = record.constructor.modelName;
-            var adapter = this.adapterFor(modelName);
-            if (adapter.recordWasPushed) {
-              adapter.recordWasPushed(this, modelName, record);
-            }
-          });
+          if (typeof records !== 'undefined') {
+            records.forEach((record) => {
+              var modelName = record.constructor.modelName;
+              var adapter = this.adapterFor(modelName);
+              if (adapter.recordWasPushed) {
+                adapter.recordWasPushed(this, modelName, record);
+              }
+            });
+          }
         },
 
         push() {
