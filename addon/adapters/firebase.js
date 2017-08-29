@@ -133,18 +133,7 @@ export default DS.Adapter.extend(Waitable, {
    * @private
    */
   _fetch(ref, log) {
-    this._incrementWaiters();
-    return new Promise((resolve, reject) => {
-
-      ref.once('value', (snapshot) => {
-        this._decrementWaiters();
-        Ember.run.scheduleOnce('afterRender', this, resolve, snapshot);
-      }, (err) => {
-        this._decrementWaiters();
-        Ember.run.scheduleOnce('afterRender', this, reject, err);
-      });
-
-    }, log);
+    return ref.once('value');
   },
 
 

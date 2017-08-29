@@ -77,12 +77,8 @@ describe('Integration: FirebaseAdapter - Finding Records', function() {
       expect(findRef.toString()).to.match(/blogs\/normalized\/posts\/post_1$/g);
     });
 
-    it('returns an object', function() {
-      expect(findPromise).to.be.an('object');
-    });
-
     it('returns a promise', function() {
-      expect(findPromise.then).to.be.a('function');
+      expect(findPromise).to.be.a('promise');
     });
 
     it('resolves with the correct payload', function(done) {
@@ -134,12 +130,8 @@ describe('Integration: FirebaseAdapter - Finding Records', function() {
       expect(findAllRef.toString()).to.match(/blogs\/normalized\/posts$/g);
     });
 
-    it('returns an object', function() {
-      expect(findAllPromise).to.be.an('object');
-    });
-
     it('returns a promise', function() {
-      expect(findAllPromise.then).to.be.a('function');
+      expect(findAllPromise).to.be.a('promise');
     });
 
     it('resolves with the correct payload', function(done) {
