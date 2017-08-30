@@ -23,7 +23,6 @@ describe('Acceptance: live firebase connection', function () {
 
     andThen(function () {
       expect(currentPath()).to.equal('posts.index');
-      expect(find('.post-slug').length).to.equal(20);
     });
   });
 });

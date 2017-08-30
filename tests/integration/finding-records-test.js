@@ -78,7 +78,7 @@ describe('Integration: FirebaseAdapter - Finding Records', function() {
     });
 
     it('returns a promise', function() {
-      expect(findPromise).to.be.a('promise');
+      expect(findPromise.then).to.be.a('function');
     });
 
     it('resolves with the correct payload', function(done) {
@@ -131,7 +131,7 @@ describe('Integration: FirebaseAdapter - Finding Records', function() {
     });
 
     it('returns a promise', function() {
-      expect(findAllPromise).to.be.a('promise');
+      expect(findAllPromise.then).to.be.a('function');
     });
 
     it('resolves with the correct payload', function(done) {
