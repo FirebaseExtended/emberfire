@@ -1,0 +1,1 @@
+fixed - Avoid infinite render on value change (#524)
