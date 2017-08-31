@@ -3,7 +3,8 @@ import DS from 'ember-data';
 import Waitable from '../mixins/waitable';
 import toPromise from '../utils/to-promise';
 
-const { assign, RSVP: { Promise } } = Ember;
+const { assign, RSVP } = Ember;
+const { Promise } = RSVP;
 
 var uniq = function (arr) {
   var ret = Ember.A();
@@ -125,7 +126,7 @@ export default DS.Adapter.extend(Waitable, {
 
 
   /**
-   * Promise interface for once('value') that also handle test waiters.
+   * Promise interface for once('value').
    *
    * @param  {Firebase} ref
    * @param  {String} log
@@ -133,18 +134,7 @@ export default DS.Adapter.extend(Waitable, {
    * @private
    */
   _fetch(ref, log) {
-    this._incrementWaiters();
-    return new Promise((resolve, reject) => {
-
-      ref.once('value', (snapshot) => {
-        this._decrementWaiters();
-        Ember.run(null, resolve, snapshot);
-      }, (err) => {
-        this._decrementWaiters();
-        Ember.run(null, reject, err);
-      });
-
-    }, log);
+    return RSVP.resolve(ref.once('value'), log);
   },
 
 
