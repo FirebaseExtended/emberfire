@@ -9,12 +9,14 @@ module.exports = {
   name: 'emberfire',
 
   included: function included(app) {
-    this._super.included(app);
+    this._super.included.apply(this, arguments);
+    var app;
 
     // make sure app is correctly assigned when being used as a nested addon
-    if (app.app) {
-      app = app.app;
-    }
+    var current = this;
+    do{
+      app = current.app || app;
+    } while (current.parent.parent && (current = current.parent));
     this.app = app;
 
     this.app.import('vendor/firebase.amd.js');
