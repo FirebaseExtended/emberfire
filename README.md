@@ -42,6 +42,7 @@ var ENV = {
     databaseURL: 'https://YOUR-FIREBASE-APP.firebaseio.com',
     storageBucket: 'YOUR-FIREBASE-APP.appspot.com',
   }
+}
 ```
 
 Get these values from the [Firebase Console](https://console.firebase.google.com/) by clicking the **[Add Firebase to your web app]** button on the project overview page.
