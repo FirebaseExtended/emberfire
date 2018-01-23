@@ -1,5 +1,6 @@
 import Ember from 'ember';
 import DS from 'ember-data';
+import Inflector from 'ember-inflector';
 import Waitable from '../mixins/waitable';
 import toPromise from '../utils/to-promise';
 
@@ -633,7 +634,7 @@ export default DS.Adapter.extend(Waitable, {
    */
   pathForType(modelName) {
     var camelized = Ember.String.camelize(modelName);
-    return Ember.String.pluralize(camelized);
+    return Inflector.inflector.pluralize(camelized);
   },
 
 
