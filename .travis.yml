@@ -38,18 +38,15 @@ matrix:
     - env: EMBER_TRY_SCENARIO=ember-data-beta
 
 before_install:
-  - npm config set spin false
-  - npm install -g bower
   - export DISPLAY=:99.0
   - sh -e /etc/init.d/xvfb start
   - sleep 3
 
 install:
   - yarn install
-  - bower install
+  - yarn run bower install
 
 script:
-  - npm run legacy
   - ember try:one $EMBER_TRY_SCENARIO
 
 after_script:
