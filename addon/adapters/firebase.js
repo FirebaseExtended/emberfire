@@ -2,21 +2,15 @@ import Ember from 'ember';
 import DS from 'ember-data';
 import Waitable from '../mixins/waitable';
 import toPromise from '../utils/to-promise';
-import assign from 'lodash/object/assign';
-import forEach from 'lodash/collection/forEach';
-import filter from 'lodash/collection/filter';
-import map from 'lodash/collection/map';
-import includes from 'lodash/collection/includes';
-import indexOf from 'lodash/array/indexOf';
-import find from 'lodash/collection/find';
 
-var Promise = Ember.RSVP.Promise;
+const { assign, RSVP } = Ember;
+const { Promise } = RSVP;
 
 var uniq = function (arr) {
   var ret = Ember.A();
 
   arr.forEach(function(k) {
-    if (indexOf(ret, k) < 0) {
+    if (ret.indexOf(k) < 0) {
       ret.push(k);
     }
   });
@@ -132,7 +126,7 @@ export default DS.Adapter.extend(Waitable, {
 
 
   /**
-   * Promise interface for once('value') that also handle test waiters.
+   * Promise interface for once('value').
    *
    * @param  {Firebase} ref
    * @param  {String} log
@@ -140,18 +134,7 @@ export default DS.Adapter.extend(Waitable, {
    * @private
    */
   _fetch(ref, log) {
-    this._incrementWaiters();
-    return new Promise((resolve, reject) => {
-
-      ref.once('value', (snapshot) => {
-        this._decrementWaiters();
-        Ember.run(null, resolve, snapshot);
-      }, (err) => {
-        this._decrementWaiters();
-        Ember.run(null, reject, err);
-      });
-
-    }, log);
+    return RSVP.resolve(ref.once('value'), log);
   },
 
 
@@ -316,8 +299,27 @@ export default DS.Adapter.extend(Waitable, {
       ref = ref.orderByChild(query.orderBy);
     }
 
-    ['startAt', 'endAt', 'equalTo', 'limitToFirst', 'limitToLast'].forEach(function (key) {
-      if (query[key] || query[key] === '' || query[key] === false) {
+    ref = this._applyRangesToRef(ref, query);
+    ref = this._applyLimitsToRef(ref, query);
+
+    return ref;
+  },
+
+  _applyRangesToRef(ref, query) {
+    const methods = ['equalTo', 'startAt', 'endAt'];
+    methods.forEach(key => {
+      if (query[key] !== undefined) {
+        ref = ref[key](query[key]);
+      }
+    });
+
+    return ref;
+  },
+
+  _applyLimitsToRef(ref, query) {
+    const methods = ['limitToFirst', 'limitToLast'];
+    methods.forEach(key => {
+      if (Number.isInteger(query[key])) {
         ref = ref[key](query[key]);
       }
     });
@@ -502,26 +504,26 @@ export default DS.Adapter.extend(Waitable, {
     var dirtyRecords = [];
 
     // Added
-    var addedRecords = filter(ids, (id) => {
+    var addedRecords = ids.filter((id) => {
       return !idsCache.includes(id);
     });
 
     // Dirty
-    dirtyRecords = filter(ids, (id) => {
+    dirtyRecords = ids.filter((id) => {
       var relatedModelName = relationship.type;
       return store.hasRecordForId(relatedModelName, id) && store.peekRecord(relatedModelName, id).get('hasDirtyAttributes') === true;
     });
 
-    dirtyRecords = map(uniq(dirtyRecords.concat(addedRecords)), (id) => {
+    dirtyRecords = uniq(dirtyRecords.concat(addedRecords)).map((id) => {
       return this._saveHasManyRecord(store, typeClass, relationship, recordRef, id);
     });
 
     // Removed
-    var removedRecords = filter(idsCache, (id) => {
-      return !includes(ids, id);
+    var removedRecords = idsCache.filter((id) => {
+      return !ids.includes(id);
     });
 
-    removedRecords = map(removedRecords, (id) => {
+    removedRecords = removedRecords.map((id) => {
       return this._removeHasManyRecord(store, recordRef, relationship.key, typeClass, id);
     });
     // Combine all the saved records
@@ -685,23 +687,30 @@ export default DS.Adapter.extend(Waitable, {
    * @return {Object}
    */
   getFirstEmbeddingParent(internalModel) {
-    var relationships = assign(
+    let relationships = assign(
       {},
       internalModel._implicitRelationships,
       internalModel._relationships.initializedRelationships
     );
 
-    var embeddingParentRel = find(relationships, (rel) => {
-      var members = rel.members.toArray();
-      var parent = members[0];
+    let embeddingParentRel;
+    let relationshipKeys = Object.keys(relationships);
+
+    for (let i = 0; i < relationshipKeys.length; i++) {
+      let rel = relationships[relationshipKeys[i]];
+      let members = rel.members.toArray();
+      let parent = members[0];
 
       if (!parent || !rel.inverseKey) {
-        return false;
+        continue;
       }
 
-      var parentRel = parent._relationships.get(rel.inverseKey);
-      return this.isRelationshipEmbedded(this.store, parent.type.modelName, parentRel.relationshipMeta);
-    });
+      let parentRel = parent._relationships.get(rel.inverseKey);
+      if (this.isRelationshipEmbedded(this.store, parent.type.modelName, parentRel.relationshipMeta)) {
+        embeddingParentRel = rel;
+        break;
+      }
+    }
 
     if (embeddingParentRel) {
       var parent = embeddingParentRel.members.toArray()[0];
@@ -747,7 +756,7 @@ export default DS.Adapter.extend(Waitable, {
       return;
     }
 
-    forEach(this._queue, (key) => {
+    this._queue.forEach((key) => {
       const { payload, modelName } = this._queuedPayloads[key];
       const normalizedData = store.normalize(modelName, payload);
       store.push(normalizedData);
@@ -778,7 +787,7 @@ export default DS.Adapter.extend(Waitable, {
     const key = `${modelName}-${id}`;
     if (this._queuedPayloads[key]) {
       // remove from original place in queue (will be added to end)
-      const oldPosition = indexOf(this._queue, key);
+      const oldPosition = this._queue.indexOf(key);
       this._queue.splice(oldPosition, 1);
     }
     this._queuedPayloads[key] = { payload, modelName };
@@ -817,10 +826,11 @@ export default DS.Adapter.extend(Waitable, {
           const isEmbedded = this.isRelationshipEmbedded(store, typeClass.modelName, relationship);
           if (isEmbedded) {
             const relationshipTypeClass = store.modelFor(relationship.type);
-            forEach(relationshipPayload, (obj, id) => {
+            for (let id in relationshipPayload) {
+              let obj = relationshipPayload[id];
               obj.id = id;
               this._updateRecordCacheForType(relationshipTypeClass, obj, store);
-            });
+            }
           } else {
             const ids = Object.keys(relationshipPayload);
             cache[key] = Ember.A(ids);
