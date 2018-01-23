@@ -1,10 +1,14 @@
 ---
 language: node_js
 node_js:
-  - "4"
+  - "7"
 
 addons:
-  firefox: "51.0" # lock firefox version until testem/firefox fix https://github.com/testem/testem/issues/1084
+  apt:
+    sources:
+      - google-chrome
+    packages:
+      - google-chrome-stable
   code_climate:
     repo_token:
       secure: gQhPZkdkqJi1XbgJpe23Ji90VQCuXLV1yOp0L1JH+Hx4L19L+mn3gEbB99bFa/Lbh4ASwpuapHy6w2VUn6mzHknbD8r0me7g5bebGFcDyPf+EOVHEzAScnFHrKIqjK/sCbvcI7xWvDpzg9kT9UTBAdVfiJYEYiPEnKskPy8FIE0=
@@ -18,12 +22,12 @@ branches:
 cache:
   directories:
     - node_modules
+    - bower_components
+    - "$HOME/.npm"
+    - "$HOME/.cache"
 
 env:
-  - EMBER_TRY_SCENARIO=ember-data-2.9.x
-  - EMBER_TRY_SCENARIO=ember-data-2.10.x
-  - EMBER_TRY_SCENARIO=ember-data-2.11.x
-  - EMBER_TRY_SCENARIO=ember-data-2.12.x COVERAGE=true
+  - EMBER_TRY_SCENARIO=ember-data-release COVERAGE=true
   - EMBER_TRY_SCENARIO=ember-data-beta
   - EMBER_TRY_SCENARIO=ember-data-canary
 
@@ -36,11 +40,9 @@ matrix:
 before_install:
   - npm config set spin false
   - npm install -g bower
-  - bower --version
   - export DISPLAY=:99.0
   - sh -e /etc/init.d/xvfb start
-  - sleep 3 # wait for xfvb to start up
-  # - ./node_modules/ember-cli/node_modules/testem/testem.js launchers
+  - sleep 3
 
 install:
   - yarn install
