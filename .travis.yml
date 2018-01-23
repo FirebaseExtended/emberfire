@@ -1,25 +1,21 @@
 ---
 language: node_js
+sudo: false
 node_js:
   - "7"
 
 addons:
-  apt:
-    sources:
-      - google-chrome
-    packages:
-      - google-chrome-stable
+  chrome: stable
   code_climate:
     repo_token:
       secure: gQhPZkdkqJi1XbgJpe23Ji90VQCuXLV1yOp0L1JH+Hx4L19L+mn3gEbB99bFa/Lbh4ASwpuapHy6w2VUn6mzHknbD8r0me7g5bebGFcDyPf+EOVHEzAScnFHrKIqjK/sCbvcI7xWvDpzg9kT9UTBAdVfiJYEYiPEnKskPy8FIE0=
-
-sudo: false
 
 branches:
   only:
     - master # otherwise pull requests get built twice
 
 cache:
+  yarn: true
   directories:
     - node_modules
     - bower_components
@@ -36,11 +32,6 @@ matrix:
   allow_failures:
     - env: EMBER_TRY_SCENARIO=ember-data-canary
     - env: EMBER_TRY_SCENARIO=ember-data-beta
-
-before_install:
-  - export DISPLAY=:99.0
-  - sh -e /etc/init.d/xvfb start
-  - sleep 3
 
 install:
   - yarn install
