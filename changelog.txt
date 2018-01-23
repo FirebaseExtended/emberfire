@@ -1,1 +1,0 @@
-fixed - Switched Ember.String.pluralize() usage to ember-inflector (#533)
