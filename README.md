@@ -1,26 +1,69 @@
-# emberfire
+# EmberFire [![Build Status](https://travis-ci.org/firebase/emberfire.svg?branch=master)](https://travis-ci.org/firebase/emberfire) [![Test Coverage](https://codeclimate.com/github/firebase/emberfire/badges/coverage.svg)](https://codeclimate.com/github/firebase/emberfire/coverage) [![Version](https://badge.fury.io/gh/firebase%2Femberfire.svg)](http://badge.fury.io/gh/firebase%2Femberfire) [![Monthly Downloads](http://img.shields.io/npm/dm/emberfire.svg?style=flat)](https://www.npmjs.org/package/emberfire) [![Ember Observer Score](http://emberobserver.com/badges/emberfire.svg)](http://emberobserver.com/addons/emberfire) [![Code Climate](https://codeclimate.com/github/firebase/emberfire/badges/gpa.svg)](https://codeclimate.com/github/firebase/emberfire)
 
-This README outlines the details of collaborating on this Ember addon.
+EmberFire is the officially supported adapter for using
+[Firebase](http://www.firebase.com/?utm_medium=web&utm_source=emberfire) with
+[Ember Data](https://github.com/emberjs/data).
+
+Join our [Firebase Google Group](https://groups.google.com/forum/#!forum/firebase-talk)
+to ask technical questions, share apps you've built, and chat with other developers in the community.
+
+## Table of Contents
+
+ * [Getting Started With Firebase](#getting-started-with-firebase)
+ * [Installation](#installation)
+ * [Compatibility](#compatibility)
+ * [Documentation](#documentation)
+ * [Migration Guides](#migration-guides)
+ * [Contributing](#contributing)
+
+## Getting Started With Firebase
+
+EmberFire requires [Firebase](https://firebase.google.com/) in order to authenticate users and sync
+and store data. Firebase is a suite of integrated products designed to help you develop your app,
+grow your user base, and earn money. You can [sign up here for a free account](https://console.firebase.google.com/).
+
 
 ## Installation
 
-* `git clone <repository-url>` this repository
-* `cd emberfire`
-* `npm install`
+```bash
+$ ember install emberfire
+```
 
-## Running
+Update `config/environment.js`
 
-* `ember serve`
-* Visit your app at [http://localhost:4200](http://localhost:4200).
+```js
+// config/environment.js
+var ENV = {
+  firebase: {
+    apiKey: 'xyz',
+    authDomain: 'YOUR-FIREBASE-APP.firebaseapp.com',
+    databaseURL: 'https://YOUR-FIREBASE-APP.firebaseio.com',
+    storageBucket: 'YOUR-FIREBASE-APP.appspot.com',
+  }
+}
+```
 
-## Running Tests
+Get these values from the [Firebase Console](https://console.firebase.google.com/) by clicking the **[Add Firebase to your web app]** button on the project overview page.
 
-* `npm test` (Runs `ember try:each` to test your addon against multiple Ember versions)
-* `ember test`
-* `ember test --server`
+**[Migrating to EmberFire v3, check out our guide](docs/migration/2XX-to-3XX.md)**
 
-## Building
+## Compatibility
 
-* `ember build`
+Please consult this table when selecting your version of EmberFire and Firebase SDK:
 
-For more information on using ember-cli, visit [https://ember-cli.com/](https://ember-cli.com/).
+| Ember Data        | EmberFire | Firebase SDK |
+| ------------------| ----------|--------------|
+| 3.0+              | 3.0.x     | 4.x          |
+| 2.3 - 2.18        | 2.0.x     | 3.x          |
+| 2.0 - 2.2         | 1.6.x     | 2.x          |
+| 1.13              | 1.5.x     | 2.x          |
+
+## Documentation
+
+* [Quickstart](docs/quickstart.md)
+* [Guide](docs/guide/README.md)
+
+## Contributing
+
+If you'd like to contribute to EmberFire, please first read through our [contribution
+guidelines](.github/CONTRIBUTING.md). Local setup instructions are available [here](.github/CONTRIBUTING.md#local-setup).
