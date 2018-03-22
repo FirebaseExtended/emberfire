@@ -1,0 +1,20 @@
+<p>{{#link-to 'users'}}Back to all{{/link-to}}</p>
+
+<h1>{{model.name}}</h1>
+
+<ul>
+    {{#each model.somethings as |something|}}
+        <li>
+            <h3>{{#link-to 'something' something}}{{ something.title }}{{/link-to}}</h3>
+            <p>{{ something.description }}</p>
+        </li>
+    {{/each}}
+</ul>
+
+<ul>
+    {{#each model.thoughts as |thought|}}
+        <li>
+            <p>{{ thought.musing }}</p>
+        </li>
+    {{/each}}
+</ul>

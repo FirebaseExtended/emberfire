@@ -1,6 +1,8 @@
 import Ember from 'ember';
 import DS from 'ember-data';
 
+import _ from 'npm:@firebase/firestore';
+
 import { pluralize } from 'ember-inflector';
 const { inject: { service }, String: { camelize } } = Ember;
 

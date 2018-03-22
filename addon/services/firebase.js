@@ -1,6 +1,6 @@
 import { getOwner } from '@ember/application';
 
-import firebase from 'firebase';
+import firebase from 'npm:firebase';
 
 export default {
   /**

@@ -1,4 +1,5 @@
 import Base from 'ember-simple-auth/authenticators/base';
+import _ from 'npm:@firebase/auth';
 
 import Ember from 'ember';
 const { RSVP: { resolve, reject}, inject: { service } } = Ember;

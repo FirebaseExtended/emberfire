@@ -18,6 +18,7 @@
     "test": "ember test"
   },
   "dependencies": {
+    "ember-browserify": "^1.2.1",
     "ember-cli-babel": "^6.3.0",
     "firebase": "^4.12.0"
   },
