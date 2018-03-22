@@ -20,6 +20,11 @@ var uniq = function (arr) {
   return ret;
 };
 
+var isInteger = Number.isInteger || function(value) {
+  return typeof value === 'number' &&
+    isFinite(value) &&
+    Math.floor(value) === value;
+};
 
 /**
  * The Firebase adapter allows your store to communicate with the Firebase
@@ -321,7 +326,7 @@ export default DS.Adapter.extend(Waitable, {
   _applyLimitsToRef(ref, query) {
     const methods = ['limitToFirst', 'limitToLast'];
     methods.forEach(key => {
-      if (Number.isInteger(query[key])) {
+      if (isInteger(query[key])) {
         ref = ref[key](query[key]);
       }
     });
