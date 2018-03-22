@@ -15,7 +15,7 @@
   "scripts": {
     "build": "ember build",
     "start": "ember server",
-    "test": "ember test"
+    "test": "COVERAGE=true ember test"
   },
   "dependencies": {
     "ember-browserify": "^1.2.1",
