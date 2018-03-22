@@ -15,7 +15,7 @@
   "scripts": {
     "build": "ember build",
     "start": "ember server",
-    "test": "ember try:each"
+    "test": "ember test"
   },
   "dependencies": {
     "ember-cli-babel": "^6.3.0",
@@ -39,6 +39,7 @@
     "ember-export-application-global": "^2.0.0",
     "ember-load-initializers": "^1.0.0",
     "ember-resolver": "^4.0.0",
+    "ember-simple-auth": "^1.5.1",
     "ember-source": "~3.0.0",
     "ember-source-channel-url": "^1.0.1",
     "loader.js": "^4.2.3"
