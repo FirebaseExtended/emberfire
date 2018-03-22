@@ -2,10 +2,11 @@
   function vendorModule() {
     'use strict';
 
-    return { 'default': FastBoot.require('firebase') };
+    return {
+      'default': (window.FastBoot ? FastBoot.require('firebase') : self['firebase']),
+      __esModule: true,
+    };
   }
 
-  if (window.FastBoot) {
-    define('firebase', [], vendorModule);
-  }
+  define('firebase', [], vendorModule);
 })();

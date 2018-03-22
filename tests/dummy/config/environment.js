@@ -1,33 +1,20 @@
-/* jshint node: true */
+/* eslint-env node */
+'use strict';
 
 module.exports = function(environment) {
-  var ENV = {
+  let ENV = {
     modulePrefix: 'dummy',
-    environment: environment,
-    baseURL: '/',
+    environment,
+    rootURL: '/',
     locationType: 'auto',
-    firebase: {
-      apiKey: 'AIzaSyCDX4pswUWqt2cti13L-k3XnDKzCivM89A',
-      authDomain: 'emberfire-demo.firebaseapp.com',
-      databaseURL: 'https://emberfire-demo.firebaseio.com',
-      storageBucket: 'firebase-emberfire-demo.appspot.com',
-    },
-    torii: {
-      sessionServiceName: 'session'
-    },
-    contentSecurityPolicy: {
-      'script-src': '\'self\' \'unsafe-eval\' apis.google.com',
-      'style-src': '\'self\' \'unsafe-inline\' fonts.googleapis.com',
-      'font-src': '\'self\' fonts.gstatic.com',
-      'frame-src': '\'self\' https://*.firebaseapp.com',
-      'img-src': '\'self\' *.gravatar.com s3.amazonaws.com',
-      'connect-src': '\'self\' wss://*.firebaseio.com https://*.googleapis.com'
-    },
     EmberENV: {
-      EXTEND_PROTOTYPES: false,
       FEATURES: {
         // Here you can enable experimental features on an ember canary build
         // e.g. 'with-controller': true
+      },
+      EXTEND_PROTOTYPES: {
+        // Prevent Ember Data from overriding Date.parse.
+        Date: false
       }
     },
 
@@ -47,7 +34,6 @@ module.exports = function(environment) {
 
   if (environment === 'test') {
     // Testem prefers this...
-    ENV.baseURL = '/';
     ENV.locationType = 'none';
 
     // keep test console output quieter

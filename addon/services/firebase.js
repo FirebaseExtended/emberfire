@@ -1,26 +1,29 @@
-import firebase from 'firebase';
-import Ember from 'ember';
+import { getOwner } from '@ember/application';
 
-const { getOwner } = Ember;
+import firebase from 'firebase';
 
 export default {
-  create(application) {
-    const config = getOwner(application).resolveRegistration('config:environment');
-    if (!config || typeof config.firebase !== 'object') {
-      throw new Error('Please set the `firebase` property in your environment config.');
-    }
+  /**
+   * @type {boolean}
+   * @default
+   * @readonly
+   */
+  isServiceFactory: true,
 
-    let app;
-
+  /**
+   * @param {Object} context
+   * @return {Firebase} Initialized Firebase app
+   */
+  create(context) {
+    const config = getOwner(context).resolveRegistration('config:environment');
     try {
-      app = firebase.app();
+      return firebase.initializeApp(config.firebase);
     } catch (e) {
-      app = firebase.initializeApp(config.firebase);
+      if (e.code == 'app/duplicate-app') {
+        return firebase.app()
+      } else {
+        throw e;
+      }
     }
-
-    return app.database().ref();
   },
-
-  config: null,
-  isServiceFactory: true
 };

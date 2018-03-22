@@ -1,3 +1,1 @@
-import firebase from 'emberfire/services/firebase';
-
-export default firebase;
+export { default } from 'emberfire/services/firebase';
