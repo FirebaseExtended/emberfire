@@ -11,8 +11,8 @@ to ask technical questions, share apps you've built, and chat with other develop
 
  * [Getting Started With Firebase](#getting-started-with-firebase)
  * [Installation](#installation)
- * [Compatibility](#compatibility)
  * [Documentation](#documentation)
+ * [Compatibility](#compatibility)
  * [Migration Guides](#migration-guides)
  * [Contributing](#contributing)
 
@@ -45,7 +45,10 @@ var ENV = {
 
 Get these values from the [Firebase Console](https://console.firebase.google.com/) by clicking the **[Add Firebase to your web app]** button on the project overview page.
 
-**[Migrating to EmberFire v3, check out our guide](docs/migration/2XX-to-3XX.md)**
+## Documentation
+
+* [Quickstart](docs/quickstart.md)
+* [Guide](docs/guide/README.md)
 
 ## Compatibility
 
@@ -54,14 +57,14 @@ Please consult this table when selecting your version of EmberFire and Firebase 
 | Ember Data        | EmberFire | Firebase SDK |
 | ------------------| ----------|--------------|
 | 3.0+              | 3.0.x     | 4.x          |
-| 2.3 - 2.18        | 2.0.x     | 3.x          |
+| 2.3+              | 2.x       | 3.x          |
 | 2.0 - 2.2         | 1.6.x     | 2.x          |
 | 1.13              | 1.5.x     | 2.x          |
 
-## Documentation
+## Migration Guides
 
-* [Quickstart](docs/quickstart.md)
-* [Guide](docs/guide/README.md)
+* [Migrating from EmberFire `2.x` to `3.x`](docs/migration/2XX-to-3XX.md)
+* [Migrating from EmberFire `1.x` to `2.x`](docs/migration/1XX-to-2XX.md)
 
 ## Contributing
 
