@@ -1,11 +1,12 @@
 import Ember from 'ember';
 import DS from 'ember-data';
-import Inflector from 'ember-inflector';
 import Waitable from '../mixins/waitable';
 import toPromise from '../utils/to-promise';
 
 const { assign, RSVP } = Ember;
 const { Promise } = RSVP;
+
+import { pluralize } from 'ember-inflector';
 
 var uniq = function (arr) {
   var ret = Ember.A();
@@ -634,7 +635,7 @@ export default DS.Adapter.extend(Waitable, {
    */
   pathForType(modelName) {
     var camelized = Ember.String.camelize(modelName);
-    return Inflector.inflector.pluralize(camelized);
+    return pluralize(camelized);
   },
 
 
