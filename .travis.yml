@@ -17,6 +17,7 @@ addons:
 branches:
   only:
     - master # otherwise pull requests get built twice
+    - v3 # for now
 
 cache:
   yarn: true
