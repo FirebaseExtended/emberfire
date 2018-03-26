@@ -1,0 +1,2 @@
+fixed - Fix depricated pluralize (#544)
+fixed - Polyfill for isNumber (#545)
