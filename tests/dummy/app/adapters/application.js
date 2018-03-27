@@ -1,3 +1,1 @@
-import FirestoreAdapter from 'emberfire/adapters/firestore';
-
-export default FirestoreAdapter.extend();
+export { default } from 'emberfire/adapters/cloud-firestore';

@@ -1,14 +1,13 @@
 import Ember from 'ember';
 import DS from 'ember-data';
 
-import _ from 'npm:@firebase/firestore';
-
 import { pluralize } from 'ember-inflector';
 const { inject: { service }, String: { camelize } } = Ember;
 
 export default DS.Adapter.extend({
     
-    firebase: service(),
+    defaultSerializer: '-cloud-firestore',
+    cloudFirestore: service(),
     store: service(),
 
     findRecord(store, type, id) {
@@ -44,13 +43,13 @@ export default DS.Adapter.extend({
     },
 
     _rootCollection(type) {
-        return this.get('firebase').firestore().collection(this._collectionNameForType(type));
+        return this.get('cloudFirestore').collection(this._collectionNameForType(type));
     },
 
     _getDocs(query) {
         return query.get().then(snapshot => {
             const results = snapshot.docs;
-            results.query = query;
+            results.__query__ = query;
             return results;
         });
     }

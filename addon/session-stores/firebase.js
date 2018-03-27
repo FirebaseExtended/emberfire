@@ -1,19 +1,15 @@
 import Base from 'ember-simple-auth/session-stores/base';
 
 import Ember from 'ember';
-const { RSVP, run } = Ember;
-const { inject: { service }} = Ember;
-const { Promise } = RSVP;
+const { inject: { service }, RSVP: { Promise, resolve }, run } = Ember;
 
 export default Base.extend({
-    firebase: service(),
+    firebaseAuth: service(),
     restoring: true,
-    persist() {
-        return RSVP.resolve();
-    },
+    persist: resolve,
     restore() {
         return new Promise(resolve => {
-            this.get('firebase').auth().onIdTokenChanged(user => run(() => {
+            this.get('firebaseAuth').onIdTokenChanged(user => run(() => {
                 let authenticated = user ? {authenticator: 'authenticator:firebase', user, credential: user.getIdToken(true)} : {};
                 if (this.get('restoring')) {
                     this.set('restoring', false);
@@ -24,7 +20,5 @@ export default Base.extend({
             }));
         });
     },
-    clear() {
-        return RSVP.resolve();
-    }
+    clear: resolve
 });

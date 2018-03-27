@@ -1,18 +1,17 @@
 import Ember from 'ember';
 import DS from 'ember-data';
 
-import _ from 'npm:@firebase/firestore';
-
 import { pluralize } from 'ember-inflector';
 const { inject: { service }, String: { camelize } } = Ember;
 
 export default DS.Adapter.extend({
     
-    firebase: service(),
+    defaultSerializer: '-realtime-database',
     store: service(),
+    realtimeDatabase: service(),
 
     findRecord(store, type, id) {
-        return this._rootCollection(type).doc(id).get();
+        return this._rootCollection(type).child(id).once('value');
     },
 
     findAll(store, type) {
@@ -24,11 +23,13 @@ export default DS.Adapter.extend({
         return this._getDocs(
             queryFn(
                 relationship.options.embedded ?
-                    this._rootCollection(relationship.parentType.modelName).doc(snapshot.id)
-                        .collection(this._collectionNameForType(relationship.type))
+                    this._rootCollection(relationship.parentType.modelName)
+                        .child(snapshot.id)
+                        .child(this._collectionNameForType(relationship.type))
                 :
                     this._rootCollection(relationship.type)
-                        .where(relationship.parentType.modelName, '==', snapshot.id)
+                        .orderByChild(relationship.parentType.modelName)
+                        .equalTo(snapshot.id)
             )
         );
     },
@@ -44,13 +45,18 @@ export default DS.Adapter.extend({
     },
 
     _rootCollection(type) {
-        return this.get('firebase').firestore().collection(this._collectionNameForType(type));
+        return this.get('realtimeDatabase').ref(this._collectionNameForType(type));
     },
 
     _getDocs(query) {
-        return query.get().then(snapshot => {
-            const results = snapshot.docs;
-            results.query = query;
+        return query.once('value').then(snapshot => {
+            let results = [];
+            snapshot.forEach(doc => {
+                let next = doc;
+                next.id = doc.key;
+                results.push(next);
+            });
+            results.$query = query;
             return results;
         });
     }

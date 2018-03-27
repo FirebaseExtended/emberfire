@@ -1,13 +1,6 @@
-import Ember from 'ember';
 import DS from 'ember-data';
 
-import _ from 'npm:@firebase/firestore';
-
-const { inject: { service }} = Ember;
-
 export default DS.JSONSerializer.extend({
-
-  firebase: service(),
 
   extractAttributes(modelClass, resourceHash) {
     return this._super(modelClass, resourceHash.data());
@@ -26,9 +19,9 @@ export default DS.JSONSerializer.extend({
   },
 
   extractMeta(store, modelClass, payload) {
-    if (payload.query) {
-      const query = payload.query;
-      delete payload.query;
+    if (payload.__query__) {
+      const query = payload.__query__;
+      delete payload.__query__;
       return { query };
     }
   }    

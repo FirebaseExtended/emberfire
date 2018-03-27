@@ -1,6 +1,6 @@
 import { getOwner } from '@ember/application';
-
 import firebase from 'npm:firebase';
+import Ember from 'ember';
 
 export default {
   /**
@@ -12,18 +12,24 @@ export default {
 
   /**
    * @param {Object} context
-   * @return {Firebase} Initialized Firebase app
+   * @return {firebase} The firebase global namespace
    */
   create(context) {
+    firebase.Promise = Ember.RSVP.Promise;
     const config = getOwner(context).resolveRegistration('config:environment');
-    try {
-      return firebase.initializeApp(config.firebase);
-    } catch (e) {
-      if (e.code == 'app/duplicate-app') {
-        return firebase.app()
-      } else {
-        throw e;
-      }
+    if (!config || typeof config.firebase !== 'object') {
+      throw new Error('Please set the `firebase` property in your environment config.');
     }
-  },
+    if (typeof config.firebase.length === 'undefined') {
+      firebase.initializeApp(config.firebase)
+    } else {
+      config.firebase.forEach(appConfig => {
+        const name = appConfig.name;
+        delete appConfig.name;
+        firebase.initializeApp(appConfig, name);
+      })
+    }
+    return firebase;
+  }
+
 };
