@@ -2,6 +2,16 @@ import Ember from 'ember';
 import { get, set } from '@ember/object';
 import { inject as service } from '@ember/service';
 
+// TODO LLLLLLLAAAAAMEEEEEEEE, auth doesn't have a registerAuth function
+//      and I was so close to victory!
+import { } from  '@firebase/auth';
+import { registerDatabase } from '@firebase/database';
+// @ts-ignore TODO wtf, missing types?
+import { registerFirestore } from '@firebase/firestore';
+import { registerFunctions } from '@firebase/functions';
+import { registerMessaging } from '@firebase/messaging';
+import { registerStorage } from '@firebase/storage';
+
 import { app, auth, database, firestore, functions, messaging, storage } from 'firebase';
 
 const getApp = (service: FirebaseApp) => {
@@ -19,12 +29,34 @@ export default class FirebaseApp extends Ember.Service.extend({
 }) {
 
     options?: {[key:string]: any};
-    auth = (): auth.Auth => getApp(this).auth();
-    database = (databaseURL?: string): database.Database => (getApp(this).database as any)(databaseURL);
-    firestore = (): firestore.Firestore => getApp(this).firestore();
-    functions = (): functions.Functions => getApp(this).functions();
-    messaging = (): messaging.Messaging => getApp(this).messaging();
-    storage = (storageBucket?: string): storage.Storage => getApp(this).storage(storageBucket);
+    auth = (): auth.Auth => {
+        return getApp(this).auth();
+    };
+    database = (databaseURL?: string): database.Database => {
+        const app: any = getApp(this);
+        if (app.database === undefined) { registerDatabase(app.firebase_) }
+        return app.database(databaseURL);
+    };
+    firestore = (): firestore.Firestore => {
+        const app: any = getApp(this);
+        if (app.firestore === undefined) { registerFirestore(app.firebase_) }
+        return app.firestore();
+    }
+    functions = (): functions.Functions => {
+        const app: any = getApp(this);
+        if (app.functions === undefined) { registerFunctions(app.firebase_) }
+        return app.functions();
+    }
+    messaging = (): messaging.Messaging => {
+        const app: any = getApp(this);
+        if (app.messaging === undefined) { registerMessaging(app.firebase_) }
+        return app.messaging();
+    }
+    storage = (storageBucket?: string): storage.Storage => {
+        const app: any = getApp(this);
+        if (app.storage === undefined) { registerStorage(app.firebase_) }
+        return app.storage(storageBucket);
+    }
 
     init() {
         this._super(...arguments);

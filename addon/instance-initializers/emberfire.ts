@@ -1,5 +1,5 @@
-import firebase from 'npm:firebase/app';
-import FirebaseAppService from '../services/firebase-app'; 
+import firebase from 'firebase/app';
+import FirebaseAppService from '../services/firebase-app';
 
 const loadEnvironment = (application:any, environment:any) => {
     const config = Object.assign({}, environment);

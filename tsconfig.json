@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "es6", 
     "allowJs": true,
-    "module": "esnext",
+    "module": "es6",
     "moduleResolution": "node",
     "sourceMap": true,
     "baseUrl": ".",
@@ -17,7 +17,7 @@
     "noImplicitReturns": true,
     "skipLibCheck": true,
     "paths": {
-      "npm:firebase/*": ["node_modules/firebase/*/index"],
+      "firebase/*": ["node_modules/firebase/*/index"],
       "emberfire": [ "addon" ],
       "emberfire/*": [ "addon/* "],
       "*": [ "types/*" ]

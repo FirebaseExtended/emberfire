@@ -6,7 +6,6 @@ import { inject as service } from '@ember/service';
 import { camelize } from '@ember/string';
 import RSVP from 'rsvp';
 
-import 'npm:firebase/firestore';
 import { firestore } from 'firebase';
 
 export type ReferenceOrQuery = firestore.CollectionReference | firestore.Query;

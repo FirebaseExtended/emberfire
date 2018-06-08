@@ -7,7 +7,7 @@ import Ember from 'ember';
 const { Promise, resolve } = RSVP;
 const { run } = Ember;
 
-import 'npm:firebase/auth';
+import 'firebase/auth';
 import { inject as service } from '@ember/service';
 
 export default Base.extend({

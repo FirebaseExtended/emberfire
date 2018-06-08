@@ -4,11 +4,8 @@ import RSVP from 'rsvp';
 import Ember from 'ember';
 import DS from 'ember-data';
 
-import 'npm:firebase/database';
-
 import { inject as service } from '@ember/service';
 import { get, set } from '@ember/object';
-
 import { database } from 'firebase';
 
 export type ReferenceOrQuery = database.Reference | database.Query;

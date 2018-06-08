@@ -1,4 +1,4 @@
-import firebase from 'npm:firebase/app';
+import firebase from 'firebase/app';
 import Ember from 'ember';
 
 export default class Firebase extends Ember.Service.extend({
