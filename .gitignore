@@ -21,3 +21,11 @@ testem.log
 .node_modules.ember-try/
 bower.json.ember-try
 package.json.ember-try
+
+addon/**/*.js
+adapters/*.d.ts
+authenticators/*.d.ts
+authorizers/*.d.ts
+serializers/*.d.ts
+services/*.d.ts
+sessions-stores/*.d.ts

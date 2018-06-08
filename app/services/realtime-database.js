@@ -1,1 +1,0 @@
-export { default } from 'emberfire/services/realtime-database';

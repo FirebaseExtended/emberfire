@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "target": "es6", 
+    "allowJs": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "baseUrl": ".",
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "alwaysStrict": true,
+    "strictNullChecks": true,
+    "strictPropertyInitialization": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "skipLibCheck": true,
+    "paths": {
+      "dummy/tests/*": ["tests/*"],
+      "dummy/*": ["tests/dummy/app/*"],
+      "npm:firebase/*": ["node_modules/firebase/*"],
+      "emberfire": [ "addon" ],
+      "emberfire/*": [ "addon/* "],
+      "*": [ "types/*" ]
+    }
+  },
+  "include": [ "app", "addon", "tests", "types" ],
+  "exclude": [ "node_modules", "**/*.spec.ts" ]
+}
