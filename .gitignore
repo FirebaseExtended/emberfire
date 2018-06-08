@@ -28,4 +28,8 @@ authenticators/*.d.ts
 authorizers/*.d.ts
 serializers/*.d.ts
 services/*.d.ts
-sessions-stores/*.d.ts
+session-stores/*.d.ts
+instance-initializers/*.d.ts
+vendor/**/node_modules
+vendor/**/tmp
+vendor/**/DEBUG

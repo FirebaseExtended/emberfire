@@ -35,10 +35,12 @@ Update `config/environment.js`
 // config/environment.js
 var ENV = {
   firebase: {
-    apiKey: 'xyz',
-    authDomain: 'YOUR-FIREBASE-APP.firebaseapp.com',
-    databaseURL: 'https://YOUR-FIREBASE-APP.firebaseio.com',
-    storageBucket: 'YOUR-FIREBASE-APP.appspot.com',
+    apiKey: "xyz",
+    authDomain: "YOUR-FIREBASE-APP.firebaseapp.com",
+    databaseURL: "https://YOUR-FIREBASE-APP.firebaseio.com",
+    projectId: "YOUR-FIREBASE-APP",
+    storageBucket: "YOUR-FIREBASE-APP.appspot.com",
+    messagingSenderId: "00000000000"
   }
 }
 ```
@@ -56,7 +58,7 @@ Please consult this table when selecting your version of EmberFire and Firebase 
 
 | Ember Data        | EmberFire | Firebase SDK |
 | ------------------| ----------|--------------|
-| 3.0+              | 3.0.x     | 4.x          |
+| 3.0+              | 3.0.x     | 5.x          |
 | 2.3+              | 2.x       | 3.x          |
 | 2.0 - 2.2         | 1.6.x     | 2.x          |
 | 1.13              | 1.5.x     | 2.x          |
