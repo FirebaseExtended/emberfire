@@ -7,15 +7,12 @@ import { camelize } from '@ember/string';
 import RSVP from 'rsvp';
 
 import 'npm:firebase/firestore';
+import { firestore } from 'firebase';
 
-export type CollectionReference = import('firebase').firestore.CollectionReference;
-export type Query = import('firebase').firestore.Query;
-export type QuerySnapshot = import('firebase').firestore.QuerySnapshot;
+export default class Firestore extends DS.Adapter {
 
-export default class CloudFirestore extends DS.Adapter {
-
-    defaultSerializer = '-cloud-firestore';
-    firebase = service('firebase');
+    defaultSerializer = '-firestore';
+    firebaseApp = service('firebase-app');
     
     findRecord(_: DS.Store, type: any, id: string) {
         return wrapFirebasePromise(() => docReference(this, type, id).get());
@@ -26,23 +23,18 @@ export default class CloudFirestore extends DS.Adapter {
     }
 
     findHasMany(_store: DS.Store, snapshot: DS.Snapshot<never>, _url: any, relationship: any) {
-        const noop = (ref: CollectionReference) => ref
-        const queryFn = relationship.options.query || noop;
-        return getDocs(
-            queryFn(
-                relationship.options.embedded ?
-                    docReference(this, relationship.parentType.modelName, snapshot.id)
-                        .collection(collectionNameForType(relationship.type))
-                :
-                    rootCollection(this, relationship.type)
-                        .where(relationship.parentType.modelName, '==', snapshot.id)
-            )
+        return queryDocs(
+            relationship.options.embedded ?
+                docReference(this, relationship.parentType.modelName, snapshot.id)
+                    .collection(collectionNameForType(relationship.type)) :
+                rootCollection(this, relationship.type)
+                    .where(relationship.parentType.modelName, '==', snapshot.id),
+            relationship.options.query
         );
     }
 
-    query(_store: DS.Store, type: any, queryFn: (ref: CollectionReference) => CollectionReference | Query) {
-        const query = queryFn(rootCollection(this, type));
-        return getDocs(query);
+    query(_store: DS.Store, type: any, queryFn: (ref: firestore.CollectionReference) => firestore.CollectionReference | firestore.Query) {
+        return queryDocs(rootCollection(this, type), queryFn);
     }
 
     shouldBackgroundReloadRecord() {
@@ -73,17 +65,17 @@ export default class CloudFirestore extends DS.Adapter {
 
 declare module 'ember-data' {
     interface AdapterRegistry {
-        'cloud-firestore': CloudFirestore;
+        'firestore': Firestore;
     }
 }
 
 const wrapFirebasePromise = (fn: () => Promise<any>) => {
     return new RSVP.Promise((resolve, reject) => {
-        fn().then(result => {
+        fn().then(result => 
             Ember.run(() => resolve(result))
-        }).catch(error => {
+        ).catch(error => 
             Ember.run(() => reject(error))
-        });
+        );
     });
 }
 
@@ -92,11 +84,11 @@ const collectionNameForType = (type: any) => {
     return pluralize(camelize(modelName));
 }
 
-const docReference = (adapter: CloudFirestore, type: any, id: string) => rootCollection(adapter, type).doc(id);
+const docReference = (adapter: Firestore, type: any, id: string) => rootCollection(adapter, type).doc(id);
 
-const getDocs = (query: CollectionReference | Query) => {
+const getDocs = (query: firestore.CollectionReference | firestore.Query) => {
     return wrapFirebasePromise(() =>
-        query.get().then((snapshot: QuerySnapshot) => {
+        query.get().then((snapshot: firestore.QuerySnapshot) => {
             const results: any = Object.assign([], snapshot.docs);
             results.__query__ = query;
             return results;
@@ -105,5 +97,11 @@ const getDocs = (query: CollectionReference | Query) => {
 }
 
 // TODO fix error TS2339: Property 'firestore' does not exist on type 'FirebaseApp'
-const rootCollection = (adapter: CloudFirestore, type: any) =>
-   (get(adapter, 'firebase').app() as any).firestore().collection(collectionNameForType(type))
+const rootCollection = (adapter: Firestore, type: any) =>
+   get(adapter, 'firebaseApp').firestore!().collection(collectionNameForType(type))
+
+const queryDocs = (referenceOrQuery: firestore.CollectionReference | firestore.Query, query?: (ref: firestore.CollectionReference|firestore.Query) => firestore.CollectionReference | firestore.Query) => {
+    const noop = (ref: firestore.CollectionReference) => ref;
+    const queryFn = query || noop;
+    return getDocs(queryFn(referenceOrQuery));
+}

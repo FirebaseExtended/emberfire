@@ -18,7 +18,7 @@ export type Snapshot = import('firebase').database.DataSnapshot;
 export default class RealtimeDatabase extends DS.Adapter {
 
     defaultSerializer = '-realtime-database';
-    firebase = service('firebase');
+    firebaseApp = service('firebase-app');
 
     findRecord(_store: DS.Store, type: any, id: string) {
         return wrapFirebasePromise(() => docReference(this, type, id).once('value'));
@@ -68,7 +68,7 @@ export default class RealtimeDatabase extends DS.Adapter {
         const id = snapshot.id;
         const data = this.serialize(snapshot, { includeId: false });
         if (id == null) {
-            return wrapFirebaseThenableReference(() => rootCollection(this, type).push(data));
+            return wrapFirebasePromise(() => rootCollection(this, type).push(data));
         } else {
             return wrapFirebasePromise(() => docReference(this, type, id).set(data));
         }
@@ -86,21 +86,14 @@ declare module 'ember-data' {
     }
 }
 
-const wrapFirebaseThenableReference = (fn: () => ThenableReference) => {
-    return new RSVP.Promise(resolve => {
-        fn().then(result => {
+const wrapFirebasePromise = (fn: () => Promise<any>|ThenableReference) => {
+    return new RSVP.Promise(async (resolve, reject) => {
+        try {
+            const result = await fn();
             Ember.run(() => resolve(result))
-        });
-    });
-}
-
-const wrapFirebasePromise = (fn: () => Promise<any>) => {
-    return new RSVP.Promise((resolve, reject) => {
-        fn().then(result => {
-            Ember.run(() => resolve(result))
-        }).catch(error => {
+        } catch(error) {
             Ember.run(() => reject(error))
-        });
+        }
     });
 }
 
@@ -110,7 +103,7 @@ const collectionNameForType = (type: any) => {
 }
 
 const rootCollection = (adapter: RealtimeDatabase, type: any) =>
-    get(adapter, 'firebase').app().database!().ref(collectionNameForType(type));
+    get(adapter, 'firebaseApp').database().ref(collectionNameForType(type));
 
 const getDocs = (query: ReferenceOrQuery) => {
     return wrapFirebasePromise(() => 

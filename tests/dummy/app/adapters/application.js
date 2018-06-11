@@ -1,1 +1,1 @@
-export { default } from 'emberfire/adapters/cloud-firestore';
+export { default } from 'emberfire/adapters/firestore';

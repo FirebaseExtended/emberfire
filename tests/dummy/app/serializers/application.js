@@ -1,1 +1,1 @@
-export { default } from 'emberfire/serializers/cloud-firestore';
+export { default } from 'emberfire/serializers/firestore';

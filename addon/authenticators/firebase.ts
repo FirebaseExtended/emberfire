@@ -8,7 +8,7 @@ import { get } from '@ember/object';
  
 export default Base.extend({
     
-    firebase: service('firebase'),
+    firebaseApp: service('firebase-app'),
 
     restore(data: any) {
         return resolve(data);
@@ -18,7 +18,7 @@ export default Base.extend({
     },
     invalidate() {
         return new Promise((resolve, reject) => {
-            get(this, 'firebase').app().auth!().signOut().then(resolve).catch(reject);
+            get(this, 'firebaseApp').auth().signOut().then(resolve).catch(reject);
         })
     }
 });

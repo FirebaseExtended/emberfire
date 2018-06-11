@@ -16,11 +16,11 @@ export default Base.extend({
     persist: resolve,
     clear: resolve,
 
-    firebase: service('firebase'),
+    firebaseApp: service('firebase-app'),
 
     restore() {
         return new Promise(resolve => {
-            get(this, 'firebase').app().auth!().onIdTokenChanged((user:any) => run(() => {
+            get(this, 'firebaseApp').auth().onIdTokenChanged((user:any) => run(() => {
                 let authenticated = user ? {authenticator: 'authenticator:firebase', user, credential: user.getIdToken(true)} : {};
                 if (get(this, 'restoring')) {
                     set(this, 'restoring', false);

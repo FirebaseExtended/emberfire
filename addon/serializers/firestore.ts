@@ -1,6 +1,6 @@
 import DS from 'ember-data';
 
-export default class CloudFirestore extends DS.JSONSerializer {
+export default class Firestore extends DS.JSONSerializer {
 
   extractAttributes(_modelClass: {}, resourceHash: any) {
     return resourceHash.data();
@@ -32,6 +32,6 @@ export default class CloudFirestore extends DS.JSONSerializer {
 
 declare module 'ember-data' {
   interface SerializerRegistry {
-    'cloud-firestore': CloudFirestore;
+    'firestore': Firestore;
   }
 }
