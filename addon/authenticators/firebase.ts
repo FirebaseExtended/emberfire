@@ -1,14 +1,14 @@
 import Base from 'ember-simple-auth/authenticators/base';
 import RSVP from 'rsvp';
 const { resolve, reject, Promise } = RSVP;
-// @ts-ignore
-import { default as firebase, app } from 'npm:firebase/app';
-// @ts-ignore
-import { default as ugh } from 'npm:firebase/auth'; ugh;
+
+import 'npm:firebase/auth';
+import { inject as service } from '@ember/service';
+import { get } from '@ember/object';
  
 export default Base.extend({
     
-    firebaseApp: undefined,
+    firebase: service('firebase'),
 
     restore(data: any) {
         return resolve(data);
@@ -18,7 +18,7 @@ export default Base.extend({
     },
     invalidate() {
         return new Promise((resolve, reject) => {
-            firebase.app().auth().signOut().then(resolve).catch(reject);
+            get(this, 'firebase').app().auth!().signOut().then(resolve).catch(reject);
         })
     }
 });

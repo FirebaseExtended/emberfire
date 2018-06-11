@@ -1,13 +1,16 @@
 import Ember from 'ember';
 import DS from 'ember-data';
 import { pluralize } from 'ember-inflector';
+import { get } from '@ember/object';
+import { inject as service } from '@ember/service';
 import { camelize } from '@ember/string';
 import RSVP from 'rsvp';
-// @ts-ignore
-import { default as firebase, app, firestore } from 'npm:firebase/app';
-// @ts-ignore
-import { default as ugh } from 'npm:firebase/firestore'; ugh;
-import { inject as service } from '@ember/service';
+
+import 'npm:firebase/firestore';
+
+export type CollectionReference = import('firebase').firestore.CollectionReference;
+export type Query = import('firebase').firestore.Query;
+export type QuerySnapshot = import('firebase').firestore.QuerySnapshot;
 
 export default class CloudFirestore extends DS.Adapter {
 
@@ -23,7 +26,7 @@ export default class CloudFirestore extends DS.Adapter {
     }
 
     findHasMany(_store: DS.Store, snapshot: DS.Snapshot<never>, _url: any, relationship: any) {
-        const noop = (ref: firestore.CollectionReference) => ref
+        const noop = (ref: CollectionReference) => ref
         const queryFn = relationship.options.query || noop;
         return getDocs(
             queryFn(
@@ -37,7 +40,7 @@ export default class CloudFirestore extends DS.Adapter {
         );
     }
 
-    query(_store: DS.Store, type: any, queryFn: (ref: firestore.CollectionReference) => firestore.CollectionReference|firestore.Query) {
+    query(_store: DS.Store, type: any, queryFn: (ref: CollectionReference) => CollectionReference | Query) {
         const query = queryFn(rootCollection(this, type));
         return getDocs(query);
     }
@@ -91,9 +94,9 @@ const collectionNameForType = (type: any) => {
 
 const docReference = (adapter: CloudFirestore, type: any, id: string) => rootCollection(adapter, type).doc(id);
 
-const getDocs = (query: firestore.CollectionReference|firestore.Query) => {
+const getDocs = (query: CollectionReference | Query) => {
     return wrapFirebasePromise(() =>
-        query.get().then(snapshot => {
+        query.get().then((snapshot: QuerySnapshot) => {
             const results: any = Object.assign([], snapshot.docs);
             results.__query__ = query;
             return results;
@@ -101,5 +104,6 @@ const getDocs = (query: firestore.CollectionReference|firestore.Query) => {
     );
 }
 
-const rootCollection = (_: CloudFirestore, type: any) => 
-   firebase.app().firestore().collection(collectionNameForType(type));
+// TODO fix error TS2339: Property 'firestore' does not exist on type 'FirebaseApp'
+const rootCollection = (adapter: CloudFirestore, type: any) =>
+   (get(adapter, 'firebase').app() as any).firestore().collection(collectionNameForType(type))

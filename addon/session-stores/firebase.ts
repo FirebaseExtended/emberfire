@@ -7,10 +7,8 @@ import Ember from 'ember';
 const { Promise, resolve } = RSVP;
 const { run } = Ember;
 
-// @ts-ignore
-import { default as firebase, app } from 'npm:firebase/app';
-// @ts-ignore
-import { default as ugh } from 'npm:firebase/auth'; ugh;
+import 'npm:firebase/auth';
+import { inject as service } from '@ember/service';
 
 export default Base.extend({
 
@@ -18,9 +16,11 @@ export default Base.extend({
     persist: resolve,
     clear: resolve,
 
+    firebase: service('firebase'),
+
     restore() {
         return new Promise(resolve => {
-            app().auth().onIdTokenChanged((user:any) => run(() => {
+            get(this, 'firebase').app().auth!().onIdTokenChanged((user:any) => run(() => {
                 let authenticated = user ? {authenticator: 'authenticator:firebase', user, credential: user.getIdToken(true)} : {};
                 if (get(this, 'restoring')) {
                     set(this, 'restoring', false);

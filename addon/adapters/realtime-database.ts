@@ -3,15 +3,22 @@ import { camelize } from '@ember/string';
 import RSVP from 'rsvp';
 import Ember from 'ember';
 import { DS } from 'ember-data';
-// @ts-ignore
-import { default as firebase, app, database } from 'npm:firebase/app';
-// @ts-ignore
-import { default as ugh } from 'npm:firebase/database'; ugh;
+
+import 'npm:firebase/database';
+
+import { inject as service } from '@ember/service';
+import { get } from '@ember/object';
+
+export type Reference = import('firebase').database.Reference;
+export type ReferenceOrQuery = Reference | import('firebase').database.Query;
+export type Query = (ref: Reference) => ReferenceOrQuery;
+export type ThenableReference = import('firebase').database.ThenableReference;
+export type Snapshot = import('firebase').database.DataSnapshot;
 
 export default class RealtimeDatabase extends DS.Adapter {
 
     defaultSerializer = '-realtime-database';
-    firebaseApp = undefined;
+    firebase = service('firebase');
 
     findRecord(_store: DS.Store, type: any, id: string) {
         return wrapFirebasePromise(() => docReference(this, type, id).once('value'));
@@ -22,7 +29,7 @@ export default class RealtimeDatabase extends DS.Adapter {
     }
 
     findHasMany(_store: DS.Store, snapshot: any, _url: string, relationship: any) {
-        const noop = (ref: database.Reference) => ref;
+        const noop = (ref: Reference) => ref;
         const queryFn = relationship.options.query || noop;
         return getDocs(
             queryFn(
@@ -37,12 +44,12 @@ export default class RealtimeDatabase extends DS.Adapter {
         );
     }
 
-    query(_store: DS.Store, type: any, queryFn: (ref: database.Reference) => database.Reference|database.Query) {
+    query(_store: DS.Store, type: any, queryFn: Query) {
         const query = queryFn(rootCollection(this, type));
         return getDocs(query);
     }
 
-    queryRecord(_store: DS.Store, type: any, queryFn: (ref: database.Reference) => database.Reference|database.Query) {
+    queryRecord(_store: DS.Store, type: any, queryFn: Query) {
         const query = queryFn(rootCollection(this, type)).limitToFirst(1);
         return getDocs(query).then((results:any[]) => results[0]);
     }
@@ -79,7 +86,7 @@ declare module 'ember-data' {
     }
 }
 
-const wrapFirebaseThenableReference = (fn: () => database.ThenableReference) => {
+const wrapFirebaseThenableReference = (fn: () => ThenableReference) => {
     return new RSVP.Promise(resolve => {
         fn().then(result => {
             Ember.run(() => resolve(result))
@@ -102,12 +109,12 @@ const collectionNameForType = (type: any) => {
     return pluralize(camelize(modelName));
 }
 
-const rootCollection = (_: RealtimeDatabase, type: any) =>
-    firebase.app().database().ref(collectionNameForType(type));
+const rootCollection = (adapter: RealtimeDatabase, type: any) =>
+    get(adapter, 'firebase').app().database!().ref(collectionNameForType(type));
 
-const getDocs = (query: database.Reference|database.Query) => {
+const getDocs = (query: ReferenceOrQuery) => {
     return wrapFirebasePromise(() => 
-        query.once('value').then(snapshot => {
+        query.once('value').then((snapshot: Snapshot) => {
             let results: any[] = [];
             snapshot.forEach(doc => {
                 let next: any = Object.assign({}, doc);

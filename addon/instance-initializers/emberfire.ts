@@ -1,5 +1,4 @@
-// @ts-ignore
-import { default as firebase } from 'npm:firebase/app';
+import firebase from 'npm:firebase/app';
 
 export default {
     name: 'emberfire',

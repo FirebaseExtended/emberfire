@@ -17,9 +17,7 @@
     "noImplicitReturns": true,
     "skipLibCheck": true,
     "paths": {
-      "dummy/tests/*": ["tests/*"],
-      "dummy/*": ["tests/dummy/app/*"],
-      "npm:firebase/*": ["node_modules/firebase/*"],
+      "npm:firebase/*": ["node_modules/firebase/*/index"],
       "emberfire": [ "addon" ],
       "emberfire/*": [ "addon/* "],
       "*": [ "types/*" ]
