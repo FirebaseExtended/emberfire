@@ -1,1 +1,5 @@
-export { default } from 'emberfire/adapters/firestore';
+import FirestoreAdapter from 'emberfire/adapters/firestore';
+
+export default FirestoreAdapter.extend({
+    enablePersistence: true
+})

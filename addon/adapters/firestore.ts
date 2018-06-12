@@ -1,7 +1,7 @@
 import Ember from 'ember';
 import DS from 'ember-data';
 import { pluralize } from 'ember-inflector';
-import { get } from '@ember/object';
+import { get, set } from '@ember/object';
 import { inject as service } from '@ember/service';
 import { camelize } from '@ember/string';
 import RSVP from 'rsvp';
@@ -9,17 +9,26 @@ import RSVP from 'rsvp';
 import 'npm:firebase/firestore';
 import { firestore } from 'firebase';
 
-export default class Firestore extends DS.Adapter {
+export type ReferenceOrQuery = firestore.CollectionReference | firestore.Query;
+export type QueryFn = (ref: ReferenceOrQuery) => ReferenceOrQuery;
 
+export default class Firestore extends DS.Adapter.extend({
+
+    firebaseApp: service('firebase-app'),
+    firestoreSettings: { timestampsInSnapshots: true } as firestore.Settings,
+    enablePersistence: false as boolean
+
+}) {
+
+    firestore? : firestore.Firestore;
     defaultSerializer = '-firestore';
-    firebaseApp = service('firebase-app');
     
-    findRecord(_: DS.Store, type: any, id: string) {
-        return wrapFirebasePromise(() => docReference(this, type, id).get());
+    findRecord(_store: DS.Store, type: any, id: string) {
+        return wrapPromiseLike(() => docReference(this, type, id).get());
     };
 
-    findAll(store: DS.Store, type: any) {
-        return this.query(store, type, ref => ref);
+    findAll(_store: DS.Store, type: any) {
+        return queryDocs(rootCollection(this, type));
     }
 
     findHasMany(_store: DS.Store, snapshot: DS.Snapshot<never>, _url: any, relationship: any) {
@@ -33,7 +42,7 @@ export default class Firestore extends DS.Adapter {
         );
     }
 
-    query(_store: DS.Store, type: any, queryFn: (ref: firestore.CollectionReference) => firestore.CollectionReference | firestore.Query) {
+    query(_store: DS.Store, type: any, queryFn: QueryFn) {
         return queryDocs(rootCollection(this, type), queryFn);
     }
 
@@ -44,21 +53,23 @@ export default class Firestore extends DS.Adapter {
     updateRecord(_store: DS.Store, type: any, snapshot: DS.Snapshot<never>) {
         const id = snapshot.id;
         const data = this.serialize(snapshot, { includeId: false });
-        return wrapFirebasePromise(() => docReference(this, type, id).update(data));
+        return wrapPromiseLike(() => docReference(this, type, id).update(data));
     }
 
     createRecord(_store: DS.Store, type: any, snapshot: DS.Snapshot<never>) {
         const id = snapshot.id;
         const data = this.serialize(snapshot, { includeId: false });
-        if (id == null) {
-            return wrapFirebasePromise(() => rootCollection(this, type).add(data));
-        } else {
-            return wrapFirebasePromise(() => docReference(this, type, id).set(data));
-        }
+        return wrapPromiseLike(() => {
+            if (id == null) {
+                return rootCollection(this, type).add(data);
+            } else {
+                return docReference(this, type, id).set(data);
+            }
+        });
     }
 
     deleteRecord(_store: DS.Store, type: any, snapshot: DS.Snapshot<never>) {
-        return wrapFirebasePromise(() => docReference(this, type, snapshot.id).delete());
+        return wrapPromiseLike(() => docReference(this, type, snapshot.id).delete());
     }
 
 };
@@ -69,12 +80,11 @@ declare module 'ember-data' {
     }
 }
 
-const wrapFirebasePromise = (fn: () => Promise<any>) => {
+const wrapPromiseLike = (fn: () => PromiseLike<any>) => {
     return new RSVP.Promise((resolve, reject) => {
-        fn().then(result => 
-            Ember.run(() => resolve(result))
-        ).catch(error => 
-            Ember.run(() => reject(error))
+        fn().then(
+            result => Ember.run(() => resolve(result)),
+            reason => Ember.run(() => reject(reason))
         );
     });
 }
@@ -86,8 +96,8 @@ const collectionNameForType = (type: any) => {
 
 const docReference = (adapter: Firestore, type: any, id: string) => rootCollection(adapter, type).doc(id);
 
-const getDocs = (query: firestore.CollectionReference | firestore.Query) => {
-    return wrapFirebasePromise(() =>
+const getDocs = (query: ReferenceOrQuery) => {
+    return wrapPromiseLike(() =>
         query.get().then((snapshot: firestore.QuerySnapshot) => {
             const results: any = Object.assign([], snapshot.docs);
             results.__query__ = query;
@@ -96,11 +106,26 @@ const getDocs = (query: firestore.CollectionReference | firestore.Query) => {
     );
 }
 
-// TODO fix error TS2339: Property 'firestore' does not exist on type 'FirebaseApp'
-const rootCollection = (adapter: Firestore, type: any) =>
-   get(adapter, 'firebaseApp').firestore!().collection(collectionNameForType(type))
+const firestoreInstance = (adapter: Firestore) => {
+    let cachedFirestoreInstance = get(adapter, 'firestore');
+    if (!cachedFirestoreInstance) {
+        const app = get(adapter, 'firebaseApp');
+        cachedFirestoreInstance = app.firestore();
+        const firestoreSettings = get(adapter, 'firestoreSettings');
+        cachedFirestoreInstance.settings(firestoreSettings);
+        const enablePersistence = get(adapter, 'enablePersistence');
+        if (enablePersistence) {
+           cachedFirestoreInstance.enablePersistence().catch(console.warn);
+        }
+        set(adapter, 'firestore', cachedFirestoreInstance);
+    }
+    return cachedFirestoreInstance;
+}
 
-const queryDocs = (referenceOrQuery: firestore.CollectionReference | firestore.Query, query?: (ref: firestore.CollectionReference|firestore.Query) => firestore.CollectionReference | firestore.Query) => {
+const rootCollection = (adapter: Firestore, type: any) => 
+    firestoreInstance(adapter).collection(collectionNameForType(type))
+
+const queryDocs = (referenceOrQuery: ReferenceOrQuery, query?: QueryFn) => {
     const noop = (ref: firestore.CollectionReference) => ref;
     const queryFn = query || noop;
     return getDocs(queryFn(referenceOrQuery));

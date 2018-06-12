@@ -7,51 +7,50 @@ import { DS } from 'ember-data';
 import 'npm:firebase/database';
 
 import { inject as service } from '@ember/service';
-import { get } from '@ember/object';
+import { get, set } from '@ember/object';
 
-export type Reference = import('firebase').database.Reference;
-export type ReferenceOrQuery = Reference | import('firebase').database.Query;
-export type Query = (ref: Reference) => ReferenceOrQuery;
-export type ThenableReference = import('firebase').database.ThenableReference;
-export type Snapshot = import('firebase').database.DataSnapshot;
+import { database } from 'firebase';
 
-export default class RealtimeDatabase extends DS.Adapter {
+export type ReferenceOrQuery = database.Reference | database.Query;
+export type QueryFn = (ref: ReferenceOrQuery) => ReferenceOrQuery;
 
+export default class RealtimeDatabase extends DS.Adapter.extend({
+
+    firebaseApp: service('firebase-app'),
+    databaseURL: undefined as string|undefined,
+
+}) {
+
+    database?: database.Database;
     defaultSerializer = '-realtime-database';
-    firebaseApp = service('firebase-app');
 
     findRecord(_store: DS.Store, type: any, id: string) {
-        return wrapFirebasePromise(() => docReference(this, type, id).once('value'));
+        return wrapPromiseLike(() => docReference(this, type, id).once('value'));
     }
 
-    findAll(store: DS.Store, type: any) {
-        return this.query(store, type, ref => ref);
+    findAll(_store: DS.Store, type: any) {
+        return queryDocs(rootCollection(this, type));
     }
 
     findHasMany(_store: DS.Store, snapshot: any, _url: string, relationship: any) {
-        const noop = (ref: Reference) => ref;
-        const queryFn = relationship.options.query || noop;
-        return getDocs(
-            queryFn(
-                relationship.options.embedded ?
-                    docReference(this, relationship.parentType.modelName, snapshot.id)
-                        .child(collectionNameForType(relationship.type))
-                :
-                    rootCollection(this, relationship.type)
-                        .orderByChild(relationship.parentType.modelName)
-                        .equalTo(snapshot.id)
-            )
+        queryDocs(
+            relationship.options.embedded ?
+                docReference(this, relationship.parentType.modelName, snapshot.id)
+                    .child(collectionNameForType(relationship.type)):
+                rootCollection(this, relationship.type)
+                    .orderByChild(relationship.parentType.modelName)
+                    .equalTo(snapshot.id),
+            relationship.options.query
         );
     }
 
-    query(_store: DS.Store, type: any, queryFn: Query) {
-        const query = queryFn(rootCollection(this, type));
-        return getDocs(query);
+    query(_store: DS.Store, type: any, queryFn: QueryFn) {
+        return queryDocs(rootCollection(this, type), queryFn);
     }
 
-    queryRecord(_store: DS.Store, type: any, queryFn: Query) {
-        const query = queryFn(rootCollection(this, type)).limitToFirst(1);
-        return getDocs(query).then((results:any[]) => results[0]);
+    queryRecord(_store: DS.Store, type: any, queryFn: QueryFn) {
+        const query = queryDocs(rootCollection(this, type).limitToFirst(1), queryFn);
+        return query.then((results:any[]) => results[0]);
     }
 
     shouldBackgroundReloadRecord() {
@@ -61,21 +60,23 @@ export default class RealtimeDatabase extends DS.Adapter {
     updateRecord(_: DS.Store, type: any, snapshot: DS.Snapshot<never>) {
         const id = snapshot.id;
         const data = this.serialize(snapshot, { includeId: false });
-        return wrapFirebasePromise(() => docReference(this, type, id).set(data));
+        return wrapPromiseLike(() => docReference(this, type, id).set(data));
     }
 
     createRecord(_: DS.Store, type: any, snapshot: DS.Snapshot<never>) {
         const id = snapshot.id;
         const data = this.serialize(snapshot, { includeId: false });
-        if (id == null) {
-            return wrapFirebasePromise(() => rootCollection(this, type).push(data));
-        } else {
-            return wrapFirebasePromise(() => docReference(this, type, id).set(data));
-        }
+        return wrapPromiseLike(() => {
+            if (id == null) {
+                return rootCollection(this, type).push(data);
+            } else {
+                return docReference(this, type, id).set(data);
+            }
+        });
     }
 
     deleteRecord(_: DS.Store, type: any, snapshot: DS.Snapshot<never>) {
-        return wrapFirebasePromise(() => docReference(this, type, snapshot.id).remove());
+        return wrapPromiseLike(() => docReference(this, type, snapshot.id).remove());
     }
 
 };
@@ -86,14 +87,18 @@ declare module 'ember-data' {
     }
 }
 
-const wrapFirebasePromise = (fn: () => Promise<any>|ThenableReference) => {
-    return new RSVP.Promise(async (resolve, reject) => {
-        try {
-            const result = await fn();
-            Ember.run(() => resolve(result))
-        } catch(error) {
-            Ember.run(() => reject(error))
-        }
+const queryDocs = (referenceOrQuery: ReferenceOrQuery, query?: QueryFn) => {
+    const noop = (ref: database.Reference) => ref;
+    const queryFn = query || noop;
+    return getDocs(queryFn(referenceOrQuery));
+}
+
+const wrapPromiseLike = (fn: () => PromiseLike<any>) => {
+    return new RSVP.Promise((resolve, reject) => {
+        fn().then(
+            result => Ember.run(() => resolve(result)),
+            reason => Ember.run(() => reject(reason))
+        );
     });
 }
 
@@ -102,12 +107,23 @@ const collectionNameForType = (type: any) => {
     return pluralize(camelize(modelName));
 }
 
-const rootCollection = (adapter: RealtimeDatabase, type: any) =>
-    get(adapter, 'firebaseApp').database().ref(collectionNameForType(type));
+const databaseInstance = (adapter: RealtimeDatabase) => {
+    let database = get(adapter, 'database');
+    if (!database) {
+        const app = get(adapter, 'firebaseApp');
+        const databaseURL = get(adapter, 'databaseURL');
+        database = app.database(databaseURL);
+        set(adapter, 'database', database);
+    }
+    return database;
+}
+
+const rootCollection = (adapter: RealtimeDatabase, type: any) => 
+    databaseInstance(adapter).ref(collectionNameForType(type));
 
 const getDocs = (query: ReferenceOrQuery) => {
-    return wrapFirebasePromise(() => 
-        query.once('value').then((snapshot: Snapshot) => {
+    return wrapPromiseLike(() => 
+        query.once('value').then(snapshot => {
             let results: any[] = [];
             snapshot.forEach(doc => {
                 let next: any = Object.assign({}, doc);
