@@ -11,8 +11,8 @@ export default class Firestore extends DS.JSONSerializer {
   }
 
   extractMeta(_store: DS.Store, _modelClass: {}, payload: any) {
-    const metadata : {[field:string]: any} = {};
-    payload.forEach(doc => metadata[doc.id] = doc.metadata);
+    const metadata : {[field:string]: any} = {docs: {}};
+    payload.forEach((doc:any) => metadata.docs[doc.id] = doc.metadata);
     if (payload.__query__) {
       metadata.query = payload.__query__;
       delete payload.__query__;
