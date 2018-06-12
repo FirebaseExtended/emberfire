@@ -34,12 +34,16 @@ export default class Firestore extends DS.Adapter.extend({
     findHasMany(_store: DS.Store, snapshot: DS.Snapshot<never>, _url: any, relationship: any) {
         return queryDocs(
             relationship.options.embedded ?
-                docReference(this, relationship.parentType.modelName, snapshot.id)
+                docReference(this, relationship.parentType, snapshot.id)
                     .collection(collectionNameForType(relationship.type)) :
                 rootCollection(this, relationship.type)
                     .where(relationship.parentType.modelName, '==', snapshot.id),
             relationship.options.query
         );
+    }
+
+    findBelongsTo(_store: DS.Store, snapshot: DS.Snapshot<never>, _url: any, relationship: any) {
+        return wrapPromiseLike(() => docReference(this, relationship.type, snapshot.id).get());
     }
 
     query(_store: DS.Store, type: any, queryFn: QueryFn) {

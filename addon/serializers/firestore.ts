@@ -7,25 +7,17 @@ export default class Firestore extends DS.JSONSerializer {
   }
 
   extractRelationships(modelClass: any, resourceHash: any) {
-    let relationships = this._super(modelClass, resourceHash.data());
-    modelClass.eachRelationship((key: any, relationshipMeta: any) => {
-      if (relationshipMeta.kind === 'hasMany') {
-        let relationship = relationships[key] || {};
-        relationship.links = { related: 'HACK!' }
-        relationships[key] = relationship;
-      }
-    });
-    return relationships;
+    return extractRelationships(modelClass, resourceHash.data());
   }
 
   extractMeta(_store: DS.Store, _modelClass: {}, payload: any) {
+    const metadata : {[field:string]: any} = {};
+    payload.forEach(doc => metadata[doc.id] = doc.metadata);
     if (payload.__query__) {
-      const query = payload.__query__;
+      metadata.query = payload.__query__;
       delete payload.__query__;
-      return { query };
-    } else {
-      return { };
     }
+    return metadata;
   }    
 
 };
@@ -34,4 +26,18 @@ declare module 'ember-data' {
   interface SerializerRegistry {
     'firestore': Firestore;
   }
+}
+
+// TODO: same as database, extract to utils
+const extractRelationships = (modelClass: any, snapshotValue: any) => {
+  let relationships: {[field:string]: any} = {};
+  modelClass.eachRelationship((key: string, relationshipMeta: any) => {
+    if (relationshipMeta.kind == 'belongsTo') {
+      const data = { id: snapshotValue[key], type: relationshipMeta.type };
+      relationships[key] = { data };
+    } else {
+      relationships[key] = { links: { related: 'HACK!' } };
+    }
+  });
+  return relationships;
 }

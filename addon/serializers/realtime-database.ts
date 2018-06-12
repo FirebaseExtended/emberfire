@@ -11,15 +11,7 @@ export default class RealtimeDatabase extends DS.JSONSerializer {
   }
 
   extractRelationships(modelClass: any, resourceHash: any) {
-    let relationships = this._super(modelClass, resourceHash.val());
-    modelClass.eachRelationship((key:any, relationshipMeta:any) => {
-      if (relationshipMeta.kind === 'hasMany') {
-        let relationship = relationships[key] || {};
-        relationship.links = { related: 'HACK!' }
-        relationships[key] = relationship;
-      }
-    });
-    return relationships;
+    return extractRelationships(modelClass, resourceHash.val());
   }
 
   extractMeta(_store: DS.Store, _modelClass: {}, payload: any) {
@@ -38,4 +30,17 @@ declare module 'ember-data' {
   interface SerializerRegistry {
     'realtime-database': RealtimeDatabase;
   }
+}
+
+const extractRelationships = (modelClass: any, snapshotValue: any) => {
+    let relationships: {[field:string]: any} = {};
+    modelClass.eachRelationship((key: string, relationshipMeta: any) => {
+      if (relationshipMeta.kind == 'belongsTo') {
+        const data = { id: snapshotValue[key], type: relationshipMeta.type };
+        relationships[key] = { data };
+      } else {
+        relationships[key] = { links: { related: 'HACK!' } };
+      }
+    });
+    return relationships;
 }
