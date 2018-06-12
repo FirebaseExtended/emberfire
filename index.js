@@ -16,7 +16,7 @@ module.exports = {
   },
 
   treeForVendor() {
-    const content = `Ember.libraries.register('emberfire', '${emberfire_version}');\nEmber.libraries.register('firebase', '${firebase_version}');`;
+    const content = `Ember.libraries.register('EmberFire', '${emberfire_version}');\nEmber.libraries.register('Firebase', '${firebase_version}');`;
     const registerVersionTree = writeFile(
       'emberfire/register-versions.js',
       content
