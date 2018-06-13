@@ -34,8 +34,10 @@ export default class Firestore extends DS.Adapter.extend({
     findHasMany(_store: DS.Store, snapshot: DS.Snapshot<never>, _url: any, relationship: any) {
         return queryDocs(
             relationship.options.embedded ?
+                // fetch the sub-collection
                 docReference(this, relationship.parentType, snapshot.id)
                     .collection(collectionNameForType(relationship.type)) :
+                // query the root collection
                 rootCollection(this, relationship.type)
                     .where(relationship.parentType.modelName, '==', snapshot.id),
             relationship.options.query
@@ -64,11 +66,11 @@ export default class Firestore extends DS.Adapter.extend({
         const id = snapshot.id;
         const data = this.serialize(snapshot, { includeId: false });
         return wrapPromiseLike<firestore.DocumentReference|void>(() => {
-            if (id == null) {
-                // TODO sort out bringing back the id?
-                return rootCollection(this, type).add(data);
-            } else {
+            if (id) {
                 return docReference(this, type, id).set(data);
+            } else {
+                // TODO sort out bringing back the id, just then snapshot => id?
+                return rootCollection(this, type).add(data);
             }
         });
     }

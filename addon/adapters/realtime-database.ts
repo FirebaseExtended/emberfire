@@ -34,12 +34,9 @@ export default class RealtimeDatabase extends DS.Adapter.extend({
 
     findHasMany(_store: DS.Store, snapshot: any, _url: string, relationship: any) {
         return queryDocs(
-            relationship.options.embedded ?
-                docReference(this, relationship.parentType.modelName, snapshot.id)
-                    .child(collectionNameForType(relationship.type)):
-                rootCollection(this, relationship.type)
-                    .orderByChild(relationship.parentType.modelName)
-                    .equalTo(snapshot.id),
+            rootCollection(this, relationship.type)
+                .orderByChild(relationship.parentType.modelName)
+                .equalTo(snapshot.id),
             relationship.options.query
         );
     }
