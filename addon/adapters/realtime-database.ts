@@ -33,6 +33,7 @@ export default class RealtimeDatabase extends DS.Adapter.extend({
     }
 
     findHasMany(_store: DS.Store, snapshot: any, _url: string, relationship: any) {
+        if (relationship.options.subcollection) { throw `subcollections (${relationship.parentType.modelName}.${relationship.key}) are not supported by the Realtime Database, consider using embedded relationships or check out Firestore` }
         return queryDocs(
             rootCollection(this, relationship.type)
                 .orderByChild(relationship.parentType.modelName)

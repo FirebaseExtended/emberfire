@@ -61,7 +61,7 @@ const normalizeRealtionship = (relationship: any) => {
 
 const normalizeBelongsTo = (_store: DS.Store, attribute: any, relationship: any, _included: any[]) => {
   if (attribute) {
-    return { id: attribute, type: relationship.type };
+    return { data: { id: attribute, type: relationship.type } };
   } else {
     return { };
   }
