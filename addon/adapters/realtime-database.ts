@@ -2,7 +2,7 @@ import { pluralize } from 'ember-inflector';
 import { camelize } from '@ember/string';
 import RSVP from 'rsvp';
 import Ember from 'ember';
-import { DS } from 'ember-data';
+import DS from 'ember-data';
 
 import 'npm:firebase/database';
 
@@ -33,7 +33,7 @@ export default class RealtimeDatabase extends DS.Adapter.extend({
     }
 
     findHasMany(_store: DS.Store, snapshot: any, _url: string, relationship: any) {
-        queryDocs(
+        return queryDocs(
             relationship.options.embedded ?
                 docReference(this, relationship.parentType.modelName, snapshot.id)
                     .child(collectionNameForType(relationship.type)):
@@ -44,13 +44,25 @@ export default class RealtimeDatabase extends DS.Adapter.extend({
         );
     }
 
+    findBelongsTo(_store: DS.Store, snapshot: DS.Snapshot<never>, _url: any, relationship: any) {
+        return wrapPromiseLike(() => docReference(this, relationship.type, snapshot.id).once('value'));
+    }
+
     query(_store: DS.Store, type: any, queryFn: QueryFn) {
         return queryDocs(rootCollection(this, type), queryFn);
     }
 
     queryRecord(_store: DS.Store, type: any, queryFn: QueryFn) {
         const query = queryDocs(rootCollection(this, type).limitToFirst(1), queryFn);
-        return query.then((results:any[]) => results[0]);
+        return query.then(results => {
+            let snapshot = undefined as database.DataSnapshot|undefined;
+            results.forEach(doc => !!(snapshot = doc));
+            if (snapshot) {
+                return snapshot;
+            } else {
+                throw new DS.NotFoundError();
+            }
+        });
     }
 
     shouldBackgroundReloadRecord() {
@@ -93,8 +105,8 @@ const queryDocs = (referenceOrQuery: ReferenceOrQuery, query?: QueryFn) => {
     return getDocs(queryFn(referenceOrQuery));
 }
 
-const wrapPromiseLike = (fn: () => PromiseLike<any>) => {
-    return new RSVP.Promise((resolve, reject) => {
+const wrapPromiseLike = <T=any>(fn: () => PromiseLike<T>) => {
+    return new RSVP.Promise<T>((resolve, reject) => {
         fn().then(
             result => Ember.run(() => resolve(result)),
             reason => Ember.run(() => reject(reason))
@@ -121,19 +133,7 @@ const databaseInstance = (adapter: RealtimeDatabase) => {
 const rootCollection = (adapter: RealtimeDatabase, type: any) => 
     databaseInstance(adapter).ref(collectionNameForType(type));
 
-const getDocs = (query: ReferenceOrQuery) => {
-    return wrapPromiseLike(() => 
-        query.once('value').then(snapshot => {
-            let results: any[] = [];
-            snapshot.forEach(doc => {
-                let next: any = Object.assign({}, doc);
-                results.push(next);
-            });
-            (results as any).$query = query;
-            return results;
-        })
-    );
-}
+const getDocs = (query: ReferenceOrQuery) => wrapPromiseLike(() => query.once('value'));
 
 const docReference = (adapter: RealtimeDatabase, type: any, id: string) => 
     rootCollection(adapter, type).child(id);

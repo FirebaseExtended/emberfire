@@ -24,7 +24,7 @@ export default class Firestore extends DS.Adapter.extend({
     defaultSerializer = '-firestore';
     
     findRecord(_store: DS.Store, type: any, id: string) {
-        return wrapPromiseLike(() => docReference(this, type, id).get());
+        return getDoc(this, type, id);
     };
 
     findAll(_store: DS.Store, type: any) {
@@ -43,7 +43,7 @@ export default class Firestore extends DS.Adapter.extend({
     }
 
     findBelongsTo(_store: DS.Store, snapshot: DS.Snapshot<never>, _url: any, relationship: any) {
-        return wrapPromiseLike(() => docReference(this, relationship.type, snapshot.id).get());
+        return getDoc(this, relationship.type, snapshot.id);
     }
 
     query(_store: DS.Store, type: any, queryFn: QueryFn) {
@@ -63,8 +63,9 @@ export default class Firestore extends DS.Adapter.extend({
     createRecord(_store: DS.Store, type: any, snapshot: DS.Snapshot<never>) {
         const id = snapshot.id;
         const data = this.serialize(snapshot, { includeId: false });
-        return wrapPromiseLike(() => {
+        return wrapPromiseLike<firestore.DocumentReference|void>(() => {
             if (id == null) {
+                // TODO sort out bringing back the id?
                 return rootCollection(this, type).add(data);
             } else {
                 return docReference(this, type, id).set(data);
@@ -84,8 +85,11 @@ declare module 'ember-data' {
     }
 }
 
-const wrapPromiseLike = (fn: () => PromiseLike<any>) => {
-    return new RSVP.Promise((resolve, reject) => {
+const getDoc = (adapter: Firestore, type: DS.Model, id: string) =>
+    wrapPromiseLike(() => docReference(adapter, type, id).get())
+
+const wrapPromiseLike = <T=any>(fn: () => PromiseLike<T>) => {
+    return new RSVP.Promise<T>((resolve, reject) => {
         fn().then(
             result => Ember.run(() => resolve(result)),
             reason => Ember.run(() => reject(reason))
@@ -100,15 +104,7 @@ const collectionNameForType = (type: any) => {
 
 const docReference = (adapter: Firestore, type: any, id: string) => rootCollection(adapter, type).doc(id);
 
-const getDocs = (query: ReferenceOrQuery) => {
-    return wrapPromiseLike(() =>
-        query.get().then((snapshot: firestore.QuerySnapshot) => {
-            const results: any = Object.assign([], snapshot.docs);
-            results.__query__ = query;
-            return results;
-        })
-    );
-}
+const getDocs = (query: ReferenceOrQuery) => wrapPromiseLike(() => query.get());
 
 const firestoreInstance = (adapter: Firestore) => {
     let cachedFirestoreInstance = get(adapter, 'firestore');
