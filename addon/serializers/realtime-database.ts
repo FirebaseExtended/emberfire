@@ -29,38 +29,6 @@ declare module 'ember-data' {
   }
 }
 
-const normalizeRelationships = (store: DS.Store, modelClass: DS.Model, attributes: any) => {
-  const relationships: {[field:string]: any} = {};
-  const embeddedRecords: any[] = [];
-  
-  modelClass.eachRelationship((key: string, relationshipMeta: any) => {
-    const attribute = attributes[key];
-    delete attributes[key];
-    if (relationshipMeta.kind == 'belongsTo') {
-      if (attribute) {
-        const data = { id: attribute, type: relationshipMeta.type };
-        relationships[key] = { data };
-      }
-    } else if (relationshipMeta.options.embedded) {
-      Object.keys(attribute).forEach(id => {
-        const val = attribute[id];
-        const snapshot = { key: id, val: () => val } as database.DataSnapshot;
-        const model = store.modelFor(relationshipMeta.type as never);
-        // TODO handle embeds of embeds... woah
-        // @ts-ignore
-        const { data, included } = normalize(store, model, snapshot);
-        embeddedRecords.push(data);
-      });
-      const data = embeddedRecords.map(record => ({ id: record.id, type: relationshipMeta.type }));
-      relationships[key] = { links: { related: 'something' }, data };
-    } else {
-      // The string related here doesn't have to be anything in particular
-      relationships[key] = { links: { related: 'something' } };
-    }
-  }, null);
-  return {relationships, included: embeddedRecords};
-}
-
 const normalize = (store: DS.Store, modelClass: DS.Model, snapshot: database.DataSnapshot) => {
   const id = snapshot.key;
   const type = (<any>modelClass).modelName;
@@ -69,3 +37,54 @@ const normalize = (store: DS.Store, modelClass: DS.Model, snapshot: database.Dat
   const data = { id, type, attributes, relationships };
   return { data, included };
 }
+
+const normalizeRelationships = (store: DS.Store, modelClass: DS.Model, attributes: any) => {
+  const relationships: {[field:string]: any} = {};
+  const included: any[] = [];
+  modelClass.eachRelationship((key: string, relationship: any) => {
+    const attribute = attributes[key];
+    delete attributes[key];
+    relationships[key] = normalizeRealtionship(relationship)(store, attribute, relationship, included);
+  }, null);
+  return {relationships, included};
+}
+
+const normalizeRealtionship = (relationship: any) => {
+  if (relationship.kind === 'belongsTo') {
+    return normalizeBelongsTo;
+  } else if (relationship.options.embedded) {
+    return normalizeEmbedded;
+  } else {
+    return normalizeHasMany;
+  }
+}
+
+const normalizeBelongsTo = (_store: DS.Store, attribute: any, relationship: any, _included: any[]) => {
+  if (attribute) {
+    return { id: attribute, type: relationship.type };
+  } else {
+    return { };
+  }
+}
+
+const normalizeEmbedded = (store: DS.Store, attribute: any, relationship: any, included: any[]) => {
+  if (attribute) {
+    Object.keys(attribute).forEach(key => {
+      const val = attribute[key];
+      const snapshot = { key, val: () => val } as database.DataSnapshot;
+      const model = store.modelFor(relationship.type as never);
+      const { data, included: includes } = normalize(store, model, snapshot);
+      included.push(data);
+      includes.forEach(record => included.push(record));
+    });
+    const data = included
+      .filter(record => record.type == relationship.type)
+      .map(record => ({ id: record.id, type: record.type }));
+    return { links: { related: 'emberfire' }, data };
+  } else {
+    return { };
+  }
+}
+
+const normalizeHasMany = (_store: DS.Store, _attribute: any, _relationship: any, _included: any[]) => 
+  ({ links: { related: 'emberfire' } });

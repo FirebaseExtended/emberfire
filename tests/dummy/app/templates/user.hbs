@@ -15,6 +15,9 @@
     {{#each model.thoughts as |thought|}}
         <li>
             <p>{{ thought.musing }}</p>
+            {{#each thought.tags as |tag| }}
+                <small>{{ tag.name }}</small>
+            {{/each}}
         </li>
     {{/each}}
 </ul>

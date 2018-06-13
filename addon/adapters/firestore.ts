@@ -33,7 +33,7 @@ export default class Firestore extends DS.Adapter.extend({
 
     findHasMany(_store: DS.Store, snapshot: DS.Snapshot<never>, _url: any, relationship: any) {
         return queryDocs(
-            relationship.options.embedded ?
+            relationship.options.subcollection ?
                 // fetch the sub-collection
                 docReference(this, relationship.parentType, snapshot.id)
                     .collection(collectionNameForType(relationship.type)) :

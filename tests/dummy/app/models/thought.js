@@ -1,7 +1,8 @@
 import DS from 'ember-data';
 
-const { attr } = DS;
+const { attr, hasMany } = DS;
 
 export default DS.Model.extend({
-    musing: attr('string')
+    musing: attr('string'),
+    tags: hasMany('tag', { embedded: true })
 });
