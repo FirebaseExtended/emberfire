@@ -18,6 +18,8 @@
     "skipLibCheck": true,
     "paths": {
       "firebase/*": ["node_modules/firebase/*/index"],
+      "ws": ["node_modules/ws/index"],
+      "xmlhttprequest": ["node_modules/xmlhttprequest/lib/XMLHttpRequest"],
       "emberfire": [ "addon" ],
       "emberfire/*": [ "addon/* "],
       "*": [ "types/*" ]
