@@ -1,6 +1,19 @@
 import firebase from 'npm:firebase/app';
 import FirebaseAppService from '../services/firebase-app'; 
 
+// @ts-ignore TODO figure out why this is unhappy
+import * as WebSocketPolyfill from 'npm:faye-websocket';
+// @ts-ignore
+import * as XMLHttpRequestPolyfill from 'npm:xhr2';
+
+if (WebSocket === undefined) { var WebSocket = WebSocketPolyfill.default; }
+if (XMLHttpRequest === undefined) {
+    //var XMLHttpRequest = XMLHttpRequestPolyfill.default;
+    //console.log(XMLHttpRequest);
+    console.log(XMLHttpRequestPolyfill);
+}
+console.log(XMLHttpRequest);
+
 const loadEnvironment = (application:any, environment:any) => {
     const config = Object.assign({}, environment);
     delete config.options;
