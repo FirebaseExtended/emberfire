@@ -6,7 +6,6 @@ module.exports = () => Promise.all(
   ['release', 'beta', 'canary'].map(getURLFor)
 ).then( ([releaseUrl, betaUrl, canaryUrl]) =>
   ({
-    useYarn: true,
     scenarios: [{
       name: 'ember-lts-2.17',
       npm: {
