@@ -1,7 +1,8 @@
 ---
 language: node_js
 node_js:
-  - "4"
+  # lts/boron is the earliest LTS that npm v6 works on
+  - "6"
 
 sudo: false
 dist: trusty
@@ -34,6 +35,10 @@ matrix:
   fast_finish: true
   allow_failures:
     - env: EMBER_TRY_SCENARIO=ember-canary
+
+before_install:
+  # upgrade npm to get the "ci" command
+  - npm i -g npm
 
 install:
   - npm ci
