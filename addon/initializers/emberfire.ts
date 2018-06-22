@@ -1,10 +1,7 @@
-// @ts-ignore, no types
-import XHR2 from 'xhr2';
+import * as firebase from 'firebase/app';
+import FirebaseAppService from '../services/firebase-app';
 
 const initialize = (application: any) => {
-    // Polyfill XMLHttpRequest for Ember Fastboot, wtf global isn't working
-    if (typeof XMLHttpRequest === 'undefined') { var XMLHttpRequest = XHR2; }
-
     const environment = application.resolveRegistration('config:environment');
     if (!environment || typeof environment.firebase !== 'object') {
         throw new Error('Please set the `firebase` property in your environment config.');
@@ -15,9 +12,6 @@ const initialize = (application: any) => {
         environment.firebase.forEach((config:any) => loadEnvironment(application, config));
     }
 };
-
-import firebase from 'firebase/app';
-import FirebaseAppService from '../services/firebase-app';
 
 const loadEnvironment = (application:any, environment:any) => {
     const config = Object.assign({}, environment);

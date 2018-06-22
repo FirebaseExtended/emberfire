@@ -1,6 +1,5 @@
-export declare function initialize(application: any): void;
 declare const _default: {
     name: string;
-    initialize: typeof initialize;
+    initialize: (application: any) => void;
 };
 export default _default;

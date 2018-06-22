@@ -14,9 +14,11 @@
   "repository": "",
   "scripts": {
     "build": "ember build",
-    "start": "ember server",
+    "server": "ember server",
+    "express": "node ./express.js",
+    "fastboot:all": "npm run ts:precompile && npm run build && npm run express",
     "test": "COVERAGE=true ember test",
-    "prepublish": "ember ts:precompile"
+    "ts:precompile": "ember ts:precompile"
   },
   "dependencies": {
     "@firebase/auth": "~0",
@@ -28,12 +30,9 @@
     "broccoli-file-creator": "^2.1.1",
     "broccoli-funnel": "^2.0.1",
     "broccoli-merge-trees": "^3.0.0",
-    "ember-auto-import": "^0.2.2",
+    "ember-auto-import": "^0.2.6",
     "ember-cli-babel": "^6.14.1",
-    "faye-websocket": "^0.11.1",
-    "firebase": "^5.0.4",
-    "xhr2": "^0.1.4",
-    "xmlhttprequest": "^1.8.0"
+    "firebase": "^5.1.0"
   },
   "devDependencies": {
     "@types/ember": "^2.8.25",
@@ -63,8 +62,11 @@
     "ember-simple-auth": "^1.6.0",
     "ember-source": "~3.2.0",
     "ember-source-channel-url": "^1.1.0",
+    "fastboot-express-middleware": "1.2.0",
     "loader.js": "^4.7.0",
-    "typescript": "~2.9.1"
+    "typescript": "~2.9.1",
+    "xmlhttprequest": "^1.8.0",
+    "ws": "^5.2.0"
   },
   "engines": {
     "node": "^4.5 || 6.* || >= 7.*"
@@ -72,11 +74,7 @@
   "ember-addon": {
     "configPath": "tests/dummy/config",
     "fastbootDependencies": [
-      "firebase",
-      "faye-websocket",
-      "xmlhttprequest",
-      "fs",
-      "child_process"
+      "firebase"
     ]
   }
 }

@@ -2,11 +2,10 @@ import Ember from 'ember';
 import { get, set } from '@ember/object';
 import { inject as service } from '@ember/service';
 
-// TODO LLLLLLLAAAAAMEEEEEEEE, auth doesn't have a registerAuth function
-//      and I was so close to victory!
-import { } from  '@firebase/auth';
+// TODO no regsiterAuth...
+import {  } from  '@firebase/auth';
 import { registerDatabase } from '@firebase/database';
-// @ts-ignore TODO wtf, missing types?
+// @ts-ignore TODO missing types
 import { registerFirestore } from '@firebase/firestore';
 import { registerFunctions } from '@firebase/functions';
 import { registerMessaging } from '@firebase/messaging';

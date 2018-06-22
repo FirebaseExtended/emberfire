@@ -23,6 +23,15 @@ module.exports = function(environment) {
       // when it is created
     },
 
+    contentSecurityPolicy: {
+      'script-src': '\'self\' \'unsafe-eval\'',
+      'style-src': '\'self\' \'unsafe-inline\'',
+      'font-src': '\'self\'',
+      'frame-src': '\'self\' https://*.firebaseapp.com',
+      'img-src': '\'self\'',
+      'connect-src': '\'self\' wss://*.firebaseio.com https://*.googleapis.com'
+    },
+
     firebase: [
       {
         apiKey: "AIzaSyAWIMkDzUu4b0nD60BrglQX5Sq0_8hnT5Y",
@@ -44,6 +53,10 @@ module.exports = function(environment) {
 
     firestore: {
       enablePersistence: true
+    },
+
+    fastboot: {
+      hostWhitelist: [/.+/]
     }
   };
 

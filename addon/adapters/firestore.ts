@@ -28,11 +28,11 @@ export default class Firestore extends DS.Adapter.extend({
     };
 
     findAll(_store: DS.Store, type: any) {
-        return queryDocs(rootCollection(this, type));
+        return queryDocs(this, rootCollection(this, type));
     }
 
     findHasMany(_store: DS.Store, snapshot: DS.Snapshot<never>, _url: any, relationship: any) {
-        return queryDocs(
+        return queryDocs(this,
             relationship.options.subcollection ?
                 // fetch the sub-collection
                 docReference(this, relationship.parentType, snapshot.id)
@@ -49,7 +49,7 @@ export default class Firestore extends DS.Adapter.extend({
     }
 
     query(_store: DS.Store, type: any, queryFn: QueryFn) {
-        return queryDocs(rootCollection(this, type), queryFn);
+        return queryDocs(this, rootCollection(this, type), queryFn);
     }
 
     shouldBackgroundReloadRecord() {
@@ -90,23 +90,11 @@ declare module 'ember-data' {
 const getDoc = (adapter: Firestore, type: DS.Model, id: string) => {
     const ref = docReference(adapter, type, id);
     const fastboot = getOwner(adapter).lookup('service:fastboot');
-    let shoebox = fastboot && get(fastboot, 'shoebox');
-    let shoeboxStore = shoebox && shoebox.retrieve('firestore');
-    const fetchDoc = () => wrapPromiseLike(() => ref.get());
+    const snapshot = wrapPromiseLike(() => ref.get());
     if (fastboot && fastboot.isFastBoot) {
-        const fetch = fetchDoc();
-        fastboot.deferRendering(fetch);
-        return fetch.then(snapshot => {
-            if (!shoeboxStore) {
-                shoeboxStore = {};
-                set(shoeboxStore, canonicalId(ref), snapshot);
-                shoebox.put('firestore', shoeboxStore);
-            }
-            return snapshot;
-        });
-    } else {
-        return shoebox && get(shoebox, `firestore.${canonicalId(ref)}`) || fetchDoc();
+        fastboot.deferRendering(snapshot);
     }
+    return snapshot;
 }
 
 const wrapPromiseLike = <T=any>(fn: () => PromiseLike<T>) => {
@@ -118,10 +106,11 @@ const wrapPromiseLike = <T=any>(fn: () => PromiseLike<T>) => {
     });
 }
 
+/*
 const canonicalId = (query: firestore.DocumentReference | CollectionReferenceOrQuery) => {
     const keyPath = get(query as any, '_key.path');
     return keyPath ? `${keyPath}|f:|ob:__name__asc,` : get(query as any, 'memoizedCanonicalId');
-}
+}*/
 
 const collectionNameForType = (type: any) => {
     const modelName = typeof(type) === 'string' ? type : type.modelName;
@@ -130,7 +119,14 @@ const collectionNameForType = (type: any) => {
 
 const docReference = (adapter: Firestore, type: any, id: string) => rootCollection(adapter, type).doc(id);
 
-const getDocs = (query: CollectionReferenceOrQuery) => wrapPromiseLike(() => query.get());
+const getDocs = (adapter: Firestore, query: CollectionReferenceOrQuery) => {
+    const fastboot = getOwner(adapter).lookup('service:fastboot');
+    const snapshot = wrapPromiseLike(() => query.get());
+    if (fastboot && fastboot.isFastBoot) {
+        fastboot.deferRendering(snapshot);
+    }
+    return snapshot;
+}
 
 const firestoreInstance = (adapter: Firestore) => {
     let cachedFirestoreInstance = get(adapter, 'firestore');
@@ -141,7 +137,7 @@ const firestoreInstance = (adapter: Firestore) => {
         cachedFirestoreInstance.settings(firestoreSettings);
         const enablePersistence = get(adapter, 'enablePersistence');
         const fastboot = getOwner(adapter).lookup('service:fastboot');
-        if (fastboot && !fastboot.isFastBoot || enablePersistence) {
+        if (enablePersistence && (fastboot == null || !fastboot.isFastBoot)) {
            cachedFirestoreInstance.enablePersistence().catch(console.warn);
         }
         set(adapter, 'firestore', cachedFirestoreInstance);
@@ -152,8 +148,8 @@ const firestoreInstance = (adapter: Firestore) => {
 const rootCollection = (adapter: Firestore, type: any) => 
     firestoreInstance(adapter).collection(collectionNameForType(type))
 
-const queryDocs = (referenceOrQuery: CollectionReferenceOrQuery, query?: QueryFn) => {
+const queryDocs = (adapter: Firestore, referenceOrQuery: CollectionReferenceOrQuery, query?: QueryFn) => {
     const noop = (ref: CollectionReferenceOrQuery) => ref;
     const queryFn = query || noop;
-    return getDocs(queryFn(referenceOrQuery));
+    return getDocs(adapter, queryFn(referenceOrQuery));
 }
