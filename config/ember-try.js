@@ -51,27 +51,6 @@ module.exports = () => Promise.all(
       npm: {
         devDependencies: {}
       }
-    }, {
-      name: 'firebase-latest',
-      npm: {
-        devDependencies: {
-          'firebase': 'latest'
-        }
-      }
-    }, {
-      name: 'firebase-next',
-      npm: {
-        devDependencies: {
-          'firebase': 'next'
-        }
-      }
-    }, {
-      name: 'firebase-canary',
-      npm: {
-        devDependencies: {
-          'firebase': 'canary'
-        }
-      }
     }]
   })
 )

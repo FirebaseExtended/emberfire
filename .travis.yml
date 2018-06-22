@@ -27,9 +27,9 @@ env:
   - EMBER_TRY_SCENARIO=ember-lts-2.17
   - EMBER_TRY_SCENARIO=ember-lts-2.18
   - EMBER_TRY_SCENARIO=ember-release COVERAGE=true
-  - EMBER_TRY_SCENARIO=firebase-latest
-  - EMBER_TRY_SCENARIO=firebase-next
-  - EMBER_TRY_SCENARIO=firebase-canary
+  - FIREBASE_SCENARIO=firebase-latest
+  - FIREBASE_SCENARIO=firebase-next
+  - FIREBASE_SCENARIO=firebase-canary
   - EMBER_TRY_SCENARIO=ember-beta
   - EMBER_TRY_SCENARIO=ember-canary
   - EMBER_TRY_SCENARIO=ember-default
@@ -46,6 +46,9 @@ before_install:
 
 install:
   - npm ci
+  - if [[ $FIREBASE_SCENARIO == 'firebase-latest' ]]; then npm i --save firebase@latest; fi
+  - if [[ $FIREBASE_SCENARIO == 'firebase-next'   ]]; then npm i --save firebase@next; fi
+  - if [[ $FIREBASE_SCENARIO == 'firebase-canary' ]]; then npm i --save firebase@canary; fi
 
 script:
   - npm run ts:precompile
