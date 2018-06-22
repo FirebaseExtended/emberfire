@@ -4,13 +4,8 @@ node_js:
   # lts/boron is the earliest LTS that npm v6 works on
   - "6"
 
-sudo: required # see before_script chrome bologna
+sudo: false
 dist: trusty
-
-before_script:
-    # https://github.com/travis-ci/travis-ci/issues/9024
-    - "sudo chown root /opt/google/chrome/chrome-sandbox"
-    - "sudo chmod 4755 /opt/google/chrome/chrome-sandbox"
 
 addons:
   chrome: stable
