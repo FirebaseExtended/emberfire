@@ -17,9 +17,7 @@
     "noImplicitReturns": true,
     "skipLibCheck": true,
     "paths": {
-      "npm:firebase/*": ["node_modules/firebase/*/index"],
-      "npm:ws": ["node_modules/ws/index"],
-      "npm:xmlhttprequest": ["node_modules/xmlhttprequest/lib/XMLHttpRequest"],
+      "npm:firebase/*": ["node_modules/firebase/*"],
       "emberfire": [ "addon" ],
       "emberfire/*": [ "addon/* "],
       "*": [ "types/*" ]

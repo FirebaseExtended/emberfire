@@ -17,7 +17,7 @@ export default Base.extend({
         return reject(new Error('Please authenticate via the Firebase SDK directly.'));
     },
     invalidate() {
-        return new Promise((resolve, reject) => {
+        return new Promise<void>((resolve, reject) => {
             get(this, 'firebaseApp').auth().signOut().then(resolve).catch(reject);
         })
     }

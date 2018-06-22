@@ -1,3 +1,4 @@
+// @ts-ignore typescript doesn't think this has a default export
 import firebase from 'npm:firebase/app';
 import Ember from 'ember';
 
