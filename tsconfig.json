@@ -17,7 +17,7 @@
     "noImplicitReturns": true,
     "skipLibCheck": true,
     "paths": {
-      "npm:firebase/*": ["node_modules/firebase/*"],
+      "firebase/*": ["node_modules/firebase/*"],
       "emberfire": [ "addon" ],
       "emberfire/*": [ "addon/* "],
       "emberfire/authorizers/firebase": ["addon/authorizers/firebase"],

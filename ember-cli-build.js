@@ -7,6 +7,7 @@ module.exports = function(defaults) {
   let app = new EmberAddon(defaults, {
     babel: {
       sourceMaps: 'inline',
+      hinting: false
     }
   });
 

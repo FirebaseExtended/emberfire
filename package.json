@@ -21,12 +21,12 @@
     "ts:precompile": "ember ts:precompile"
   },
   "dependencies": {
-    "ember-browserify": "^1.2.2",
-    "ember-cli-babel": "^6.14.1",
-    "firebase": "^5.1.0",
     "broccoli-file-creator": "^2.1.1",
     "broccoli-funnel": "^2.0.1",
-    "broccoli-merge-trees": "^3.0.0"
+    "broccoli-merge-trees": "^3.0.0",
+    "ember-browserify": "^1.2.2",
+    "ember-cli-babel": "^6.14.1",
+    "firebase": "^5.1.0"
   },
   "devDependencies": {
     "@types/ember": "^2.8.25",
@@ -56,6 +56,8 @@
     "ember-simple-auth": "^1.6.0",
     "ember-source": "~3.2.0",
     "ember-source-channel-url": "^1.1.0",
+    "eslint-plugin-ember": "^5.2.0",
+    "eslint-plugin-node": "^6.0.1",
     "fastboot-express-middleware": "1.2.0",
     "loader.js": "^4.7.0",
     "typescript": "~2.9.1",

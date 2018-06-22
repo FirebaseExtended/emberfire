@@ -2,10 +2,9 @@ import Base from 'ember-simple-auth/session-stores/base';
 
 import { get, set } from '@ember/object';
 import RSVP from 'rsvp';
-import Ember from 'ember';
 
 const { Promise, resolve } = RSVP;
-const { run } = Ember;
+import { run } from '@ember/runloop';
 
 import 'npm:firebase/auth';
 import { inject as service } from '@ember/service';

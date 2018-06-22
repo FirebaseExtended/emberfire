@@ -1,4 +1,4 @@
-import Ember from 'ember';
+import { run } from '@ember/runloop';
 import DS from 'ember-data';
 import { getOwner } from '@ember/application';
 import { pluralize } from 'ember-inflector';
@@ -94,8 +94,8 @@ const getDoc = (adapter: Firestore, type: DS.Model, id: string) =>
 const wrapPromiseLike = <T=any>(fn: () => PromiseLike<T>) => {
     return new RSVP.Promise<T>((resolve, reject) => {
         fn().then(
-            result => Ember.run(() => resolve(result)),
-            reason => Ember.run(() => reject(reason))
+            result => run(() => resolve(result)),
+            reason => run(() => reject(reason))
         );
     });
 }

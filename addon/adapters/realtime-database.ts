@@ -1,8 +1,8 @@
 import { pluralize } from 'ember-inflector';
 import { camelize } from '@ember/string';
 import RSVP from 'rsvp';
-import Ember from 'ember';
 import DS from 'ember-data';
+import { run } from '@ember/runloop';
 
 import 'npm:firebase/database';
 
@@ -106,8 +106,8 @@ const queryDocs = (referenceOrQuery: ReferenceOrQuery, query?: QueryFn) => {
 const wrapPromiseLike = <T=any>(fn: () => PromiseLike<T>) => {
     return new RSVP.Promise<T>((resolve, reject) => {
         fn().then(
-            result => Ember.run(() => resolve(result)),
-            reason => Ember.run(() => reject(reason))
+            result => run(() => resolve(result)),
+            reason => run(() => reject(reason))
         );
     });
 }
