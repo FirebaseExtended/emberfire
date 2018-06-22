@@ -8,6 +8,22 @@ module.exports = () => Promise.all(
   ({
     useYarn: true,
     scenarios: [{
+      name: 'ember-lts-2.17',
+      npm: {
+        devDependencies: {
+          'ember-source': '~2.17.0',
+          'ember-data': '~2.17.0'
+        }
+      }
+    }, {
+      name: 'ember-lts-2.18',
+      npm: {
+        devDependencies: {
+          'ember-source': '~2.18.0',
+          'ember-data': '~2.18.0'
+        }
+      }
+    }, {
       name: 'ember-release',
       npm: {
         devDependencies: {
