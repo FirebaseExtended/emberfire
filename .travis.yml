@@ -27,6 +27,9 @@ env:
   - EMBER_TRY_SCENARIO=ember-lts-2.17
   - EMBER_TRY_SCENARIO=ember-lts-2.18
   - EMBER_TRY_SCENARIO=ember-release COVERAGE=true
+  - EMBER_TRY_SCENARIO=firebase-latest
+  - EMBER_TRY_SCENARIO=firebase-next
+  - EMBER_TRY_SCENARIO=firebase-canary
   - EMBER_TRY_SCENARIO=ember-beta
   - EMBER_TRY_SCENARIO=ember-canary
   - EMBER_TRY_SCENARIO=ember-default
@@ -35,6 +38,7 @@ matrix:
   fast_finish: true
   allow_failures:
     - env: EMBER_TRY_SCENARIO=ember-canary
+    - env: EMBER_TRY_SCENARIO=firebase-canary
 
 before_install:
   # upgrade npm to get the "ci" command
