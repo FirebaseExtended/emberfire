@@ -21,12 +21,6 @@
     "ts:precompile": "ember ts:precompile"
   },
   "dependencies": {
-    "@firebase/auth": "~0",
-    "@firebase/database": "~0",
-    "@firebase/firestore": "~0",
-    "@firebase/functions": "~0",
-    "@firebase/messaging": "~0",
-    "@firebase/storage": "~0",
     "broccoli-file-creator": "^2.1.1",
     "broccoli-funnel": "^2.0.1",
     "broccoli-merge-trees": "^3.0.0",
