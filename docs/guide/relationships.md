@@ -41,3 +41,5 @@ EmberFire can handle relationships in several different ways:
 1. **Relationships**
 1. [Security Rules](security-rules.md)
 1. [Deploying to Firebase Hosting](deploying-to-firebase-hosting.md)
+1. [Fastboot support](fastboot-support.md)
+1. [Deploying to Cloud Functions for Firebase](deploying-fastboot-to-cloud-functions.md)
