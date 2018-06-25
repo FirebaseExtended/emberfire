@@ -115,5 +115,6 @@ Now we have access to all of our posts, and can display them in our template:
 1. [Querying Data](querying-data.md)
 1. [Relationships](relationships.md)
 1. [Security Rules](security-rules.md)
-1. [Using EmberFire without Ember CLI](without-ember-cli.md)
 1. [Deploying to Firebase Hosting](deploying-to-firebase-hosting.md)
+1. [Fastboot support](fastboot-support.md)
+1. [Deploying to Cloud Functions for Firebase](deploying-fastboot-to-cloud-functions.md)
