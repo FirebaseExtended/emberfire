@@ -1,4 +1,4 @@
-[AngularFire](../README.md) > [RealtimeDatabaseAdapter](../classes/realtimedatabaseadapter.md)
+[EmberFire](../README.md) > [RealtimeDatabaseAdapter](../classes/realtimedatabaseadapter.md)
 
 # Class: RealtimeDatabaseAdapter
 
@@ -40,7 +40,7 @@
 
 **● database**: *`database.Database`*
 
-*Defined in [adapters/realtime-database.ts:26](https://github.com/firebase/emberfire/blob/8580d84/addon/adapters/realtime-database.ts#L26)*
+*Defined in [adapters/realtime-database.ts:26](https://github.com/firebase/emberfire/blob/c7f4d01/addon/adapters/realtime-database.ts#L26)*
 
 ___
 <a id="databaseurl"></a>
@@ -50,7 +50,7 @@ ___
 **● databaseURL**: * `string` &#124; `undefined`
 *
 
-*Defined in [adapters/realtime-database.ts:24](https://github.com/firebase/emberfire/blob/8580d84/addon/adapters/realtime-database.ts#L24)*
+*Defined in [adapters/realtime-database.ts:24](https://github.com/firebase/emberfire/blob/c7f4d01/addon/adapters/realtime-database.ts#L24)*
 
 ___
 <a id="defaultserializer"></a>
@@ -59,7 +59,7 @@ ___
 
 **● defaultSerializer**: *`string`* = "-realtime-database"
 
-*Defined in [adapters/realtime-database.ts:27](https://github.com/firebase/emberfire/blob/8580d84/addon/adapters/realtime-database.ts#L27)*
+*Defined in [adapters/realtime-database.ts:27](https://github.com/firebase/emberfire/blob/c7f4d01/addon/adapters/realtime-database.ts#L27)*
 
 ___
 <a id="firebaseapp"></a>
@@ -68,7 +68,7 @@ ___
 
 **● firebaseApp**: *`ComputedProperty`<[FirebaseAppService](firebaseappservice.md), [FirebaseAppService](firebaseappservice.md)>*
 
-*Defined in [adapters/realtime-database.ts:24](https://github.com/firebase/emberfire/blob/8580d84/addon/adapters/realtime-database.ts#L24)*
+*Defined in [adapters/realtime-database.ts:24](https://github.com/firebase/emberfire/blob/c7f4d01/addon/adapters/realtime-database.ts#L24)*
 
 ___
 
@@ -80,7 +80,7 @@ ___
 
 ▸ **createRecord**(_: *`Store`*, type: *`any`*, snapshot: *`Snapshot`<`never`>*): `Promise`<`any`>
 
-*Defined in [adapters/realtime-database.ts:78](https://github.com/firebase/emberfire/blob/8580d84/addon/adapters/realtime-database.ts#L78)*
+*Defined in [adapters/realtime-database.ts:78](https://github.com/firebase/emberfire/blob/c7f4d01/addon/adapters/realtime-database.ts#L78)*
 
 **Parameters:**
 
@@ -99,7 +99,7 @@ ___
 
 ▸ **deleteRecord**(_: *`Store`*, type: *`any`*, snapshot: *`Snapshot`<`never`>*): `Promise`<`any`>
 
-*Defined in [adapters/realtime-database.ts:90](https://github.com/firebase/emberfire/blob/8580d84/addon/adapters/realtime-database.ts#L90)*
+*Defined in [adapters/realtime-database.ts:90](https://github.com/firebase/emberfire/blob/c7f4d01/addon/adapters/realtime-database.ts#L90)*
 
 **Parameters:**
 
@@ -118,7 +118,7 @@ ___
 
 ▸ **findAll**(_store: *`Store`*, type: *`any`*): `Promise`<`DataSnapshot`>
 
-*Defined in [adapters/realtime-database.ts:33](https://github.com/firebase/emberfire/blob/8580d84/addon/adapters/realtime-database.ts#L33)*
+*Defined in [adapters/realtime-database.ts:33](https://github.com/firebase/emberfire/blob/c7f4d01/addon/adapters/realtime-database.ts#L33)*
 
 **Parameters:**
 
@@ -136,7 +136,7 @@ ___
 
 ▸ **findBelongsTo**(_store: *`Store`*, snapshot: *`Snapshot`<`never`>*, _url: *`any`*, relationship: *`any`*): `Promise`<`DataSnapshot`>
 
-*Defined in [adapters/realtime-database.ts:47](https://github.com/firebase/emberfire/blob/8580d84/addon/adapters/realtime-database.ts#L47)*
+*Defined in [adapters/realtime-database.ts:47](https://github.com/firebase/emberfire/blob/c7f4d01/addon/adapters/realtime-database.ts#L47)*
 
 **Parameters:**
 
@@ -156,7 +156,7 @@ ___
 
 ▸ **findHasMany**(_store: *`Store`*, snapshot: *`any`*, _url: *`string`*, relationship: *`any`*): `Promise`<`DataSnapshot`>
 
-*Defined in [adapters/realtime-database.ts:37](https://github.com/firebase/emberfire/blob/8580d84/addon/adapters/realtime-database.ts#L37)*
+*Defined in [adapters/realtime-database.ts:37](https://github.com/firebase/emberfire/blob/c7f4d01/addon/adapters/realtime-database.ts#L37)*
 
 **Parameters:**
 
@@ -176,7 +176,7 @@ ___
 
 ▸ **findRecord**(_store: *`Store`*, type: *`any`*, id: *`string`*): `Promise`<`DataSnapshot`>
 
-*Defined in [adapters/realtime-database.ts:29](https://github.com/firebase/emberfire/blob/8580d84/addon/adapters/realtime-database.ts#L29)*
+*Defined in [adapters/realtime-database.ts:29](https://github.com/firebase/emberfire/blob/c7f4d01/addon/adapters/realtime-database.ts#L29)*
 
 **Parameters:**
 
@@ -195,7 +195,7 @@ ___
 
 ▸ **query**(_store: *`Store`*, type: *`any`*, queryFn: *[QueryFn](../#queryfn)*): `Promise`<`DataSnapshot`>
 
-*Defined in [adapters/realtime-database.ts:51](https://github.com/firebase/emberfire/blob/8580d84/addon/adapters/realtime-database.ts#L51)*
+*Defined in [adapters/realtime-database.ts:51](https://github.com/firebase/emberfire/blob/c7f4d01/addon/adapters/realtime-database.ts#L51)*
 
 **Parameters:**
 
@@ -214,7 +214,7 @@ ___
 
 ▸ **queryRecord**(_store: *`Store`*, type: *`any`*, queryFn: *[QueryFn](../#queryfn)*): `Promise`<`DataSnapshot`>
 
-*Defined in [adapters/realtime-database.ts:55](https://github.com/firebase/emberfire/blob/8580d84/addon/adapters/realtime-database.ts#L55)*
+*Defined in [adapters/realtime-database.ts:55](https://github.com/firebase/emberfire/blob/c7f4d01/addon/adapters/realtime-database.ts#L55)*
 
 **Parameters:**
 
@@ -233,7 +233,7 @@ ___
 
 ▸ **shouldBackgroundReloadRecord**(): `boolean`
 
-*Defined in [adapters/realtime-database.ts:68](https://github.com/firebase/emberfire/blob/8580d84/addon/adapters/realtime-database.ts#L68)*
+*Defined in [adapters/realtime-database.ts:68](https://github.com/firebase/emberfire/blob/c7f4d01/addon/adapters/realtime-database.ts#L68)*
 
 **Returns:** `boolean`
 
@@ -244,7 +244,7 @@ ___
 
 ▸ **updateRecord**(_: *`Store`*, type: *`any`*, snapshot: *`Snapshot`<`never`>*): `Promise`<`any`>
 
-*Defined in [adapters/realtime-database.ts:72](https://github.com/firebase/emberfire/blob/8580d84/addon/adapters/realtime-database.ts#L72)*
+*Defined in [adapters/realtime-database.ts:72](https://github.com/firebase/emberfire/blob/c7f4d01/addon/adapters/realtime-database.ts#L72)*
 
 **Parameters:**
 

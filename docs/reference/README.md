@@ -1,5 +1,5 @@
 
-#  AngularFire
+#  EmberFire
 
 ## Index
 
@@ -36,7 +36,7 @@
 **ΤCollectionReferenceOrQuery**: * `CollectionReference` &#124; `Query`
 *
 
-*Defined in [adapters/firestore.ts:14](https://github.com/firebase/emberfire/blob/8580d84/addon/adapters/firestore.ts#L14)*
+*Defined in [adapters/firestore.ts:14](https://github.com/firebase/emberfire/blob/c7f4d01/addon/adapters/firestore.ts#L14)*
 
 ___
 <a id="documentsnapshot"></a>
@@ -46,7 +46,7 @@ ___
 **ΤDocumentSnapshot**: * `DocumentSnapshot` &#124; `QueryDocumentSnapshot`
 *
 
-*Defined in [serializers/firestore.ts:5](https://github.com/firebase/emberfire/blob/8580d84/addon/serializers/firestore.ts#L5)*
+*Defined in [serializers/firestore.ts:5](https://github.com/firebase/emberfire/blob/c7f4d01/addon/serializers/firestore.ts#L5)*
 
 ___
 <a id="queryfn"></a>
@@ -55,8 +55,8 @@ ___
 
 **ΤQueryFn**: *`function`*
 
-*Defined in [adapters/firestore.ts:15](https://github.com/firebase/emberfire/blob/8580d84/addon/adapters/firestore.ts#L15)*
-*Defined in [adapters/realtime-database.ts:14](https://github.com/firebase/emberfire/blob/8580d84/addon/adapters/realtime-database.ts#L14)*
+*Defined in [adapters/firestore.ts:15](https://github.com/firebase/emberfire/blob/c7f4d01/addon/adapters/firestore.ts#L15)*
+*Defined in [adapters/realtime-database.ts:14](https://github.com/firebase/emberfire/blob/c7f4d01/addon/adapters/realtime-database.ts#L14)*
 
 #### Type declaration
 ▸(ref: *[ReferenceOrQuery](#referenceorquery)*): [ReferenceOrQuery](#referenceorquery)
@@ -77,7 +77,7 @@ ___
 **ΤReferenceOrQuery**: * `Reference` &#124; `Query`
 *
 
-*Defined in [adapters/realtime-database.ts:13](https://github.com/firebase/emberfire/blob/8580d84/addon/adapters/realtime-database.ts#L13)*
+*Defined in [adapters/realtime-database.ts:13](https://github.com/firebase/emberfire/blob/c7f4d01/addon/adapters/realtime-database.ts#L13)*
 
 ___
 <a id="snapshot"></a>
@@ -87,7 +87,7 @@ ___
 **ΤSnapshot**: * `DocumentSnapshot` &#124; `QuerySnapshot`
 *
 
-*Defined in [serializers/firestore.ts:6](https://github.com/firebase/emberfire/blob/8580d84/addon/serializers/firestore.ts#L6)*
+*Defined in [serializers/firestore.ts:6](https://github.com/firebase/emberfire/blob/c7f4d01/addon/serializers/firestore.ts#L6)*
 
 ___
 

@@ -1,4 +1,4 @@
-[AngularFire](../README.md) > [FirebaseToriiAdapter](../classes/firebasetoriiadapter.md)
+[EmberFire](../README.md) > [FirebaseToriiAdapter](../classes/firebasetoriiadapter.md)
 
 # Class: FirebaseToriiAdapter
 

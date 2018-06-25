@@ -7,7 +7,7 @@ module.exports = {
     mode: 'file',
     theme: 'markdown',
     mdEngine: 'github',
-    name: 'AngularFire',
+    name: 'EmberFire',
     ignoreCompilerErrors: true,
     excludeProtected: true,
     excludeExternals: true,

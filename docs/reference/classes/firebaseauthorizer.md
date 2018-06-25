@@ -1,4 +1,4 @@
-[AngularFire](../README.md) > [FirebaseAuthorizer](../classes/firebaseauthorizer.md)
+[EmberFire](../README.md) > [FirebaseAuthorizer](../classes/firebaseauthorizer.md)
 
 # Class: FirebaseAuthorizer
 
@@ -159,7 +159,7 @@ ___
 
 ▸ **authorize**(data: *`any`*, cb: *`any`*): `void`
 
-*Defined in [authorizers/firebase.ts:4](https://github.com/firebase/emberfire/blob/8580d84/addon/authorizers/firebase.ts#L4)*
+*Defined in [authorizers/firebase.ts:4](https://github.com/firebase/emberfire/blob/c7f4d01/addon/authorizers/firebase.ts#L4)*
 
 **Parameters:**
 

@@ -1,4 +1,4 @@
-[AngularFire](../README.md) > [FirebaseToriiProvider](../classes/firebasetoriiprovider.md)
+[EmberFire](../README.md) > [FirebaseToriiProvider](../classes/firebasetoriiprovider.md)
 
 # Class: FirebaseToriiProvider
 
