@@ -43,7 +43,7 @@ module.exports = () => Promise.all(
       npm: {
         devDependencies: {
           'ember-source': canaryUrl,
-          'ember-data': 'emberjs/data#canary'
+          'ember-data': 'emberjs/data#master'
         }
       }
     }, {
