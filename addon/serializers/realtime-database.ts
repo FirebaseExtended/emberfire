@@ -2,7 +2,7 @@ import DS from 'ember-data';
 
 import { database } from 'firebase';
 
-export default class RealtimeDatabase extends DS.JSONSerializer {
+export default class RealtimeDatabaseSerializer extends DS.JSONSerializer {
 
   normalizeSingleResponse(store: DS.Store, primaryModelClass: DS.Model, payload: database.DataSnapshot, _id: string | number, _requestType: string) {
     if (!payload.exists) { throw  new DS.NotFoundError(); }
@@ -25,7 +25,7 @@ export default class RealtimeDatabase extends DS.JSONSerializer {
 
 declare module 'ember-data' {
   interface SerializerRegistry {
-    'realtime-database': RealtimeDatabase;
+    'realtime-database': RealtimeDatabaseSerializer;
   }
 }
 

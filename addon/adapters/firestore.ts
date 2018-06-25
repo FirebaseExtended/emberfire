@@ -6,19 +6,24 @@ import { get, set } from '@ember/object';
 import { inject as service } from '@ember/service';
 import { camelize } from '@ember/string';
 import RSVP from 'rsvp';
+import Ember from 'ember';
+import FirebaseAppService from '../services/firebase-app';
 
 import { firestore } from 'firebase';
 
 export type CollectionReferenceOrQuery = firestore.CollectionReference | firestore.Query;
 export type QueryFn = (ref: CollectionReferenceOrQuery) => CollectionReferenceOrQuery;
 
-export default class Firestore extends DS.Adapter.extend({
+export default class FirestoreAdapter extends DS.Adapter.extend({
 
     firebaseApp: service('firebase-app'),
     firestoreSettings: { timestampsInSnapshots: true } as firestore.Settings,
     enablePersistence: false as boolean
 
 }) {
+
+    // @ts-ignore repeating here so typedoc picks it up
+    enablePersistence: boolean; firestoreSettings: firestore.Settings; firebaseApp: Ember.ComputedProperty<FirebaseAppService, FirebaseAppService>;
 
     firestore? : firestore.Firestore;
     defaultSerializer = '-firestore';
@@ -83,11 +88,11 @@ export default class Firestore extends DS.Adapter.extend({
 
 declare module 'ember-data' {
     interface AdapterRegistry {
-        'firestore': Firestore;
+        'firestore': FirestoreAdapter;
     }
 }
 
-const getDoc = (adapter: Firestore, type: DS.Model, id: string) =>
+const getDoc = (adapter: FirestoreAdapter, type: DS.Model, id: string) =>
     wrapPromiseLike(() => docReference(adapter, type, id).get());
 
 const wrapPromiseLike = <T=any>(fn: () => PromiseLike<T>) => {
@@ -110,11 +115,11 @@ const collectionNameForType = (type: any) => {
     return pluralize(camelize(modelName));
 }
 
-const docReference = (adapter: Firestore, type: any, id: string) => rootCollection(adapter, type).doc(id);
+const docReference = (adapter: FirestoreAdapter, type: any, id: string) => rootCollection(adapter, type).doc(id);
 
 const getDocs = (query: CollectionReferenceOrQuery) => wrapPromiseLike(() => query.get());
 
-const firestoreInstance = (adapter: Firestore) => {
+const firestoreInstance = (adapter: FirestoreAdapter) => {
     let cachedFirestoreInstance = get(adapter, 'firestore');
     if (!cachedFirestoreInstance) {
         const app = get(adapter, 'firebaseApp');
@@ -131,7 +136,7 @@ const firestoreInstance = (adapter: Firestore) => {
     return cachedFirestoreInstance;
 }
 
-const rootCollection = (adapter: Firestore, type: any) => 
+const rootCollection = (adapter: FirestoreAdapter, type: any) => 
     firestoreInstance(adapter).collection(collectionNameForType(type))
 
 const queryDocs = (referenceOrQuery: CollectionReferenceOrQuery, query?: QueryFn) => {

@@ -1,17 +1,16 @@
-// @ts-ignore typescript doesn't think this has a default export
-import firebase from 'firebase/app';
+import * as firebase from 'firebase/app';
 import Service from '@ember/service';
 
-export default class Firebase extends Service.extend({
+export default class FirebaseService extends Service {
 
-  app: firebase.app,
-  apps: firebase.apps,
-  initializeApp: firebase.initializeApp
+  app = (name?: string) => firebase.app(name);
+  apps = firebase.apps;
+  initializeApp = (options: Object, nameOrConfig?: string|Object) => firebase.initializeApp(options, nameOrConfig as string|undefined);
 
-}) {};
+};
 
 declare module '@ember/service' {
   interface Registry {
-    firebase: Firebase;
+    firebase: FirebaseService;
   }
 }

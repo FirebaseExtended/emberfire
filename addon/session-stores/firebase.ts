@@ -1,7 +1,10 @@
-import Base from 'ember-simple-auth/session-stores/base';
+import BaseSessionStore from 'ember-simple-auth/session-stores/base';
 
 import { get, set } from '@ember/object';
 import RSVP from 'rsvp';
+
+import Ember from 'ember';
+import FirebaseAppService from '../services/firebase-app';
 
 const { Promise, resolve } = RSVP;
 import { run } from '@ember/runloop';
@@ -9,13 +12,16 @@ import { run } from '@ember/runloop';
 import 'firebase/auth';
 import { inject as service } from '@ember/service';
 
-export default Base.extend({
+export default class FirebaseSessionStore extends BaseSessionStore.extend({
+    firebaseApp: service('firebase-app')
+}) { 
 
-    restoring: true,
-    persist: resolve,
-    clear: resolve,
+    // @ts-ignore repeat here for typedoc
+    firebaseApp: Ember.ComputedProperty<FirebaseAppService, FirebaseAppService>;
 
-    firebaseApp: service('firebase-app'),
+    restoring = true;
+    persist = resolve;
+    clear = resolve;
 
     restore() {
         return new Promise(resolve => {
@@ -30,4 +36,5 @@ export default Base.extend({
             }));
         });
     }
-})
+
+};

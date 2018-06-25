@@ -51,6 +51,7 @@ Get these values from the [Firebase Console](https://console.firebase.google.com
 
 * [Quickstart](docs/quickstart.md)
 * [Guide](docs/guide/README.md)
+* [API Reference](docs/reference/README.md)
 
 ## Compatibility
 

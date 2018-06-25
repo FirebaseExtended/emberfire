@@ -18,7 +18,8 @@
     "start": "node ./express.js",
     "all": "npm run ts:precompile && npm run build && npm run start",
     "test": "COVERAGE=true ember test",
-    "ts:precompile": "ember ts:precompile"
+    "ts:precompile": "ember ts:precompile",
+    "reference": "typedoc --options typedoc.js addon"
   },
   "dependencies": {
     "broccoli-file-creator": "^2.1.1",
@@ -62,6 +63,8 @@
     "fastboot-express-middleware": "1.2.0",
     "loader.js": "^4.7.0",
     "typescript": "~2.9.1",
+    "typedoc": "^0.11.1",
+    "typedoc-plugin-markdown": "^1.1.12",
     "ws": "^5.2.0",
     "xmlhttprequest": "^1.8.0"
   },

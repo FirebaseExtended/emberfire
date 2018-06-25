@@ -1,2 +1,2 @@
 // TODO flush out
-export default {}
+export default class FirebaseToriiAdapter {}

@@ -6,7 +6,7 @@ export type DocumentSnapshot = firestore.DocumentSnapshot | firestore.QueryDocum
 export type Snapshot = firestore.DocumentSnapshot | firestore.QuerySnapshot;
 
 // TODO aside from .data(), key vs. id, metadata, and subcollection this is basicly realtime-database, should refactor to reuse
-export default class Firestore extends DS.JSONSerializer {
+export default class FirestoreSerializer extends DS.JSONSerializer {
 
   normalizeSingleResponse(store: DS.Store, primaryModelClass: DS.Model, payload:  firestore.DocumentSnapshot, _id: string | number, _requestType: string) {
     if (!payload.exists) { throw  new DS.NotFoundError(); }
@@ -31,7 +31,7 @@ export default class Firestore extends DS.JSONSerializer {
 
 declare module 'ember-data' {
   interface SerializerRegistry {
-    'firestore': Firestore;
+    'firestore': FirestoreSerializer;
   }
 }
 

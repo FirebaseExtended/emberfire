@@ -1,6 +1,8 @@
 import Service from '@ember/service';
 import { get, set } from '@ember/object';
 import { inject as service } from '@ember/service';
+import Ember from 'ember';
+import FirebaseService from './firebase';
 
 import 'firebase/auth';
 import 'firebase/database';
@@ -11,19 +13,22 @@ import 'firebase/storage';
 
 import { app, auth, database, firestore, functions, messaging, storage } from 'firebase';
 
-const getApp = (service: FirebaseApp) => {
+const getApp = (service: FirebaseAppService) => {
     const firebase = get(service, 'firebase');
     const name = get(service, 'name');
     // TODO raise exception is undefined? or does it already?
     return (firebase.app(name) as any) as app.App;
 }
 
-export default class FirebaseApp extends Service.extend({
+export default class FirebaseAppService extends Service.extend({
 
     name: undefined,
     firebase: service('firebase')
 
 }) {
+
+    // @ts-ignore repeat here for typedocs
+    firebase: Ember.ComputedProperty<FirebaseService, FirebaseService>; name: string|undefined;
 
     options?: {[key:string]: any};
     auth = (): auth.Auth => getApp(this).auth();
@@ -43,6 +48,6 @@ export default class FirebaseApp extends Service.extend({
 
 declare module '@ember/service' {
   interface Registry {
-    "firebase-app": FirebaseApp;
+    "firebase-app": FirebaseAppService;
   }
 }

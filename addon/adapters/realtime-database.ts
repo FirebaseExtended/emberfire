@@ -3,6 +3,8 @@ import { camelize } from '@ember/string';
 import RSVP from 'rsvp';
 import DS from 'ember-data';
 import { run } from '@ember/runloop';
+import Ember from 'ember';
+import FirebaseAppService from '../services/firebase-app';
 
 import { inject as service } from '@ember/service';
 import { get, set } from '@ember/object';
@@ -11,12 +13,15 @@ import { database } from 'firebase';
 export type ReferenceOrQuery = database.Reference | database.Query;
 export type QueryFn = (ref: ReferenceOrQuery) => ReferenceOrQuery;
 
-export default class RealtimeDatabase extends DS.Adapter.extend({
+export default class RealtimeDatabaseAdapter extends DS.Adapter.extend({
 
     firebaseApp: service('firebase-app'),
     databaseURL: undefined as string|undefined,
 
 }) {
+
+    // @ts-ignore repeat here for typedoc
+    firebaseApp: Ember.ComputedProperty<FirebaseAppService, FirebaseAppService>; databaseURL: string|undefined;
 
     database?: database.Database;
     defaultSerializer = '-realtime-database';
@@ -90,7 +95,7 @@ export default class RealtimeDatabase extends DS.Adapter.extend({
 
 declare module 'ember-data' {
     interface AdapterRegistry {
-        'realtime-database': RealtimeDatabase;
+        'realtime-database': RealtimeDatabaseAdapter;
     }
 }
 
@@ -114,7 +119,7 @@ const collectionNameForType = (type: any) => {
     return pluralize(camelize(modelName));
 }
 
-const databaseInstance = (adapter: RealtimeDatabase) => {
+const databaseInstance = (adapter: RealtimeDatabaseAdapter) => {
     let database = get(adapter, 'database');
     if (!database) {
         const app = get(adapter, 'firebaseApp');
@@ -125,10 +130,10 @@ const databaseInstance = (adapter: RealtimeDatabase) => {
     return database;
 }
 
-const rootCollection = (adapter: RealtimeDatabase, type: any) => 
+const rootCollection = (adapter: RealtimeDatabaseAdapter, type: any) => 
     databaseInstance(adapter).ref(collectionNameForType(type));
 
 const getDocs = (query: ReferenceOrQuery) => wrapPromiseLike(() => query.once('value'));
 
-const docReference = (adapter: RealtimeDatabase, type: any, id: string) => 
+const docReference = (adapter: RealtimeDatabaseAdapter, type: any, id: string) => 
     rootCollection(adapter, type).child(id);
