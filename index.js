@@ -10,6 +10,11 @@ const firebase_version = require('firebase').SDK_VERSION;
 module.exports = {
   name: 'emberfire',
 
+  autoImport:{
+    exclude: [],
+    webpack: {}
+  },
+
   included(app) {
     this._super.included.apply(this, arguments);
     this.import('vendor/emberfire/register-versions.js');

@@ -15,8 +15,8 @@
   "scripts": {
     "build": "ember build",
     "server": "ember server",
-    "express": "node ./express.js",
-    "fastboot:all": "npm run ts:precompile && npm run build && npm run express",
+    "start": "node ./express.js",
+    "all": "npm run ts:precompile && npm run build && npm run start",
     "test": "COVERAGE=true ember test",
     "ts:precompile": "ember ts:precompile"
   },
@@ -30,7 +30,7 @@
     "broccoli-file-creator": "^2.1.1",
     "broccoli-funnel": "^2.0.1",
     "broccoli-merge-trees": "^3.0.0",
-    "ember-auto-import": "^0.2.6",
+    "ember-auto-import": "^1.0.0",
     "ember-cli-babel": "^6.14.1",
     "firebase": "^5.1.0"
   },
@@ -62,11 +62,14 @@
     "ember-simple-auth": "^1.6.0",
     "ember-source": "~3.2.0",
     "ember-source-channel-url": "^1.1.0",
+    "ember-try": "^0.2.23",
+    "eslint-plugin-ember": "^5.2.0",
+    "eslint-plugin-node": "^6.0.1",
     "fastboot-express-middleware": "1.2.0",
     "loader.js": "^4.7.0",
     "typescript": "~2.9.1",
-    "xmlhttprequest": "^1.8.0",
-    "ws": "^5.2.0"
+    "ws": "^5.2.0",
+    "xmlhttprequest": "^1.8.0"
   },
   "engines": {
     "node": "^4.5 || 6.* || >= 7.*"

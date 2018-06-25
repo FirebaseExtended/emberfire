@@ -1,4 +1,5 @@
-import * as firebase from 'firebase/app';
+// @ts-ignore typescript doesn't think this has a default export
+import firebase from 'firebase/app';
 import FirebaseAppService from '../services/firebase-app';
 
 const initialize = (application: any) => {

@@ -22,9 +22,13 @@
       "xmlhttprequest": ["node_modules/xmlhttprequest/lib/XMLHttpRequest"],
       "emberfire": [ "addon" ],
       "emberfire/*": [ "addon/* "],
+      "emberfire/authorizers/firebase": ["addon/authorizers/firebase"],
+      "emberfire/authenticators/firebase": [ "addon/authenticators/firebase"],
+      "emberfire/initializers/emberfire": [ "addon/initializers/emberfire"],
+      "emberfire/services/firebase": [ "addon/services/firebase"],
       "*": [ "types/*" ]
     }
   },
-  "include": [ "app", "addon", "tests", "types" ],
+  "include": [ "addon", "app", "types" ],
   "exclude": [ "node_modules", "**/*.spec.ts" ]
 }

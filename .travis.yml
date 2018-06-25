@@ -1,7 +1,8 @@
 ---
 language: node_js
 node_js:
-  - "8"
+  # lts/boron is the earliest LTS that npm v6 works on
+  - "6"
 
 sudo: false
 dist: trusty
@@ -18,28 +19,40 @@ branches:
     - v3 # for now
 
 cache:
-  yarn: true
+  directories:
+  - "$HOME/.npm"
 
 env:
+  # build for the last two LTS versions (https://www.emberjs.com/builds/)
+  - EMBER_TRY_SCENARIO=ember-lts-2.17
+  - EMBER_TRY_SCENARIO=ember-lts-2.18
   - EMBER_TRY_SCENARIO=ember-release COVERAGE=true
+  - FIREBASE_SCENARIO=firebase-latest EMBER_TRY_SCENARIO=ember-default
+  - FIREBASE_SCENARIO=firebase-next EMBER_TRY_SCENARIO=ember-default
+  - FIREBASE_SCENARIO=firebase-canary EMBER_TRY_SCENARIO=ember-default
   - EMBER_TRY_SCENARIO=ember-beta
   - EMBER_TRY_SCENARIO=ember-canary
+  - EMBER_TRY_SCENARIO=ember-default
 
 matrix:
   fast_finish: true
   allow_failures:
     - env: EMBER_TRY_SCENARIO=ember-canary
+    - env: FIREBASE_SCENARIO=firebase-canary EMBER_TRY_SCENARIO=ember-default
+    - env: EMBER_TRY_SCENARIO=ember-beta
 
 before_install:
-  - curl -o- -L https://yarnpkg.com/install.sh | bash
-  - export PATH=$HOME/.yarn/bin:$PATH
+  # upgrade npm to get the "ci" command
+  - npm i -g npm
 
 install:
-  - yarn install --no-lockfile --non-interactive
+  - npm ci
+  - if [[ $FIREBASE_SCENARIO == 'firebase-latest' ]]; then npm i --save firebase@latest; fi
+  - if [[ $FIREBASE_SCENARIO == 'firebase-next'   ]]; then npm i --save firebase@next; fi
+  - if [[ $FIREBASE_SCENARIO == 'firebase-canary' ]]; then npm i --save firebase@canary; fi
 
 script:
-  # Usually, it's ok to finish the test scenario without reverting
-  #  to the addon's original dependency state, skipping "cleanup".
+  - npm run ts:precompile
   - node_modules/.bin/ember try:one $EMBER_TRY_SCENARIO --skip-cleanup
 
 after_script:

@@ -1,4 +1,4 @@
-import Ember from 'ember';
+import { run } from '@ember/runloop';
 import DS from 'ember-data';
 import { getOwner } from '@ember/application';
 import { pluralize } from 'ember-inflector';
@@ -28,11 +28,11 @@ export default class Firestore extends DS.Adapter.extend({
     };
 
     findAll(_store: DS.Store, type: any) {
-        return queryDocs(this, rootCollection(this, type));
+        return queryDocs(rootCollection(this, type));
     }
 
     findHasMany(_store: DS.Store, snapshot: DS.Snapshot<never>, _url: any, relationship: any) {
-        return queryDocs(this,
+        return queryDocs(
             relationship.options.subcollection ?
                 // fetch the sub-collection
                 docReference(this, relationship.parentType, snapshot.id)
@@ -49,7 +49,7 @@ export default class Firestore extends DS.Adapter.extend({
     }
 
     query(_store: DS.Store, type: any, queryFn: QueryFn) {
-        return queryDocs(this, rootCollection(this, type), queryFn);
+        return queryDocs(rootCollection(this, type), queryFn);
     }
 
     shouldBackgroundReloadRecord() {
@@ -87,21 +87,14 @@ declare module 'ember-data' {
     }
 }
 
-const getDoc = (adapter: Firestore, type: DS.Model, id: string) => {
-    const ref = docReference(adapter, type, id);
-    const fastboot = getOwner(adapter).lookup('service:fastboot');
-    const snapshot = wrapPromiseLike(() => ref.get());
-    if (fastboot && fastboot.isFastBoot) {
-        fastboot.deferRendering(snapshot);
-    }
-    return snapshot;
-}
+const getDoc = (adapter: Firestore, type: DS.Model, id: string) =>
+    wrapPromiseLike(() => docReference(adapter, type, id).get());
 
 const wrapPromiseLike = <T=any>(fn: () => PromiseLike<T>) => {
     return new RSVP.Promise<T>((resolve, reject) => {
         fn().then(
-            result => Ember.run(() => resolve(result)),
-            reason => Ember.run(() => reject(reason))
+            result => run(() => resolve(result)),
+            reason => run(() => reject(reason))
         );
     });
 }
@@ -119,14 +112,7 @@ const collectionNameForType = (type: any) => {
 
 const docReference = (adapter: Firestore, type: any, id: string) => rootCollection(adapter, type).doc(id);
 
-const getDocs = (adapter: Firestore, query: CollectionReferenceOrQuery) => {
-    const fastboot = getOwner(adapter).lookup('service:fastboot');
-    const snapshot = wrapPromiseLike(() => query.get());
-    if (fastboot && fastboot.isFastBoot) {
-        fastboot.deferRendering(snapshot);
-    }
-    return snapshot;
-}
+const getDocs = (query: CollectionReferenceOrQuery) => wrapPromiseLike(() => query.get());
 
 const firestoreInstance = (adapter: Firestore) => {
     let cachedFirestoreInstance = get(adapter, 'firestore');
@@ -148,8 +134,8 @@ const firestoreInstance = (adapter: Firestore) => {
 const rootCollection = (adapter: Firestore, type: any) => 
     firestoreInstance(adapter).collection(collectionNameForType(type))
 
-const queryDocs = (adapter: Firestore, referenceOrQuery: CollectionReferenceOrQuery, query?: QueryFn) => {
+const queryDocs = (referenceOrQuery: CollectionReferenceOrQuery, query?: QueryFn) => {
     const noop = (ref: CollectionReferenceOrQuery) => ref;
     const queryFn = query || noop;
-    return getDocs(adapter, queryFn(referenceOrQuery));
+    return getDocs(queryFn(referenceOrQuery));
 }

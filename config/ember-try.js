@@ -6,8 +6,23 @@ module.exports = () => Promise.all(
   ['release', 'beta', 'canary'].map(getURLFor)
 ).then( ([releaseUrl, betaUrl, canaryUrl]) =>
   ({
-    useYarn: true,
     scenarios: [{
+      name: 'ember-lts-2.17',
+      npm: {
+        devDependencies: {
+          'ember-source': '~2.17.0',
+          'ember-data': '~2.17.0'
+        }
+      }
+    }, {
+      name: 'ember-lts-2.18',
+      npm: {
+        devDependencies: {
+          'ember-source': '~2.18.0',
+          'ember-data': '~2.18.0'
+        }
+      }
+    }, {
       name: 'ember-release',
       npm: {
         devDependencies: {
@@ -28,7 +43,7 @@ module.exports = () => Promise.all(
       npm: {
         devDependencies: {
           'ember-source': canaryUrl,
-          'ember-data': 'emberjs/data#canary'
+          'ember-data': 'emberjs/data#master'
         }
       }
     }, {

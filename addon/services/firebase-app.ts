@@ -1,4 +1,4 @@
-import Ember from 'ember';
+import Service from '@ember/service';
 import { get, set } from '@ember/object';
 import { inject as service } from '@ember/service';
 
@@ -20,7 +20,7 @@ const getApp = (service: FirebaseApp) => {
     return (firebase.app(name) as any) as app.App;
 }
 
-export default class FirebaseApp extends Ember.Service.extend({
+export default class FirebaseApp extends Service.extend({
 
     name: undefined,
     firebase: service('firebase')
