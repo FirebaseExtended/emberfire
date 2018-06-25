@@ -15,7 +15,7 @@ module.exports = {
     return RSVP.all([
       this.addAddonToProject('firebase'),
       this.addPackageToProject('emberfire'),
-      this.addAddonToProject('ember-browserify')
+      this.addAddonToProject('ember-auto-import')
     ]);
   }
 };
