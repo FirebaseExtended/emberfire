@@ -12,5 +12,6 @@
 
 ## Additional Resources
 
+1. [Advanced Configuration](advanced-configuration.md) - Use advanced configuration to connect to multiple Firebase applications, databases, etc.
 1. [Using FirebaseUI auth](https://gist.github.com/steven-ferguson/8eddf63123fa74066e9d92f7e829d8e9) - [@steven-ferguson](https://github.com/steven-ferguson) shows how to integrate [FirebaseUI Auth](https://github.com/firebase/firebaseui-web)
 1. [Acceptance Testing WIP](https://github.com/firebase/emberfire/pull/409) - This pull request will give standard acceptance testing patterns to EmberFire projects

@@ -16,7 +16,7 @@
 * [enablePersistence](firestoreadapter.md#enablepersistence)
 * [firebaseApp](firestoreadapter.md#firebaseapp)
 * [firestore](firestoreadapter.md#firestore)
-* [firestoreSettings](firestoreadapter.md#firestoresettings)
+* [settings](firestoreadapter.md#settings)
 
 ### Methods
 
@@ -40,7 +40,7 @@
 
 **● defaultSerializer**: *`string`* = "-firestore"
 
-*Defined in [adapters/firestore.ts:29](https://github.com/firebase/emberfire/blob/7728aa3/addon/adapters/firestore.ts#L29)*
+*Defined in [adapters/firestore.ts:29](https://github.com/firebase/emberfire/blob/ffe43cd/addon/adapters/firestore.ts#L29)*
 
 ___
 <a id="enablepersistence"></a>
@@ -49,7 +49,7 @@ ___
 
 **● enablePersistence**: *`boolean`*
 
-*Defined in [adapters/firestore.ts:26](https://github.com/firebase/emberfire/blob/7728aa3/addon/adapters/firestore.ts#L26)*
+*Defined in [adapters/firestore.ts:26](https://github.com/firebase/emberfire/blob/ffe43cd/addon/adapters/firestore.ts#L26)*
 
 ___
 <a id="firebaseapp"></a>
@@ -58,7 +58,7 @@ ___
 
 **● firebaseApp**: *`ComputedProperty`<[FirebaseAppService](firebaseappservice.md), [FirebaseAppService](firebaseappservice.md)>*
 
-*Defined in [adapters/firestore.ts:26](https://github.com/firebase/emberfire/blob/7728aa3/addon/adapters/firestore.ts#L26)*
+*Defined in [adapters/firestore.ts:26](https://github.com/firebase/emberfire/blob/ffe43cd/addon/adapters/firestore.ts#L26)*
 
 ___
 <a id="firestore"></a>
@@ -67,16 +67,16 @@ ___
 
 **● firestore**: *`firestore.Firestore`*
 
-*Defined in [adapters/firestore.ts:28](https://github.com/firebase/emberfire/blob/7728aa3/addon/adapters/firestore.ts#L28)*
+*Defined in [adapters/firestore.ts:28](https://github.com/firebase/emberfire/blob/ffe43cd/addon/adapters/firestore.ts#L28)*
 
 ___
-<a id="firestoresettings"></a>
+<a id="settings"></a>
 
-###  firestoreSettings
+###  settings
 
-**● firestoreSettings**: *`Settings`*
+**● settings**: *`Settings`*
 
-*Defined in [adapters/firestore.ts:26](https://github.com/firebase/emberfire/blob/7728aa3/addon/adapters/firestore.ts#L26)*
+*Defined in [adapters/firestore.ts:26](https://github.com/firebase/emberfire/blob/ffe43cd/addon/adapters/firestore.ts#L26)*
 
 ___
 
@@ -88,7 +88,7 @@ ___
 
 ▸ **createRecord**(_store: *`Store`*, type: *`any`*, snapshot: *`Snapshot`<`never`>*): `Promise`< `void` &#124; `DocumentReference`>
 
-*Defined in [adapters/firestore.ts:70](https://github.com/firebase/emberfire/blob/7728aa3/addon/adapters/firestore.ts#L70)*
+*Defined in [adapters/firestore.ts:70](https://github.com/firebase/emberfire/blob/ffe43cd/addon/adapters/firestore.ts#L70)*
 
 **Parameters:**
 
@@ -107,7 +107,7 @@ ___
 
 ▸ **deleteRecord**(_store: *`Store`*, type: *`any`*, snapshot: *`Snapshot`<`never`>*): `Promise`<`void`>
 
-*Defined in [adapters/firestore.ts:83](https://github.com/firebase/emberfire/blob/7728aa3/addon/adapters/firestore.ts#L83)*
+*Defined in [adapters/firestore.ts:83](https://github.com/firebase/emberfire/blob/ffe43cd/addon/adapters/firestore.ts#L83)*
 
 **Parameters:**
 
@@ -126,7 +126,7 @@ ___
 
 ▸ **findAll**(_store: *`Store`*, type: *`any`*): `Promise`<`QuerySnapshot`>
 
-*Defined in [adapters/firestore.ts:35](https://github.com/firebase/emberfire/blob/7728aa3/addon/adapters/firestore.ts#L35)*
+*Defined in [adapters/firestore.ts:35](https://github.com/firebase/emberfire/blob/ffe43cd/addon/adapters/firestore.ts#L35)*
 
 **Parameters:**
 
@@ -144,7 +144,7 @@ ___
 
 ▸ **findBelongsTo**(_store: *`Store`*, snapshot: *`Snapshot`<`never`>*, _url: *`any`*, relationship: *`any`*): `Promise`<`DocumentSnapshot`>
 
-*Defined in [adapters/firestore.ts:52](https://github.com/firebase/emberfire/blob/7728aa3/addon/adapters/firestore.ts#L52)*
+*Defined in [adapters/firestore.ts:52](https://github.com/firebase/emberfire/blob/ffe43cd/addon/adapters/firestore.ts#L52)*
 
 **Parameters:**
 
@@ -164,7 +164,7 @@ ___
 
 ▸ **findHasMany**(_store: *`Store`*, snapshot: *`Snapshot`<`never`>*, _url: *`any`*, relationship: *`any`*): `Promise`<`QuerySnapshot`>
 
-*Defined in [adapters/firestore.ts:39](https://github.com/firebase/emberfire/blob/7728aa3/addon/adapters/firestore.ts#L39)*
+*Defined in [adapters/firestore.ts:39](https://github.com/firebase/emberfire/blob/ffe43cd/addon/adapters/firestore.ts#L39)*
 
 **Parameters:**
 
@@ -184,7 +184,7 @@ ___
 
 ▸ **findRecord**(_store: *`Store`*, type: *`any`*, id: *`string`*): `Promise`<`DocumentSnapshot`>
 
-*Defined in [adapters/firestore.ts:31](https://github.com/firebase/emberfire/blob/7728aa3/addon/adapters/firestore.ts#L31)*
+*Defined in [adapters/firestore.ts:31](https://github.com/firebase/emberfire/blob/ffe43cd/addon/adapters/firestore.ts#L31)*
 
 **Parameters:**
 
@@ -203,7 +203,7 @@ ___
 
 ▸ **query**(_store: *`Store`*, type: *`any`*, queryFn: *[QueryFn](../#queryfn)*): `Promise`<`QuerySnapshot`>
 
-*Defined in [adapters/firestore.ts:56](https://github.com/firebase/emberfire/blob/7728aa3/addon/adapters/firestore.ts#L56)*
+*Defined in [adapters/firestore.ts:56](https://github.com/firebase/emberfire/blob/ffe43cd/addon/adapters/firestore.ts#L56)*
 
 **Parameters:**
 
@@ -222,7 +222,7 @@ ___
 
 ▸ **shouldBackgroundReloadRecord**(): `boolean`
 
-*Defined in [adapters/firestore.ts:60](https://github.com/firebase/emberfire/blob/7728aa3/addon/adapters/firestore.ts#L60)*
+*Defined in [adapters/firestore.ts:60](https://github.com/firebase/emberfire/blob/ffe43cd/addon/adapters/firestore.ts#L60)*
 
 **Returns:** `boolean`
 
@@ -233,7 +233,7 @@ ___
 
 ▸ **updateRecord**(_store: *`Store`*, type: *`any`*, snapshot: *`Snapshot`<`never`>*): `Promise`<`void`>
 
-*Defined in [adapters/firestore.ts:64](https://github.com/firebase/emberfire/blob/7728aa3/addon/adapters/firestore.ts#L64)*
+*Defined in [adapters/firestore.ts:64](https://github.com/firebase/emberfire/blob/ffe43cd/addon/adapters/firestore.ts#L64)*
 
 **Parameters:**
 

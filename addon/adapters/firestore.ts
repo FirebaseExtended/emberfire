@@ -17,13 +17,13 @@ export type QueryFn = (ref: CollectionReferenceOrQuery) => CollectionReferenceOr
 export default class FirestoreAdapter extends DS.Adapter.extend({
 
     firebaseApp: service('firebase-app'),
-    firestoreSettings: { timestampsInSnapshots: true } as firestore.Settings,
+    settings: { timestampsInSnapshots: true } as firestore.Settings,
     enablePersistence: false as boolean
 
 }) {
 
     // @ts-ignore repeating here so typedoc picks it up
-    enablePersistence: boolean; firestoreSettings: firestore.Settings; firebaseApp: Ember.ComputedProperty<FirebaseAppService, FirebaseAppService>;
+    enablePersistence: boolean; settings: firestore.Settings; firebaseApp: Ember.ComputedProperty<FirebaseAppService, FirebaseAppService>;
 
     firestore? : firestore.Firestore;
     defaultSerializer = '-firestore';
@@ -124,8 +124,8 @@ const firestoreInstance = (adapter: FirestoreAdapter) => {
     if (!cachedFirestoreInstance) {
         const app = get(adapter, 'firebaseApp');
         cachedFirestoreInstance = app.firestore();
-        const firestoreSettings = get(adapter, 'firestoreSettings');
-        cachedFirestoreInstance.settings(firestoreSettings);
+        const settings = get(adapter, 'settings');
+        cachedFirestoreInstance.settings(settings);
         const enablePersistence = get(adapter, 'enablePersistence');
         const fastboot = getOwner(adapter).lookup('service:fastboot');
         if (enablePersistence && (fastboot == null || !fastboot.isFastBoot)) {

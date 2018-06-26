@@ -30,7 +30,7 @@
 
 **● firebaseApp**: *`ComputedProperty`<[FirebaseAppService](firebaseappservice.md), [FirebaseAppService](firebaseappservice.md)>*
 
-*Defined in [authenticators/firebase.ts:19](https://github.com/firebase/emberfire/blob/7728aa3/addon/authenticators/firebase.ts#L19)*
+*Defined in [authenticators/firebase.ts:19](https://github.com/firebase/emberfire/blob/ffe43cd/addon/authenticators/firebase.ts#L19)*
 
 ___
 
@@ -42,7 +42,7 @@ ___
 
 ▸ **authenticate**(): `Promise`<`never`>
 
-*Defined in [authenticators/firebase.ts:25](https://github.com/firebase/emberfire/blob/7728aa3/addon/authenticators/firebase.ts#L25)*
+*Defined in [authenticators/firebase.ts:25](https://github.com/firebase/emberfire/blob/ffe43cd/addon/authenticators/firebase.ts#L25)*
 
 **Returns:** `Promise`<`never`>
 
@@ -53,7 +53,7 @@ ___
 
 ▸ **invalidate**(): `Promise`<`void`>
 
-*Defined in [authenticators/firebase.ts:29](https://github.com/firebase/emberfire/blob/7728aa3/addon/authenticators/firebase.ts#L29)*
+*Defined in [authenticators/firebase.ts:29](https://github.com/firebase/emberfire/blob/ffe43cd/addon/authenticators/firebase.ts#L29)*
 
 **Returns:** `Promise`<`void`>
 
@@ -64,7 +64,7 @@ ___
 
 ▸ **restore**(data: *`any`*): `Promise`<`any`>
 
-*Defined in [authenticators/firebase.ts:21](https://github.com/firebase/emberfire/blob/7728aa3/addon/authenticators/firebase.ts#L21)*
+*Defined in [authenticators/firebase.ts:21](https://github.com/firebase/emberfire/blob/ffe43cd/addon/authenticators/firebase.ts#L21)*
 
 **Parameters:**
 
