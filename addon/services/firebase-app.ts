@@ -28,9 +28,9 @@ export default class FirebaseAppService extends Service.extend({
 }) {
 
     // @ts-ignore repeat here for typedocs
-    firebase: Ember.ComputedProperty<FirebaseService, FirebaseService>; name: string|undefined;
+    firebase: Ember.ComputedProperty<FirebaseService, FirebaseService>; name?: string;
 
-    options?: {[key:string]: any};
+    options?: object;
     auth = (): auth.Auth => getApp(this).auth();
     database = (databaseURL?: string): database.Database => (getApp(this).database as any)(databaseURL);
     firestore = (): firestore.Firestore => getApp(this).firestore();

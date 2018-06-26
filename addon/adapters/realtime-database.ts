@@ -16,12 +16,12 @@ export type QueryFn = (ref: ReferenceOrQuery) => ReferenceOrQuery;
 export default class RealtimeDatabaseAdapter extends DS.Adapter.extend({
 
     firebaseApp: service('firebase-app'),
-    databaseURL: undefined as string|undefined,
+    databaseURL: undefined
 
 }) {
 
     // @ts-ignore repeat here for typedoc
-    firebaseApp: Ember.ComputedProperty<FirebaseAppService, FirebaseAppService>; databaseURL: string|undefined;
+    firebaseApp: Ember.ComputedProperty<FirebaseAppService, FirebaseAppService>; databaseURL?: string;
 
     database?: database.Database;
     defaultSerializer = '-realtime-database';
