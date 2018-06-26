@@ -14,19 +14,77 @@ import { firestore } from 'firebase';
 export type CollectionReferenceOrQuery = firestore.CollectionReference | firestore.Query;
 export type QueryFn = (ref: CollectionReferenceOrQuery) => CollectionReferenceOrQuery;
 
+/**
+ * Persist your Ember Data models in Cloud Firestore
+ * 
+ * ```js
+ * // app/adapters/application.js
+ * import FirestoreAdapter from 'emberfire/adapters/firestore';
+ *
+ * export default FirestoreAdapter.extend({
+ *   // configuration goes here
+ * });
+ * ```
+ * 
+ */
 export default class FirestoreAdapter extends DS.Adapter.extend({
 
     firebaseApp: service('firebase-app'),
     settings: { timestampsInSnapshots: true } as firestore.Settings,
-    enablePersistence: false as boolean
+    enablePersistence: false as boolean,
+    firestore: undefined as firestore.Firestore|undefined,
+    defaultSerializer: '-firestore'
 
 }) {
 
-    // @ts-ignore repeating here so typedoc picks it up
-    enablePersistence: boolean; settings: firestore.Settings; firebaseApp: Ember.ComputedProperty<FirebaseAppService, FirebaseAppService>;
+    /**
+     * Enable offline persistence with Cloud Firestore, it is not enabled by default
+     * 
+     * ```js
+     * // app/adapters/application.js
+     * import FirestoreAdapter from 'emberfire/adapters/firestore';
+     *
+     * export default FirestoreAdapter.extend({
+     *   enablePersistence: true
+     * });
+     * ```
+     * 
+     */
+    // @ts-ignore repeat here for the tyepdocs
+    enablePersistence: boolean;
 
-    firestore? : firestore.Firestore;
-    defaultSerializer = '-firestore';
+    /**
+     * Override the default configuration of the Cloud Firestore adapter: `{ timestampsInSnapshots: true }`
+     * 
+     * ```js
+     * // app/adapters/application.js
+     * import FirestoreAdapter from 'emberfire/adapters/firestore';
+     *
+     * export default FirestoreAdapter.extend({
+     *   settings: { timestampsInSnapshots: false }
+     * });
+     * ```
+     * 
+     */
+    // @ts-ignore repeat here for the tyepdocs
+    settings: firestore.Settings;
+    
+    /**
+     * Override the default FirebaseApp Service used by the FirestoreAdapter: `service('firebase-app')`
+     * 
+     * ```js
+     * // app/adapters/application.js
+     * import FirestoreAdapter from 'emberfire/adapters/firestore';
+     * import { inject as service } from '@ember/service';
+     *
+     * export default FirestoreAdapter.extend({
+     *   firebaseApp: service('firebase-different-app')
+     * });
+     * ```
+     * 
+     */
+    // @ts-ignore repeat here for the tyepdocs
+    firebaseApp: Ember.ComputedProperty<FirebaseAppService, FirebaseAppService>;
 
     findRecord(_store: DS.Store, type: any, id: string) {
         return getDoc(this, type, id);

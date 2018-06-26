@@ -13,18 +13,60 @@ import { database } from 'firebase';
 export type ReferenceOrQuery = database.Reference | database.Query;
 export type QueryFn = (ref: ReferenceOrQuery) => ReferenceOrQuery;
 
+/**
+ * Persist your Ember Data models in the Firebase Realtime Database
+ * 
+ * ```js
+ * // app/adapters/application.js
+ * import RealtimeDatabaseAdapter from 'emberfire/adapters/realtime-database';
+ *
+ * export default RealtimeDatabaseAdapter.extend({
+ *   // configuration goes here
+ * });
+ * ```
+ * 
+ */
 export default class RealtimeDatabaseAdapter extends DS.Adapter.extend({
 
     firebaseApp: service('firebase-app'),
-    databaseURL: undefined
+    databaseURL: undefined,
+    database: undefined as database.Database|undefined,
+    defaultSerializer: '-realtime-database'
 
 }) {
 
-    // @ts-ignore repeat here for typedoc
-    firebaseApp: Ember.ComputedProperty<FirebaseAppService, FirebaseAppService>; databaseURL?: string;
-
-    database?: database.Database;
-    defaultSerializer = '-realtime-database';
+    /**
+     * Override the default FirebaseApp Service used by the RealtimeDatabaseAdapter: `service('firebase-app')`
+     * 
+     * ```js
+     * // app/adapters/application.js
+     * import RealtimeDatabaseAdapter from 'emberfire/adapters/realtime-database';
+     * import { inject as service } from '@ember/service';
+     *
+     * export default RealtimeDatabaseAdapter.extend({
+     *   firebaseApp: service('firebase-different-app')
+     * });
+     * ```
+     * 
+     */
+    // @ts-ignore repeat here for the tyepdocs
+    firebaseApp: Ember.ComputedProperty<FirebaseAppService, FirebaseAppService>;
+    
+    /**
+     * Override the default database used by the RealtimeDatabaseAdapter
+     * 
+     * ```js
+     * // app/adapters/application.js
+     * import RealtimeDatabaseAdapter from 'emberfire/adapters/realtime-database';
+     *
+     * export default RealtimeDatabaseAdapter.extend({
+     *   databaseURL: 'https://DIFFERENT_DATABASE.firebaseio.com'
+     * });
+     * ```
+     * 
+     */
+    // @ts-ignore repeat here for the tyepdocs
+    databaseURL?: string;
 
     findRecord(_store: DS.Store, type: any, id: string) {
         return wrapPromiseLike(() => docReference(this, type, id).once('value'));
