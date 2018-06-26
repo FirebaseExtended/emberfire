@@ -12,5 +12,6 @@ module.exports = {
     excludeProtected: true,
     excludeExternals: true,
     excludeNotExported: true,
-    excludePrivate: true
+    excludePrivate: true,
+    gitRevision: 'v3'
 };

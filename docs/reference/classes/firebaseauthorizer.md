@@ -159,7 +159,7 @@ ___
 
 ▸ **authorize**(data: *`any`*, cb: *`any`*): `void`
 
-*Defined in [authorizers/firebase.ts:4](https://github.com/firebase/emberfire/blob/ffe43cd/addon/authorizers/firebase.ts#L4)*
+*Defined in [authorizers/firebase.ts:4](https://github.com/firebase/emberfire/blob/v3/addon/authorizers/firebase.ts#L4)*
 
 **Parameters:**
 
