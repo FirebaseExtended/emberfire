@@ -34,6 +34,8 @@ tsconfig.json
 typedoc.js
 yarn.lock
 package-lock.json
+/addon/**/*.ts
+/app/**/*.ts
 
 /.node_modules.ember-try/*
 bower.json.ember-try

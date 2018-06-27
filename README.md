@@ -72,4 +72,4 @@ Please consult this table when selecting your version of EmberFire and Firebase 
 ## Contributing
 
 If you'd like to contribute to EmberFire, please first read through our [contribution
-guidelines](.github/CONTRIBUTING.md). Local setup instructions are available [here](.github/CONTRIBUTING.md#local-setup).
+guidelines](https://github.com/firebase/emberfire/blob/master/.github/CONTRIBUTING.md). Local setup instructions are available [here](https://github.com/firebase/emberfire/blob/master/.github/CONTRIBUTING.md#local-setup).
