@@ -7,7 +7,7 @@ export default class FirebaseService extends Service {
   apps = firebase.apps;
   initializeApp = (options: Object, nameOrConfig?: string|Object) => firebase.initializeApp(options, nameOrConfig as string|undefined);
 
-};
+}
 
 declare module '@ember/service' {
   interface Registry {

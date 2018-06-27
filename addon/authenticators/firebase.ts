@@ -32,4 +32,4 @@ export default class FirebaseAuthenticator extends BaseAuthenticator.extend({
         })
     }
 
-};
+}

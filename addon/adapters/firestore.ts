@@ -88,7 +88,7 @@ export default class FirestoreAdapter extends DS.Adapter.extend({
 
     findRecord(_store: DS.Store, type: any, id: string) {
         return getDoc(this, type, id);
-    };
+    }
 
     findAll(_store: DS.Store, type: any) {
         return queryDocs(rootCollection(this, type));
@@ -142,7 +142,7 @@ export default class FirestoreAdapter extends DS.Adapter.extend({
         return wrapPromiseLike(() => docReference(this, type, snapshot.id).delete());
     }
 
-};
+}
 
 declare module 'ember-data' {
     interface AdapterRegistry {
@@ -173,9 +173,9 @@ const collectionNameForType = (type: any) => {
     return pluralize(camelize(modelName));
 }
 
-const docReference = (adapter: FirestoreAdapter, type: any, id: string) => rootCollection(adapter, type).doc(id);
+const docReference = (adapter: FirestoreAdapter, type: any, id: string) => rootCollection(adapter, type).doc(id)
 
-const getDocs = (query: CollectionReferenceOrQuery) => wrapPromiseLike(() => query.get());
+const getDocs = (query: CollectionReferenceOrQuery) => wrapPromiseLike(() => query.get())
 
 const firestoreInstance = (adapter: FirestoreAdapter) => {
     let cachedFirestoreInstance = get(adapter, 'firestore');

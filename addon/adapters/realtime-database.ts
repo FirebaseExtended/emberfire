@@ -133,7 +133,7 @@ export default class RealtimeDatabaseAdapter extends DS.Adapter.extend({
         return wrapPromiseLike(() => docReference(this, type, snapshot.id).remove());
     }
 
-};
+}
 
 declare module 'ember-data' {
     interface AdapterRegistry {
@@ -173,9 +173,9 @@ const databaseInstance = (adapter: RealtimeDatabaseAdapter) => {
 }
 
 const rootCollection = (adapter: RealtimeDatabaseAdapter, type: any) => 
-    databaseInstance(adapter).ref(collectionNameForType(type));
+    databaseInstance(adapter).ref(collectionNameForType(type))
 
-const getDocs = (query: ReferenceOrQuery) => wrapPromiseLike(() => query.once('value'));
+const getDocs = (query: ReferenceOrQuery) => wrapPromiseLike(() => query.once('value'))
 
 const docReference = (adapter: RealtimeDatabaseAdapter, type: any, id: string) => 
-    rootCollection(adapter, type).child(id);
+    rootCollection(adapter, type).child(id)

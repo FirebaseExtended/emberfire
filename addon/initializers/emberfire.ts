@@ -11,7 +11,7 @@ const initialize = (application: any) => {
     } else {
         environment.firebase.forEach((config:any) => loadEnvironment(application, config));
     }
-};
+}
 
 const loadEnvironment = (application:any, environment:any) => {
     const config = Object.assign({}, environment);
@@ -27,4 +27,4 @@ const loadEnvironment = (application:any, environment:any) => {
 export default {
   name: 'emberfire',
   initialize: initialize
-};
+}

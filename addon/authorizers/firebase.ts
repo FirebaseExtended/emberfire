@@ -6,4 +6,4 @@ export default class FirebaseAuthorizer extends BaseAuthorizer {
             cb('Authorization', `Bearer ${token}`);
         });
     }
-};
+}

@@ -37,4 +37,4 @@ export default class FirebaseSessionStore extends BaseSessionStore.extend({
         });
     }
 
-};
+}

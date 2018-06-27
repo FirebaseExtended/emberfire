@@ -44,7 +44,7 @@ export default class FirebaseAppService extends Service.extend({
         set(this, 'options', app.options);
     }
 
-};
+}
 
 declare module '@ember/service' {
   interface Registry {

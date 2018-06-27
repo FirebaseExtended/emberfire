@@ -19,9 +19,9 @@ export default class RealtimeDatabaseSerializer extends DS.JSONSerializer {
       Object.assign(embeddedRecords, included);
     });
     return { data: noramlizedRecords, included: embeddedRecords, meta: {} };
-  };
+  }
 
-};
+}
 
 declare module 'ember-data' {
   interface SerializerRegistry {
@@ -87,4 +87,4 @@ const normalizeEmbedded = (store: DS.Store, attribute: any, relationship: any, i
 }
 
 const normalizeHasMany = (_store: DS.Store, _attribute: any, _relationship: any, _included: any[]) => 
-  ({ links: { related: 'emberfire' } });
+  ({ links: { related: 'emberfire' } })

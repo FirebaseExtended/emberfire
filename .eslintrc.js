@@ -16,7 +16,6 @@ module.exports = {
     },
     rules: {
         "no-unused-vars": 0, // can't get the _ ignore working
-        "no-extra-semi": 0,   // typescript spits these out on occasion
         "ember/avoid-leaking-state-in-ember-objects": 0, // using this, TODO override only for the one file
         "no-console": 0 // using this, TODO override only for the specific file
     },

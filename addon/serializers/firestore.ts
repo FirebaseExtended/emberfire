@@ -25,9 +25,9 @@ export default class FirestoreSerializer extends DS.JSONSerializer {
     });
     const meta = extractMeta(payload);
     return { data: noramlizedRecords, included, meta };
-  };
+  }
 
-};
+}
 
 declare module 'ember-data' {
   interface SerializerRegistry {
@@ -106,4 +106,4 @@ const normalizeEmbedded = (store: DS.Store, attribute: any, relationship: any, i
 }
 
 const normalizeHasMany = (_store: DS.Store, _attribute: any, _relationship: any, _included: any[]) => 
-  ({ links: { related: 'emberfire' } });
+  ({ links: { related: 'emberfire' } })
