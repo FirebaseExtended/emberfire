@@ -39,7 +39,6 @@ matrix:
   allow_failures:
     - env: EMBER_TRY_SCENARIO=ember-canary
     - env: FIREBASE_SCENARIO=firebase-canary EMBER_TRY_SCENARIO=ember-default
-    - env: EMBER_TRY_SCENARIO=ember-beta
 
 before_install:
   # upgrade npm to get the "ci" command
