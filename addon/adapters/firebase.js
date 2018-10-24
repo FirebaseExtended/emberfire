@@ -1,4 +1,3 @@
-import Ember from 'ember';
 import DS from 'ember-data';
 import Waitable from '../mixins/waitable';
 import toPromise from '../utils/to-promise';
