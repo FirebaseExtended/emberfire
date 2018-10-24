@@ -1,5 +1,4 @@
 import firebase from 'firebase';
-import Ember from 'ember';
 
 const { getOwner } = Ember;
 
