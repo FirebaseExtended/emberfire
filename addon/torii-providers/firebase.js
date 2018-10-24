@@ -1,4 +1,3 @@
-import Ember from 'ember';
 import Waitable from '../mixins/waitable';
 
 const { getOwner } = Ember;
