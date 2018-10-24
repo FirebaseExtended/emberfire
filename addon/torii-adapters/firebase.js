@@ -1,5 +1,3 @@
-import Ember from 'ember';
-
 export default Ember.Object.extend({
   firebaseApp: Ember.inject.service(),
 
