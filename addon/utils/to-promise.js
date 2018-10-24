@@ -1,4 +1,3 @@
-import Ember from 'ember';
 
 export default function(fn, context, _args, errorMsg) {
   var args = _args || [];
