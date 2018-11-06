@@ -818,6 +818,7 @@ export default DS.Adapter.extend(Waitable, {
    * _updateHasManyCacheForType
    */
   _updateRecordCacheForType(typeClass, payload, store) {
+    if (store.isDestroying || store.isDestroyed) { return; }
     if (!payload) { return; }
     const id = payload.id;
     const cache = this._getRecordCache(typeClass, id);
