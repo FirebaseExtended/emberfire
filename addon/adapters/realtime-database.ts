@@ -8,7 +8,7 @@ import FirebaseAppService from '../services/firebase-app';
 
 import { inject as service } from '@ember/service';
 import { get, set } from '@ember/object';
-import { database } from 'firebase';
+import { database } from 'firebase/app';
 
 export type ReferenceOrQuery = database.Reference | database.Query;
 export type QueryFn = (ref: ReferenceOrQuery) => ReferenceOrQuery;

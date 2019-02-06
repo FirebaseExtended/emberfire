@@ -25,7 +25,7 @@ export default class FirebaseSessionStore extends BaseSessionStore.extend({
 
     restore() {
         return new Promise(resolve => {
-            get(this, 'firebaseApp').auth().onIdTokenChanged((user:any) => run(() => {
+            get(this, 'firebaseApp').auth().onIdTokenChanged(user => run(() => {
                 let authenticated = user ? {authenticator: 'authenticator:firebase', user, credential: user.getIdToken()} : {};
                 if (get(this, 'restoring')) {
                     set(this, 'restoring', false);

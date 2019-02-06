@@ -9,7 +9,7 @@ import RSVP from 'rsvp';
 import Ember from 'ember';
 import FirebaseAppService from '../services/firebase-app';
 
-import { firestore } from 'firebase';
+import { firestore } from 'firebase/app';
 
 export type CollectionReferenceOrQuery = firestore.CollectionReference | firestore.Query;
 export type QueryFn = (ref: CollectionReferenceOrQuery) => CollectionReferenceOrQuery;
@@ -30,8 +30,9 @@ export type QueryFn = (ref: CollectionReferenceOrQuery) => CollectionReferenceOr
 export default class FirestoreAdapter extends DS.Adapter.extend({
 
     firebaseApp: service('firebase-app'),
-    settings: { timestampsInSnapshots: true } as firestore.Settings,
+    settings: { } as firestore.Settings,
     enablePersistence: false as boolean,
+    persistenceSettings: { } as firestore.PersistenceSettings,
     firestore: undefined as firestore.Firestore|undefined,
     defaultSerializer: '-firestore'
 
@@ -61,13 +62,30 @@ export default class FirestoreAdapter extends DS.Adapter.extend({
      * import FirestoreAdapter from 'emberfire/adapters/firestore';
      *
      * export default FirestoreAdapter.extend({
-     *   settings: { timestampsInSnapshots: false }
+     *   settings: { timestampsInSnapshots: true }
      * });
      * ```
      * 
      */
     // @ts-ignore repeat here for the tyepdocs
     settings: firestore.Settings;
+
+    /**
+     * Pass persistence settings to Cloud Firestore, enablePersistence has to be true for these to be used
+     * 
+     * ```js
+     * // app/adapters/application.js
+     * import FirestoreAdapter from 'emberfire/adapters/firestore';
+     *
+     * export default FirestoreAdapter.extend({
+     *   enablePersistence: true,
+     *   persistenceSettings: { experimentalTabSynchronization: true }
+     * });
+     * ```
+     * 
+     */
+    // @ts-ignore repeat here for the tyepdocs
+    persistenceSettings: firestore.PersistenceSettings;
     
     /**
      * Override the default FirebaseApp Service used by the FirestoreAdapter: `service('firebase-app')`
@@ -187,7 +205,8 @@ const firestoreInstance = (adapter: FirestoreAdapter) => {
         const enablePersistence = get(adapter, 'enablePersistence');
         const fastboot = getOwner(adapter).lookup('service:fastboot');
         if (enablePersistence && (fastboot == null || !fastboot.isFastBoot)) {
-           cachedFirestoreInstance.enablePersistence().catch(console.warn);
+            const persistenceSettings = get(adapter, 'persistenceSettings');
+            cachedFirestoreInstance.enablePersistence(persistenceSettings).catch(console.warn);
         }
         set(adapter, 'firestore', cachedFirestoreInstance);
     }

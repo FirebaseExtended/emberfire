@@ -11,13 +11,12 @@ import 'firebase/functions';
 import 'firebase/messaging';
 import 'firebase/storage';
 
-import { app, auth, database, firestore, functions, messaging, storage } from 'firebase';
+import { app, auth, database, firestore, functions, messaging, storage } from 'firebase/app';
 
-const getApp = (service: FirebaseAppService) => {
+const getApp = (service: FirebaseAppService): app.App => {
     const firebase = get(service, 'firebase');
     const name = get(service, 'name');
-    // TODO raise exception is undefined? or does it already?
-    return (firebase.app(name) as any) as app.App;
+    return firebase.app(name);
 }
 
 export default class FirebaseAppService extends Service.extend({
@@ -31,10 +30,12 @@ export default class FirebaseAppService extends Service.extend({
     firebase: Ember.ComputedProperty<FirebaseService, FirebaseService>; name?: string;
 
     options?: object;
+
+    delete = () => getApp(this).delete();
     auth = (): auth.Auth => getApp(this).auth();
-    database = (databaseURL?: string): database.Database => (getApp(this).database as any)(databaseURL);
+    database = (databaseURL?: string): database.Database => getApp(this).database(databaseURL);
     firestore = (): firestore.Firestore => getApp(this).firestore();
-    functions = (): functions.Functions => getApp(this).functions();
+    functions = (region?: string): functions.Functions => getApp(this).functions(region);
     messaging = (): messaging.Messaging => getApp(this).messaging();
     storage = (storageBucket?: string): storage.Storage => getApp(this).storage(storageBucket);
 
