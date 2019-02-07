@@ -2,7 +2,6 @@ import { pluralize } from 'ember-inflector';
 import { camelize } from '@ember/string';
 import RSVP from 'rsvp';
 import DS from 'ember-data';
-import { run } from '@ember/runloop';
 import Ember from 'ember';
 import FirebaseAppService from '../services/firebase-app';
 
@@ -30,7 +29,7 @@ export default class RealtimeDatabaseAdapter extends DS.Adapter.extend({
 
     firebaseApp: service('firebase-app'),
     databaseURL: undefined,
-    database: undefined as Promise<database.Database>|undefined,
+    database: undefined as RSVP.Promise<database.Database>|undefined,
     defaultSerializer: '-realtime-database'
 
 }) {
@@ -144,15 +143,6 @@ const queryDocs = (referenceOrQuery: ReferenceOrQuery, query?: QueryFn) => {
     return getDocs(queryFn(referenceOrQuery));
 }
 
-const wrapPromiseLike = <T=any>(fn: () => PromiseLike<T>) => {
-    return new RSVP.Promise<T>((resolve, reject) => {
-        fn().then(
-            result => run(() => resolve(result)),
-            reason => run(() => reject(reason))
-        );
-    });
-}
-
 const collectionNameForType = (type: any) => {
     const modelName = typeof(type) === 'string' ? type : type.modelName;
     return pluralize(camelize(modelName));
@@ -170,9 +160,9 @@ const databaseInstance = (adapter: RealtimeDatabaseAdapter) => {
 }
 
 const rootCollection = (adapter: RealtimeDatabaseAdapter, type: any) => 
-    wrapPromiseLike(() => databaseInstance(adapter)).then(database => database.ref(collectionNameForType(type)));
+   databaseInstance(adapter).then(database => database.ref(collectionNameForType(type)));
 
-const getDocs = (query: ReferenceOrQuery) => wrapPromiseLike(() => query.once('value'))
+const getDocs = (query: ReferenceOrQuery) => query.once('value')
 
 const docReference = (adapter: RealtimeDatabaseAdapter, type: any, id: string) => 
     rootCollection(adapter, type).then(ref => ref.child(id))

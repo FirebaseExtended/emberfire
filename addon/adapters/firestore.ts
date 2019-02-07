@@ -33,7 +33,7 @@ export default class FirestoreAdapter extends DS.Adapter.extend({
     settings: { } as firestore.Settings,
     enablePersistence: false as boolean,
     persistenceSettings: { } as firestore.PersistenceSettings,
-    firestore: undefined as Promise<firestore.Firestore>|undefined,
+    firestore: undefined as RSVP.Promise<firestore.Firestore>|undefined,
     defaultSerializer: '-firestore'
 
 }) {
@@ -164,15 +164,6 @@ declare module 'ember-data' {
 const getDoc = (adapter: FirestoreAdapter, type: DS.Model, id: string) =>
     docReference(adapter, type, id).then(doc => doc.get());
 
-const wrapPromiseLike = <T=any>(fn: () => PromiseLike<T>) => {
-    return new RSVP.Promise<T>((resolve, reject) => {
-        fn().then(
-            result => run(() => resolve(result)),
-            reason => run(() => reject(reason))
-        );
-    });
-}
-
 /*
 const canonicalId = (query: firestore.DocumentReference | CollectionReferenceOrQuery) => {
     const keyPath = get(query as any, '_key.path');
@@ -209,7 +200,7 @@ const firestoreInstance = (adapter: FirestoreAdapter) => {
 };
 
 const rootCollection = (adapter: FirestoreAdapter, type: any) => 
-    wrapPromiseLike(() => firestoreInstance(adapter)).then(firestore => firestore.collection(collectionNameForType(type)))
+    firestoreInstance(adapter).then(firestore => firestore.collection(collectionNameForType(type)))
 
 const queryDocs = (referenceOrQuery: CollectionReferenceOrQuery, query?: QueryFn) => {
     const noop = (ref: CollectionReferenceOrQuery) => ref;
