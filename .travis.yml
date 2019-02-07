@@ -40,6 +40,10 @@ matrix:
     - env: EMBER_TRY_SCENARIO=ember-canary
     - env: EMBER_TRY_SCENARIO=firebase-canary
 
+before_install:
+  # upgrade npm to get the "ci" command
+  - npm i -g npm
+
 install:
   - npm ci
 
