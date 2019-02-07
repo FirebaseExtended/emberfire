@@ -18,7 +18,7 @@
     "start": "node ./express.js",
     "all": "npm run ts:precompile && npm run build && npm run start",
     "package": "npm run ts:precompile && npm run build && npm pack .",
-    "test": "COVERAGE=true ember test",
+    "test": "npm run ts:precompile && ember test",
     "ts:precompile": "ember ts:precompile",
     "reference": "typedoc --options typedoc.js addon"
   },
@@ -57,8 +57,6 @@
     "ember-resolver": "^5.0.1",
     "ember-simple-auth": "^1.8.1",
     "ember-source": "^3.7.3",
-    "ember-source-channel-url": "^1.1.0",
-    "ember-try": "^1.1.0",
     "eslint-plugin-ember": "^6.2.0",
     "eslint-plugin-node": "^8.0.1",
     "fastboot-express-middleware": "1.2.0",

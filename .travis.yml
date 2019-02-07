@@ -24,32 +24,36 @@ cache:
 
 env:
   # build for LTS versions (https://www.emberjs.com/builds/)
-  - EMBER_TRY_SCENARIO=ember-lts-2.16
-  - EMBER_TRY_SCENARIO=ember-lts-2.18
-  - EMBER_TRY_SCENARIO=ember-lts-3.4
-  - EMBER_TRY_SCENARIO=ember-default COVERAGE=true
-  - EMBER_TRY_SCENARIO=firebase-latest
-  - EMBER_TRY_SCENARIO=firebase-next
-  - EMBER_TRY_SCENARIO=firebase-canary
-  - EMBER_TRY_SCENARIO=ember-beta
-  - EMBER_TRY_SCENARIO=ember-canary
+  - COVERAGE=true
+  - FIREBASE_SCENARIO=latest
+  - FIREBASE_SCENARIO=next
+  - FIREBASE_SCENARIO=canary
+  - EMBER_SCENARIO=latest
+  - EMBER_SCENARIO=beta
+  - EMBER_SCENARIO=lts
 
 matrix:
   fast_finish: true
   allow_failures:
-    - env: EMBER_TRY_SCENARIO=ember-canary
-    - env: EMBER_TRY_SCENARIO=firebase-canary
+    - env: FIREBASE_SCENARIO=canary
+    - env: FIREBASE_SCENARIO=next
+    - env: EMBER_SCENARIO=beta
 
 before_install:
   # upgrade npm to get the "ci" command
   - npm i -g npm
 
 install:
+  - if [[ $FIREBASE_SCENARIO == 'latest' ]]; then npm i --save firebase@latest; fi
+  - if [[ $FIREBASE_SCENARIO == 'next'   ]]; then npm i --save firebase@next; fi
+  - if [[ $FIREBASE_SCENARIO == 'canary' ]]; then npm i --save firebase@canary; fi
+  - if [[ $EMBER_SCENARIO == 'latest' ]]; then npm i --save-dev ember-core@latest ember-data@latest; fi
+  - if [[ $EMBER_SCENARIO == 'beta' ]]; then npm i --save-dev ember-core@beta ember-data@beta; fi
+  - if [[ $EMBER_SCENARIO == 'lts' ]]; then npm i --save-dev ember-core@lts ember-data@lts; fi
   - npm ci
 
 script:
-  - npm run ts:precompile
-  - node_modules/.bin/ember try:one $EMBER_TRY_SCENARIO --skip-cleanup
+  - npm run test
 
 after_script:
   - if [ "$COVERAGE" ]; then sed 's/SF:modules\/emberfire\//SF:addon\//g' coverage/lcov.info > coverage/lcov.info.fixed; fi
