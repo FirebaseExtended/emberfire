@@ -7,11 +7,11 @@ module.exports = () => Promise.all(
 ).then( ([releaseUrl, betaUrl, canaryUrl]) =>
   ({
     scenarios: [{
-      name: 'ember-lts-2.17',
+      name: 'ember-lts-2.16',
       npm: {
         devDependencies: {
-          'ember-source': '~2.17.0',
-          'ember-data': '~2.17.0'
+          'ember-source': '~2.16.0',
+          'ember-data': '~2.16.0'
         }
       }
     }, {
@@ -20,6 +20,14 @@ module.exports = () => Promise.all(
         devDependencies: {
           'ember-source': '~2.18.0',
           'ember-data': '~2.18.0'
+        }
+      }
+    }, {
+      name: 'ember-lts-3.4',
+      npm: {
+        devDependencies: {
+          'ember-source': '~3.4.0',
+          'ember-data': '~3.4.0'
         }
       }
     }, {

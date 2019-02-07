@@ -7,6 +7,7 @@ import { camelize } from '@ember/string';
 import RSVP from 'rsvp';
 import Ember from 'ember';
 import FirebaseAppService from '../services/firebase-app';
+import ModelRegistry from 'ember-data/types/registries/model';
 
 import { firestore } from 'firebase/app';
 
@@ -103,17 +104,18 @@ export default class FirestoreAdapter extends DS.Adapter.extend({
     // @ts-ignore repeat here for the tyepdocs
     firebaseApp: Ember.ComputedProperty<FirebaseAppService, FirebaseAppService>;
 
-    findRecord(_store: DS.Store, type: any, id: string) {
+    findRecord<K extends keyof ModelRegistry>(_store: DS.Store, type: ModelRegistry[K], id: string) {
         return getDoc(this, type, id);
     }
 
-    findAll(_store: DS.Store, type: any) {
+    findAll<K extends keyof ModelRegistry>(_store: DS.Store, type: ModelRegistry[K]) {
         return rootCollection(this, type).then(queryDocs);
     }
-
-    findHasMany(store: DS.Store, snapshot: DS.Snapshot<never>, url: any, relationship: any) {
-        if (store.adapterFor(relationship.type) !== this) {
-            return store.adapterFor(relationship.type).findHasMany(store, snapshot, url, relationship);
+    
+    findHasMany<K extends keyof ModelRegistry>(store: DS.Store, snapshot: DS.Snapshot<K>, url: string, relationship: {[key:string]: any}) {
+        const adapter = store.adapterFor(relationship.type as never) as any; // TODO fix types
+        if (adapter !== this) {
+            return adapter.findHasMany(store, snapshot, url, relationship);
         } else if (relationship.options.subcollection) {
             return docReference(this, relationship.parentModelName, snapshot.id).then(doc => queryDocs(doc.collection(collectionNameForType(relationship.type)), relationship.options.query));
         } else {
@@ -121,15 +123,16 @@ export default class FirestoreAdapter extends DS.Adapter.extend({
         }
     }
 
-    findBelongsTo(store: DS.Store, snapshot: DS.Snapshot<never>, url: any, relationship: any) {
-        if (store.adapterFor(relationship.type) !== this) {
-            return store.adapterFor(relationship.type).findBelongsTo(store, snapshot, url, relationship);
+    findBelongsTo<K extends keyof ModelRegistry>(store: DS.Store, snapshot: DS.Snapshot<K>, url: string, relationship: {[key:string]: any}) {
+        const adapter = store.adapterFor(relationship.type as never) as any; // TODO fix types
+        if (adapter !== this) {
+            return adapter.findBelongsTo(store, snapshot, url, relationship);
         } else {
             return getDoc(this, relationship.type, snapshot.id);
         }
     }
 
-    query(_store: DS.Store, type: any, queryFn: QueryFn) {
+    query<K extends keyof ModelRegistry>(_store: DS.Store, type: ModelRegistry[K], queryFn: QueryFn, _recordArray: DS.AdapterPopulatedRecordArray<any>) {
         return rootCollection(this, type).then(collection => queryDocs(collection, queryFn));
     }
 
@@ -137,13 +140,13 @@ export default class FirestoreAdapter extends DS.Adapter.extend({
         return false; // TODO can we make this dependent on a listener attached
     }
 
-    updateRecord(_store: DS.Store, type: any, snapshot: DS.Snapshot<never>) {
+    updateRecord<K extends keyof ModelRegistry>(_store: DS.Store, type: ModelRegistry[K], snapshot: DS.Snapshot<K>) {
         const id = snapshot.id;
         const data = this.serialize(snapshot, { includeId: false });
         return docReference(this, type, id).then(doc => doc.update(data));
     }
 
-    createRecord(_store: DS.Store, type: any, snapshot: DS.Snapshot<never>) {
+    createRecord<K extends keyof ModelRegistry>(_store: DS.Store, type: ModelRegistry[K], snapshot: DS.Snapshot<K>) {
         const id = snapshot.id;
         const data = this.serialize(snapshot, { includeId: false });
         // TODO remove the unnecessary get()
@@ -154,7 +157,7 @@ export default class FirestoreAdapter extends DS.Adapter.extend({
         }
     }
 
-    deleteRecord(_store: DS.Store, type: any, snapshot: DS.Snapshot<never>) {
+    deleteRecord<K extends keyof ModelRegistry>(_store: DS.Store, type: ModelRegistry[K], snapshot: DS.Snapshot<K>) {
         return docReference(this, type, snapshot.id).then(doc => doc.delete());
     }
 

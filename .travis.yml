@@ -23,16 +23,16 @@ cache:
   - "$HOME/.npm"
 
 env:
-  # build for the last two LTS versions (https://www.emberjs.com/builds/)
-  - EMBER_TRY_SCENARIO=ember-lts-2.17
+  # build for LTS versions (https://www.emberjs.com/builds/)
+  - EMBER_TRY_SCENARIO=ember-lts-2.16
   - EMBER_TRY_SCENARIO=ember-lts-2.18
-  - EMBER_TRY_SCENARIO=ember-release COVERAGE=true
+  - EMBER_TRY_SCENARIO=ember-lts-3.4
+  - EMBER_TRY_SCENARIO=ember-default COVERAGE=true
   - FIREBASE_SCENARIO=firebase-latest EMBER_TRY_SCENARIO=ember-default
   - FIREBASE_SCENARIO=firebase-next EMBER_TRY_SCENARIO=ember-default
   - FIREBASE_SCENARIO=firebase-canary EMBER_TRY_SCENARIO=ember-default
   - EMBER_TRY_SCENARIO=ember-beta
   - EMBER_TRY_SCENARIO=ember-canary
-  - EMBER_TRY_SCENARIO=ember-default
 
 matrix:
   fast_finish: true

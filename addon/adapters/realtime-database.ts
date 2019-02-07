@@ -4,6 +4,7 @@ import RSVP from 'rsvp';
 import DS from 'ember-data';
 import Ember from 'ember';
 import FirebaseAppService from '../services/firebase-app';
+import ModelRegistry from 'ember-data/types/registries/model';
 
 import { inject as service } from '@ember/service';
 import { get, set } from '@ember/object';
@@ -67,17 +68,18 @@ export default class RealtimeDatabaseAdapter extends DS.Adapter.extend({
     // @ts-ignore repeat here for the tyepdocs
     databaseURL?: string;
 
-    findRecord(_store: DS.Store, type: any, id: string) {
+    findRecord<K extends keyof ModelRegistry>(_store: DS.Store, type: ModelRegistry[K], id: string) {
         return docReference(this, type, id).then(ref => ref.once('value'));
     }
 
-    findAll(_store: DS.Store, type: any) {
+    findAll<K extends keyof ModelRegistry>(_store: DS.Store, type: ModelRegistry[K]) {
         return rootCollection(this, type).then(queryDocs);
     }
 
-    findHasMany(store: DS.Store, snapshot: any, url: string, relationship: any) {
-        if (store.adapterFor(relationship.type) !== this) {
-            return store.adapterFor(relationship.type).findHasMany(store, snapshot, url, relationship);
+    findHasMany<K extends keyof ModelRegistry>(store: DS.Store, snapshot: DS.Snapshot<K>, url: string, relationship: {[key:string]: any}) {
+        const adapter = store.adapterFor(relationship.type as never) as any;
+        if (adapter !== this) {
+            return adapter.findHasMany(store, snapshot, url, relationship);
         } else if (relationship.options.subcollection) {
             throw `subcollections (${relationship.parentModelName}.${relationship.key}) are not supported by the Realtime Database, consider using embedded relationships or check out Firestore`;
         } else {
@@ -88,19 +90,20 @@ export default class RealtimeDatabaseAdapter extends DS.Adapter.extend({
         }
     }
 
-    findBelongsTo(store: DS.Store, snapshot: DS.Snapshot<never>, url: any, relationship: any) {
-        if (store.adapterFor(relationship.type) !== this) {
-            return store.adapterFor(relationship.type).findBelongsTo(store, snapshot, url, relationship);
+    findBelongsTo<K extends keyof ModelRegistry>(store: DS.Store, snapshot: DS.Snapshot<K>, url: any, relationship: any) {
+        const adapter = store.adapterFor(relationship.type as never) as any;
+        if (adapter !== this) {
+            return adapter.findBelongsTo(store, snapshot, url, relationship);
         } else {
             return docReference(this, relationship.type, snapshot.id).then(ref => ref.once('value'));
         }
     }
 
-    query(_store: DS.Store, type: any, queryFn: QueryFn) {
+    query<K extends keyof ModelRegistry>(_store: DS.Store, type: ModelRegistry[K], queryFn: QueryFn) {
         return rootCollection(this, type).then(ref => queryDocs(ref, queryFn));
     }
 
-    queryRecord(_store: DS.Store, type: any, queryFn: QueryFn) {
+    queryRecord<K extends keyof ModelRegistry>(_store: DS.Store, type: ModelRegistry[K], queryFn: QueryFn) {
         const query = rootCollection(this, type).then(ref => queryDocs(ref.limitToFirst(1), queryFn));
         return query.then(results => {
             let snapshot = undefined as database.DataSnapshot|undefined;
@@ -117,13 +120,13 @@ export default class RealtimeDatabaseAdapter extends DS.Adapter.extend({
         return false; // TODO can we make this dependent on a listener attached
     }
 
-    updateRecord(_: DS.Store, type: any, snapshot: DS.Snapshot<never>) {
+    updateRecord<K extends keyof ModelRegistry>(_: DS.Store, type: ModelRegistry[K], snapshot: DS.Snapshot<K>) {
         const id = snapshot.id;
         const data = this.serialize(snapshot, { includeId: false });
         return docReference(this, type, id).then(ref => ref.set(data));
     }
 
-    createRecord(_: DS.Store, type: any, snapshot: DS.Snapshot<never>) {
+    createRecord<K extends keyof ModelRegistry>(_: DS.Store, type: ModelRegistry[K], snapshot: DS.Snapshot<K>) {
         const id = snapshot.id;
         const data = this.serialize(snapshot, { includeId: false });
         // TODO remove the unnecessary once('value')
@@ -134,7 +137,7 @@ export default class RealtimeDatabaseAdapter extends DS.Adapter.extend({
         }
     }
 
-    deleteRecord(_: DS.Store, type: any, snapshot: DS.Snapshot<never>) {
+    deleteRecord<K extends keyof ModelRegistry>(_: DS.Store, type: ModelRegistry[K], snapshot: DS.Snapshot<K>) {
         return docReference(this, type, snapshot.id).then(ref => ref.remove());
     }
 
