@@ -47,9 +47,9 @@ install:
   - if [[ $FIREBASE_SCENARIO == 'latest' ]]; then npm i --save firebase@latest; fi
   - if [[ $FIREBASE_SCENARIO == 'next'   ]]; then npm i --save firebase@next; fi
   - if [[ $FIREBASE_SCENARIO == 'canary' ]]; then npm i --save firebase@canary; fi
-  - if [[ $EMBER_SCENARIO == 'latest' ]]; then npm i --save-dev ember-core@latest ember-data@latest; fi
-  - if [[ $EMBER_SCENARIO == 'beta' ]]; then npm i --save-dev ember-core@beta ember-data@beta; fi
-  - if [[ $EMBER_SCENARIO == 'lts' ]]; then npm i --save-dev ember-core@lts ember-data@lts; fi
+  - if [[ $EMBER_SCENARIO == 'latest' ]]; then npm i --save-dev ember-source@latest ember-data@latest; fi
+  - if [[ $EMBER_SCENARIO == 'beta' ]]; then npm i --save-dev ember-source@beta ember-data@beta; fi
+  - if [[ $EMBER_SCENARIO == 'lts' ]]; then npm i --save-dev ember-source@lts ember-data@lts; fi
   - npm ci
 
 script:
