@@ -28,9 +28,9 @@ env:
   - EMBER_TRY_SCENARIO=ember-lts-2.18
   - EMBER_TRY_SCENARIO=ember-lts-3.4
   - EMBER_TRY_SCENARIO=ember-default COVERAGE=true
-  - FIREBASE_SCENARIO=firebase-latest EMBER_TRY_SCENARIO=ember-default
-  - FIREBASE_SCENARIO=firebase-next EMBER_TRY_SCENARIO=ember-default
-  - FIREBASE_SCENARIO=firebase-canary EMBER_TRY_SCENARIO=ember-default
+  - EMBER_TRY_SCENARIO=firebase-latest
+  - EMBER_TRY_SCENARIO=firebase-next
+  - EMBER_TRY_SCENARIO=firebase-canary
   - EMBER_TRY_SCENARIO=ember-beta
   - EMBER_TRY_SCENARIO=ember-canary
 
@@ -38,18 +38,10 @@ matrix:
   fast_finish: true
   allow_failures:
     - env: EMBER_TRY_SCENARIO=ember-canary
-    - env: FIREBASE_SCENARIO=firebase-canary EMBER_TRY_SCENARIO=ember-default
-    - env: EMBER_TRY_SCENARIO=ember-beta
-
-before_install:
-  # upgrade npm to get the "ci" command
-  - npm i -g npm
+    - env: EMBER_TRY_SCENARIO=firebase-canary
 
 install:
   - npm ci
-  - if [[ $FIREBASE_SCENARIO == 'firebase-latest' ]]; then npm i --save firebase@latest; fi
-  - if [[ $FIREBASE_SCENARIO == 'firebase-next'   ]]; then npm i --save firebase@next; fi
-  - if [[ $FIREBASE_SCENARIO == 'firebase-canary' ]]; then npm i --save firebase@canary; fi
 
 script:
   - npm run ts:precompile

@@ -6,6 +6,7 @@ module.exports = () => Promise.all(
   ['release', 'beta', 'canary'].map(getURLFor)
 ).then( ([releaseUrl, betaUrl, canaryUrl]) =>
   ({
+    npmOptions: ['--loglevel=silent', '--no-shrinkwrap=true'],
     scenarios: [{
       name: 'ember-lts-2.16',
       npm: {
@@ -58,6 +59,27 @@ module.exports = () => Promise.all(
       name: 'ember-default',
       npm: {
         devDependencies: {}
+      }
+    }, {
+      name: 'firebase-latest',
+      npm: {
+        dependencies: {
+          'firebase': 'latest'
+        }
+      }
+    }, {
+      name: 'firebase-next',
+      npm: {
+        dependencies: {
+          'firebase@next': 'latest'
+        }
+      }
+    }, {
+      name: 'firebase-canary',
+      npm: {
+        dependencies: {
+          'firebase@canary': 'latest'
+        }
       }
     }]
   })
