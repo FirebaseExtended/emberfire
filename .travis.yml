@@ -1,26 +1,17 @@
----
 language: node_js
-node_js: "8.12.0"
-sudo: false
 dist: xenial
 
 addons:
   chrome: stable
-  code_climate:
-    repo_token:
-      secure: gQhPZkdkqJi1XbgJpe23Ji90VQCuXLV1yOp0L1JH+Hx4L19L+mn3gEbB99bFa/Lbh4ASwpuapHy6w2VUn6mzHknbD8r0me7g5bebGFcDyPf+EOVHEzAScnFHrKIqjK/sCbvcI7xWvDpzg9kT9UTBAdVfiJYEYiPEnKskPy8FIE0=
 
 branches:
   only:
     - master # otherwise pull requests get built twice
     - v3 # for now
 
-cache:
-  directories:
-  - "$HOME/.npm"
+cache: npm
 
 env:
-  # build for LTS versions (https://www.emberjs.com/builds/)
   - COVERAGE=true
   - FIREBASE_SCENARIO=latest
   - FIREBASE_SCENARIO=next
@@ -36,18 +27,10 @@ matrix:
     - env: FIREBASE_SCENARIO=next
     - env: EMBER_SCENARIO=beta
 
-install:
-  - if [[ $FIREBASE_SCENARIO == 'latest' ]]; then npm i --no-progress --silent --save firebase@latest; fi
-  - if [[ $FIREBASE_SCENARIO == 'next'   ]]; then npm i --no-progress --silent --save firebase@next; fi
-  - if [[ $FIREBASE_SCENARIO == 'canary' ]]; then npm i --no-progress --silent --save firebase@canary; fi
-  - if [[ $EMBER_SCENARIO == 'latest' ]]; then npm i --no-progress --silent --save-dev ember-source@latest ember-data@latest; fi
-  - if [[ $EMBER_SCENARIO == 'beta' ]]; then npm i --no-progress --silent --save-dev ember-source@beta ember-data@beta; fi
-  - if [[ $EMBER_SCENARIO == 'lts' ]]; then npm i --no-progress --silent --save-dev ember-source@lts ember-data@lts; fi
-  - npm ci --no-progress --silent
-
-script:
-  - npm run test
-
-after_script:
-  - if [ "$COVERAGE" ]; then sed 's/SF:modules\/emberfire\//SF:addon\//g' coverage/lcov.info > coverage/lcov.info.fixed; fi
-  - if [ "$COVERAGE" ]; then codeclimate-test-reporter < coverage/lcov.info.fixed; fi
+before_install:
+  - if [[ $FIREBASE_SCENARIO == 'latest' ]]; then npm i --save firebase@latest; fi
+  - if [[ $FIREBASE_SCENARIO == 'next'   ]]; then npm i --save firebase@next; fi
+  - if [[ $FIREBASE_SCENARIO == 'canary' ]]; then npm i --save firebase@canary; fi
+  - if [[ $EMBER_SCENARIO == 'latest' ]]; then npm i --save-dev ember-source@latest ember-data@latest; fi
+  - if [[ $EMBER_SCENARIO == 'beta' ]]; then npm i --save-dev ember-source@beta ember-data@beta; fi
+  - if [[ $EMBER_SCENARIO == 'lts' ]]; then npm i --save-dev ember-source@lts ember-data@lts; fi
