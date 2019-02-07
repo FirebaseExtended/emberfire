@@ -1,6 +1,6 @@
 {
   "name": "emberfire",
-  "version": "3.0.0-beta.1",
+  "version": "3.0.0-rc.1",
   "description": "The default blueprint for ember-cli addons.",
   "keywords": [
     "ember-addon"
@@ -17,6 +17,7 @@
     "server": "ember server",
     "start": "node ./express.js",
     "all": "npm run ts:precompile && npm run build && npm run start",
+    "package": "npm run ts:precompile && npm run build && npm pack .",
     "test": "COVERAGE=true ember test",
     "ts:precompile": "ember ts:precompile",
     "reference": "typedoc --options typedoc.js addon"

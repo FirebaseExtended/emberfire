@@ -24,7 +24,11 @@ This will add Firebase as a dependency in our `package.json` and will generate `
 
 ```js
 import FirestoreAdapter from 'emberfire/adapters/firestore';
+
 export default FirestoreAdapter.extend({
+  // Uncomment the following lines to enable offline persistence and multi-tab support
+  // enablePersistence: true,
+  // persistenceSettings: { experimentalTabSynchronization: true }
 });
 ```
 

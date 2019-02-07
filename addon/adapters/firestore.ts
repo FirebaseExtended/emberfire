@@ -1,4 +1,3 @@
-import { run } from '@ember/runloop';
 import DS from 'ember-data';
 import { getOwner } from '@ember/application';
 import { pluralize } from 'ember-inflector';
@@ -112,16 +111,22 @@ export default class FirestoreAdapter extends DS.Adapter.extend({
         return rootCollection(this, type).then(queryDocs);
     }
 
-    findHasMany(_store: DS.Store, snapshot: DS.Snapshot<never>, _url: any, relationship: any) {
-        if (relationship.options.subcollection) {
-            return docReference(this, relationship.parentType, snapshot.id).then(doc => queryDocs(doc.collection(collectionNameForType(relationship.type)), relationship.options.query));
+    findHasMany(store: DS.Store, snapshot: DS.Snapshot<never>, url: any, relationship: any) {
+        if (store.adapterFor(relationship.type) !== this) {
+            return store.adapterFor(relationship.type).findHasMany(store, snapshot, url, relationship);
+        } else if (relationship.options.subcollection) {
+            return docReference(this, relationship.parentModelName, snapshot.id).then(doc => queryDocs(doc.collection(collectionNameForType(relationship.type)), relationship.options.query));
         } else {
-            return rootCollection(this, relationship.type).then(collection => queryDocs(collection.where(relationship.parentType.modelName, '==', snapshot.id), relationship.options.query));
+            return rootCollection(this, relationship.type).then(collection => queryDocs(collection.where(relationship.parentModelName, '==', snapshot.id), relationship.options.query));
         }
     }
 
-    findBelongsTo(_store: DS.Store, snapshot: DS.Snapshot<never>, _url: any, relationship: any) {
-        return getDoc(this, relationship.type, snapshot.id);
+    findBelongsTo(store: DS.Store, snapshot: DS.Snapshot<never>, url: any, relationship: any) {
+        if (store.adapterFor(relationship.type) !== this) {
+            return store.adapterFor(relationship.type).findBelongsTo(store, snapshot, url, relationship);
+        } else {
+            return getDoc(this, relationship.type, snapshot.id);
+        }
     }
 
     query(_store: DS.Store, type: any, queryFn: QueryFn) {
@@ -141,11 +146,11 @@ export default class FirestoreAdapter extends DS.Adapter.extend({
     createRecord(_store: DS.Store, type: any, snapshot: DS.Snapshot<never>) {
         const id = snapshot.id;
         const data = this.serialize(snapshot, { includeId: false });
+        // TODO remove the unnecessary get()
         if (id) {
-            return docReference(this, type, id).then(doc => doc.set(data));
+            return docReference(this, type, id).then(doc => doc.set(data).then(() => doc.get()));
         } else {
-            // TODO sort out bringing back the id, just then snapshot => id?
-            return rootCollection(this, type).then(collection => collection.add(data));
+            return rootCollection(this, type).then(collection => collection.add(data)).then(doc => doc.get());
         }
     }
 
