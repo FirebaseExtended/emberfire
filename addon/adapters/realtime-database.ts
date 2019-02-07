@@ -75,16 +75,25 @@ export default class RealtimeDatabaseAdapter extends DS.Adapter.extend({
         return rootCollection(this, type).then(queryDocs);
     }
 
-    findHasMany(_store: DS.Store, snapshot: any, _url: string, relationship: any) {
-        if (relationship.options.subcollection) { throw `subcollections (${relationship.parentModelName}.${relationship.key}) are not supported by the Realtime Database, consider using embedded relationships or check out Firestore` }
-        return rootCollection(this, relationship.type).then(ref => queryDocs(
-            ref.orderByChild(relationship.parentModelName).equalTo(snapshot.id),
-            relationship.options.query
-        ));
+    findHasMany(store: DS.Store, snapshot: any, url: string, relationship: any) {
+        if (store.adapterFor(relationship.type) !== this) {
+            return store.adapterFor(relationship.type).findHasMany(store, snapshot, url, relationship);
+        } else if (relationship.options.subcollection) {
+            throw `subcollections (${relationship.parentModelName}.${relationship.key}) are not supported by the Realtime Database, consider using embedded relationships or check out Firestore`;
+        } else {
+            return rootCollection(this, relationship.type).then(ref => queryDocs(
+                ref.orderByChild(relationship.parentModelName).equalTo(snapshot.id),
+                relationship.options.query
+            ));
+        }
     }
 
-    findBelongsTo(_store: DS.Store, snapshot: DS.Snapshot<never>, _url: any, relationship: any) {
-        return docReference(this, relationship.type, snapshot.id).then(ref => ref.once('value'));
+    findBelongsTo(store: DS.Store, snapshot: DS.Snapshot<never>, url: any, relationship: any) {
+        if (store.adapterFor(relationship.type) !== this) {
+            return store.adapterFor(relationship.type).findBelongsTo(store, snapshot, url, relationship);
+        } else {
+            return docReference(this, relationship.type, snapshot.id).then(ref => ref.once('value'));
+        }
     }
 
     query(_store: DS.Store, type: any, queryFn: QueryFn) {
@@ -117,10 +126,11 @@ export default class RealtimeDatabaseAdapter extends DS.Adapter.extend({
     createRecord(_: DS.Store, type: any, snapshot: DS.Snapshot<never>) {
         const id = snapshot.id;
         const data = this.serialize(snapshot, { includeId: false });
+        // TODO remove the unnecessary once('value')
         if (id == null) {
-            return rootCollection(this, type).then(ref => ref.push(data));
+            return rootCollection(this, type).then(ref => ref.push(data).then(ref => ref.once('value')));
         } else {
-            return docReference(this, type, id).then(ref => ref.set(data));
+            return docReference(this, type, id).then(ref => ref.set(data).then(() => ref.once('value')));
         }
     }
 
