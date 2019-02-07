@@ -33,7 +33,7 @@ export default class FirestoreAdapter extends DS.Adapter.extend({
     settings: { } as firestore.Settings,
     enablePersistence: false as boolean,
     persistenceSettings: { } as firestore.PersistenceSettings,
-    firestore: undefined as firestore.Firestore|undefined,
+    firestore: undefined as Promise<firestore.Firestore>|undefined,
     defaultSerializer: '-firestore'
 
 }) {
@@ -109,20 +109,15 @@ export default class FirestoreAdapter extends DS.Adapter.extend({
     }
 
     findAll(_store: DS.Store, type: any) {
-        return queryDocs(rootCollection(this, type));
+        return rootCollection(this, type).then(queryDocs);
     }
 
     findHasMany(_store: DS.Store, snapshot: DS.Snapshot<never>, _url: any, relationship: any) {
-        return queryDocs(
-            relationship.options.subcollection ?
-                // fetch the sub-collection
-                docReference(this, relationship.parentType, snapshot.id)
-                    .collection(collectionNameForType(relationship.type)) :
-                // query the root collection
-                rootCollection(this, relationship.type)
-                    .where(relationship.parentType.modelName, '==', snapshot.id),
-            relationship.options.query
-        );
+        if (relationship.options.subcollection) {
+            return docReference(this, relationship.parentType, snapshot.id).then(doc => queryDocs(doc.collection(collectionNameForType(relationship.type)), relationship.options.query));
+        } else {
+            return rootCollection(this, relationship.type).then(collection => queryDocs(collection.where(relationship.parentType.modelName, '==', snapshot.id), relationship.options.query));
+        }
     }
 
     findBelongsTo(_store: DS.Store, snapshot: DS.Snapshot<never>, _url: any, relationship: any) {
@@ -130,7 +125,7 @@ export default class FirestoreAdapter extends DS.Adapter.extend({
     }
 
     query(_store: DS.Store, type: any, queryFn: QueryFn) {
-        return queryDocs(rootCollection(this, type), queryFn);
+        return rootCollection(this, type).then(collection => queryDocs(collection, queryFn));
     }
 
     shouldBackgroundReloadRecord() {
@@ -140,24 +135,22 @@ export default class FirestoreAdapter extends DS.Adapter.extend({
     updateRecord(_store: DS.Store, type: any, snapshot: DS.Snapshot<never>) {
         const id = snapshot.id;
         const data = this.serialize(snapshot, { includeId: false });
-        return wrapPromiseLike(() => docReference(this, type, id).update(data));
+        return docReference(this, type, id).then(doc => doc.update(data));
     }
 
     createRecord(_store: DS.Store, type: any, snapshot: DS.Snapshot<never>) {
         const id = snapshot.id;
         const data = this.serialize(snapshot, { includeId: false });
-        return wrapPromiseLike<firestore.DocumentReference|void>(() => {
-            if (id) {
-                return docReference(this, type, id).set(data);
-            } else {
-                // TODO sort out bringing back the id, just then snapshot => id?
-                return rootCollection(this, type).add(data);
-            }
-        });
+        if (id) {
+            return docReference(this, type, id).then(doc => doc.set(data));
+        } else {
+            // TODO sort out bringing back the id, just then snapshot => id?
+            return rootCollection(this, type).then(collection => collection.add(data));
+        }
     }
 
     deleteRecord(_store: DS.Store, type: any, snapshot: DS.Snapshot<never>) {
-        return wrapPromiseLike(() => docReference(this, type, snapshot.id).delete());
+        return docReference(this, type, snapshot.id).then(doc => doc.delete());
     }
 
 }
@@ -169,7 +162,7 @@ declare module 'ember-data' {
 }
 
 const getDoc = (adapter: FirestoreAdapter, type: DS.Model, id: string) =>
-    wrapPromiseLike(() => docReference(adapter, type, id).get());
+    docReference(adapter, type, id).then(doc => doc.get());
 
 const wrapPromiseLike = <T=any>(fn: () => PromiseLike<T>) => {
     return new RSVP.Promise<T>((resolve, reject) => {
@@ -189,32 +182,34 @@ const canonicalId = (query: firestore.DocumentReference | CollectionReferenceOrQ
 const collectionNameForType = (type: any) => {
     const modelName = typeof(type) === 'string' ? type : type.modelName;
     return pluralize(camelize(modelName));
-}
+};
 
-const docReference = (adapter: FirestoreAdapter, type: any, id: string) => rootCollection(adapter, type).doc(id)
+const docReference = (adapter: FirestoreAdapter, type: any, id: string) => rootCollection(adapter, type).then(collection => collection.doc(id));
 
-const getDocs = (query: CollectionReferenceOrQuery) => wrapPromiseLike(() => query.get())
+const getDocs = (query: CollectionReferenceOrQuery) => query.get();
 
 const firestoreInstance = (adapter: FirestoreAdapter) => {
     let cachedFirestoreInstance = get(adapter, 'firestore');
     if (!cachedFirestoreInstance) {
         const app = get(adapter, 'firebaseApp');
-        cachedFirestoreInstance = app.firestore();
-        const settings = get(adapter, 'settings');
-        cachedFirestoreInstance.settings(settings);
-        const enablePersistence = get(adapter, 'enablePersistence');
-        const fastboot = getOwner(adapter).lookup('service:fastboot');
-        if (enablePersistence && (fastboot == null || !fastboot.isFastBoot)) {
-            const persistenceSettings = get(adapter, 'persistenceSettings');
-            cachedFirestoreInstance.enablePersistence(persistenceSettings).catch(console.warn);
-        }
+        cachedFirestoreInstance = app.firestore().then(firestore => {
+            const settings = get(adapter, 'settings');
+            firestore.settings(settings);
+            const enablePersistence = get(adapter, 'enablePersistence');
+            const fastboot = getOwner(adapter).lookup('service:fastboot');
+            if (enablePersistence && (fastboot == null || !fastboot.isFastBoot)) {
+                const persistenceSettings = get(adapter, 'persistenceSettings');
+                firestore.enablePersistence(persistenceSettings).catch(console.warn);
+            }
+            return firestore;
+        });
         set(adapter, 'firestore', cachedFirestoreInstance);
     }
     return cachedFirestoreInstance;
-}
+};
 
 const rootCollection = (adapter: FirestoreAdapter, type: any) => 
-    firestoreInstance(adapter).collection(collectionNameForType(type))
+    wrapPromiseLike(() => firestoreInstance(adapter)).then(firestore => firestore.collection(collectionNameForType(type)))
 
 const queryDocs = (referenceOrQuery: CollectionReferenceOrQuery, query?: QueryFn) => {
     const noop = (ref: CollectionReferenceOrQuery) => ref;

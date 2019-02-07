@@ -30,7 +30,7 @@ export default class RealtimeDatabaseAdapter extends DS.Adapter.extend({
 
     firebaseApp: service('firebase-app'),
     databaseURL: undefined,
-    database: undefined as database.Database|undefined,
+    database: undefined as Promise<database.Database>|undefined,
     defaultSerializer: '-realtime-database'
 
 }) {
@@ -69,33 +69,32 @@ export default class RealtimeDatabaseAdapter extends DS.Adapter.extend({
     databaseURL?: string;
 
     findRecord(_store: DS.Store, type: any, id: string) {
-        return wrapPromiseLike(() => docReference(this, type, id).once('value'));
+        return docReference(this, type, id).then(ref => ref.once('value'));
     }
 
     findAll(_store: DS.Store, type: any) {
-        return queryDocs(rootCollection(this, type));
+        return rootCollection(this, type).then(queryDocs);
     }
 
     findHasMany(_store: DS.Store, snapshot: any, _url: string, relationship: any) {
         if (relationship.options.subcollection) { throw `subcollections (${relationship.parentType.modelName}.${relationship.key}) are not supported by the Realtime Database, consider using embedded relationships or check out Firestore` }
-        return queryDocs(
-            rootCollection(this, relationship.type)
-                .orderByChild(relationship.parentType.modelName)
+        return rootCollection(this, relationship.type).then(ref => queryDocs(
+                ref.orderByChild(relationship.parentType.modelName)
                 .equalTo(snapshot.id),
             relationship.options.query
-        );
+        ));
     }
 
     findBelongsTo(_store: DS.Store, snapshot: DS.Snapshot<never>, _url: any, relationship: any) {
-        return wrapPromiseLike(() => docReference(this, relationship.type, snapshot.id).once('value'));
+        return docReference(this, relationship.type, snapshot.id).then(ref => ref.once('value'));
     }
 
     query(_store: DS.Store, type: any, queryFn: QueryFn) {
-        return queryDocs(rootCollection(this, type), queryFn);
+        return rootCollection(this, type).then(ref => queryDocs(ref, queryFn));
     }
 
     queryRecord(_store: DS.Store, type: any, queryFn: QueryFn) {
-        const query = queryDocs(rootCollection(this, type).limitToFirst(1), queryFn);
+        const query = rootCollection(this, type).then(ref => queryDocs(ref.limitToFirst(1), queryFn));
         return query.then(results => {
             let snapshot = undefined as database.DataSnapshot|undefined;
             results.forEach(doc => !!(snapshot = doc));
@@ -114,23 +113,21 @@ export default class RealtimeDatabaseAdapter extends DS.Adapter.extend({
     updateRecord(_: DS.Store, type: any, snapshot: DS.Snapshot<never>) {
         const id = snapshot.id;
         const data = this.serialize(snapshot, { includeId: false });
-        return wrapPromiseLike(() => docReference(this, type, id).set(data));
+        return docReference(this, type, id).then(ref => ref.set(data));
     }
 
     createRecord(_: DS.Store, type: any, snapshot: DS.Snapshot<never>) {
         const id = snapshot.id;
         const data = this.serialize(snapshot, { includeId: false });
-        return wrapPromiseLike(() => {
-            if (id == null) {
-                return rootCollection(this, type).push(data);
-            } else {
-                return docReference(this, type, id).set(data);
-            }
-        });
+        if (id == null) {
+            return rootCollection(this, type).then(ref => ref.push(data));
+        } else {
+            return docReference(this, type, id).then(ref => ref.set(data));
+        }
     }
 
     deleteRecord(_: DS.Store, type: any, snapshot: DS.Snapshot<never>) {
-        return wrapPromiseLike(() => docReference(this, type, snapshot.id).remove());
+        return docReference(this, type, snapshot.id).then(ref => ref.remove());
     }
 
 }
@@ -173,9 +170,9 @@ const databaseInstance = (adapter: RealtimeDatabaseAdapter) => {
 }
 
 const rootCollection = (adapter: RealtimeDatabaseAdapter, type: any) => 
-    databaseInstance(adapter).ref(collectionNameForType(type))
+    wrapPromiseLike(() => databaseInstance(adapter)).then(database => database.ref(collectionNameForType(type)));
 
 const getDocs = (query: ReferenceOrQuery) => wrapPromiseLike(() => query.once('value'))
 
 const docReference = (adapter: RealtimeDatabaseAdapter, type: any, id: string) => 
-    rootCollection(adapter, type).child(id)
+    rootCollection(adapter, type).then(ref => ref.child(id))

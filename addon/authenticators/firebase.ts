@@ -3,7 +3,7 @@ import RSVP from 'rsvp';
 import Ember from 'ember';
 import FirebaseAppService from '../services/firebase-app';
 
-const { resolve, reject, Promise } = RSVP;
+const { resolve, reject } = RSVP;
 
 import 'firebase/auth';
 import { inject as service } from '@ember/service';
@@ -27,9 +27,7 @@ export default class FirebaseAuthenticator extends BaseAuthenticator.extend({
     }
 
     invalidate() {
-        return new Promise<void>((resolve, reject) => {
-            get(this, 'firebaseApp').auth().signOut().then(resolve).catch(reject);
-        })
+        return get(this, 'firebaseApp').auth().then(auth => auth.signOut());
     }
 
 }

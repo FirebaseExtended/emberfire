@@ -11,6 +11,10 @@ import 'firebase/functions';
 import 'firebase/messaging';
 import 'firebase/storage';
 
+import RSVP from 'rsvp';
+const { resolve } = RSVP;
+
+// @ts-ignore
 import { app, auth, database, firestore, functions, messaging, storage } from 'firebase/app';
 
 const getApp = (service: FirebaseAppService): app.App => {
@@ -32,12 +36,12 @@ export default class FirebaseAppService extends Service.extend({
     options?: object;
 
     delete = () => getApp(this).delete();
-    auth = (): auth.Auth => getApp(this).auth();
-    database = (databaseURL?: string): database.Database => getApp(this).database(databaseURL);
-    firestore = (): firestore.Firestore => getApp(this).firestore();
-    functions = (region?: string): functions.Functions => getApp(this).functions(region);
-    messaging = (): messaging.Messaging => getApp(this).messaging();
-    storage = (storageBucket?: string): storage.Storage => getApp(this).storage(storageBucket);
+    auth = () => resolve(getApp(this).auth());
+    database = (databaseURL?: string) => resolve(getApp(this).database(databaseURL));
+    firestore = () => resolve(getApp(this).firestore());
+    functions = (region?: string) => resolve(getApp(this).functions(region));
+    messaging = () => resolve(getApp(this).messaging());
+    storage = (storageBucket?: string) => resolve(getApp(this).storage(storageBucket));
 
     init() {
         this._super(...arguments);
