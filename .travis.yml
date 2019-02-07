@@ -1,11 +1,8 @@
 ---
 language: node_js
-node_js:
-  # lts/boron is the earliest LTS that npm v6 works on
-  - "6"
-
+node_js: "8.12.0"
 sudo: false
-dist: trusty
+dist: xenial
 
 addons:
   chrome: stable
@@ -39,18 +36,14 @@ matrix:
     - env: FIREBASE_SCENARIO=next
     - env: EMBER_SCENARIO=beta
 
-before_install:
-  # upgrade npm to get the "ci" command
-  - npm i -g npm
-
 install:
-  - if [[ $FIREBASE_SCENARIO == 'latest' ]]; then npm i --save firebase@latest; fi
-  - if [[ $FIREBASE_SCENARIO == 'next'   ]]; then npm i --save firebase@next; fi
-  - if [[ $FIREBASE_SCENARIO == 'canary' ]]; then npm i --save firebase@canary; fi
-  - if [[ $EMBER_SCENARIO == 'latest' ]]; then npm i --save-dev ember-source@latest ember-data@latest; fi
-  - if [[ $EMBER_SCENARIO == 'beta' ]]; then npm i --save-dev ember-source@beta ember-data@beta; fi
-  - if [[ $EMBER_SCENARIO == 'lts' ]]; then npm i --save-dev ember-source@lts ember-data@lts; fi
-  - npm ci
+  - if [[ $FIREBASE_SCENARIO == 'latest' ]]; then npm i --no-progress --silent --save firebase@latest; fi
+  - if [[ $FIREBASE_SCENARIO == 'next'   ]]; then npm i --no-progress --silent --save firebase@next; fi
+  - if [[ $FIREBASE_SCENARIO == 'canary' ]]; then npm i --no-progress --silent --save firebase@canary; fi
+  - if [[ $EMBER_SCENARIO == 'latest' ]]; then npm i --no-progress --silent --save-dev ember-source@latest ember-data@latest; fi
+  - if [[ $EMBER_SCENARIO == 'beta' ]]; then npm i --no-progress --silent --save-dev ember-source@beta ember-data@beta; fi
+  - if [[ $EMBER_SCENARIO == 'lts' ]]; then npm i --no-progress --silent --save-dev ember-source@lts ember-data@lts; fi
+  - npm ci --no-progress --silent
 
 script:
   - npm run test
