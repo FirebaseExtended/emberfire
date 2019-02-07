@@ -12,7 +12,7 @@ export default Controller.extend({
         },
         login() {
             const provider = new firebase.auth.GoogleAuthProvider();
-            return this.get('firebaseApp').auth().signInWithPopup(provider);
+            return this.get('firebaseApp').auth().then(auth => auth.signInWithPopup(provider));
         }
     }
 });

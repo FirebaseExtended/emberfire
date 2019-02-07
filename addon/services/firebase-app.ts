@@ -4,14 +4,7 @@ import { inject as service } from '@ember/service';
 import Ember from 'ember';
 import FirebaseService from './firebase';
 
-import 'firebase/auth';
-import 'firebase/database';
-import 'firebase/firestore';
-import 'firebase/functions';
-import 'firebase/messaging';
-import 'firebase/storage';
-
-import RSVP from 'rsvp';
+import RSVP, { reject } from 'rsvp';
 const { resolve } = RSVP;
 
 // @ts-ignore
@@ -36,12 +29,12 @@ export default class FirebaseAppService extends Service.extend({
     options?: object;
 
     delete = () => getApp(this).delete();
-    auth = () => resolve(getApp(this).auth());
-    database = (databaseURL?: string) => resolve(getApp(this).database(databaseURL));
-    firestore = () => resolve(getApp(this).firestore());
-    functions = (region?: string) => resolve(getApp(this).functions(region));
-    messaging = () => resolve(getApp(this).messaging());
-    storage = (storageBucket?: string) => resolve(getApp(this).storage(storageBucket));
+    auth = () => getApp(this).auth && resolve(getApp(this).auth()) || reject('import "firebase/auth"');
+    database = (databaseURL?: string) => getApp(this).database && resolve(getApp(this).database(databaseURL)) || reject('import "firebase/database"');
+    firestore = () => getApp(this).firestore && resolve(getApp(this).firestore()) || reject('import "firebase/firestore"');
+    functions = (region?: string) => getApp(this).functions && resolve(getApp(this).functions(region)) || reject('import "firebase/functions"');
+    messaging = () => getApp(this).messaging && resolve(getApp(this).messaging()) || reject('import "firebase/messaging"');
+    storage = (storageBucket?: string) => getApp(this).storage && resolve(getApp(this).storage(storageBucket)) || reject('import "firebase/storage"');
 
     init() {
         this._super(...arguments);

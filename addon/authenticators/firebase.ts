@@ -5,7 +5,6 @@ import FirebaseAppService from '../services/firebase-app';
 
 const { resolve, reject } = RSVP;
 
-import 'firebase/auth';
 import { inject as service } from '@ember/service';
 import { get } from '@ember/object';
  

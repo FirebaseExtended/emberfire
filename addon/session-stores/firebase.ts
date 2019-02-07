@@ -9,7 +9,6 @@ import FirebaseAppService from '../services/firebase-app';
 const { Promise, resolve } = RSVP;
 import { run } from '@ember/runloop';
 
-import 'firebase/auth';
 import { inject as service } from '@ember/service';
 
 export default class FirebaseSessionStore extends BaseSessionStore.extend({
