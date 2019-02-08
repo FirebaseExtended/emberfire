@@ -14,7 +14,7 @@ In order to use Ember Simple Auth, we need to create a `app/session-stores/appli
 $ ember generate firebase-session-store
 ```
 
-The next step is to enable an authentication provider in the Firebase Authentication panel, and enter the API key and secret for that provider. Details on enabling third-party providers can be found in our docs e.g. [Enabling Twitter login](https://firebase.google.com/docs/auth/web/twitter-login).
+The next step is to enable an authentication provider in the Firebase Authentication panel, and enter the API key and secret for that provider. Details on enabling third-party providers can be found in our docs e.g. [Enabling Google Sign-In](https://firebase.google.com/docs/auth/web/google-signin).
 
 In this example we'll use Google authentication. To start, we'll define `login` and `logout` actions in our application route making use of the `session` and `firebaseApp` services:
 
@@ -31,9 +31,10 @@ export default Route.extend({
         logout() {
             return this.get('session').invalidate();
         },
-        login() {
+        async login() {
             const provider = new firebase.auth.GoogleAuthProvider();
-            return this.get('firebaseApp').auth().then(auth => auth.signInWithPopup(provider));
+            const auth = await this.get('firebaseApp').auth();
+            return auth.signInWithPopup(provider);
         }
     }
 });
@@ -101,9 +102,10 @@ export default Route.extend({
         logout() {
             return get(this, 'session').close();
         },
-        login() {
+        async login() {
             const provider = new firebase.auth.GoogleAuthProvider();
-            return get(this, 'firebaseApp').auth().signInWithPopup(provider);
+            const auth = await get(this, 'firebaseApp').auth();
+            return auth.signInWithPopup(provider);
         }
     }
 });

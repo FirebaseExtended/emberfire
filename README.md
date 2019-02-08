@@ -1,11 +1,17 @@
-# EmberFire [![Build Status](https://travis-ci.org/firebase/emberfire.svg?branch=master)](https://travis-ci.org/firebase/emberfire) [![Test Coverage](https://codeclimate.com/github/firebase/emberfire/badges/coverage.svg)](https://codeclimate.com/github/firebase/emberfire/coverage) [![Version](https://badge.fury.io/gh/firebase%2Femberfire.svg)](http://badge.fury.io/gh/firebase%2Femberfire) [![Monthly Downloads](http://img.shields.io/npm/dm/emberfire.svg?style=flat)](https://www.npmjs.org/package/emberfire) [![Ember Observer Score](http://emberobserver.com/badges/emberfire.svg)](http://emberobserver.com/addons/emberfire) [![Code Climate](https://codeclimate.com/github/firebase/emberfire/badges/gpa.svg)](https://codeclimate.com/github/firebase/emberfire)
+# EmberFire [![Build Status](https://travis-ci.org/firebase/emberfire.svg?branch=master)](https://travis-ci.org/firebase/emberfire) [![Version](https://badge.fury.io/gh/firebase%2Femberfire.svg)](http://badge.fury.io/gh/firebase%2Femberfire) [![Monthly Downloads](http://img.shields.io/npm/dm/emberfire.svg?style=flat)](https://www.npmjs.org/package/emberfire) [![Ember Observer Score](http://emberobserver.com/badges/emberfire.svg)](http://emberobserver.com/addons/emberfire)
 
 EmberFire is the officially supported adapter for using
-[Firebase](http://www.firebase.com/?utm_medium=web&utm_source=emberfire) with
-[Ember Data](https://github.com/emberjs/data).
+[Firebase](http://www.firebase.com/?utm_medium=web&utm_source=emberfire) with [Ember](https://www.emberjs.com/) and 
+[Ember Data](https://guides.emberjs.com/release/models/).
 
-Join our [Firebase Google Group](https://groups.google.com/forum/#!forum/firebase-talk)
+Join the [Firebase Google Group](https://groups.google.com/forum/#!forum/firebase-talk)
 to ask technical questions, share apps you've built, and chat with other developers in the community.
+
+---
+
+> **WARNING**: Master branch is the work in progress for version 3 of Emberfire, [version 2 is available here](https://github.com/firebase/emberfire/tree/v2). [Learn more about the rewrite effort here](https://github.com/firebase/emberfire/issues/542).
+
+---
 
 ## Table of Contents
 

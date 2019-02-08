@@ -4,7 +4,7 @@
 
 ## Hierarchy
 
-  `object` & `Base`<`this`>
+ `object` & `Base`<`this`>
 
 **↳ FirebaseSessionStore**
 
@@ -31,7 +31,7 @@
 
 **● clear**: *`resolve`* =  resolve
 
-*Defined in [session-stores/firebase.ts:24](https://github.com/firebase/emberfire/blob/v3/addon/session-stores/firebase.ts#L24)*
+*Defined in [session-stores/firebase.ts:23](https://github.com/firebase/emberfire/blob/v3/addon/session-stores/firebase.ts#L23)*
 
 ___
 <a id="firebaseapp"></a>
@@ -40,7 +40,7 @@ ___
 
 **● firebaseApp**: *`ComputedProperty`<[FirebaseAppService](firebaseappservice.md), [FirebaseAppService](firebaseappservice.md)>*
 
-*Defined in [session-stores/firebase.ts:20](https://github.com/firebase/emberfire/blob/v3/addon/session-stores/firebase.ts#L20)*
+*Defined in [session-stores/firebase.ts:19](https://github.com/firebase/emberfire/blob/v3/addon/session-stores/firebase.ts#L19)*
 
 ___
 <a id="persist"></a>
@@ -49,7 +49,7 @@ ___
 
 **● persist**: *`resolve`* =  resolve
 
-*Defined in [session-stores/firebase.ts:23](https://github.com/firebase/emberfire/blob/v3/addon/session-stores/firebase.ts#L23)*
+*Defined in [session-stores/firebase.ts:22](https://github.com/firebase/emberfire/blob/v3/addon/session-stores/firebase.ts#L22)*
 
 ___
 <a id="restoring"></a>
@@ -58,7 +58,7 @@ ___
 
 **● restoring**: *`boolean`* = true
 
-*Defined in [session-stores/firebase.ts:22](https://github.com/firebase/emberfire/blob/v3/addon/session-stores/firebase.ts#L22)*
+*Defined in [session-stores/firebase.ts:21](https://github.com/firebase/emberfire/blob/v3/addon/session-stores/firebase.ts#L21)*
 
 ___
 
@@ -70,7 +70,7 @@ ___
 
 ▸ **restore**(): `Promise`<`Object`>
 
-*Defined in [session-stores/firebase.ts:26](https://github.com/firebase/emberfire/blob/v3/addon/session-stores/firebase.ts#L26)*
+*Defined in [session-stores/firebase.ts:25](https://github.com/firebase/emberfire/blob/v3/addon/session-stores/firebase.ts#L25)*
 
 **Returns:** `Promise`<`Object`>
 

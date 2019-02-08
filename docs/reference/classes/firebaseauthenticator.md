@@ -4,7 +4,7 @@
 
 ## Hierarchy
 
-  `object` & `Base`<`this`>
+ `object` & `Base`<`this`>
 
 **↳ FirebaseAuthenticator**
 
@@ -30,7 +30,7 @@
 
 **● firebaseApp**: *`ComputedProperty`<[FirebaseAppService](firebaseappservice.md), [FirebaseAppService](firebaseappservice.md)>*
 
-*Defined in [authenticators/firebase.ts:19](https://github.com/firebase/emberfire/blob/v3/addon/authenticators/firebase.ts#L19)*
+*Defined in [authenticators/firebase.ts:18](https://github.com/firebase/emberfire/blob/v3/addon/authenticators/firebase.ts#L18)*
 
 ___
 
@@ -42,7 +42,7 @@ ___
 
 ▸ **authenticate**(): `Promise`<`never`>
 
-*Defined in [authenticators/firebase.ts:25](https://github.com/firebase/emberfire/blob/v3/addon/authenticators/firebase.ts#L25)*
+*Defined in [authenticators/firebase.ts:24](https://github.com/firebase/emberfire/blob/v3/addon/authenticators/firebase.ts#L24)*
 
 **Returns:** `Promise`<`never`>
 
@@ -53,7 +53,7 @@ ___
 
 ▸ **invalidate**(): `Promise`<`void`>
 
-*Defined in [authenticators/firebase.ts:29](https://github.com/firebase/emberfire/blob/v3/addon/authenticators/firebase.ts#L29)*
+*Defined in [authenticators/firebase.ts:28](https://github.com/firebase/emberfire/blob/v3/addon/authenticators/firebase.ts#L28)*
 
 **Returns:** `Promise`<`void`>
 
@@ -64,11 +64,11 @@ ___
 
 ▸ **restore**(data: *`any`*): `Promise`<`any`>
 
-*Defined in [authenticators/firebase.ts:21](https://github.com/firebase/emberfire/blob/v3/addon/authenticators/firebase.ts#L21)*
+*Defined in [authenticators/firebase.ts:20](https://github.com/firebase/emberfire/blob/v3/addon/authenticators/firebase.ts#L20)*
 
 **Parameters:**
 
-| Param | Type |
+| Name | Type |
 | ------ | ------ |
 | data | `any` |
 

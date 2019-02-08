@@ -4,11 +4,6 @@ dist: xenial
 addons:
   chrome: stable
 
-branches:
-  only:
-    - master # otherwise pull requests get built twice
-    - v3 # for now
-
 cache: npm
 
 env:

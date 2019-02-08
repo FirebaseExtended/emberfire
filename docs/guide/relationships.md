@@ -24,10 +24,6 @@ EmberFire can handle relationships in several different ways:
 
 .. TODO
 
-## Partial embeds, embedded ids, and advanced usage
-
-... TODO note about using Cloud Functions to handle all this
-
 ## Cleaning up relationships
 
 ... TODO note about using Cloud Functions for this

@@ -12,6 +12,20 @@ export default Ember.Route.extend({
 
 The second argument of the query method allows for modification of the assumed Firestore reference, [learn more about what query options are available in the Firestore documentation.](https://firebase.google.com/docs/firestore/query-data/queries#simple_queries)
 
+# Getting realtime updates to our queries
+
+Use the `RealtimeRouteMixin` to get updates to records in your query while your route is in view.
+
+```js
+import { RealtimeRouteMixin } from 'emberfire/services/realtime-listener';
+
+export default Route.extend(RealtimeRouteMixin, {
+  model: function() {
+    return this.store.query('post', ref => ref.orderBy('publishedAt', 'desc').limit(10));
+  }
+});
+```
+
 ## Working with security rules
 
 ... TODO flush out

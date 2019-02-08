@@ -27,7 +27,7 @@
 
 ###  apps
 
-**● apps**: *( `null` &#124; `App`)[]* =  firebase.apps
+**● apps**: *`App`[]* =  firebase.apps
 
 *Defined in [services/firebase.ts:7](https://github.com/firebase/emberfire/blob/v3/addon/services/firebase.ts#L7)*
 
@@ -39,15 +39,15 @@ ___
 
 ###  app
 
-▸ **app**(name?: * `undefined` &#124; `string`*): `App`
+▸ **app**(name?: *`undefined` \| `string`*): `App`
 
 *Defined in [services/firebase.ts:6](https://github.com/firebase/emberfire/blob/v3/addon/services/firebase.ts#L6)*
 
 **Parameters:**
 
-| Param | Type |
+| Name | Type |
 | ------ | ------ |
-| `Optional` name |  `undefined` &#124; `string`|
+| `Optional` name | `undefined` \| `string` |
 
 **Returns:** `App`
 
@@ -56,16 +56,16 @@ ___
 
 ###  initializeApp
 
-▸ **initializeApp**(options: *`Object`*, nameOrConfig?: * `string` &#124; `Object`*): `App`
+▸ **initializeApp**(options: *`Object`*, nameOrConfig?: *`string` \| `Object`*): `App`
 
 *Defined in [services/firebase.ts:8](https://github.com/firebase/emberfire/blob/v3/addon/services/firebase.ts#L8)*
 
 **Parameters:**
 
-| Param | Type |
+| Name | Type |
 | ------ | ------ |
 | options | `Object` |
-| `Optional` nameOrConfig |  `string` &#124; `Object`|
+| `Optional` nameOrConfig | `string` \| `Object` |
 
 **Returns:** `App`
 

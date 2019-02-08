@@ -15,7 +15,7 @@ export default FirestoreAdapter.extend({
 
 ## Hierarchy
 
-  `object` & `Adapter`<`this`>
+ `object` & `Adapter`<`this`>
 
 **↳ FirestoreAdapter**
 
@@ -25,6 +25,7 @@ export default FirestoreAdapter.extend({
 
 * [enablePersistence](firestoreadapter.md#enablepersistence)
 * [firebaseApp](firestoreadapter.md#firebaseapp)
+* [persistenceSettings](firestoreadapter.md#persistencesettings)
 * [settings](firestoreadapter.md#settings)
 
 ### Methods
@@ -49,7 +50,7 @@ export default FirestoreAdapter.extend({
 
 **● enablePersistence**: *`boolean`*
 
-*Defined in [adapters/firestore.ts:54](https://github.com/firebase/emberfire/blob/v3/addon/adapters/firestore.ts#L54)*
+*Defined in [adapters/firestore.ts:55](https://github.com/firebase/emberfire/blob/v3/addon/adapters/firestore.ts#L55)*
 
 Enable offline persistence with Cloud Firestore, it is not enabled by default
 
@@ -69,7 +70,7 @@ ___
 
 **● firebaseApp**: *`ComputedProperty`<[FirebaseAppService](firebaseappservice.md), [FirebaseAppService](firebaseappservice.md)>*
 
-*Defined in [adapters/firestore.ts:87](https://github.com/firebase/emberfire/blob/v3/addon/adapters/firestore.ts#L87)*
+*Defined in [adapters/firestore.ts:105](https://github.com/firebase/emberfire/blob/v3/addon/adapters/firestore.ts#L105)*
 
 Override the default FirebaseApp Service used by the FirestoreAdapter: `service('firebase-app')`
 
@@ -84,13 +85,34 @@ export default FirestoreAdapter.extend({
 ```
 
 ___
+<a id="persistencesettings"></a>
+
+###  persistenceSettings
+
+**● persistenceSettings**: *`PersistenceSettings`*
+
+*Defined in [adapters/firestore.ts:88](https://github.com/firebase/emberfire/blob/v3/addon/adapters/firestore.ts#L88)*
+
+Pass persistence settings to Cloud Firestore, enablePersistence has to be true for these to be used
+
+```js
+// app/adapters/application.js
+import FirestoreAdapter from 'emberfire/adapters/firestore';
+
+export default FirestoreAdapter.extend({
+  enablePersistence: true,
+  persistenceSettings: { experimentalTabSynchronization: true }
+});
+```
+
+___
 <a id="settings"></a>
 
 ###  settings
 
 **● settings**: *`Settings`*
 
-*Defined in [adapters/firestore.ts:70](https://github.com/firebase/emberfire/blob/v3/addon/adapters/firestore.ts#L70)*
+*Defined in [adapters/firestore.ts:71](https://github.com/firebase/emberfire/blob/v3/addon/adapters/firestore.ts#L71)*
 
 Override the default configuration of the Cloud Firestore adapter: `{ timestampsInSnapshots: true }`
 
@@ -99,7 +121,7 @@ Override the default configuration of the Cloud Firestore adapter: `{ timestamps
 import FirestoreAdapter from 'emberfire/adapters/firestore';
 
 export default FirestoreAdapter.extend({
-  settings: { timestampsInSnapshots: false }
+  settings: { timestampsInSnapshots: true }
 });
 ```
 
@@ -111,36 +133,42 @@ ___
 
 ###  createRecord
 
-▸ **createRecord**(_store: *`Store`*, type: *`any`*, snapshot: *`Snapshot`<`never`>*): `Promise`< `void` &#124; `DocumentReference`>
+▸ **createRecord**<`K`>(_store: *`Store`*, type: *`ModelRegistry[K]`*, snapshot: *`Snapshot`<`K`>*): `Promise`<`DocumentSnapshot`>
 
-*Defined in [adapters/firestore.ts:128](https://github.com/firebase/emberfire/blob/v3/addon/adapters/firestore.ts#L128)*
+*Defined in [adapters/firestore.ts:149](https://github.com/firebase/emberfire/blob/v3/addon/adapters/firestore.ts#L149)*
 
+**Type parameters:**
+
+#### K :  `keyof ModelRegistry`
 **Parameters:**
 
-| Param | Type |
+| Name | Type |
 | ------ | ------ |
 | _store | `Store` |
-| type | `any` |
-| snapshot | `Snapshot`<`never`> |
+| type | `ModelRegistry[K]` |
+| snapshot | `Snapshot`<`K`> |
 
-**Returns:** `Promise`< `void` &#124; `DocumentReference`>
+**Returns:** `Promise`<`DocumentSnapshot`>
 
 ___
 <a id="deleterecord"></a>
 
 ###  deleteRecord
 
-▸ **deleteRecord**(_store: *`Store`*, type: *`any`*, snapshot: *`Snapshot`<`never`>*): `Promise`<`void`>
+▸ **deleteRecord**<`K`>(_store: *`Store`*, type: *`ModelRegistry[K]`*, snapshot: *`Snapshot`<`K`>*): `Promise`<`void`>
 
-*Defined in [adapters/firestore.ts:141](https://github.com/firebase/emberfire/blob/v3/addon/adapters/firestore.ts#L141)*
+*Defined in [adapters/firestore.ts:160](https://github.com/firebase/emberfire/blob/v3/addon/adapters/firestore.ts#L160)*
 
+**Type parameters:**
+
+#### K :  `keyof ModelRegistry`
 **Parameters:**
 
-| Param | Type |
+| Name | Type |
 | ------ | ------ |
 | _store | `Store` |
-| type | `any` |
-| snapshot | `Snapshot`<`never`> |
+| type | `ModelRegistry[K]` |
+| snapshot | `Snapshot`<`K`> |
 
 **Returns:** `Promise`<`void`>
 
@@ -149,16 +177,19 @@ ___
 
 ###  findAll
 
-▸ **findAll**(_store: *`Store`*, type: *`any`*): `Promise`<`QuerySnapshot`>
+▸ **findAll**<`K`>(_store: *`Store`*, type: *`ModelRegistry[K]`*): `Promise`<`QuerySnapshot`>
 
-*Defined in [adapters/firestore.ts:93](https://github.com/firebase/emberfire/blob/v3/addon/adapters/firestore.ts#L93)*
+*Defined in [adapters/firestore.ts:111](https://github.com/firebase/emberfire/blob/v3/addon/adapters/firestore.ts#L111)*
 
+**Type parameters:**
+
+#### K :  `keyof ModelRegistry`
 **Parameters:**
 
-| Param | Type |
+| Name | Type |
 | ------ | ------ |
 | _store | `Store` |
-| type | `any` |
+| type | `ModelRegistry[K]` |
 
 **Returns:** `Promise`<`QuerySnapshot`>
 
@@ -167,56 +198,65 @@ ___
 
 ###  findBelongsTo
 
-▸ **findBelongsTo**(_store: *`Store`*, snapshot: *`Snapshot`<`never`>*, _url: *`any`*, relationship: *`any`*): `Promise`<`DocumentSnapshot`>
+▸ **findBelongsTo**<`K`>(store: *`Store`*, snapshot: *`Snapshot`<`K`>*, url: *`string`*, relationship: *`object`*): `any`
 
-*Defined in [adapters/firestore.ts:110](https://github.com/firebase/emberfire/blob/v3/addon/adapters/firestore.ts#L110)*
+*Defined in [adapters/firestore.ts:126](https://github.com/firebase/emberfire/blob/v3/addon/adapters/firestore.ts#L126)*
 
+**Type parameters:**
+
+#### K :  `keyof ModelRegistry`
 **Parameters:**
 
-| Param | Type |
+| Name | Type |
 | ------ | ------ |
-| _store | `Store` |
-| snapshot | `Snapshot`<`never`> |
-| _url | `any` |
-| relationship | `any` |
+| store | `Store` |
+| snapshot | `Snapshot`<`K`> |
+| url | `string` |
+| relationship | `object` |
 
-**Returns:** `Promise`<`DocumentSnapshot`>
+**Returns:** `any`
 
 ___
 <a id="findhasmany"></a>
 
 ###  findHasMany
 
-▸ **findHasMany**(_store: *`Store`*, snapshot: *`Snapshot`<`never`>*, _url: *`any`*, relationship: *`any`*): `Promise`<`QuerySnapshot`>
+▸ **findHasMany**<`K`>(store: *`Store`*, snapshot: *`Snapshot`<`K`>*, url: *`string`*, relationship: *`object`*): `any`
 
-*Defined in [adapters/firestore.ts:97](https://github.com/firebase/emberfire/blob/v3/addon/adapters/firestore.ts#L97)*
+*Defined in [adapters/firestore.ts:115](https://github.com/firebase/emberfire/blob/v3/addon/adapters/firestore.ts#L115)*
 
+**Type parameters:**
+
+#### K :  `keyof ModelRegistry`
 **Parameters:**
 
-| Param | Type |
+| Name | Type |
 | ------ | ------ |
-| _store | `Store` |
-| snapshot | `Snapshot`<`never`> |
-| _url | `any` |
-| relationship | `any` |
+| store | `Store` |
+| snapshot | `Snapshot`<`K`> |
+| url | `string` |
+| relationship | `object` |
 
-**Returns:** `Promise`<`QuerySnapshot`>
+**Returns:** `any`
 
 ___
 <a id="findrecord"></a>
 
 ###  findRecord
 
-▸ **findRecord**(_store: *`Store`*, type: *`any`*, id: *`string`*): `Promise`<`DocumentSnapshot`>
+▸ **findRecord**<`K`>(_store: *`Store`*, type: *`ModelRegistry[K]`*, id: *`string`*): `Promise`<`DocumentSnapshot`>
 
-*Defined in [adapters/firestore.ts:89](https://github.com/firebase/emberfire/blob/v3/addon/adapters/firestore.ts#L89)*
+*Defined in [adapters/firestore.ts:107](https://github.com/firebase/emberfire/blob/v3/addon/adapters/firestore.ts#L107)*
 
+**Type parameters:**
+
+#### K :  `keyof ModelRegistry`
 **Parameters:**
 
-| Param | Type |
+| Name | Type |
 | ------ | ------ |
 | _store | `Store` |
-| type | `any` |
+| type | `ModelRegistry[K]` |
 | id | `string` |
 
 **Returns:** `Promise`<`DocumentSnapshot`>
@@ -226,17 +266,21 @@ ___
 
 ###  query
 
-▸ **query**(_store: *`Store`*, type: *`any`*, queryFn: *[QueryFn](../#queryfn)*): `Promise`<`QuerySnapshot`>
+▸ **query**<`K`>(_store: *`Store`*, type: *`ModelRegistry[K]`*, queryFn: *[QueryFn](../#queryfn)*, _recordArray: *`AdapterPopulatedRecordArray`<`any`>*): `Promise`<`QuerySnapshot`>
 
-*Defined in [adapters/firestore.ts:114](https://github.com/firebase/emberfire/blob/v3/addon/adapters/firestore.ts#L114)*
+*Defined in [adapters/firestore.ts:135](https://github.com/firebase/emberfire/blob/v3/addon/adapters/firestore.ts#L135)*
 
+**Type parameters:**
+
+#### K :  `keyof ModelRegistry`
 **Parameters:**
 
-| Param | Type |
+| Name | Type |
 | ------ | ------ |
 | _store | `Store` |
-| type | `any` |
+| type | `ModelRegistry[K]` |
 | queryFn | [QueryFn](../#queryfn) |
+| _recordArray | `AdapterPopulatedRecordArray`<`any`> |
 
 **Returns:** `Promise`<`QuerySnapshot`>
 
@@ -247,7 +291,7 @@ ___
 
 ▸ **shouldBackgroundReloadRecord**(): `boolean`
 
-*Defined in [adapters/firestore.ts:118](https://github.com/firebase/emberfire/blob/v3/addon/adapters/firestore.ts#L118)*
+*Defined in [adapters/firestore.ts:139](https://github.com/firebase/emberfire/blob/v3/addon/adapters/firestore.ts#L139)*
 
 **Returns:** `boolean`
 
@@ -256,17 +300,20 @@ ___
 
 ###  updateRecord
 
-▸ **updateRecord**(_store: *`Store`*, type: *`any`*, snapshot: *`Snapshot`<`never`>*): `Promise`<`void`>
+▸ **updateRecord**<`K`>(_store: *`Store`*, type: *`ModelRegistry[K]`*, snapshot: *`Snapshot`<`K`>*): `Promise`<`void`>
 
-*Defined in [adapters/firestore.ts:122](https://github.com/firebase/emberfire/blob/v3/addon/adapters/firestore.ts#L122)*
+*Defined in [adapters/firestore.ts:143](https://github.com/firebase/emberfire/blob/v3/addon/adapters/firestore.ts#L143)*
 
+**Type parameters:**
+
+#### K :  `keyof ModelRegistry`
 **Parameters:**
 
-| Param | Type |
+| Name | Type |
 | ------ | ------ |
 | _store | `Store` |
-| type | `any` |
-| snapshot | `Snapshot`<`never`> |
+| type | `ModelRegistry[K]` |
+| snapshot | `Snapshot`<`K`> |
 
 **Returns:** `Promise`<`void`>
 
