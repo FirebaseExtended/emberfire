@@ -8,22 +8,23 @@ export type Snapshot = firestore.DocumentSnapshot | firestore.QuerySnapshot;
 // TODO aside from .data(), key vs. id, metadata, and subcollection this is basicly realtime-database, should refactor to reuse
 export default class FirestoreSerializer extends DS.JSONSerializer {
 
-  normalizeSingleResponse(store: DS.Store, primaryModelClass: DS.Model, payload:  firestore.DocumentSnapshot, _id: string | number, _requestType: string) {
+  normalizeSingleResponse(store: DS.Store, primaryModelClass: DS.Model, payload: firestore.DocumentSnapshot, _id: string | number, _requestType: string) {
     if (!payload.exists) { throw  new DS.NotFoundError(); }
     const { data, included } = normalize(store, primaryModelClass, payload) as any;
-    const meta = extractMeta(payload);
+    const meta = { ...extractMeta(payload), ref: payload.ref};
     return { data, included, meta };
   }
 
   normalizeArrayResponse(store: DS.Store, primaryModelClass: DS.Model, payload: firestore.QuerySnapshot, _id: string | number, _requestType: string) {
     const noramlizedRecords: any[] = []
     const included: any[] = [];
+    const query = payload.query;
     payload.forEach(snapshot => {
       const { data, included: includes } = normalize(store, primaryModelClass, snapshot);
       noramlizedRecords.push(data);
       includes.forEach(record => included.push(record));
     });
-    const meta = extractMeta(payload);
+    const meta = { ...extractMeta(payload), query };
     return { data: noramlizedRecords, included, meta };
   }
 
@@ -35,7 +36,7 @@ declare module 'ember-data' {
   }
 }
 
-const normalize = (store: DS.Store, modelClass: DS.Model, snapshot: DocumentSnapshot) => {
+export const normalize = (store: DS.Store, modelClass: DS.Model, snapshot: DocumentSnapshot) => {
   const id = snapshot.id;
   const type = (<any>modelClass).modelName;
   const attributes = snapshot.data()!;
@@ -44,14 +45,18 @@ const normalize = (store: DS.Store, modelClass: DS.Model, snapshot: DocumentSnap
   return { data, included };
 }
 
+// TODO clean up
 const extractMeta = (snapshot: any) => {
   const meta: any = Object.assign({}, snapshot.metadata);
   const keyPath = get(snapshot, '_key.path');
   meta.database = get(snapshot, '_firestore._databaseId');
   meta.canonicalId = keyPath ? `${keyPath}|f:|ob:__name__asc,` : get(snapshot, '_originalQuery.memoizedCanonicalId');
-  const targetIds = get(snapshot, '_firestore._firestoreClient.localStore.targetIds') || {};
-  const targetId = meta.canonicalId && Object.keys(targetIds).map(tid => targetIds[tid]).find((target:any) => target.query.memoizedCanonicalId === meta.canonicalId);
-  meta.version = get(snapshot, '_document.version') || targetId && targetId.snapshotVersion;
+  meta.firestore = get(snapshot, '_firestore');
+  meta.client =  get(snapshot, '_firestore._firestoreClient');
+  const queryDataByTarget = get(snapshot, '_firestore._firestoreClient.localStore.queryDataByTarget') || {};
+  const queryData = meta.canonicalId && Object.keys(queryDataByTarget).map(tid => queryDataByTarget[tid]).find((target:any) => target.query.memoizedCanonicalId === meta.canonicalId);
+  meta.queryData = queryData || {};
+  meta.version = get(snapshot, '_document.version') || queryData && queryData.snapshotVersion;
   return meta;
 }
 

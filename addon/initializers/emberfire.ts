@@ -1,5 +1,6 @@
 import * as firebase from 'firebase/app';
 import FirebaseAppService from '../services/firebase-app';
+import RealtimeListenerService from '../services/realtime-listener';
 
 const initialize = (application: any) => {
     const environment = application.resolveRegistration('config:environment');
@@ -11,6 +12,7 @@ const initialize = (application: any) => {
     } else {
         environment.firebase.forEach((config:any) => loadEnvironment(application, config));
     }
+    application.register("service:realtime-listener", RealtimeListenerService.extend({}), { instantiate: true });
 }
 
 const loadEnvironment = (application:any, environment:any) => {

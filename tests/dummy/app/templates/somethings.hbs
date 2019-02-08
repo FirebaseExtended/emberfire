@@ -1,7 +1,7 @@
 <ul>
     {{#each model as |something|}}
         <li>
-            <h3>{{#link-to 'something' something}} {{something.id }} {{ something.title }}{{/link-to}}</h3>
+            <h3>{{#link-to 'something' something}}{{ something.title }}{{/link-to}}</h3>
             <p>{{ something.description }}</p>
         </li>
     {{/each}}
