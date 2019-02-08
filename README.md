@@ -5,11 +5,11 @@ EmberFire is the officially supported adapter for using
 [Ember Data](https://guides.emberjs.com/release/models/).
 
 Join the [Firebase Google Group](https://groups.google.com/forum/#!forum/firebase-talk)
-to ask technical questions, share apps you've built, and chat with other developers in the community.
+to ask technical questions, share apps you've built, and chat with other developers in the community. You can also find us in the [Firebase Community Slack](https://firebase.community/) (look for the `#ember` room) or [Stack Overflow](https://stackoverflow.com/questions/tagged/emberfire).
 
 ---
 
-> **WARNING**: Master branch is the work in progress for version 3 of Emberfire, [version 2 is available here](https://github.com/firebase/emberfire/tree/v2). [Learn more about the rewrite effort here](https://github.com/firebase/emberfire/issues/542).
+> **WARNING**: Master branch is the work in progress for version 3 of Emberfire. You can find [version 2 here](https://github.com/firebase/emberfire/tree/v2), if you're looking for documentation or to contribute a fix for stable. [Learn more about the rewrite effort here](https://github.com/firebase/emberfire/issues/542).
 
 ---
 
