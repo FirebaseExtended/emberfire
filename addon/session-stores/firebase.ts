@@ -1,4 +1,5 @@
-import BaseSessionStore from 'ember-simple-auth/session-stores/base';
+import Evented from '@ember/object/evented';
+import EmberObject from '@ember/object';
 
 import { get, set } from '@ember/object';
 import RSVP from 'rsvp';
@@ -11,9 +12,9 @@ import { run } from '@ember/runloop';
 
 import { inject as service } from '@ember/service';
 
-export default class FirebaseSessionStore extends BaseSessionStore.extend({
+export default class FirebaseSessionStore extends EmberObject.extend(Evented, {
     firebaseApp: service('firebase-app')
-}) { 
+}) {
 
     // @ts-ignore repeat here for typedoc
     firebaseApp: Ember.ComputedProperty<FirebaseAppService, FirebaseAppService>;
