@@ -47,5 +47,6 @@ Note that you can use any hosting service you'd like to deploy your Ember app, y
 1. [Querying Data](querying-data.md)
 1. [Relationships](relationships.md)
 1. [Security Rules](security-rules.md)
-1. [Using EmberFire without Ember CLI](without-ember-cli.md)
 1. **Deploying to Firebase Hosting**
+1. [Fastboot support](fastboot-support.md)
+1. [Deploying to Cloud Functions for Firebase](deploying-fastboot-to-cloud-functions.md)

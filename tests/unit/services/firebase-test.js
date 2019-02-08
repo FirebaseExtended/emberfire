@@ -1,76 +1,14 @@
-/* jshint expr:true */
-import { expect } from 'chai';
-import { it, describe } from 'mocha';
-import { setupTest } from 'ember-mocha';
-import firebase from 'firebase';
-import sinon from 'sinon';
-import Ember from 'ember';
+import { moduleFor, test } from 'ember-qunit';
 
-const { setOwner } = Ember;
+moduleFor('service:firebase', 'Unit | Service | firebase');
 
-describe('FirebaseService', function() {
-  setupTest('emberfire@service:firebase');
+test('should expose Firebase as a service', function(assert) {
 
-  const configMock = {
-    firebase: {
-      blah: 'a'
-    }
-  };
+  assert.expect(3);
 
-  const emberAppMock = {
-    resolveRegistration() {
-      return configMock;
-    }
-  };
+  const result = this.subject();
 
-  const firebaseAppMock = {
-    name: '[EmberFire default app]',
-    database() {
-      return databaseMock;
-    }
-  };
-
-  const databaseMock = {
-    ref() { return refMock; }
-  };
-
-  const refMock = {};
-
-  let initializeAppStub;
-  let appStub;
-
-  beforeEach(() => {
-    appStub =
-        sinon.stub(firebase, 'app')
-            .throws('no app');
-
-    initializeAppStub =
-        sinon.stub(firebase, 'initializeApp')
-            .returns(firebaseAppMock);
-  });
-
-  afterEach(() => {
-    appStub.restore();
-    initializeAppStub.restore();
-  });
-
-  it('is the database reference', function() {
-    setOwner(this, emberAppMock); // set owner context to mock app
-    const service = this.subject(this);
-    expect(service).to.be.equal(refMock);
-  });
-
-  it('initializes the app with the environment config', function() {
-    setOwner(this, emberAppMock); // set owner context to mock app
-    this.subject(this);
-    expect(initializeAppStub.calledWith(configMock.firebase)).to.be.true;
-  });
-
-  it('uses existing app if already present', function() {
-    appStub.returns(firebaseAppMock);
-
-    setOwner(this, emberAppMock); // set owner context to mock app
-    this.subject(this);
-    expect(initializeAppStub.notCalled).to.be.true;
-  });
+  assert.ok(result.app);
+  assert.ok(result.initializeApp);
+  assert.ok(result.apps);
 });

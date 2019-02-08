@@ -1,5 +1,13 @@
-# Fastboot Support in EmberFire
+# Fastboot Support
 
-In [#439](https://github.com/firebase/emberfire/pull/439) we added basic Fastboot support by pulling in the Node.js library while in the Fastboot environment.
+... TODO flush out
 
-Currently Fastboot support does not include authentication and should be considered experimental.
+1. [Installation](installation.md)
+1. [User Authentication](authentication.md)
+1. [Saving and Retrieving Data](saving-and-retrieving-data.md)
+1. [Querying Data](querying-data.md)
+1. [Relationships](relationships.md)
+1. [Security Rules](security-rules.md)
+1. [Deploying to Firebase Hosting](deploying-to-firebase-hosting.md)
+1. **Fastboot support**
+1. [Deploying to Cloud Functions for Firebase](deploying-fastboot-to-cloud-functions.md)

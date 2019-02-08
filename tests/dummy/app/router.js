@@ -1,20 +1,17 @@
-import Ember from 'ember';
+import EmberRouter from '@ember/routing/router';
 import config from './config/environment';
 
-const Router = Ember.Router.extend({
-  location: config.locationType
+const Router = EmberRouter.extend({
+  location: config.locationType,
+  rootURL: config.rootURL
 });
 
 Router.map(function() {
-  this.route('posts', { path: '/posts' }, function() {
-    this.route('new');
+  this.route('somethings', {path: '/'}, () => {
+    this.route('something', {path: 'somethings/:id'});
   });
-  this.route('post', { path: '/post/:post_id' });
-  this.route('user', { path: '/user/:user_id' });
-  this.route('auth');
-
-  this.route('widgets', function() {
-    this.route('current');
+  this.route('users', () => {
+    this.route('user', {path: 'users/:id'});
   });
 });
 

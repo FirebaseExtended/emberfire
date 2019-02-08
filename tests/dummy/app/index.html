@@ -3,24 +3,22 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>FireBlog (powered by EmberFire)</title>
+    <title>Dummy</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     {{content-for "head"}}
 
-    <link href="https://fonts.googleapis.com/css?family=Lato:100,300,400,700,900,400italic" rel="stylesheet" type="text/css">
-
-    <link rel="stylesheet" href="assets/vendor.css">
-    <link rel="stylesheet" href="assets/dummy.css">
+    <link integrity="" rel="stylesheet" href="{{rootURL}}assets/vendor.css">
+    <link integrity="" rel="stylesheet" href="{{rootURL}}assets/dummy.css">
 
     {{content-for "head-footer"}}
   </head>
   <body>
     {{content-for "body"}}
 
-    <script src="assets/vendor.js"></script>
-    <script src="assets/dummy.js"></script>
+    <script src="{{rootURL}}assets/vendor.js"></script>
+    <script src="{{rootURL}}assets/dummy.js"></script>
 
     {{content-for "body-footer"}}
   </body>

@@ -1,55 +1,34 @@
-/* jshint node: true */
+/* eslint-env node */
 'use strict';
-
-var path = require('path');
-var Webpack = require('broccoli-webpack');
-var mergeTrees = require('broccoli-merge-trees');
+const MergeTrees = require('broccoli-merge-trees');
+const Funnel = require('broccoli-funnel');
+const path = require('path');
+const writeFile = require('broccoli-file-creator');
+const emberfire_version = require('./package.json').version;
+const firebase_version = require('firebase').SDK_VERSION;
 
 module.exports = {
   name: 'emberfire',
 
-  included: function included(app) {
-    this._super.included(app);
-
-    // make sure app is correctly assigned when being used as a nested addon
-    if (app.app) {
-      app = app.app;
+  options: {
+    autoImport:{
+      exclude: [],
+      webpack: {}
     }
-    this.app = app;
-
-    this.app.import('vendor/firebase.amd.js');
-    this.app.import('vendor/shims/firebase.js');
   },
 
-  treeForVendor: function(tree) {
-    var trees = [];
+  included(app) {
+    this._super.included.apply(this, arguments);
+    this.import('vendor/emberfire/register-versions.js');
+  },
 
-    var firebase;
-
-    try {
-      var resolve = require('resolve');
-      firebase = resolve.sync('firebase/package.json', {
-        basedir: this.project.root
-      });
-    } catch (e) {
-      firebase = require.resolve('firebase/package.json');
-    }
-
-    trees.push(new Webpack([
-      path.dirname(firebase)
-    ], {
-      entry: './firebase-browser.js',
-      output: {
-        library: 'firebase',
-        libraryTarget: 'amd',
-        filename: 'firebase.amd.js'
-      }
-    }));
-
-    if (tree) {
-      trees.push(tree);
-    }
-
-    return mergeTrees(trees, { overwrite: true });
+  treeForVendor() {
+    const content = `Ember.libraries.register('EmberFire', '${emberfire_version}');\nEmber.libraries.register('Firebase', '${firebase_version}');`;
+    const registerVersionTree = writeFile(
+      'emberfire/register-versions.js',
+      content
+    );
+    return MergeTrees([registerVersionTree]);
   }
+
 };

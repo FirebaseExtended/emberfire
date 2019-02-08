@@ -1,3 +1,1 @@
-import EmberFireInitializer from 'emberfire/initializers/emberfire';
-
-export default EmberFireInitializer;
+export { default } from 'emberfire/initializers/emberfire';

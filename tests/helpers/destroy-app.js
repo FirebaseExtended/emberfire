@@ -1,7 +1,5 @@
-import Ember from 'ember';
-import destroyFirebaseApps from './destroy-firebase-apps';
+import { run } from '@ember/runloop';
 
 export default function destroyApp(application) {
-  destroyFirebaseApps();
-  Ember.run(application, 'destroy');
+  run(application, 'destroy');
 }
