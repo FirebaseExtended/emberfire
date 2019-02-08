@@ -66,7 +66,7 @@ In our `publishPost` action, we create a new post in the data store with the tit
 
 > **Note:** By default Firebase requires users be authenticated before they can read and write to the database. If you have not authenticated your users, you will receive errors . If you want to allow reading/writing to the database from unauthenticated users, check out the [security rules](security-rules.md) section.
 
-EmberFire uses Firebase's `push()` function under the hood, which creates a unique timestamp-based ID for each record that is added to the database. Our data now looks like this:
+EmberFire uses Firebase's `push()` function under the hood, which creates a unique timestamp-based ID for each record that is added to the database. (If you require a custom unique ID on your record, include an `id` attribute in your `createRecord` request.) Our data now looks like this:
 
 ```json
 {
