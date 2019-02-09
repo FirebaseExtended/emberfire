@@ -13,11 +13,9 @@
   },
   "repository": "",
   "scripts": {
-    "build": "ember build",
-    "server": "ember server",
-    "start": "node ./express.js",
-    "all": "npm run ts:precompile && npm run build && npm run start",
-    "package": "npm run ts:precompile && npm run build && npm pack .",
+    "build": "npm run ts:precompile && ember build",
+    "serve": "npm run build && node ./express.js",
+    "package": "npm run build && npm pack .",
     "test": "npm run ts:precompile && ember test",
     "ts:precompile": "ember ts:precompile",
     "reference": "typedoc --options typedoc.js addon"

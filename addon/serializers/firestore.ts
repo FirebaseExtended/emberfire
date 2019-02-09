@@ -1,6 +1,5 @@
 import DS from 'ember-data';
 import { firestore } from 'firebase';
-import { get } from '@ember/object';
 
 export type DocumentSnapshot = firestore.DocumentSnapshot | firestore.QueryDocumentSnapshot;
 export type Snapshot = firestore.DocumentSnapshot | firestore.QuerySnapshot;
@@ -11,21 +10,16 @@ export default class FirestoreSerializer extends DS.JSONSerializer {
   normalizeSingleResponse(store: DS.Store, primaryModelClass: DS.Model, payload: firestore.DocumentSnapshot, _id: string | number, _requestType: string) {
     if (!payload.exists) { throw  new DS.NotFoundError(); }
     const { data, included } = normalize(store, primaryModelClass, payload) as any;
-    const meta = { ...extractMeta(payload), ref: payload.ref};
+    const meta = extractMeta(payload);
     return { data, included, meta };
   }
 
   normalizeArrayResponse(store: DS.Store, primaryModelClass: DS.Model, payload: firestore.QuerySnapshot, _id: string | number, _requestType: string) {
-    const noramlizedRecords: any[] = []
-    const included: any[] = [];
-    const query = payload.query;
-    payload.forEach(snapshot => {
-      const { data, included: includes } = normalize(store, primaryModelClass, snapshot);
-      noramlizedRecords.push(data);
-      includes.forEach(record => included.push(record));
-    });
-    const meta = { ...extractMeta(payload), query };
-    return { data: noramlizedRecords, included, meta };
+    const normalizedPayload = payload.docs.map(snapshot => normalize(store, primaryModelClass, snapshot));
+    const included = new Array().concat(...normalizedPayload.map(({included}) => included));
+    const meta = extractMeta(payload)
+    const data = normalizedPayload.map(({data}) => data);
+    return { data, included, meta };
   }
 
 }
@@ -45,19 +39,19 @@ export const normalize = (store: DS.Store, modelClass: DS.Model, snapshot: Docum
   return { data, included };
 }
 
-// TODO clean up
-const extractMeta = (snapshot: any) => {
-  const meta: any = Object.assign({}, snapshot.metadata);
-  const keyPath = get(snapshot, '_key.path');
-  meta.database = get(snapshot, '_firestore._databaseId');
-  meta.canonicalId = keyPath ? `${keyPath}|f:|ob:__name__asc,` : get(snapshot, '_originalQuery.memoizedCanonicalId');
-  meta.firestore = get(snapshot, '_firestore');
-  meta.client =  get(snapshot, '_firestore._firestoreClient');
-  const queryDataByTarget = get(snapshot, '_firestore._firestoreClient.localStore.queryDataByTarget') || {};
-  const queryData = meta.canonicalId && Object.keys(queryDataByTarget).map(tid => queryDataByTarget[tid]).find((target:any) => target.query.memoizedCanonicalId === meta.canonicalId);
-  meta.queryData = queryData || {};
-  meta.version = get(snapshot, '_document.version') || queryData && queryData.snapshotVersion;
-  return meta;
+function isQuerySnapshot(arg: any): arg is firestore.QuerySnapshot {
+  return arg.query !== undefined;
+}
+
+const extractMeta = (snapshot: firestore.DocumentSnapshot|firestore.QuerySnapshot) => {
+  const fromCache = snapshot.metadata.fromCache;
+  const hasPendingWrites = snapshot.metadata.hasPendingWrites;
+  if (isQuerySnapshot(snapshot)) {
+    const query = snapshot.query;
+    return { fromCache, hasPendingWrites, query };
+  }
+  const ref = snapshot.ref;
+  return { fromCache, hasPendingWrites, ref };
 }
 
 const normalizeRelationships = (store: DS.Store, modelClass: DS.Model, attributes: any) => {

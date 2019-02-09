@@ -11,7 +11,8 @@ import { get, set } from '@ember/object';
 import { database } from 'firebase/app';
 
 export type ReferenceOrQuery = database.Reference | database.Query;
-export type QueryFn = (ref: ReferenceOrQuery) => ReferenceOrQuery;
+export type ReferenceOrQueryFn = (ref: ReferenceOrQuery) => ReferenceOrQuery;
+export type QueryFn = (ref: database.Reference) => ReferenceOrQuery;
 
 /**
  * Persist your Ember Data models in the Firebase Realtime Database
@@ -68,18 +69,19 @@ export default class RealtimeDatabaseAdapter extends DS.Adapter.extend({
     // @ts-ignore repeat here for the tyepdocs
     databaseURL?: string;
 
-    findRecord<K extends keyof ModelRegistry>(_store: DS.Store, type: ModelRegistry[K], id: string) {
-        return docReference(this, type, id).then(ref => ref.once('value'));
+    findRecord<K extends keyof ModelRegistry>(store: DS.Store, type: ModelRegistry[K], id: string) {
+        return this.queryRecord(store, type, ref => ref.child(id));
     }
 
-    findAll<K extends keyof ModelRegistry>(_store: DS.Store, type: ModelRegistry[K]) {
-        return rootCollection(this, type).then(queryDocs);
+    findAll<K extends keyof ModelRegistry>(store: DS.Store, type: ModelRegistry[K]) {
+        return this.query(store, type, ref => ref)
     }
 
     findHasMany<K extends keyof ModelRegistry>(store: DS.Store, snapshot: DS.Snapshot<K>, url: string, relationship: {[key:string]: any}) {
-        const adapter = store.adapterFor(relationship.type as never) as any;
+        const adapter = store.adapterFor(relationship.type as never) as any; // TODO kill the any
         if (adapter !== this) {
-            return adapter.findHasMany(store, snapshot, url, relationship);
+            // TODO allow for different serializers, if not already working
+            return adapter.findHasMany(store, snapshot, url, relationship) as RSVP.Promise<any>;
         } else if (relationship.options.subcollection) {
             throw `subcollections (${relationship.parentModelName}.${relationship.key}) are not supported by the Realtime Database, consider using embedded relationships or check out Firestore`;
         } else {
@@ -91,9 +93,10 @@ export default class RealtimeDatabaseAdapter extends DS.Adapter.extend({
     }
 
     findBelongsTo<K extends keyof ModelRegistry>(store: DS.Store, snapshot: DS.Snapshot<K>, url: any, relationship: any) {
-        const adapter = store.adapterFor(relationship.type as never) as any;
+        const adapter = store.adapterFor(relationship.type as never) as any;  // TODO kill the any
         if (adapter !== this) {
-            return adapter.findBelongsTo(store, snapshot, url, relationship);
+            // TODO allow for different serializers, if not already working
+            return adapter.findBelongsTo(store, snapshot, url, relationship) as RSVP.Promise<any>;
         } else {
             return docReference(this, relationship.type, snapshot.id).then(ref => ref.once('value'));
         }
@@ -123,13 +126,14 @@ export default class RealtimeDatabaseAdapter extends DS.Adapter.extend({
     updateRecord<K extends keyof ModelRegistry>(_: DS.Store, type: ModelRegistry[K], snapshot: DS.Snapshot<K>) {
         const id = snapshot.id;
         const data = this.serialize(snapshot, { includeId: false });
+        // TODO is this correct? e.g, clear dirty state and trigger didChange; what about failure?
         return docReference(this, type, id).then(ref => ref.set(data));
     }
 
     createRecord<K extends keyof ModelRegistry>(_: DS.Store, type: ModelRegistry[K], snapshot: DS.Snapshot<K>) {
         const id = snapshot.id;
         const data = this.serialize(snapshot, { includeId: false });
-        // TODO remove the unnecessary once('value')
+        // TODO remove the unnecessary once('value'), handle in serializer if I can (noramlizeCreateResponse right?) also this fails if read permissions is denied
         if (id == null) {
             return rootCollection(this, type).then(ref => ref.push(data).then(ref => ref.once('value')));
         } else {
@@ -149,7 +153,7 @@ declare module 'ember-data' {
     }
 }
 
-const queryDocs = (referenceOrQuery: ReferenceOrQuery, query?: QueryFn) => {
+const queryDocs = (referenceOrQuery: ReferenceOrQuery, query?: ReferenceOrQueryFn) => {
     const noop = (ref: database.Reference) => ref;
     const queryFn = query || noop;
     return getDocs(queryFn(referenceOrQuery));

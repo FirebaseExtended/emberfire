@@ -75,29 +75,17 @@ If you'd like to contribute to EmberFire, run the following commands to get your
 ### Setup
 
 * `git clone` this repository
-* `npm install -g ember-cli bower gulp`
-* `npm install`
-* `bower install`
+* `npm i`
 
 ### Running tests
 
 * `ember test` OR
 * `ember test --server`
 
-##### Running tests against a specific version of ember-data
-
-* `ember try:one <scenario>` where  `<scenario>` is one of the scenarios in `config/ember-try.js`
-
-Example:
-
-```
-ember try:one ember-data-canary
-```
-
 ### Running the FireBlog demo app
 
-* `ember server`
-* Visit your app at [http://localhost:4200](http://localhost:4200).
+* `npm run serve`
+* Visit your app at [http://localhost:3000](http://localhost:3000).
 
 ### Using your local EmberFire workdir in another local project
 

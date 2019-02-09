@@ -13,6 +13,7 @@ import { firestore } from 'firebase/app';
 
 export type CollectionReferenceOrQuery = firestore.CollectionReference | firestore.Query;
 export type QueryFn = (ref: CollectionReferenceOrQuery) => CollectionReferenceOrQuery;
+export type QueryRecordFn = (ref: firestore.CollectionReference) => firestore.DocumentReference;
 
 /**
  * Persist your Ember Data models in Cloud Firestore
@@ -104,18 +105,19 @@ export default class FirestoreAdapter extends DS.Adapter.extend({
     // @ts-ignore repeat here for the tyepdocs
     firebaseApp: Ember.ComputedProperty<FirebaseAppService, FirebaseAppService>;
 
-    findRecord<K extends keyof ModelRegistry>(_store: DS.Store, type: ModelRegistry[K], id: string) {
-        return getDoc(this, type, id);
+    findRecord<K extends keyof ModelRegistry>(store: DS.Store, type: ModelRegistry[K], id: string) {
+        return this.queryRecord(store, type, ref => ref.doc(id));
     }
 
-    findAll<K extends keyof ModelRegistry>(_store: DS.Store, type: ModelRegistry[K]) {
-        return rootCollection(this, type).then(queryDocs);
+    findAll<K extends keyof ModelRegistry>(store: DS.Store, type: ModelRegistry[K]) {
+        return this.query(store, type, ref => ref)
     }
     
     findHasMany<K extends keyof ModelRegistry>(store: DS.Store, snapshot: DS.Snapshot<K>, url: string, relationship: {[key:string]: any}) {
         const adapter = store.adapterFor(relationship.type as never) as any; // TODO fix types
         if (adapter !== this) {
-            return adapter.findHasMany(store, snapshot, url, relationship);
+            // TODO allow for different serializers, if not already working
+            return adapter.findHasMany(store, snapshot, url, relationship) as RSVP.Promise<any>;
         } else if (relationship.options.subcollection) {
             return docReference(this, relationship.parentModelName, snapshot.id).then(doc => queryDocs(doc.collection(collectionNameForType(relationship.type)), relationship.options.query));
         } else {
@@ -126,14 +128,19 @@ export default class FirestoreAdapter extends DS.Adapter.extend({
     findBelongsTo<K extends keyof ModelRegistry>(store: DS.Store, snapshot: DS.Snapshot<K>, url: string, relationship: {[key:string]: any}) {
         const adapter = store.adapterFor(relationship.type as never) as any; // TODO fix types
         if (adapter !== this) {
-            return adapter.findBelongsTo(store, snapshot, url, relationship);
+            // TODO allow for different serializers, if not already working
+            return adapter.findBelongsTo(store, snapshot, url, relationship) as RSVP.Promise<any>;
         } else {
             return getDoc(this, relationship.type, snapshot.id);
         }
     }
 
-    query<K extends keyof ModelRegistry>(_store: DS.Store, type: ModelRegistry[K], queryFn: QueryFn, _recordArray: DS.AdapterPopulatedRecordArray<any>) {
+    query<K extends keyof ModelRegistry>(_store: DS.Store, type: ModelRegistry[K], queryFn: QueryFn, _recordArray?: DS.AdapterPopulatedRecordArray<any>) {
         return rootCollection(this, type).then(collection => queryDocs(collection, queryFn));
+    }
+
+    queryRecord<K extends keyof ModelRegistry>(_store: DS.Store, type: ModelRegistry[K], queryFn: QueryRecordFn) {
+        return rootCollection(this, type).then(queryFn).then(ref => ref.get());
     }
 
     shouldBackgroundReloadRecord() {
@@ -143,13 +150,14 @@ export default class FirestoreAdapter extends DS.Adapter.extend({
     updateRecord<K extends keyof ModelRegistry>(_store: DS.Store, type: ModelRegistry[K], snapshot: DS.Snapshot<K>) {
         const id = snapshot.id;
         const data = this.serialize(snapshot, { includeId: false });
+        // TODO is this correct? e.g, clear dirty state and trigger didChange; what about failure?
         return docReference(this, type, id).then(doc => doc.update(data));
     }
 
     createRecord<K extends keyof ModelRegistry>(_store: DS.Store, type: ModelRegistry[K], snapshot: DS.Snapshot<K>) {
         const id = snapshot.id;
         const data = this.serialize(snapshot, { includeId: false });
-        // TODO remove the unnecessary get()
+        // TODO remove the unnecessary get(), handle in serializer if I can (noramlizeCreateResponse right?) also this fails if read permissions is denied
         if (id) {
             return docReference(this, type, id).then(doc => doc.set(data).then(() => doc.get()));
         } else {

@@ -1,5 +1,5 @@
 import Route from '@ember/routing/route';
-import { RealtimeRouteMixin } from 'emberfire/services/realtime-listener';
+import RealtimeRouteMixin from 'emberfire/mixins/realtime-route';
 
 export default Route.extend(RealtimeRouteMixin, {
     model() {
