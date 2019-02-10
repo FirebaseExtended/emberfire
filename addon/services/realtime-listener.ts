@@ -4,7 +4,6 @@ import DS from 'ember-data';
 import { get } from '@ember/object';
 import { run } from '@ember/runloop';
 import { firestore } from 'firebase/app';
-import { normalize } from '../serializers/firestore';
 
 const getService = (object:Object) => getOwner(object).lookup('service:realtime-listener') as RealtimeListenerService;
 const isFastboot = (object:Object) => {
@@ -12,14 +11,7 @@ const isFastboot = (object:Object) => {
     return fastboot && fastboot.isFastBoot;
 }
 
-// TODO kill this once subscribe has proper type checks
-const hasProperMeta = (model: any) => {
-    const meta = model.get('meta');
-    // TODO handle queryRecord
-    return meta && (meta.query || meta.ref) || console.warn('Realtime listeners only work for models returned from FirestoreAdapter query and queryRecord.');
-}
-
-export const subscribe = (route: Object, model: DS.Model) => !isFastboot(route) && hasProperMeta(model) && getService(route).subscribe(route, model);
+export const subscribe = (route: Object, model: DS.Model) => !isFastboot(route) && getService(route).subscribe(route, model);
 export const unsubscribe = (route: Object) => !isFastboot(route) && getService(route).unsubscribe(route);
 
 const setRouteSubscription = (service: RealtimeListenerService, route: Object, unsubscribe: (() => void)|null) => {
@@ -40,18 +32,14 @@ export default class RealtimeListenerService extends Service.extend({
 }) {
 
     subscribe(route: Object, model: any) {
-        const meta = model.get('meta');
-        const store = model.store as DS.Store; // TODO type model?
-        const modelName = model.modelName as never; // TODO add K so drop never
-        const query = meta.query as firestore.Query|undefined;
-        const ref = meta.ref as firestore.DocumentReference|undefined;
-        // TODO typecheck Firestore queryRecord ref and RTDB ref
+        const store = model.store as DS.Store;
+        const modelName = (model.modelName || model.get('_internalModel.modelName')) as never
+        const query = model.get('meta.query') as firestore.Query|undefined;
+        const ref = model.get('_internalModel._recordData._data._ref') as firestore.DocumentReference|undefined;
         if (query) {
-            console.log("query listener", route, query);
             const unsubscribe = query.onSnapshot(snapshot => {
                 snapshot.docChanges().forEach(change => run(() => {
-                    // normalize should come from the right serializer, not hardcode
-                    const normalizedData = normalize(store, store.modelFor(modelName), change.doc);
+                    const normalizedData = store.normalize(modelName, change.doc);
                     switch(change.type) {
                         case 'added': {
                             const current = model.content.objectAt(change.newIndex);
@@ -84,10 +72,11 @@ export default class RealtimeListenerService extends Service.extend({
             });
             setRouteSubscription(this, route, unsubscribe);
         } else if (ref) {
-            console.log("doc listener", route, ref);
             const unsubscribe = ref.onSnapshot(doc => {
-                const normalizedData = normalize(store, store.modelFor(modelName), doc);
-                store.push(normalizedData);
+                run(() => {
+                    const normalizedData = store.normalize(modelName, doc);
+                    store.push(normalizedData);
+                });
             });
             setRouteSubscription(this, route, unsubscribe);
         }

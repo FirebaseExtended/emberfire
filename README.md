@@ -7,12 +7,13 @@ to ask technical questions, share apps you've built, and chat with other develop
 
 ---
 
-> **WARNING**: Master branch is the work in progress for version 3 of Emberfire. You can find [version 2 here](https://github.com/firebase/emberfire/tree/v2), if you're looking for documentation or to contribute a fix for stable. [Learn more about the rewrite effort here](https://github.com/firebase/emberfire/issues/542).
+> **WARNING**: Master branch is the work in progress for version 3 of Emberfire. [You can find version 2 here](https://github.com/firebase/emberfire/tree/v2), if you're looking for documentation or to contribute to stable. [Learn more about the rewrite effort here](https://github.com/firebase/emberfire/issues/542).
 
 ---
 
-## What is EmberFire?
+## Why EmberFire?
 
+- **Offically supported** - Maintained by the Firebase team
 - **Ember Data Adapters** - [Cloud Firestore](https://firebase.google.com/docs/firestore/) and [Realtime Database](https://firebase.google.com/docs/database/) adapters for Ember Data allow you to persist your models in Firebase
 - **Ember Services** - `firebase` and `firebase-app` services allow direct access to the underlying [Firebase SDK instance](https://firebase.google.com/docs/reference/js/)
 - **Realtime Bindings** - Listen for realtime updates to your Firebase backed Ember Data models using the provided `realtime-listener` service or the `RealtimeRouteMixin`

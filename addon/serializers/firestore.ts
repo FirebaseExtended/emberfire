@@ -9,9 +9,8 @@ export default class FirestoreSerializer extends DS.JSONSerializer {
 
   normalizeSingleResponse(store: DS.Store, primaryModelClass: DS.Model, payload: firestore.DocumentSnapshot, _id: string | number, _requestType: string) {
     if (!payload.exists) { throw  new DS.NotFoundError(); }
-    const { data, included } = normalize(store, primaryModelClass, payload) as any;
     const meta = extractMeta(payload);
-    return { data, included, meta };
+    return { ...normalize(store, primaryModelClass, payload), meta };
   }
 
   normalizeArrayResponse(store: DS.Store, primaryModelClass: DS.Model, payload: firestore.QuerySnapshot, _id: string | number, _requestType: string) {
@@ -33,7 +32,8 @@ declare module 'ember-data' {
 export const normalize = (store: DS.Store, modelClass: DS.Model, snapshot: DocumentSnapshot) => {
   const id = snapshot.id;
   const type = (<any>modelClass).modelName;
-  const attributes = snapshot.data()!;
+  const _ref = snapshot.ref;
+  const attributes = { ...snapshot.data()!, _ref };
   const { relationships, included } = normalizeRelationships(store, modelClass, attributes);
   const data = { id, type, attributes, relationships };
   return { data, included };
@@ -44,14 +44,12 @@ function isQuerySnapshot(arg: any): arg is firestore.QuerySnapshot {
 }
 
 const extractMeta = (snapshot: firestore.DocumentSnapshot|firestore.QuerySnapshot) => {
-  const fromCache = snapshot.metadata.fromCache;
-  const hasPendingWrites = snapshot.metadata.hasPendingWrites;
   if (isQuerySnapshot(snapshot)) {
     const query = snapshot.query;
-    return { fromCache, hasPendingWrites, query };
+    return { ...snapshot.metadata, query };
+  } else {
+    return snapshot.metadata;
   }
-  const ref = snapshot.ref;
-  return { fromCache, hasPendingWrites, ref };
 }
 
 const normalizeRelationships = (store: DS.Store, modelClass: DS.Model, attributes: any) => {
