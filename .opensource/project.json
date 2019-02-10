@@ -1,0 +1,24 @@
+{
+    "name": "EmberFire",
+    "platforms": [ "Web" ],
+    "content": "README.md",
+    "pages" : {
+        "docs/quickstart.md": "Quickstart",
+        "docs/guide/authentication.md": "User Authentication",
+        "docs/guide/saving-and-retrieving-data.md": "Saving and Retrieving Data",
+        "docs/guide/querying-data.md": "Querying Data",
+        "docs/guide/relationships.md": "Relationships",
+        "docs/guide/security-rules.md": "Security Rules",
+        "docs/guide/deploying-to-firebase-hosting.md": "Deploy to Firebase Hosting",
+        "docs/guide/fastboot-suppor.md": "Fastboot support",
+        "docs/guide/deploying-fastboot-to-cloud-functions.md": "Deploy to Cloud Functions",
+        "docs/guide/advanced-configuration.md": "Advanced Configuration",
+        "docs/migration/2XX-to-3XX.md": "Upgrading to version 3"
+    },
+    "related": [ ],
+    "tabs": [
+        { "title": "Guide", "href": "https://github.com/firebase/emberfire/blob/master/docs/guide/README.md" },
+        { "title": "API Reference", "href": "https://github.com/firebase/emberfire/blob/master/docs/reference/README.md" },
+        { "title": "Stack Overflow", "href": "https://stackoverflow.com/questions/tagged/emberfire" }
+    ]
+}

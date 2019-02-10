@@ -1,0 +1,10 @@
+important - Requires Firebase JS SDK 5.x
+important - Now targetting Ember 3.4.8+
+feature - Cloud Firestore now supported with an Ember Data adapter
+important - Realtime Database adapter has been rewritten, there are many breaking changes
+feature - Support Ember Simple Auth with a Firebase Auth provider
+fixed - Realtime Database relationships should be much more robust
+feature - Add a firebase-app service which allows calls to the initialized Firebase app instance
+fixed - Now works on Ember Fastboot
+changed - No longer listen to realtime changes by default, use the Realtime Service or Mixins to receive realtime updates to your models
+feature - Support multiple Firebase applications via named services

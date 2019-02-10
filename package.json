@@ -1,17 +1,25 @@
 {
   "name": "emberfire",
   "version": "3.0.0-rc.1",
-  "description": "The default blueprint for ember-cli addons.",
+  "description": "The officially supported adapter for using Firebase with Ember",
   "keywords": [
-    "ember-addon"
+    "ember-addon",
+    "firebase"
   ],
   "license": "MIT",
-  "author": "",
+  "author": "Firebase (https://firebase.google.com/)",
+  "homepage": "https://firebaseopensource.com/projects/firebase/emberfire/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/firebase/emberfire.git"
+  },
+  "bugs": {
+    "url": "https://github.com/firebase/emberfire/issues"
+  },
   "directories": {
     "doc": "doc",
     "test": "tests"
   },
-  "repository": "",
   "scripts": {
     "build": "npm run ts:precompile && ember build",
     "serve": "npm run build && node ./express.js",
@@ -71,5 +79,6 @@
   "ember-addon": {
     "configPath": "tests/dummy/config",
     "fastbootDependencies": []
-  }
+  },
+  "typings": "index.d.ts"
 }

@@ -1,6 +1,10 @@
 import * as firebase from 'firebase/app';
 import FirebaseAppService from '../services/firebase-app';
 import RealtimeListenerService from '../services/realtime-listener';
+import FirestoreAdapter from '../adapters/firestore';
+import FirestoreSerializer from '../serializers/firestore';
+import RealtimeDatabaseAdapater from '../adapters/realtime-database';
+import RealtimeDatabaseSerializer from '../serializers/realtime-database';
 
 const initialize = (application: any) => {
     const environment = application.resolveRegistration('config:environment');
@@ -13,6 +17,10 @@ const initialize = (application: any) => {
         environment.firebase.forEach((config:any) => loadEnvironment(application, config));
     }
     application.register("service:realtime-listener", RealtimeListenerService.extend({}), { instantiate: true });
+    application.register('adapter:-firestore', FirestoreAdapter);
+    application.register('serializer:-firestore', FirestoreSerializer);
+    application.register('adapter:-realtime-database', RealtimeDatabaseAdapater);
+    application.register('serializer:-realtime-database', RealtimeDatabaseSerializer);
 }
 
 const loadEnvironment = (application:any, environment:any) => {
