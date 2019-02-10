@@ -5,4 +5,12 @@
     <button {{action 'login'}}>Login</button>
 {{/if}}
 
+<nav>
+    <ul>
+        <li>{{#link-to "somethings"}}Somethings{{/link-to}}</li>
+        <li>{{#link-to "users"}}Users{{/link-to}}</li>
+        <li>{{#link-to "comments"}}Comments{{/link-to}}</li>
+    </ul>
+</nav>
+
 {{outlet}}

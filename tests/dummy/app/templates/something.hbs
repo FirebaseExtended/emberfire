@@ -4,4 +4,13 @@
 {{#if model.user }}
     <h2>{{#link-to 'user' model.user.id }}{{ model.user.name }}{{/link-to}}</h2>
 {{/if}}
+
 <p>{{ model.description }}</p>
+
+<ul>
+{{#each model.comments as |comment|}}
+    <li>
+        <p>{{ comment.body }}</p>
+    </li>
+{{/each}}
+</ul>

@@ -1,0 +1,8 @@
+<ul>
+    {{#each model as |comment|}}
+        <li>
+            <p>{{ comment.body }}</p>
+            <small>{{ comment.id }}</small>
+        </li>
+    {{/each}}
+</ul>

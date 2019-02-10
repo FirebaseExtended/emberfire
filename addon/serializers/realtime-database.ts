@@ -6,8 +6,7 @@ export default class RealtimeDatabaseSerializer extends DS.JSONSerializer {
 
   normalizeSingleResponse(store: DS.Store, primaryModelClass: DS.Model, payload: database.DataSnapshot, _id: string | number, _requestType: string) {
     if (!payload.exists) { throw  new DS.NotFoundError(); }
-    const { data, included } = normalize(store, primaryModelClass, payload) as any;
-    return { data, included, meta: {} };
+    return normalize(store, primaryModelClass, payload);
   }
 
   normalizeArrayResponse(store: DS.Store, primaryModelClass: DS.Model, payload: database.DataSnapshot, _id: string | number, _requestType: string) {
@@ -16,9 +15,9 @@ export default class RealtimeDatabaseSerializer extends DS.JSONSerializer {
     payload.forEach(snapshot => {
       const { data, included } = normalize(store, primaryModelClass, snapshot);
       noramlizedRecords.push(data);
-      Object.assign(embeddedRecords, included);
+      Object.assign(embeddedRecords, [...embeddedRecords, ...included]);
     });
-    return { data: noramlizedRecords, included: embeddedRecords, meta: {} };
+    return { data: noramlizedRecords, included: embeddedRecords, meta: { query: (payload as any).query || payload.ref } };
   }
 
 }
@@ -29,10 +28,10 @@ declare module 'ember-data' {
   }
 }
 
-const normalize = (store: DS.Store, modelClass: DS.Model, snapshot: database.DataSnapshot) => {
+export const normalize = (store: DS.Store, modelClass: DS.Model, snapshot: database.DataSnapshot) => {
   const id = snapshot.key;
   const type = (<any>modelClass).modelName;
-  const attributes = snapshot.val();
+  const attributes = { ...snapshot.val(), _ref: snapshot.ref };
   const { relationships, included } = normalizeRelationships(store, modelClass, attributes);
   const data = { id, type, attributes, relationships };
   return { data, included };

@@ -8,7 +8,9 @@ let fastboot = new FastBoot({
   distPath: `${__dirname}/dist`,
   sandboxGlobals: {
     XMLHttpRequest: require('xmlhttprequest').XMLHttpRequest,
-    WebSocket: require('ws')
+    WebSocket: require('ws'),
+    clearInterval: clearInterval,
+    setInterval: setInterval
   }
 });
 

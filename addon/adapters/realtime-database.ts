@@ -178,7 +178,10 @@ const databaseInstance = (adapter: RealtimeDatabaseAdapter) => {
 const rootCollection = (adapter: RealtimeDatabaseAdapter, type: any) => 
    databaseInstance(adapter).then(database => database.ref(collectionNameForType(type)));
 
-const getDocs = (query: ReferenceOrQuery) => query.once('value')
+const getDocs = (query: ReferenceOrQuery) => query.once('value').then(value => {
+    (value as any).query = query; // tack query on for now
+    return value;
+});
 
 const docReference = (adapter: RealtimeDatabaseAdapter, type: any, id: string) => 
     rootCollection(adapter, type).then(ref => ref.child(id))
