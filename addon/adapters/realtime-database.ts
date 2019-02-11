@@ -163,7 +163,7 @@ export type ReferenceOrQueryFn = (ref: ReferenceOrQuery) => ReferenceOrQuery;
 export type QueryFn = (ref: database.Reference) => ReferenceOrQuery;
 
 // Keeping this for compatability with version 2
-export enum OrderBy { Key = '_key', Value = '_value', Priority = '_priority' };
+export enum OrderBy { Key = '_key', Value = '_value', Priority = '_priority' }
 
 export type BoundOp = string|number|boolean|null|[string|number|boolean|null,string];
 

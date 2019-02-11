@@ -17,7 +17,7 @@
     },
     "related": [ ],
     "tabs": [
-        { "title": "Guide", "href": "https://github.com/firebase/emberfire/blob/master/docs/guide/README.md" },
+        { "title": "NPM", "href": "https://npmjs.com/package/emberfire" },
         { "title": "API Reference", "href": "https://github.com/firebase/emberfire/blob/master/docs/reference/README.md" },
         { "title": "Stack Overflow", "href": "https://stackoverflow.com/questions/tagged/emberfire" }
     ]

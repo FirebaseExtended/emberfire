@@ -1,9 +1,23 @@
 important - Requires Firebase JS SDK 5.x
-important - Now targetting Ember 3.4.8+
-feature - Cloud Firestore now supported with an Ember Data adapter
+important - Now targeting Ember 3.4.8+
+important - Requires ember-auto-import; we're no longer using babelify or browserify
+important - KNOWN ISSUE WITH RC.1: many-to-many relationships are not working as expected
+important - KNOWN ISSUE WITH RC.1: saving a model will not save/create relationships
+important - KNOWN ISSUE WITH RC.1: the include option on query/queryRecord does not yet function
+important - KNOWN ISSUE WITH RC.1: realtime listener mixin does not listen for updates to relationships
+feature - Cloud Firestore is now supported with an Ember Data adapter
 feature - Support Ember Simple Auth with a Firebase Auth provider
-fixed - Realtime Database relationships should be much more robust
 feature - Add a firebase-app service which allows calls to the initialized Firebase app instance
-fixed - Now works on Ember Fastboot
-changed - No longer listen to realtime changes by default, use the Realtime Service or Mixins to receive realtime updates to your models
-feature - Support multiple Firebase applications via named services
+feature - Support for multiple Firebase applications via named services
+fixed - Now supports Ember Fastboot
+changed - The Realtime Database adapter has moved, it now at `emberfire/adapters/realtime-database`
+feature - The Realtime Database adapter now allows you to point to a different database instance
+changed - The firebase-app service calls are now promises
+changed - The Realtime Database adapter no longer listens to realtime changes by default, use the Realtime Service or Mixins to receive updates to your models
+fixed - "Falsy" sorts now function in Realtime Database queries
+changed - Relationship ids are no longer embedded for hasMany relationships, instead a query is used
+fixed - Relationship integrity should now be much more reliable
+feature - Support a reference factory option in query and relationships, allowing you to override the assumed database reference
+fixed - Relationships should now be able to cross different adapters/serializers
+changed - All relationships are now async, unless they are embedded
+feature - Typings are now provided
