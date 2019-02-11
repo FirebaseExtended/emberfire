@@ -1,1 +1,9 @@
 {{outlet}}
+
+<ul>
+    {{#each model as |user|}}
+        <li>
+            <h3>{{#link-to 'user' user}}{{ user.name }}{{/link-to}}</h3>
+        </li>
+    {{/each}}
+</ul>

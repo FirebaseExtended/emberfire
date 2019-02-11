@@ -11,6 +11,7 @@
 {{#each model.comments as |comment|}}
     <li>
         <p>{{ comment.body }}</p>
+        {{#if comment.user}}<small>{{#link-to "user" comment.user.id}}{{comment.user.name}}{{/link-to}}</small>{{/if}}
     </li>
 {{/each}}
 </ul>

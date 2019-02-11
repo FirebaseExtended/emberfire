@@ -4,7 +4,7 @@
 
 ## Hierarchy
 
- `object` & `Base`<`this`>
+ `Evented`<`this`> & `object` & `EmberObject`<`this`>
 
 **↳ FirebaseAuthenticator**
 

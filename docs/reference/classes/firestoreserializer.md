@@ -395,7 +395,7 @@ ___
 
 *Overrides JSONSerializer.normalizeArrayResponse*
 
-*Defined in [serializers/firestore.ts:18](https://github.com/firebase/emberfire/blob/v3/addon/serializers/firestore.ts#L18)*
+*Defined in [serializers/firestore.ts:16](https://github.com/firebase/emberfire/blob/v3/addon/serializers/firestore.ts#L16)*
 
 **Parameters:**
 
@@ -675,7 +675,7 @@ ___
 
 *Overrides JSONSerializer.normalizeSingleResponse*
 
-*Defined in [serializers/firestore.ts:11](https://github.com/firebase/emberfire/blob/v3/addon/serializers/firestore.ts#L11)*
+*Defined in [serializers/firestore.ts:10](https://github.com/firebase/emberfire/blob/v3/addon/serializers/firestore.ts#L10)*
 
 **Parameters:**
 

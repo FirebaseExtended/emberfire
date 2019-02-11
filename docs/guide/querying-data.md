@@ -5,12 +5,22 @@ In our posts template, let's say we want to display the ten most recent blog pos
 ```js
 export default Ember.Route.extend({
   model: function() {
-    return this.store.query('post', ref => ref.orderBy('publishedAt', 'desc').limit(10));
+    return this.store.query('post', { orderBy: { publishedAt: 'desc' }, limit: 10 });
   }
 });
 ```
 
-The second argument of the query method allows for modification of the assumed Firestore reference, [learn more about what query options are available in the Firestore documentation.](https://firebase.google.com/docs/firestore/query-data/queries#simple_queries)
+Alternatively we can directly modify the the assumed Firestore reference, [learn more about what query options are available in the Firestore documentation](https://firebase.google.com/docs/firestore/query-data/queries#simple_queries):
+
+```js
+export default Ember.Route.extend({
+  model: function() {
+    return this.store.query('post', { query: ref => ref.orderBy('publishedAt', 'desc').limit(10) });
+  }
+});
+```
+
+This is useful for more advanced use cases.
 
 # Getting realtime updates to our queries
 
@@ -21,9 +31,58 @@ import { RealtimeRouteMixin } from 'emberfire/services/realtime-listener';
 
 export default Route.extend(RealtimeRouteMixin, {
   model: function() {
-    return this.store.query('post', ref => ref.orderBy('publishedAt', 'desc').limit(10));
+    return this.store.query('post', { orderBy: { publishedAt: 'desc' }, limit: 10 });
   }
 });
+```
+
+## Query Options
+
+### Firestore
+
+TODO write about the options available
+
+```ts
+    filter?: {[key:string]:any},
+    where?: WhereOp|WhereOp[],
+    endAt?: BoundOp,
+    endBefore?: BoundOp,
+    startAt?: BoundOp,
+    startAfter?: BoundOp,
+    orderBy?: OrderOp,
+    include?: string
+```
+
+#### Query
+
+```ts
+    query?: (CollectionReference) => (Query|CollectionReference), 
+    limit?: number
+```
+
+#### QueryRecord
+
+```ts
+    doc?: (CollectionReference) => (Query|DocumentReference)
+```
+
+### Realtime Database
+
+```ts
+    query?: (Reference) => Reference,
+    filter?: {[key:string]:string|number|boolean|null},
+    endAt?: BoundOp,
+    equalTo?: BoundOp,
+    limitToFirst?: number,
+    limitToLast?: number,
+    orderBy?: string|OrderBy,
+    startAt?: BoundOp
+```
+
+#### Query
+
+```ts
+    limit?: number
 ```
 
 ## Working with security rules

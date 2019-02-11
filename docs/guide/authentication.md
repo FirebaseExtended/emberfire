@@ -1,5 +1,24 @@
 # Authentication
 
+## Directly with the Firebase SDK
+
+```js
+firebaseApp.auth().then(auth => /* Firebase SDK calls */)
+```
+
+Getting at the current user:
+
+```js
+export default Ember.Route.extend({
+  firebaseApp: service(),
+  model: function() {
+    return this.firebaseApp.auth().then(({currentUser}) =>
+        currentUser ? this.store.query('comment', { filter: { user: currentUser.uid} }) : reject()
+    );
+  }
+});
+```
+
 ## Ember Simple Auth
 
 We can add authentication to our app using the [Ember Simple Auth session store](hhttps://github.com/simplabs/ember-simple-auth#session-stores) built into EmberFire. The first step to set up authentication in our app is installing the ember-simple-auth addon by running:

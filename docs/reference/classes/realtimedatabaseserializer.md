@@ -395,7 +395,7 @@ ___
 
 *Overrides JSONSerializer.normalizeArrayResponse*
 
-*Defined in [serializers/realtime-database.ts:13](https://github.com/firebase/emberfire/blob/v3/addon/serializers/realtime-database.ts#L13)*
+*Defined in [serializers/realtime-database.ts:12](https://github.com/firebase/emberfire/blob/v3/addon/serializers/realtime-database.ts#L12)*
 
 **Parameters:**
 

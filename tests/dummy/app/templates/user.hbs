@@ -21,3 +21,12 @@
         </li>
     {{/each}}
 </ul>
+
+<ul>
+    {{#each model.comments as |comment|}}
+        <li>
+            <p>{{ comment.body }}</p>
+            {{#if comment.something}}<small>{{#link-to "something" comment.something.id}}{{comment.something.name}}{{/link-to}}</small>{{/if}}
+        </li>
+    {{/each}}
+</ul>

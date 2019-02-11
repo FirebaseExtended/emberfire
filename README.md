@@ -60,7 +60,7 @@ import RealtimeRouteMixin from 'emberfire/mixins/realtime-route';
 
 export default Route.extend(RealtimeRouteMixin, {
     model() {
-        return this.store.query('article', ref => ref.orderBy('publishedAt'));
+        return this.store.query('article', { orderBy: 'publishedAt' });
     }
 })
 ```

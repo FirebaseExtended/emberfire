@@ -5,14 +5,9 @@ import DS from 'ember-data';
 import Ember from 'ember';
 import FirebaseAppService from '../services/firebase-app';
 import ModelRegistry from 'ember-data/types/registries/model';
-
 import { inject as service } from '@ember/service';
 import { get, set } from '@ember/object';
 import { database } from 'firebase/app';
-
-export type ReferenceOrQuery = database.Reference | database.Query;
-export type ReferenceOrQueryFn = (ref: ReferenceOrQuery) => ReferenceOrQuery;
-export type QueryFn = (ref: database.Reference) => ReferenceOrQuery;
 
 /**
  * Persist your Ember Data models in the Firebase Realtime Database
@@ -29,6 +24,7 @@ export type QueryFn = (ref: database.Reference) => ReferenceOrQuery;
  */
 export default class RealtimeDatabaseAdapter extends DS.Adapter.extend({
 
+    namespace: undefined as string|undefined,
     firebaseApp: service('firebase-app'),
     databaseURL: undefined,
     database: undefined as RSVP.Promise<database.Database>|undefined,
@@ -52,6 +48,23 @@ export default class RealtimeDatabaseAdapter extends DS.Adapter.extend({
      */
     // @ts-ignore repeat here for the tyepdocs
     firebaseApp: Ember.ComputedProperty<FirebaseAppService, FirebaseAppService>;
+
+
+    /**
+     * Namespace all of the paths
+     * 
+     * ```js
+     * // app/adapters/application.js
+     * import RealtimeDatabaseAdapter from 'emberfire/adapters/realtime-database';
+     *
+     * export default RealtimeDatabaseAdapter.extend({
+     *   namespace: 'environments/production'
+     * });
+     * ```
+     * 
+     */
+    // @ts-ignore repeat here for the tyepdocs
+    namespace: string|undefined;
     
     /**
      * Override the default database used by the RealtimeDatabaseAdapter
@@ -69,18 +82,17 @@ export default class RealtimeDatabaseAdapter extends DS.Adapter.extend({
     // @ts-ignore repeat here for the tyepdocs
     databaseURL?: string;
 
-    findRecord<K extends keyof ModelRegistry>(store: DS.Store, type: ModelRegistry[K], id: string) {
-        return this.queryRecord(store, type, ref => ref.child(id));
+    findRecord<K extends keyof ModelRegistry>(_store: DS.Store, type: ModelRegistry[K], id: string) {
+        return docReference(this, type, id).then(doc => doc.once('value'));
     }
 
     findAll<K extends keyof ModelRegistry>(store: DS.Store, type: ModelRegistry[K]) {
-        return this.query(store, type, ref => ref)
+        return this.query(store, type)
     }
 
     findHasMany<K extends keyof ModelRegistry>(store: DS.Store, snapshot: DS.Snapshot<K>, url: string, relationship: {[key:string]: any}) {
         const adapter = store.adapterFor(relationship.type as never) as any; // TODO kill the any
         if (adapter !== this) {
-            // TODO allow for different serializers, if not already working
             return adapter.findHasMany(store, snapshot, url, relationship) as RSVP.Promise<any>;
         } else if (relationship.options.subcollection) {
             throw `subcollections (${relationship.parentModelName}.${relationship.key}) are not supported by the Realtime Database, consider using embedded relationships or check out Firestore`;
@@ -95,19 +107,18 @@ export default class RealtimeDatabaseAdapter extends DS.Adapter.extend({
     findBelongsTo<K extends keyof ModelRegistry>(store: DS.Store, snapshot: DS.Snapshot<K>, url: any, relationship: any) {
         const adapter = store.adapterFor(relationship.type as never) as any;  // TODO kill the any
         if (adapter !== this) {
-            // TODO allow for different serializers, if not already working
             return adapter.findBelongsTo(store, snapshot, url, relationship) as RSVP.Promise<any>;
         } else {
             return docReference(this, relationship.type, snapshot.id).then(ref => ref.once('value'));
         }
     }
 
-    query<K extends keyof ModelRegistry>(_store: DS.Store, type: ModelRegistry[K], queryFn: QueryFn) {
-        return rootCollection(this, type).then(ref => queryDocs(ref, queryFn));
+    query<K extends keyof ModelRegistry>(_store: DS.Store, type: ModelRegistry[K], options?: QueryOptions) {
+        return rootCollection(this, type).then(ref => queryDocs(ref, queryOptionsToQueryFn(options)));
     }
 
-    queryRecord<K extends keyof ModelRegistry>(_store: DS.Store, type: ModelRegistry[K], queryFn: QueryFn) {
-        const query = rootCollection(this, type).then(ref => queryDocs(ref.limitToFirst(1), queryFn));
+    queryRecord<K extends keyof ModelRegistry>(_store: DS.Store, type: ModelRegistry[K], options?: QueryOptions) {
+        const query = rootCollection(this, type).then(ref => queryDocs(ref.limitToFirst(1), queryOptionsToQueryFn(options)));
         return query.then(results => {
             let snapshot = undefined as database.DataSnapshot|undefined;
             results.forEach(doc => !!(snapshot = doc));
@@ -147,22 +158,77 @@ export default class RealtimeDatabaseAdapter extends DS.Adapter.extend({
 
 }
 
-declare module 'ember-data' {
-    interface AdapterRegistry {
-        'realtime-database': RealtimeDatabaseAdapter;
+export type ReferenceOrQuery = database.Reference | database.Query;
+export type ReferenceOrQueryFn = (ref: ReferenceOrQuery) => ReferenceOrQuery;
+export type QueryFn = (ref: database.Reference) => ReferenceOrQuery;
+
+// Keeping this for compatability with version 2
+export enum OrderBy { Key = '_key', Value = '_value', Priority = '_priority' };
+
+export type BoundOp = string|number|boolean|null|[string|number|boolean|null,string];
+
+export type QueryOptionsOnlyQuery = {
+    query: (ref: database.Reference) => database.Reference|database.Query
+}
+
+// TODO adapterOptions?
+export type QueryOptions = ({
+    filter?: {[key:string]:string|number|boolean|null},
+    endAt?: BoundOp,
+    equalTo?: BoundOp,
+    limitToFirst?: number,
+    limitToLast?: number,
+    orderBy?: string|OrderBy,
+    startAt?: BoundOp
+} | QueryOptionsOnlyQuery) & { include?: string }
+
+const isQueryOnly = (arg: any): arg is QueryOptionsOnlyQuery => arg.query !== undefined;
+
+// query: ref => ref.orderByChild('asdf')
+// filter: { published: true }
+// orderBy: OrderBy.Key, equalTo: 'asdf'
+// orderBy: 'publishedAt'
+const queryOptionsToQueryFn = (options?:QueryOptions) => (collectionRef:database.Reference) => {
+    let ref = collectionRef as ReferenceOrQuery;
+    if (options) {
+        if (isQueryOnly(options)) { return options.query(collectionRef); }
+        if (options.filter) {
+            Object.keys(options.filter).forEach(field => {
+                ref = ref.orderByChild(field).equalTo(options.filter![field]);
+            })
+        }
+        if (options.orderBy) {
+            switch(options.orderBy) {
+                case OrderBy.Key:
+                    ref = ref.orderByKey();
+                    break;
+                case OrderBy.Priority:
+                    ref = ref.orderByPriority();
+                    break;
+                case OrderBy.Value:
+                    ref = ref.orderByValue();
+                    break;
+                default:
+                    ref = ref.orderByChild(options.orderBy);
+            }
+        }
+        if (options.equalTo !== undefined) { ref = options.equalTo && typeof options.equalTo === "object" ? ref.equalTo(options.equalTo[0], options.equalTo[1]) : ref.equalTo(options.equalTo)  }
+        if (options.startAt !== undefined) { ref = options.startAt && typeof options.startAt === "object" ? ref.startAt(options.startAt[0], options.startAt[1]) : ref.startAt(options.startAt) }
+        if (options.endAt   !== undefined) { ref = options.endAt   && typeof options.endAt   === "object" ? ref.endAt(options.endAt[0],     options.endAt[1])   : ref.endAt(options.endAt) }
+        if (options.limitToFirst) { ref = ref.limitToFirst(options.limitToFirst) }
+        if (options.limitToLast)  { ref = ref.limitToLast(options.limitToLast) }
     }
+    return ref;
 }
 
-const queryDocs = (referenceOrQuery: ReferenceOrQuery, query?: ReferenceOrQueryFn) => {
-    const noop = (ref: database.Reference) => ref;
-    const queryFn = query || noop;
-    return getDocs(queryFn(referenceOrQuery));
-}
 
-const collectionNameForType = (type: any) => {
-    const modelName = typeof(type) === 'string' ? type : type.modelName;
-    return pluralize(camelize(modelName));
-}
+const noop = (ref: database.Reference) => ref;
+const queryDocs = (referenceOrQuery: ReferenceOrQuery, query?: ReferenceOrQueryFn) => getDocs((query || noop)(referenceOrQuery));
+// TODO allow override
+const collectionNameForType = (type: any) =>  pluralize(camelize(typeof(type) === 'string' ? type : type.modelName));
+const rootCollection = (adapter: RealtimeDatabaseAdapter, type: any) => databaseInstance(adapter).then(database => database.ref([get(adapter, 'namespace'), collectionNameForType(type)].join('/')));
+const getDocs = (query: ReferenceOrQuery) => query.once('value').then(value => ((value as any).query = query) && value);
+const docReference = (adapter: RealtimeDatabaseAdapter, type: any, id: string) => rootCollection(adapter, type).then(ref => ref.child(id));
 
 const databaseInstance = (adapter: RealtimeDatabaseAdapter) => {
     let database = get(adapter, 'database');
@@ -175,13 +241,8 @@ const databaseInstance = (adapter: RealtimeDatabaseAdapter) => {
     return database;
 }
 
-const rootCollection = (adapter: RealtimeDatabaseAdapter, type: any) => 
-   databaseInstance(adapter).then(database => database.ref(collectionNameForType(type)));
-
-const getDocs = (query: ReferenceOrQuery) => query.once('value').then(value => {
-    (value as any).query = query; // tack query on for now
-    return value;
-});
-
-const docReference = (adapter: RealtimeDatabaseAdapter, type: any, id: string) => 
-    rootCollection(adapter, type).then(ref => ref.child(id))
+declare module 'ember-data' {
+    interface AdapterRegistry {
+        'realtime-database': RealtimeDatabaseAdapter;
+    }
+}
