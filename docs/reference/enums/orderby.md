@@ -20,7 +20,7 @@
 
 **Key**:  = "_key"
 
-*Defined in [adapters/realtime-database.ts:166](https://github.com/firebase/emberfire/blob/v3/addon/adapters/realtime-database.ts#L166)*
+*Defined in [adapters/realtime-database.ts:166](https://github.com/firebase/emberfire/blob/v3.0.0-rc.1/addon/adapters/realtime-database.ts#L166)*
 
 ___
 <a id="priority"></a>
@@ -29,7 +29,7 @@ ___
 
 **Priority**:  = "_priority"
 
-*Defined in [adapters/realtime-database.ts:166](https://github.com/firebase/emberfire/blob/v3/addon/adapters/realtime-database.ts#L166)*
+*Defined in [adapters/realtime-database.ts:166](https://github.com/firebase/emberfire/blob/v3.0.0-rc.1/addon/adapters/realtime-database.ts#L166)*
 
 ___
 <a id="value"></a>
@@ -38,7 +38,7 @@ ___
 
 **Value**:  = "_value"
 
-*Defined in [adapters/realtime-database.ts:166](https://github.com/firebase/emberfire/blob/v3/addon/adapters/realtime-database.ts#L166)*
+*Defined in [adapters/realtime-database.ts:166](https://github.com/firebase/emberfire/blob/v3.0.0-rc.1/addon/adapters/realtime-database.ts#L166)*
 
 ___
 

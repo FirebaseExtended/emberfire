@@ -13,5 +13,5 @@ module.exports = {
     excludeExternals: true,
     excludeNotExported: true,
     excludePrivate: true,
-    gitRevision: 'v3'
+    gitRevision: 'v3.0.0-rc.1'
 };

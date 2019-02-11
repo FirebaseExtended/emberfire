@@ -29,7 +29,7 @@
 
 **● apps**: *`App`[]* =  firebase.apps
 
-*Defined in [services/firebase.ts:7](https://github.com/firebase/emberfire/blob/v3/addon/services/firebase.ts#L7)*
+*Defined in [services/firebase.ts:7](https://github.com/firebase/emberfire/blob/v3.0.0-rc.1/addon/services/firebase.ts#L7)*
 
 ___
 
@@ -41,7 +41,7 @@ ___
 
 ▸ **app**(name?: *`undefined` \| `string`*): `App`
 
-*Defined in [services/firebase.ts:6](https://github.com/firebase/emberfire/blob/v3/addon/services/firebase.ts#L6)*
+*Defined in [services/firebase.ts:6](https://github.com/firebase/emberfire/blob/v3.0.0-rc.1/addon/services/firebase.ts#L6)*
 
 **Parameters:**
 
@@ -58,7 +58,7 @@ ___
 
 ▸ **initializeApp**(options: *`Object`*, nameOrConfig?: *`string` \| `Object`*): `App`
 
-*Defined in [services/firebase.ts:8](https://github.com/firebase/emberfire/blob/v3/addon/services/firebase.ts#L8)*
+*Defined in [services/firebase.ts:8](https://github.com/firebase/emberfire/blob/v3.0.0-rc.1/addon/services/firebase.ts#L8)*
 
 **Parameters:**
 

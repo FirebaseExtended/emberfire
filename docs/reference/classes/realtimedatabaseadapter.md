@@ -50,7 +50,7 @@ export default RealtimeDatabaseAdapter.extend({
 
 **● databaseURL**: *`undefined` \| `string`*
 
-*Defined in [adapters/realtime-database.ts:83](https://github.com/firebase/emberfire/blob/v3/addon/adapters/realtime-database.ts#L83)*
+*Defined in [adapters/realtime-database.ts:83](https://github.com/firebase/emberfire/blob/v3.0.0-rc.1/addon/adapters/realtime-database.ts#L83)*
 
 Override the default database used by the RealtimeDatabaseAdapter
 
@@ -70,7 +70,7 @@ ___
 
 **● firebaseApp**: *`ComputedProperty`<[FirebaseAppService](firebaseappservice.md), [FirebaseAppService](firebaseappservice.md)>*
 
-*Defined in [adapters/realtime-database.ts:50](https://github.com/firebase/emberfire/blob/v3/addon/adapters/realtime-database.ts#L50)*
+*Defined in [adapters/realtime-database.ts:50](https://github.com/firebase/emberfire/blob/v3.0.0-rc.1/addon/adapters/realtime-database.ts#L50)*
 
 Override the default FirebaseApp Service used by the RealtimeDatabaseAdapter: `service('firebase-app')`
 
@@ -91,7 +91,7 @@ ___
 
 **● namespace**: *`string` \| `undefined`*
 
-*Defined in [adapters/realtime-database.ts:67](https://github.com/firebase/emberfire/blob/v3/addon/adapters/realtime-database.ts#L67)*
+*Defined in [adapters/realtime-database.ts:67](https://github.com/firebase/emberfire/blob/v3.0.0-rc.1/addon/adapters/realtime-database.ts#L67)*
 
 Namespace all of the paths
 
@@ -114,7 +114,7 @@ ___
 
 ▸ **createRecord**<`K`>(_: *`Store`*, type: *`ModelRegistry[K]`*, snapshot: *`Snapshot`<`K`>*): `Promise`<`DataSnapshot`>
 
-*Defined in [adapters/realtime-database.ts:144](https://github.com/firebase/emberfire/blob/v3/addon/adapters/realtime-database.ts#L144)*
+*Defined in [adapters/realtime-database.ts:144](https://github.com/firebase/emberfire/blob/v3.0.0-rc.1/addon/adapters/realtime-database.ts#L144)*
 
 **Type parameters:**
 
@@ -136,7 +136,7 @@ ___
 
 ▸ **deleteRecord**<`K`>(_: *`Store`*, type: *`ModelRegistry[K]`*, snapshot: *`Snapshot`<`K`>*): `Promise`<`any`>
 
-*Defined in [adapters/realtime-database.ts:155](https://github.com/firebase/emberfire/blob/v3/addon/adapters/realtime-database.ts#L155)*
+*Defined in [adapters/realtime-database.ts:155](https://github.com/firebase/emberfire/blob/v3.0.0-rc.1/addon/adapters/realtime-database.ts#L155)*
 
 **Type parameters:**
 
@@ -158,7 +158,7 @@ ___
 
 ▸ **findAll**<`K`>(store: *`Store`*, type: *`ModelRegistry[K]`*): `Promise`<`DataSnapshot`>
 
-*Defined in [adapters/realtime-database.ts:89](https://github.com/firebase/emberfire/blob/v3/addon/adapters/realtime-database.ts#L89)*
+*Defined in [adapters/realtime-database.ts:89](https://github.com/firebase/emberfire/blob/v3.0.0-rc.1/addon/adapters/realtime-database.ts#L89)*
 
 **Type parameters:**
 
@@ -179,7 +179,7 @@ ___
 
 ▸ **findBelongsTo**<`K`>(store: *`Store`*, snapshot: *`Snapshot`<`K`>*, url: *`any`*, relationship: *`any`*): `Promise`<`any`>
 
-*Defined in [adapters/realtime-database.ts:107](https://github.com/firebase/emberfire/blob/v3/addon/adapters/realtime-database.ts#L107)*
+*Defined in [adapters/realtime-database.ts:107](https://github.com/firebase/emberfire/blob/v3.0.0-rc.1/addon/adapters/realtime-database.ts#L107)*
 
 **Type parameters:**
 
@@ -202,7 +202,7 @@ ___
 
 ▸ **findHasMany**<`K`>(store: *`Store`*, snapshot: *`Snapshot`<`K`>*, url: *`string`*, relationship: *`object`*): `Promise`<`any`>
 
-*Defined in [adapters/realtime-database.ts:93](https://github.com/firebase/emberfire/blob/v3/addon/adapters/realtime-database.ts#L93)*
+*Defined in [adapters/realtime-database.ts:93](https://github.com/firebase/emberfire/blob/v3.0.0-rc.1/addon/adapters/realtime-database.ts#L93)*
 
 **Type parameters:**
 
@@ -225,7 +225,7 @@ ___
 
 ▸ **findRecord**<`K`>(_store: *`Store`*, type: *`ModelRegistry[K]`*, id: *`string`*): `Promise`<`DataSnapshot`>
 
-*Defined in [adapters/realtime-database.ts:85](https://github.com/firebase/emberfire/blob/v3/addon/adapters/realtime-database.ts#L85)*
+*Defined in [adapters/realtime-database.ts:85](https://github.com/firebase/emberfire/blob/v3.0.0-rc.1/addon/adapters/realtime-database.ts#L85)*
 
 **Type parameters:**
 
@@ -247,7 +247,7 @@ ___
 
 ▸ **query**<`K`>(_store: *`Store`*, type: *`ModelRegistry[K]`*, options?: *[QueryOptions](../#queryoptions)*): `Promise`<`DataSnapshot`>
 
-*Defined in [adapters/realtime-database.ts:116](https://github.com/firebase/emberfire/blob/v3/addon/adapters/realtime-database.ts#L116)*
+*Defined in [adapters/realtime-database.ts:116](https://github.com/firebase/emberfire/blob/v3.0.0-rc.1/addon/adapters/realtime-database.ts#L116)*
 
 **Type parameters:**
 
@@ -269,7 +269,7 @@ ___
 
 ▸ **queryRecord**<`K`>(_store: *`Store`*, type: *`ModelRegistry[K]`*, options?: *[QueryOptions](../#queryoptions)*): `Promise`<`DataSnapshot`>
 
-*Defined in [adapters/realtime-database.ts:120](https://github.com/firebase/emberfire/blob/v3/addon/adapters/realtime-database.ts#L120)*
+*Defined in [adapters/realtime-database.ts:120](https://github.com/firebase/emberfire/blob/v3.0.0-rc.1/addon/adapters/realtime-database.ts#L120)*
 
 **Type parameters:**
 
@@ -291,7 +291,7 @@ ___
 
 ▸ **shouldBackgroundReloadRecord**(): `boolean`
 
-*Defined in [adapters/realtime-database.ts:133](https://github.com/firebase/emberfire/blob/v3/addon/adapters/realtime-database.ts#L133)*
+*Defined in [adapters/realtime-database.ts:133](https://github.com/firebase/emberfire/blob/v3.0.0-rc.1/addon/adapters/realtime-database.ts#L133)*
 
 **Returns:** `boolean`
 
@@ -302,7 +302,7 @@ ___
 
 ▸ **updateRecord**<`K`>(_: *`Store`*, type: *`ModelRegistry[K]`*, snapshot: *`Snapshot`<`K`>*): `Promise`<`any`>
 
-*Defined in [adapters/realtime-database.ts:137](https://github.com/firebase/emberfire/blob/v3/addon/adapters/realtime-database.ts#L137)*
+*Defined in [adapters/realtime-database.ts:137](https://github.com/firebase/emberfire/blob/v3.0.0-rc.1/addon/adapters/realtime-database.ts#L137)*
 
 **Type parameters:**
 

@@ -25,7 +25,7 @@
 
 ▸ **subscribe**(route: *`Object`*, model: *`any`*): `void`
 
-*Defined in [services/realtime-listener.ts:46](https://github.com/firebase/emberfire/blob/v3/addon/services/realtime-listener.ts#L46)*
+*Defined in [services/realtime-listener.ts:46](https://github.com/firebase/emberfire/blob/v3.0.0-rc.1/addon/services/realtime-listener.ts#L46)*
 
 **Parameters:**
 
@@ -43,7 +43,7 @@ ___
 
 ▸ **unsubscribe**(route: *`Object`*): `void`
 
-*Defined in [services/realtime-listener.ts:178](https://github.com/firebase/emberfire/blob/v3/addon/services/realtime-listener.ts#L178)*
+*Defined in [services/realtime-listener.ts:178](https://github.com/firebase/emberfire/blob/v3.0.0-rc.1/addon/services/realtime-listener.ts#L178)*
 
 **Parameters:**
 

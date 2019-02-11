@@ -37,7 +37,7 @@
 
 **● firebase**: *`ComputedProperty`<[FirebaseService](firebaseservice.md), [FirebaseService](firebaseservice.md)>*
 
-*Defined in [services/firebase-app.ts:35](https://github.com/firebase/emberfire/blob/v3/addon/services/firebase-app.ts#L35)*
+*Defined in [services/firebase-app.ts:35](https://github.com/firebase/emberfire/blob/v3.0.0-rc.1/addon/services/firebase-app.ts#L35)*
 
 ___
 <a id="name"></a>
@@ -46,7 +46,7 @@ ___
 
 **● name**: *`undefined` \| `string`*
 
-*Defined in [services/firebase-app.ts:35](https://github.com/firebase/emberfire/blob/v3/addon/services/firebase-app.ts#L35)*
+*Defined in [services/firebase-app.ts:35](https://github.com/firebase/emberfire/blob/v3.0.0-rc.1/addon/services/firebase-app.ts#L35)*
 
 ___
 <a id="options"></a>
@@ -55,7 +55,7 @@ ___
 
 **● options**: *`undefined` \| `object`*
 
-*Defined in [services/firebase-app.ts:37](https://github.com/firebase/emberfire/blob/v3/addon/services/firebase-app.ts#L37)*
+*Defined in [services/firebase-app.ts:37](https://github.com/firebase/emberfire/blob/v3.0.0-rc.1/addon/services/firebase-app.ts#L37)*
 
 ___
 
@@ -67,7 +67,7 @@ ___
 
 ▸ **auth**(): `Promise`<`Auth`>
 
-*Defined in [services/firebase-app.ts:40](https://github.com/firebase/emberfire/blob/v3/addon/services/firebase-app.ts#L40)*
+*Defined in [services/firebase-app.ts:40](https://github.com/firebase/emberfire/blob/v3.0.0-rc.1/addon/services/firebase-app.ts#L40)*
 
 **Returns:** `Promise`<`Auth`>
 
@@ -78,7 +78,7 @@ ___
 
 ▸ **database**(databaseURL?: *`undefined` \| `string`*): `Promise`<`Database`>
 
-*Defined in [services/firebase-app.ts:41](https://github.com/firebase/emberfire/blob/v3/addon/services/firebase-app.ts#L41)*
+*Defined in [services/firebase-app.ts:41](https://github.com/firebase/emberfire/blob/v3.0.0-rc.1/addon/services/firebase-app.ts#L41)*
 
 **Parameters:**
 
@@ -95,7 +95,7 @@ ___
 
 ▸ **delete**(): `Promise`<`any`>
 
-*Defined in [services/firebase-app.ts:39](https://github.com/firebase/emberfire/blob/v3/addon/services/firebase-app.ts#L39)*
+*Defined in [services/firebase-app.ts:39](https://github.com/firebase/emberfire/blob/v3.0.0-rc.1/addon/services/firebase-app.ts#L39)*
 
 **Returns:** `Promise`<`any`>
 
@@ -106,7 +106,7 @@ ___
 
 ▸ **firestore**(): `Promise`<`Firestore`>
 
-*Defined in [services/firebase-app.ts:42](https://github.com/firebase/emberfire/blob/v3/addon/services/firebase-app.ts#L42)*
+*Defined in [services/firebase-app.ts:42](https://github.com/firebase/emberfire/blob/v3.0.0-rc.1/addon/services/firebase-app.ts#L42)*
 
 **Returns:** `Promise`<`Firestore`>
 
@@ -117,7 +117,7 @@ ___
 
 ▸ **functions**(region?: *`undefined` \| `string`*): `Promise`<`Functions`>
 
-*Defined in [services/firebase-app.ts:43](https://github.com/firebase/emberfire/blob/v3/addon/services/firebase-app.ts#L43)*
+*Defined in [services/firebase-app.ts:43](https://github.com/firebase/emberfire/blob/v3.0.0-rc.1/addon/services/firebase-app.ts#L43)*
 
 **Parameters:**
 
@@ -134,7 +134,7 @@ ___
 
 ▸ **init**(): `void`
 
-*Defined in [services/firebase-app.ts:47](https://github.com/firebase/emberfire/blob/v3/addon/services/firebase-app.ts#L47)*
+*Defined in [services/firebase-app.ts:47](https://github.com/firebase/emberfire/blob/v3.0.0-rc.1/addon/services/firebase-app.ts#L47)*
 
 **Returns:** `void`
 
@@ -145,7 +145,7 @@ ___
 
 ▸ **messaging**(): `Promise`<`Messaging`>
 
-*Defined in [services/firebase-app.ts:44](https://github.com/firebase/emberfire/blob/v3/addon/services/firebase-app.ts#L44)*
+*Defined in [services/firebase-app.ts:44](https://github.com/firebase/emberfire/blob/v3.0.0-rc.1/addon/services/firebase-app.ts#L44)*
 
 **Returns:** `Promise`<`Messaging`>
 
@@ -156,7 +156,7 @@ ___
 
 ▸ **storage**(storageBucket?: *`undefined` \| `string`*): `Promise`<`Storage`>
 
-*Defined in [services/firebase-app.ts:45](https://github.com/firebase/emberfire/blob/v3/addon/services/firebase-app.ts#L45)*
+*Defined in [services/firebase-app.ts:45](https://github.com/firebase/emberfire/blob/v3.0.0-rc.1/addon/services/firebase-app.ts#L45)*
 
 **Parameters:**
 

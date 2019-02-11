@@ -30,7 +30,7 @@
 
 **● firebaseApp**: *`ComputedProperty`<[FirebaseAppService](firebaseappservice.md), [FirebaseAppService](firebaseappservice.md)>*
 
-*Defined in [torii-adapters/firebase.ts:19](https://github.com/firebase/emberfire/blob/v3/addon/torii-adapters/firebase.ts#L19)*
+*Defined in [torii-adapters/firebase.ts:19](https://github.com/firebase/emberfire/blob/v3.0.0-rc.1/addon/torii-adapters/firebase.ts#L19)*
 
 ___
 
@@ -42,7 +42,7 @@ ___
 
 ▸ **close**(): `Promise`<`void`>
 
-*Defined in [torii-adapters/firebase.ts:40](https://github.com/firebase/emberfire/blob/v3/addon/torii-adapters/firebase.ts#L40)*
+*Defined in [torii-adapters/firebase.ts:40](https://github.com/firebase/emberfire/blob/v3.0.0-rc.1/addon/torii-adapters/firebase.ts#L40)*
 
 **Returns:** `Promise`<`void`>
 
@@ -53,7 +53,7 @@ ___
 
 ▸ **open**(user: *`any`*): `string`
 
-*Defined in [torii-adapters/firebase.ts:21](https://github.com/firebase/emberfire/blob/v3/addon/torii-adapters/firebase.ts#L21)*
+*Defined in [torii-adapters/firebase.ts:21](https://github.com/firebase/emberfire/blob/v3.0.0-rc.1/addon/torii-adapters/firebase.ts#L21)*
 
 **Parameters:**
 
@@ -70,7 +70,7 @@ ___
 
 ▸ **restore**(): `Promise`<`Object`>
 
-*Defined in [torii-adapters/firebase.ts:25](https://github.com/firebase/emberfire/blob/v3/addon/torii-adapters/firebase.ts#L25)*
+*Defined in [torii-adapters/firebase.ts:25](https://github.com/firebase/emberfire/blob/v3.0.0-rc.1/addon/torii-adapters/firebase.ts#L25)*
 
 **Returns:** `Promise`<`Object`>
 
