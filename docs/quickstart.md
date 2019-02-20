@@ -32,7 +32,7 @@ export default FirestoreAdapter.extend({
 });
 ```
 
-If you prefer to use the Firebase Realtime Database, you can run the following command `$ ember generate realtime-database-adapter`.
+If you prefer to use the Firebase Realtime Database, you can run the following command `$ ember generate realtime-database-adapter application`.
 
 # 4. Configure Firebase
 
