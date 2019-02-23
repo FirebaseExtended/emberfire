@@ -10,7 +10,7 @@
         "docs/guide/relationships.md": "Relationships",
         "docs/guide/security-rules.md": "Security Rules",
         "docs/guide/deploying-to-firebase-hosting.md": "Deploy to Firebase Hosting",
-        "docs/guide/fastboot-suppor.md": "Fastboot support",
+        "docs/guide/fastboot-support.md": "Fastboot support",
         "docs/guide/deploying-fastboot-to-cloud-functions.md": "Deploy to Cloud Functions",
         "docs/guide/advanced-configuration.md": "Advanced Configuration",
         "docs/migration/2XX-to-3XX.md": "Upgrading to version 3"
