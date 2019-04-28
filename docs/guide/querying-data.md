@@ -27,7 +27,7 @@ This is useful for more advanced use cases.
 Use the `RealtimeRouteMixin` to get updates to records in your query while your route is in view.
 
 ```js
-import { RealtimeRouteMixin } from 'emberfire/services/realtime-listener';
+import RealtimeRouteMixin from 'emberfire/mixins/realtime-route';
 
 export default Route.extend(RealtimeRouteMixin, {
   model: function() {
