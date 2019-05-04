@@ -26,6 +26,7 @@
       "emberfire/authenticators/firebase": [ "addon/authenticators/firebase"],
       "emberfire/initializers/emberfire": [ "addon/initializers/emberfire"],
       "emberfire/services/firebase": [ "addon/services/firebase"],
+      "emberfire/services/firebase-app": [ "addon/services/firebase-app"],
       "*": [ "types/*" ]
     }
   },
