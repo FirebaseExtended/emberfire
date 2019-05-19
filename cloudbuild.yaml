@@ -1,0 +1,27 @@
+# See go/emberfire-releasing for details on the EmberFire release process.
+# If you need to trigger a release manually, be sure to use substitutions like so:
+#   @canary `gcloud builds submit --substitutions=SHORT_SHA="9b0a0b0"`
+#   @next   `gcloud builds submit --substitutions=TAG_NAME="v1.2.3-rc.1"`
+#   @latest `gcloud builds submit --substitutions=TAG_NAME="v1.2.3"`
+steps:
+- name: 'gcr.io/cloud-builders/npm'
+  entrypoint: 'bash'
+  args: ["./tools/build.sh"]
+  env:
+  - 'TAG_NAME=$TAG_NAME'
+  - 'SHORT_SHA=$SHORT_SHA'
+
+- name: 'gcr.io/cloud-builders/npm'
+  entrypoint: 'bash'
+  args: ["./tools/test.sh"]
+
+- name: 'gcr.io/cloud-builders/npm'
+  entrypoint: 'bash'
+  env: ['TAG_NAME=$TAG_NAME']
+  args: ["./tools/publish.sh"]
+  secretEnv: ['NPM_TOKEN']
+
+secrets:
+- kmsKeyName: projects/emberfire/locations/global/keyRings/cloud-build/cryptoKeys/cloud-build
+  secretEnv:
+    NPM_TOKEN: CiQAxlQk+PxG1u0O1jMNoRKrxzNe3cSVlQy3gaqsjD41F2m4OVsSTQDyeLEmlpwbxLfuaD0/PrvQ/BYQcwosux7TsMiIMX6PAAD61VfBV6teM5fkIgmWG7rPdRmFvzavH0j2excXsS1k8KR4lLh6+gsT3JUk

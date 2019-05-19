@@ -1,6 +1,6 @@
 {
-  "name": "emberfire",
-  "version": "3.0.0-rc.1",
+  "name": "emberfire-exp",
+  "version": "3.0.0",
   "description": "The officially supported adapter for using Firebase with Ember",
   "keywords": [
     "ember-addon",
