@@ -23,6 +23,8 @@ matrix:
     - env: EMBER_SCENARIO=beta
 
 before_install:
+  # TODO remove once publishing to emberfire
+  - export EMBER_CLI_IGNORE_ADDON_NAME_MISMATCH=true
   - if [[ $FIREBASE_SCENARIO == 'latest' ]]; then npm i --save firebase@latest; fi
   - if [[ $FIREBASE_SCENARIO == 'next'   ]]; then npm i --save firebase@next; fi
   - if [[ $FIREBASE_SCENARIO == 'canary' ]]; then npm i --save firebase@canary; fi
