@@ -1,6 +1,3 @@
-# TODO remove when no longer publishing to emberfire-exp
-export EMBER_CLI_IGNORE_ADDON_NAME_MISMATCH=true
-
 if test $TAG_NAME; then
     npm version $(echo $TAG_NAME | sed 's/^v\(.*\)$/\1/')
 else
