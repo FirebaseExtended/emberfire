@@ -24,10 +24,8 @@ to ask technical questions, share apps you've built, and chat with other develop
 ## Installation
 
 ```bash
-$ ember install emberfire
+$ ember install emberfire@next
 ```
-
-<small>To try version 3 while it's under development install <code>emberfire@next</code>. Be sure to <a href="https://github.com/firebase/emberfire/releases">check the change log</a> for information on breaking changes and known issues.</small>
 
 ## Example use
 
