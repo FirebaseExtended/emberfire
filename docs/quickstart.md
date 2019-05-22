@@ -17,7 +17,7 @@ $ cd your-app-name
 To install EmberFire, simply run the following command within your ember-cli app directory:
 
 ```
-$ ember install emberfire
+$ ember install emberfire@next
 ```
 
 This will add Firebase as a dependency in our `package.json` and will generate `app/adapters/application.js` with the following content:

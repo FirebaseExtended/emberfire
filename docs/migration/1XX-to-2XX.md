@@ -6,7 +6,7 @@ change log](https://github.com/firebase/emberfire/releases/tag/v2.0.0).
 Install the 2.0 version of emberfire:
 
 ```
-ember install emberfire@2.0.0
+ember install emberfire@^2.0.0
 ```
 
 ## Upgrade to the Firebase `3.x.x` SDK

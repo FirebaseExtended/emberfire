@@ -15,7 +15,7 @@ Firebase's realtime data synchronization is a great fit with Ember's frontend ph
 In order to use EmberFire in our project, we can run the following in our ember-cli app's directory:
 
 ```
-$ ember install emberfire
+$ ember install emberfire@next
 ```
 
 This will add Firebase to your `package.json` file and generate `app/adapters/application.js` for you with the following content:
