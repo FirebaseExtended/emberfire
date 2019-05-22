@@ -27,7 +27,7 @@ to ask technical questions, share apps you've built, and chat with other develop
 $ ember install emberfire
 ```
 
-<small>To try version 3 while it's under development install <code>emberfire-exp</code>. Be sure to <a href="https://github.com/firebase/emberfire/releases">check the change log</a> for information on breaking changes and known issues.</small>
+<small>To try version 3 while it's under development install <code>emberfire@next</code>. Be sure to <a href="https://github.com/firebase/emberfire/releases">check the change log</a> for information on breaking changes and known issues.</small>
 
 ## Example use
 
