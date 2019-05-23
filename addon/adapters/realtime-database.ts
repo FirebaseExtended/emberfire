@@ -238,7 +238,7 @@ const databaseInstance = (adapter: RealtimeDatabaseAdapter) => {
         database = app.database(databaseURL);
         set(adapter, 'database', database);
     }
-    return database;
+    return database!;
 }
 
 declare module 'ember-data' {

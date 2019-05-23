@@ -5,23 +5,25 @@ import Ember from 'ember';
 import FirebaseService from './firebase';
 
 import RSVP from 'rsvp';
+import { auth, database, firestore, functions, messaging, storage, performance } from 'firebase';
 const { resolve } = RSVP;
 
-// TODO move these over to dynamic imports
-import 'firebase/auth';
-import 'firebase/database';
-import 'firebase/firestore';
-import 'firebase/functions';
-import 'firebase/messaging';
-import 'firebase/storage';
-
-// @ts-ignore
-import { app, auth, database, firestore, functions, messaging, storage } from 'firebase/app';
-
-const getApp = (service: FirebaseAppService): app.App => {
+const getApp = (service: FirebaseAppService)=> {
     const firebase = get(service, 'firebase');
     const name = get(service, 'name');
     return firebase.app(name);
+}
+
+// dynamically import the Firebase module required
+function getModuleFactory(service: FirebaseAppService, module: 'auth'): () => RSVP.Promise<auth.Auth>;
+function getModuleFactory(service: FirebaseAppService, module: 'database'): (databaseURL?: string) => RSVP.Promise<database.Database>;
+function getModuleFactory(service: FirebaseAppService, module: 'firestore'): () => RSVP.Promise<firestore.Firestore>;
+function getModuleFactory(service: FirebaseAppService, module: 'functions'): (region?: string) => RSVP.Promise<functions.Functions>;
+function getModuleFactory(service: FirebaseAppService, module: 'messaging'): () => RSVP.Promise<messaging.Messaging>;
+function getModuleFactory(service: FirebaseAppService, module: 'performance'): () => RSVP.Promise<performance.Performance>;
+function getModuleFactory(service: FirebaseAppService, module: 'storage'): (bucket?: string) => RSVP.Promise<storage.Storage>;
+function getModuleFactory(service: FirebaseAppService, module: string) {
+  return (...options: any[]) => resolve(getApp(service)).then((app:any) => import(`firebase/${module}`).then(() => app[module](...options)));
 }
 
 export default class FirebaseAppService extends Service.extend({
@@ -37,12 +39,14 @@ export default class FirebaseAppService extends Service.extend({
     options?: object;
 
     delete = () => getApp(this).delete();
-    auth = () => resolve(getApp(this).auth());
-    database = (databaseURL?: string) => resolve(getApp(this).database(databaseURL));
-    firestore = () => resolve(getApp(this).firestore());
-    functions = (region?: string) => resolve(getApp(this).functions(region));
-    messaging = () => resolve(getApp(this).messaging());
-    storage = (storageBucket?: string) => resolve(getApp(this).storage(storageBucket));
+
+    auth        = getModuleFactory(this, 'auth');
+    database    = getModuleFactory(this, 'database');
+    firestore   = getModuleFactory(this, 'firestore');
+    functions   = getModuleFactory(this, 'functions');
+    messaging   = getModuleFactory(this, 'messaging');
+    performance = getModuleFactory(this, 'performance');
+    storage     = getModuleFactory(this, 'storage');
 
     init() {
         this._super(...arguments);

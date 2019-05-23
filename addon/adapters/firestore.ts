@@ -299,7 +299,7 @@ const getFirestore = (adapter: FirestoreAdapter) => {
         });
         set(adapter, 'firestore', cachedFirestoreInstance);
     }
-    return cachedFirestoreInstance;
+    return cachedFirestoreInstance!;
 };
 
 declare module 'ember-data' {
