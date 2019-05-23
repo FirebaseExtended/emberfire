@@ -39,6 +39,7 @@
   "devDependencies": {
     "@types/ember": "^3.1.0",
     "@types/ember-data": "^3.1.7",
+    "babel-eslint": "^10.0.1",
     "broccoli-asset-rev": "^3.0.0",
     "codeclimate-test-reporter": "^0.5.1",
     "ember-ajax": "^4.0.2",
@@ -46,7 +47,6 @@
     "ember-cli-code-coverage": "^0.4.2",
     "ember-cli-dependency-checker": "^3.2.0",
     "ember-cli-eslint": "^5.0.1",
-    "ember-cli-fastboot": "^2.0.4",
     "ember-cli-htmlbars": "^3.0.1",
     "ember-cli-htmlbars-inline-precompile": "^2.1.0",
     "ember-cli-inject-live-reload": "^2.0.1",
@@ -65,7 +65,6 @@
     "ember-source": "^3.10.0",
     "eslint-plugin-ember": "^6.4.1",
     "eslint-plugin-node": "^8.0.1",
-    "fastboot-express-middleware": "1.2.0",
     "loader.js": "^4.7.0",
     "typedoc": "^0.14.2",
     "typedoc-plugin-markdown": "^1.2.1",

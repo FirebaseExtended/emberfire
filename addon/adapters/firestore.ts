@@ -92,7 +92,7 @@ export default class FirestoreAdapter extends DS.Adapter.extend({
      *
      * export default FirestoreAdapter.extend({
      *   enablePersistence: true,
-     *   persistenceSettings: { experimentalTabSynchronization: true }
+     *   persistenceSettings: { synchronizeTabs: true }
      * });
      * ```
      * 

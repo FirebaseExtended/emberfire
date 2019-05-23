@@ -14,6 +14,9 @@ module.exports = {
     autoImport:{
       exclude: [],
       webpack: {}
+    },
+    babel: {
+      plugins: [ require.resolve('ember-auto-import/babel-plugin') ]
     }
   },
 
