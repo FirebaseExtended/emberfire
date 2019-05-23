@@ -1,6 +1,6 @@
 import DS from 'ember-data';
 
-import { database } from 'firebase';
+import { database } from 'firebase/app';
 
 export default class RealtimeDatabaseSerializer extends DS.JSONSerializer {
 
