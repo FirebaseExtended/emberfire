@@ -7,7 +7,7 @@ import FirebaseService from './firebase';
 import RSVP from 'rsvp';
 const { resolve } = RSVP;
 
-const getApp = (service: FirebaseAppService)=> {
+const getApp = (service: FirebaseAppService) => {
     const firebase = get(service, 'firebase');
     const name = get(service, 'name');
     return firebase.app(name);
