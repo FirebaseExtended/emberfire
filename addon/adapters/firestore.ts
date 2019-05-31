@@ -92,7 +92,7 @@ export default class FirestoreAdapter extends DS.Adapter.extend({
      *
      * export default FirestoreAdapter.extend({
      *   enablePersistence: true,
-     *   persistenceSettings: { experimentalTabSynchronization: true }
+     *   persistenceSettings: { synchronizeTabs: true }
      * });
      * ```
      * 
@@ -299,7 +299,7 @@ const getFirestore = (adapter: FirestoreAdapter) => {
         });
         set(adapter, 'firestore', cachedFirestoreInstance);
     }
-    return cachedFirestoreInstance;
+    return cachedFirestoreInstance!;
 };
 
 declare module 'ember-data' {

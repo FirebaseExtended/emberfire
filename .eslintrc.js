@@ -4,6 +4,7 @@ module.exports = {
       ecmaVersion: 2017,
       sourceType: 'module'
     },
+    parser: 'babel-eslint',
     plugins: [
       'ember'
     ],

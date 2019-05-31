@@ -7,18 +7,7 @@ import FirebaseService from './firebase';
 import RSVP from 'rsvp';
 const { resolve } = RSVP;
 
-// TODO move these over to dynamic imports
-import 'firebase/auth';
-import 'firebase/database';
-import 'firebase/firestore';
-import 'firebase/functions';
-import 'firebase/messaging';
-import 'firebase/storage';
-
-// @ts-ignore
-import { app, auth, database, firestore, functions, messaging, storage } from 'firebase/app';
-
-const getApp = (service: FirebaseAppService): app.App => {
+const getApp = (service: FirebaseAppService) => {
     const firebase = get(service, 'firebase');
     const name = get(service, 'name');
     return firebase.app(name);
@@ -37,12 +26,16 @@ export default class FirebaseAppService extends Service.extend({
     options?: object;
 
     delete = () => getApp(this).delete();
-    auth = () => resolve(getApp(this).auth());
-    database = (databaseURL?: string) => resolve(getApp(this).database(databaseURL));
-    firestore = () => resolve(getApp(this).firestore());
-    functions = (region?: string) => resolve(getApp(this).functions(region));
-    messaging = () => resolve(getApp(this).messaging());
-    storage = (storageBucket?: string) => resolve(getApp(this).storage(storageBucket));
+
+    auth        = () => resolve(import('firebase/auth')     ).then(() => getApp(this).auth());
+    firestore   = () => resolve(import('firebase/firestore')).then(() => getApp(this).firestore());
+    messaging   = () => resolve(import('firebase/messaging')).then(() => getApp(this).messaging());
+    database    = (url?: string)    => resolve(import('firebase/database') ).then(() => getApp(this).database(url));
+    functions   = (region?: string) => resolve(import('firebase/functions')).then(() => getApp(this).functions(region));
+
+    // TODO: drop the <any> once firebase-js-sdk #1792 and #1812 and patched in, they were missing typings
+    performance = ()                => resolve(import(<any>'firebase/performance')).then(() => getApp(this).performance());
+    storage     = (url?: string)    => resolve(import(<any>'firebase/storage')    ).then(() => getApp(this).storage(url));
 
     init() {
         this._super(...arguments);

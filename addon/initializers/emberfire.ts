@@ -1,10 +1,13 @@
-import * as firebase from 'firebase/app';
+// @ts-ignore export for Node problem
+import _firebase from 'firebase/app';
 import FirebaseAppService from '../services/firebase-app';
 import RealtimeListenerService from '../services/realtime-listener';
 import FirestoreAdapter from '../adapters/firestore';
 import FirestoreSerializer from '../serializers/firestore';
 import RealtimeDatabaseAdapater from '../adapters/realtime-database';
 import RealtimeDatabaseSerializer from '../serializers/realtime-database';
+
+const firebase = _firebase as typeof import('firebase/app');
 
 const initialize = (application: any) => {
     const environment = application.resolveRegistration('config:environment');
