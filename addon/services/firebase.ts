@@ -9,7 +9,7 @@ export default class FirebaseService extends Service {
 
   app = (name?: string) => firebase.app(name);
   apps = firebase.apps;
-  initializeApp = (options: Object, nameOrConfig?: string|Object): app.App => firebase.initializeApp(options, nameOrConfig as string | undefined);
+  initializeApp = (options: Object, nameOrConfig?: string|Object) => firebase.initializeApp(options, nameOrConfig as string | undefined);
 
 }
 
