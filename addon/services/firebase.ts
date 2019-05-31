@@ -1,7 +1,6 @@
 // @ts-ignore Node.js issues
 import _firebase from 'firebase/app';
 import Service from '@ember/service';
-import { app } from 'firebase/app';
 
 const firebase = _firebase as typeof import('firebase/app');
 
