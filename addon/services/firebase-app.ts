@@ -38,7 +38,7 @@ export default class FirebaseAppService extends Service.extend({
     storage     = (url?: string)    => resolve(import(<any>'firebase/storage')    ).then(() => getApp(this).storage(url));
 
     init() {
-        this._super(...arguments);
+        super.init(...arguments);
         const app = getApp(this);
         set(this, 'options', app.options);
     }
