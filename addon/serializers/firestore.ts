@@ -10,11 +10,19 @@ export default class FirestoreSerializer extends DS.JSONSerializer {
   normalizeSingleResponse(store: DS.Store, primaryModelClass: DS.Model, payload: firestore.DocumentSnapshot, _id: string | number, _requestType: string) {
     if (!payload.exists) { throw  new DS.NotFoundError(); }
     const meta = extractMeta(payload);
-    return { ...normalize(store, primaryModelClass, payload), meta };
+
+    let normalized = normalize(store, primaryModelClass, payload);
+    (this as any).applyTransforms(primaryModelClass, normalized.data.attributes);
+
+    return { ...normalized, meta };
   }
 
   normalizeArrayResponse(store: DS.Store, primaryModelClass: DS.Model, payload: firestore.QuerySnapshot, _id: string | number, _requestType: string) {
-    const normalizedPayload = payload.docs.map(snapshot => normalize(store, primaryModelClass, snapshot));
+    const normalizedPayload = payload.docs.map(snapshot => {
+      let normalized = normalize(store, primaryModelClass, snapshot);
+      (this as any).applyTransforms(primaryModelClass, normalized.data.attributes);
+      return normalized;
+    });
     const included = new Array().concat(...normalizedPayload.map(({included}) => included));
     const meta = extractMeta(payload)
     const data = normalizedPayload.map(({data}) => data);
@@ -102,5 +110,5 @@ const normalizeEmbedded = (store: DS.Store, attribute: any, relationship: any, i
   }
 }
 
-const normalizeHasMany = (_store: DS.Store, _attribute: any, _relationship: any, _included: any[]) => 
+const normalizeHasMany = (_store: DS.Store, _attribute: any, _relationship: any, _included: any[]) =>
   ({ links: { related: 'emberfire' } })
