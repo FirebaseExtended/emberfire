@@ -37,8 +37,9 @@ export default class FirebaseAppService extends Service.extend({
     performance = ()                => resolve(import(<any>'firebase/performance')).then(() => getApp(this).performance());
     storage     = (url?: string)    => resolve(import(<any>'firebase/storage')    ).then(() => getApp(this).storage(url));
 
-    init() {
-        this._super(...arguments);
+    init(...args: any[]) {
+        // @ts-ignore because ember do pass arguments here
+        super.init(...args);
         const app = getApp(this);
         set(this, 'options', app.options);
     }
