@@ -27,15 +27,16 @@ export default class FirebaseAppService extends Service.extend({
 
     delete = () => getApp(this).delete();
 
-    auth        = () => resolve(import('firebase/auth')     ).then(() => getApp(this).auth());
-    firestore   = () => resolve(import('firebase/firestore')).then(() => getApp(this).firestore());
-    messaging   = () => resolve(import('firebase/messaging')).then(() => getApp(this).messaging());
+    auth         = () => resolve(import('firebase/auth')         ).then(() => getApp(this).auth());
+    analytics    = () => resolve(import('firebase/analytics')    ).then(() => getApp(this).analytics());
+    firestore    = () => resolve(import('firebase/firestore')    ).then(() => getApp(this).firestore());
+    messaging    = () => resolve(import('firebase/messaging')    ).then(() => getApp(this).messaging());
+    performance  = () => resolve(import('firebase/performance')  ).then(() => getApp(this).performance());
+    remoteConfig = () => resolve(import('firebase/remote-config')).then(() => getApp(this).remoteConfig());
+
     database    = (url?: string)    => resolve(import('firebase/database') ).then(() => getApp(this).database(url));
     functions   = (region?: string) => resolve(import('firebase/functions')).then(() => getApp(this).functions(region));
-
-    // TODO: drop the <any> once firebase-js-sdk #1792 and #1812 and patched in, they were missing typings
-    performance = ()                => resolve(import(<any>'firebase/performance')).then(() => getApp(this).performance());
-    storage     = (url?: string)    => resolve(import(<any>'firebase/storage')    ).then(() => getApp(this).storage(url));
+    storage     = (url?: string)    => resolve(import('firebase/storage')  ).then(() => getApp(this).storage(url));
 
     init(...args: any[]) {
         // @ts-ignore because ember do pass arguments here
