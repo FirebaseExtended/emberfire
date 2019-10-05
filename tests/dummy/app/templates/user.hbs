@@ -25,7 +25,7 @@
 <ul>
     {{#each model.comments as |comment|}}
         <li>
-            <p>{{ comment.body }}</p>
+            <p>{{#link-to 'comment' comment }}{{ comment.body }}{{/link-to}}</p>
             {{#if comment.something}}<small>{{#link-to "something" comment.something.id}}{{comment.something.name}}{{/link-to}}</small>{{/if}}
         </li>
     {{/each}}

@@ -13,7 +13,9 @@ Router.map(function() {
   this.route('users', () => {
     this.route('user', {path: 'users/:id'});
   });
-  this.route('comments');
+  this.route('comments', () => {
+    this.route('comment', {path: 'comments/:id'});
+  });
 });
 
 export default Router;

@@ -18,13 +18,25 @@ const isFastboot = (object:Object) => {
 export const subscribe = (route: Object, model: DS.Model) => !isFastboot(route) && getService(route).subscribe(route, model);
 export const unsubscribe = (route: Object) => !isFastboot(route) && getService(route).unsubscribe(route);
 
-const setRouteSubscription = (service: RealtimeListenerService, route: Object, unsubscribe: (() => void)|null) => {
+const setRouteSubscription = (service: RealtimeListenerService, route: Object, uniqueIdentifier: string, unsubscribe: () => void) => {
     const routeSubscriptions = get(service, `routeSubscriptions`);
-    const existingSubscription = get(routeSubscriptions, route.toString());
-    if (existingSubscription) { existingSubscription() }
-    if (unsubscribe) {
-        routeSubscriptions[route.toString()] = unsubscribe;
+    const existingSubscriptions = routeSubscriptions[route.toString()];
+    if (existingSubscriptions) {
+        const existingSubscription = existingSubscriptions[uniqueIdentifier];
+        if (existingSubscription) { existingSubscription() }
     } else {
+        routeSubscriptions[route.toString()] = {};
+    }
+    routeSubscriptions[route.toString()][uniqueIdentifier] = unsubscribe;
+}
+
+const unsubscribeRoute = (service: RealtimeListenerService, route: Object) => {
+    const routeSubscriptions = get(service, `routeSubscriptions`);
+    const existingSubscriptions = get(routeSubscriptions, route.toString());
+    if (existingSubscriptions) {
+        Object.keys(existingSubscriptions).forEach(key => {
+            existingSubscriptions[key]();
+        });
         delete routeSubscriptions[route.toString()];
     }
 }
@@ -39,7 +51,7 @@ function isFirestoreDocumentRefernce(arg: any): arg is firestore.DocumentReferen
 
 export default class RealtimeListenerService extends Service.extend({
 
-    routeSubscriptions: {} as {[key:string]: () => void}
+    routeSubscriptions: {} as {[key:string]: {[key:string]: () => void}}
 
 }) {
 
@@ -49,6 +61,14 @@ export default class RealtimeListenerService extends Service.extend({
         const modelClass = store.modelFor(modelName);
         const query = model.get('meta.query') as firestore.Query|database.Reference|undefined;
         const ref = model.get('_internalModel._recordData._data._ref') as firestore.DocumentReference|database.Reference|undefined;
+        const uniqueIdentifier = query ?
+            (query as any)._query &&
+                (query as any)._query.memoizedCanonicalId ||
+                query.toString() :
+            ref &&
+                ((ref as any)._key &&
+                    (ref as any)._key.toString() ||
+                    ref!.toString());
         if (query) {
             if (isFirestoreQuery(query)) {
                 const unsubscribe = query.onSnapshot(snapshot => {
@@ -84,7 +104,7 @@ export default class RealtimeListenerService extends Service.extend({
                         }
                     }))
                 });
-                setRouteSubscription(this, route, unsubscribe);
+                setRouteSubscription(this, route, uniqueIdentifier, unsubscribe);
             } else {
                 const onChildAdded = query.on('child_added', (snapshot, priorKey) => {
                     run(() => {
@@ -144,7 +164,7 @@ export default class RealtimeListenerService extends Service.extend({
                     query.off('child_changed', onChildChanged);
                     query.off('child_moved', onChildMoved);
                 }
-                setRouteSubscription(this, route, unsubscribe);
+                setRouteSubscription(this, route, uniqueIdentifier, unsubscribe);
             }
         } else if (ref) {
             if (isFirestoreDocumentRefernce(ref)) {
@@ -154,7 +174,7 @@ export default class RealtimeListenerService extends Service.extend({
                         store.push(normalizedData);
                     });
                 });
-                setRouteSubscription(this, route, unsubscribe);
+                setRouteSubscription(this, route, uniqueIdentifier, unsubscribe);
             } else {
                 const listener = ref.on('value', snapshot => {
                     run(() => {
@@ -170,13 +190,13 @@ export default class RealtimeListenerService extends Service.extend({
                     });
                 });
                 const unsubscribe = () => ref.off('value', listener);
-                setRouteSubscription(this, route, unsubscribe);
+                setRouteSubscription(this, route, uniqueIdentifier, unsubscribe);
             }
         }
     }
 
     unsubscribe(route: Object) {
-        setRouteSubscription(this, route, null);
+        unsubscribeRoute(this, route);
     }
 
 }
