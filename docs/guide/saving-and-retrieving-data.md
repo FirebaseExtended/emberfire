@@ -111,6 +111,7 @@ Now we have access to all of our posts, and can display them in our template:
 
 1. [Installation](installation.md)
 1. [User Authentication](authentication.md)
+1. [Collect Analytics](analytics.md)
 1. **Saving and Retrieving Data**
 1. [Querying Data](querying-data.md)
 1. [Relationships](relationships.md)

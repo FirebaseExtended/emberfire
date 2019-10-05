@@ -43,6 +43,7 @@ Note that you can use any hosting service you'd like to deploy your Ember app, y
 
 1. [Installation](installation.md)
 1. [User Authentication](authentication.md)
+1. [Collect Analytics](analytics.md)
 1. [Saving and Retrieving Data](saving-and-retrieving-data.md)
 1. [Querying Data](querying-data.md)
 1. [Relationships](relationships.md)

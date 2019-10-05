@@ -18,6 +18,7 @@ to ask technical questions, share apps you've built, and chat with other develop
 - **Ember Services** - `firebase` and `firebase-app` services allow direct access to the underlying [Firebase SDK instance](https://firebase.google.com/docs/reference/js/)
 - **Realtime Bindings** - Listen for realtime updates to your Firebase backed Ember Data models using the provided `realtime-listener` service or the `RealtimeRouteMixin`
 - **Authentication Providers** - Integrate [Firebase Authentication](https://firebase.google.com/docs/auth/) with your Ember application easily with providers for [Ember Simple Auth](http://ember-simple-auth.com/) and [Torii](http://vestorly.github.io/torii/)
+- **Analytics Collection** - The `AnalyticsRouteMixin` adds [Google Analytics](https://firebase.google.com/docs/analytics) screen tracking to your Ember Router.
 - **Offline Enabled** - Persist Ember Data models offline automatically with `FirestoreAdapter`
 - **Fastboot Compatible** - Perform initial rendering and fetching of your models server-side to increase application performance
 
@@ -62,7 +63,15 @@ export default Route.extend(RealtimeRouteMixin, {
     model() {
         return this.store.query('article', { orderBy: 'publishedAt' });
     }
-})
+});
+```
+
+```js
+// app/routes/application.js
+import AnalyticsRouteMixin from 'emberfire/mixins/analytics-route';
+import Route from '@ember/routing/route';
+
+export default Route.extend(AnalyticsRouteMixin);
 ```
 
 ## Documentation

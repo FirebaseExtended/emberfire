@@ -32,6 +32,7 @@ EmberFire can handle relationships in several different ways:
 
 1. [Installation](installation.md)
 1. [User Authentication](authentication.md)
+1. [Collect Analytics](analytics.md)
 1. [Saving and Retrieving Data](saving-and-retrieving-data.md)
 1. [Querying Data](querying-data.md)
 1. **Relationships**
