@@ -39,7 +39,9 @@ module.exports = function(environment) {
         databaseURL: "https://ember-test-69699.firebaseio.com",
         projectId: "ember-test-69699",
         storageBucket: "ember-test-69699.appspot.com",
-        messagingSenderId: "39112982274"
+        messagingSenderId: "39112982274",
+        appId: "1:39112982274:web:acf53ad9e778bfd079cc1b",
+        measurementId: "G-YRDCZ1HFCQ"
       }, {
         apiKey: "AIzaSyAWIMkDzUu4b0nD60BrglQX5Sq0_8hnT5Y",
         authDomain: "ember-test-69699.firebaseapp.com",
@@ -47,6 +49,8 @@ module.exports = function(environment) {
         projectId: "ember-test-69699",
         storageBucket: "ember-test-69699.appspot.com",
         messagingSenderId: "39112982274",
+        appId: "1:39112982274:web:acf53ad9e778bfd079cc1b",
+        measurementId: "G-YRDCZ1HFCQ",
         name: "second-app"
       }
     ],
