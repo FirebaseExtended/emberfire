@@ -6,16 +6,19 @@ export default class RealtimeDatabaseSerializer extends DS.JSONSerializer {
 
   normalizeSingleResponse(store: DS.Store, primaryModelClass: DS.Model, payload: database.DataSnapshot, _id: string | number, _requestType: string) {
     if (!payload.exists) { throw  new DS.NotFoundError(); }
-    return normalize(store, primaryModelClass, payload);
+    let normalized = normalize(store, primaryModelClass, payload);
+    (this as any).applyTransforms(primaryModelClass, normalized.data.attributes);
+    return normalized;
   }
 
   normalizeArrayResponse(store: DS.Store, primaryModelClass: DS.Model, payload: database.DataSnapshot, _id: string | number, _requestType: string) {
     const noramlizedRecords: any[] = []
     const embeddedRecords: any[] = [];
     payload.forEach(snapshot => {
-      const { data, included } = normalize(store, primaryModelClass, snapshot);
-      noramlizedRecords.push(data);
-      Object.assign(embeddedRecords, [...embeddedRecords, ...included]);
+      let normalized = normalize(store, primaryModelClass, snapshot);
+      (this as any).applyTransforms(primaryModelClass, normalized.data.attributes);
+      noramlizedRecords.push(normalized.data);
+      Object.assign(embeddedRecords, [...embeddedRecords, ...normalized.included]);
     });
     return { data: noramlizedRecords, included: embeddedRecords, meta: { query: (payload as any).query || payload.ref } };
   }
