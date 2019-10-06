@@ -4,23 +4,27 @@ import { database } from 'firebase/app';
 
 export default class RealtimeDatabaseSerializer extends DS.JSONSerializer {
 
+  // @ts-ignore TODO update the types to support
+  applyTransforms: (a: DS.Model, b: any) => void;
+
   normalizeSingleResponse(store: DS.Store, primaryModelClass: DS.Model, payload: database.DataSnapshot, _id: string | number, _requestType: string) {
     if (!payload.exists) { throw  new DS.NotFoundError(); }
     let normalized = normalize(store, primaryModelClass, payload);
-    (this as any).applyTransforms(primaryModelClass, normalized.data.attributes);
+    this.applyTransforms(primaryModelClass, normalized.data.attributes);
     return normalized;
   }
 
   normalizeArrayResponse(store: DS.Store, primaryModelClass: DS.Model, payload: database.DataSnapshot, _id: string | number, _requestType: string) {
-    const noramlizedRecords: any[] = []
-    const embeddedRecords: any[] = [];
+    const normalizedPayload: any[] = []
     payload.forEach(snapshot => {
       let normalized = normalize(store, primaryModelClass, snapshot);
-      (this as any).applyTransforms(primaryModelClass, normalized.data.attributes);
-      noramlizedRecords.push(normalized.data);
-      Object.assign(embeddedRecords, [...embeddedRecords, ...normalized.included]);
+      this.applyTransforms(primaryModelClass, normalized.data.attributes);
+      normalizedPayload.push(normalized);
     });
-    return { data: noramlizedRecords, included: embeddedRecords, meta: { query: (payload as any).query || payload.ref } };
+    const included = new Array().concat(...normalizedPayload.map(({included}) => included));
+    const meta = { query: (payload as any).query || payload.ref };
+    const data = normalizedPayload.map(({data}) => data);
+    return { data, included, meta };
   }
 
 }

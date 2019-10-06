@@ -7,20 +7,21 @@ export type Snapshot = firestore.DocumentSnapshot | firestore.QuerySnapshot;
 // TODO aside from .data(), key vs. id, metadata, and subcollection this is basicly realtime-database, should refactor to reuse
 export default class FirestoreSerializer extends DS.JSONSerializer {
 
+  // @ts-ignore TODO update the types to support
+  applyTransforms: (a: DS.Model, b: any) => void;
+
   normalizeSingleResponse(store: DS.Store, primaryModelClass: DS.Model, payload: firestore.DocumentSnapshot, _id: string | number, _requestType: string) {
     if (!payload.exists) { throw  new DS.NotFoundError(); }
     const meta = extractMeta(payload);
-
     let normalized = normalize(store, primaryModelClass, payload);
-    (this as any).applyTransforms(primaryModelClass, normalized.data.attributes);
-
+    this.applyTransforms(primaryModelClass, normalized.data.attributes);
     return { ...normalized, meta };
   }
 
   normalizeArrayResponse(store: DS.Store, primaryModelClass: DS.Model, payload: firestore.QuerySnapshot, _id: string | number, _requestType: string) {
     const normalizedPayload = payload.docs.map(snapshot => {
       let normalized = normalize(store, primaryModelClass, snapshot);
-      (this as any).applyTransforms(primaryModelClass, normalized.data.attributes);
+      this.applyTransforms(primaryModelClass, normalized.data.attributes);
       return normalized;
     });
     const included = new Array().concat(...normalizedPayload.map(({included}) => included));
