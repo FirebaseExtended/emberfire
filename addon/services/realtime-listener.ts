@@ -30,14 +30,21 @@ const setRouteSubscription = (service: RealtimeListenerService, route: Object, u
     routeSubscriptions[route.toString()][uniqueIdentifier] = unsubscribe;
 }
 
-const unsubscribeRoute = (service: RealtimeListenerService, route: Object) => {
+const unsubscribeRoute = (service: RealtimeListenerService, route: Object, uniqueIdentifier?: string) => {
     const routeSubscriptions = get(service, `routeSubscriptions`);
     const existingSubscriptions = get(routeSubscriptions, route.toString());
     if (existingSubscriptions) {
-        Object.keys(existingSubscriptions).forEach(key => {
-            existingSubscriptions[key]();
-        });
-        delete routeSubscriptions[route.toString()];
+        if (uniqueIdentifier) {
+            if (existingSubscriptions[uniqueIdentifier]) {
+                existingSubscriptions[uniqueIdentifier]();
+                delete existingSubscriptions[uniqueIdentifier];
+            }
+        } else {
+            Object.keys(existingSubscriptions).forEach(key => {
+                existingSubscriptions[key]();
+            });
+            delete routeSubscriptions[route.toString()];
+        }
     }
 }
 
@@ -61,14 +68,7 @@ export default class RealtimeListenerService extends Service.extend({
         const modelClass = store.modelFor(modelName);
         const query = model.get('meta.query') as firestore.Query|database.Reference|undefined;
         const ref = model.get('_internalModel._recordData._data._ref') as firestore.DocumentReference|database.Reference|undefined;
-        const uniqueIdentifier = query ?
-            (query as any)._query &&
-                (query as any)._query.memoizedCanonicalId ||
-                query.toString() :
-            ref &&
-                ((ref as any)._key &&
-                    (ref as any)._key.toString() ||
-                    ref!.toString());
+        const uniqueIdentifier = model.toString();
         if (query) {
             if (isFirestoreQuery(query)) {
                 const unsubscribe = query.onSnapshot(snapshot => {
@@ -195,8 +195,8 @@ export default class RealtimeListenerService extends Service.extend({
         }
     }
 
-    unsubscribe(route: Object) {
-        unsubscribeRoute(this, route);
+    unsubscribe(route: Object, model?: DS.Model) {
+        unsubscribeRoute(this, route, model && model.toString());
     }
 
 }
