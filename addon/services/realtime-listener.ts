@@ -16,7 +16,7 @@ const isFastboot = (object:Object) => {
 }
 
 export const subscribe = (route: Object, model: DS.Model) => !isFastboot(route) && getService(route).subscribe(route, model);
-export const unsubscribe = (route: Object) => !isFastboot(route) && getService(route).unsubscribe(route);
+export const unsubscribe = (route: Object, model?: DS.Model) => !isFastboot(route) && getService(route).unsubscribe(route, model);
 
 const setRouteSubscription = (service: RealtimeListenerService, route: Object, uniqueIdentifier: string, unsubscribe: () => void) => {
     const routeSubscriptions = get(service, `routeSubscriptions`);
