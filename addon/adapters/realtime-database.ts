@@ -226,7 +226,7 @@ const noop = (ref: database.Reference) => ref;
 const queryDocs = (referenceOrQuery: ReferenceOrQuery, query?: ReferenceOrQueryFn) => getDocs((query || noop)(referenceOrQuery));
 // TODO allow override
 const collectionNameForType = (type: any) =>  pluralize(camelize(typeof(type) === 'string' ? type : type.modelName));
-const rootCollection = (adapter: RealtimeDatabaseAdapter, type: any) => databaseInstance(adapter).then(database => database.ref([get(adapter, 'namespace'), collectionNameForType(type)].join('/')));
+export const rootCollection = (adapter: RealtimeDatabaseAdapter, type: any) => databaseInstance(adapter).then(database => database.ref([get(adapter, 'namespace'), collectionNameForType(type)].join('/')));
 const getDocs = (query: ReferenceOrQuery) => query.once('value').then(value => ((value as any).query = query) && value);
 const docReference = (adapter: RealtimeDatabaseAdapter, type: any, id: string) => rootCollection(adapter, type).then(ref => ref.child(id));
 

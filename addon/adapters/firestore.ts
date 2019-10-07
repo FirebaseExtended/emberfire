@@ -236,7 +236,7 @@ const getDoc = (adapter: FirestoreAdapter, type: DS.Model, id: string) => docRef
 const collectionNameForType = (type: any) => pluralize(camelize(typeof(type) === 'string' ? type : type.modelName));
 const docReference = (adapter: FirestoreAdapter, type: any, id: string) => rootCollection(adapter, type).then(collection => collection.doc(id));
 const getDocs = (query: CollectionReferenceOrQuery) => query.get();
-const rootCollection = (adapter: FirestoreAdapter, type: any) =>  getFirestore(adapter).then(firestore => {
+export const rootCollection = (adapter: FirestoreAdapter, type: any) =>  getFirestore(adapter).then(firestore => {
     const namespace = get(adapter, 'namespace');
     const root = namespace ? firestore.doc(namespace) : firestore;
     return root.collection(collectionNameForType(type));
