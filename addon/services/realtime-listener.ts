@@ -92,14 +92,17 @@ export default class RealtimeListenerService extends Service.extend({
         const args = { model, store, modelName, modelClass, uniqueIdentifier, serializer, adapter };
         if (query) {
             if (isFirestoreQuery(query)) {
+                // Firestore query
                 const unsubscribe = runFirestoreCollectionListener({query, ...args});
                 setRouteSubscription(this, route, uniqueIdentifier, unsubscribe);
             } else {
+                // RTDB query
                 const unsubscribe = runRealtimeDatabaseListListener({ref: query, ...args});
                 setRouteSubscription(this, route, uniqueIdentifier, unsubscribe);
             }
         } else if (ref) {
             if (isFirestoreDocumentRefernce(ref)) {
+                // Firestore find
                 const unsubscribe = ref.onSnapshot(doc => {
                     run(() => {
                         const normalizedData = serializer.normalizeSingleResponse(store, modelClass, doc);
@@ -108,6 +111,7 @@ export default class RealtimeListenerService extends Service.extend({
                 });
                 setRouteSubscription(this, route, uniqueIdentifier, unsubscribe);
             } else {
+                // RTDB find
                 const listener = ref.on('value', snapshot => {
                     run(() => {
                         if (snapshot) {
@@ -125,13 +129,15 @@ export default class RealtimeListenerService extends Service.extend({
                 setRouteSubscription(this, route, uniqueIdentifier, unsubscribe);
             }
         } else {
-            // this might be a findAll, findAll strips metadata :(
+            // findAll ditches the metadata :(
             if (serializer.constructor.name == 'FirestoreSerializer') {
+                // Firestore findAll
                 firestoreRootCollection(adapter, modelName).then(query => {
                     const unsubscribe = runFirestoreCollectionListener({query, ...args});
                     setRouteSubscription(this, route, uniqueIdentifier, unsubscribe);
                 });
             } else if (serializer.constructor.name == 'RealtimeDatabaseSerializer') {
+                // RTDB findAll
                 realtimeDatabaseRootCollection(adapter, modelName).then(ref => {
                     const unsubscribe = runRealtimeDatabaseListListener({ref, ...args});
                     setRouteSubscription(this, route, uniqueIdentifier, unsubscribe);

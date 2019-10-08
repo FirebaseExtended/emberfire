@@ -6,7 +6,7 @@ export default Route.extend(RealtimeRouteMixin, {
     model(params) {
         return this.store.queryRecord('something', {
             doc: ref => ref.doc(params.id),
-            include: ['comments,comments.user']
+            include: 'user,comments'
         });
     },
     afterModel(model) {

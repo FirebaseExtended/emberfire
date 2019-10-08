@@ -1,5 +1,7 @@
 import DS from 'ember-data';
 import { firestore } from 'firebase/app';
+// @ts-ignore
+import { singularize } from 'ember-inflector';
 
 export type DocumentSnapshot = firestore.DocumentSnapshot | firestore.QueryDocumentSnapshot;
 export type Snapshot = firestore.DocumentSnapshot | firestore.QuerySnapshot;
@@ -38,16 +40,6 @@ declare module 'ember-data' {
   }
 }
 
-export const normalize = (store: DS.Store, modelClass: DS.Model, snapshot: DocumentSnapshot) => {
-  const id = snapshot.id;
-  const type = (<any>modelClass).modelName;
-  const _ref = snapshot.ref;
-  const attributes = { ...snapshot.data()!, _ref };
-  const { relationships, included } = normalizeRelationships(store, modelClass, attributes);
-  const data = { id, type, attributes, relationships };
-  return { data, included };
-}
-
 function isQuerySnapshot(arg: any): arg is firestore.QuerySnapshot {
   return arg.query !== undefined;
 }
@@ -65,15 +57,28 @@ const normalizeRelationships = (store: DS.Store, modelClass: DS.Model, attribute
   const relationships: {[field:string]: any} = {};
   const included: any[] = [];
   modelClass.eachRelationship((key: string, relationship: any) => {
-    const attribute = attributes[key];
-    delete attributes[key];
+    const attribute = attributes.data()[key];
+    const payload = attributes._document && attributes._document._included && attributes._document._included[key];
+    if (payload) {
+      const modelName = singularize(relationship.key) as never;
+      const modelClass = store.modelFor(modelName);
+      const serializer = store.serializerFor(modelName) as any;
+      const { data } = relationship.kind === 'belongsTo' ? serializer.normalizeSingleResponse(store, modelClass, payload) : serializer.normalizeArrayResponse(store, modelClass, payload);
+      if (Array.isArray(data)) {
+        data.forEach((r:any) => {
+          return included.splice(-1, 0, { links: { self: 'emberfire' }, ...r })
+        });
+      } else {
+        included.splice(-1, 0, { links: { self: 'emberfire' }, ...data });
+      }
+    }
     relationships[key] = normalizeRealtionship(relationship)(store, attribute, relationship, included);
   }, null);
   return {relationships, included};
 }
 
 const normalizeRealtionship = (relationship: any) => {
-  if (relationship.kind === 'belongsTo') {
+  if (relationship.kind == 'belongsTo') {
     return normalizeBelongsTo;
   } else if (relationship.options.subcollection) {
     return normalizeHasMany; // this is handled in the adapter
@@ -105,11 +110,32 @@ const normalizeEmbedded = (store: DS.Store, attribute: any, relationship: any, i
     const data = included
       .filter(record => record.type == relationship.type)
       .map(record => ({ id: record.id, type: record.type }));
-    return { links: { related: 'emberfire' }, data };
+    if (data.length > 0 ) {
+      return { links: { related: 'emberfire' }, data };
+    } else {
+      return { links: { related: 'emberfire' } };
+    }
   } else {
     return { };
   }
 }
 
-const normalizeHasMany = (_store: DS.Store, _attribute: any, _relationship: any, _included: any[]) =>
-  ({ links: { related: 'emberfire' } })
+const normalizeHasMany = (_store: DS.Store, _payload: firestore.QuerySnapshot, relationship: any, included: any[]) => {
+  const relevantIncluded = included.filter(i => i.type == singularize(relationship.key));
+  const data = relevantIncluded.map((r:any) => ({ type: r.type, id: r.id }));
+  if (data.length > 0) {
+    return { links: { related: 'emberfire' }, data };
+  } else {
+    return { links: { related: 'emberfire' } };
+  }
+}
+
+export const normalize = (store: DS.Store, modelClass: DS.Model, snapshot: DocumentSnapshot) => {
+  const id = snapshot.id;
+  const type = (<any>modelClass).modelName;
+  const _ref = snapshot.ref;
+  const attributes = { ...snapshot.data()!, _ref };
+  const { relationships, included } = normalizeRelationships(store, modelClass, snapshot);
+  const data = { id, type, attributes, relationships };
+  return { data, included };
+}

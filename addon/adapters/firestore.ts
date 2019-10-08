@@ -4,7 +4,7 @@ import { pluralize } from 'ember-inflector';
 import { get, set } from '@ember/object';
 import { inject as service } from '@ember/service';
 import { camelize } from '@ember/string';
-import RSVP from 'rsvp';
+import RSVP, { resolve } from 'rsvp';
 import Ember from 'ember';
 import FirebaseAppService from '../services/firebase-app';
 import ModelRegistry from 'ember-data/types/registries/model';
@@ -117,12 +117,14 @@ export default class FirestoreAdapter extends DS.Adapter.extend({
     // @ts-ignore repeat here for the tyepdocs
     firebaseApp: Ember.ComputedProperty<FirebaseAppService, FirebaseAppService>;
 
-    findRecord<K extends keyof ModelRegistry>(_store: DS.Store, type: ModelRegistry[K], id: string) {
-        return rootCollection(this, type).then(ref => ref.doc(id).get());
+    findRecord<K extends keyof ModelRegistry>(store: DS.Store, type: ModelRegistry[K], id: string, snapshot: any) {
+        return rootCollection(this, type).then(ref =>
+            includeRelationships(ref.doc(id).get(), store, this, snapshot, type)
+        );
     }
 
     findAll<K extends keyof ModelRegistry>(store: DS.Store, type: ModelRegistry[K]) {
-        return this.query(store, type)
+        return this.query(store, type);
     }
     
     findHasMany<K extends keyof ModelRegistry>(store: DS.Store, snapshot: DS.Snapshot<K>, url: string, relationship: {[key:string]: any}) {
@@ -145,22 +147,25 @@ export default class FirestoreAdapter extends DS.Adapter.extend({
         }
     }
 
-    query<K extends keyof ModelRegistry>(_store: DS.Store, type: ModelRegistry[K], options?: QueryOptions, _recordArray?: DS.AdapterPopulatedRecordArray<any>) {
-        return rootCollection(this, type).then(collection => queryDocs(collection, queryOptionsToQueryFn(options)));
+    query<K extends keyof ModelRegistry>(store: DS.Store, type: ModelRegistry[K], options?: QueryOptions, _recordArray?: DS.AdapterPopulatedRecordArray<any>) {
+        return rootCollection(this, type).then(collection =>
+            queryDocs(collection, queryOptionsToQueryFn(options))
+        ).then(q => includeCollectionRelationships(q, store, this, options, type));
     }
 
-    queryRecord<K extends keyof ModelRegistry>(_store: DS.Store, type: ModelRegistry[K], options?: QueryOptions|QueryRecordOptions) {
+    queryRecord<K extends keyof ModelRegistry>(store: DS.Store, type: ModelRegistry[K], options?: QueryOptions|QueryRecordOptions) {
         return rootCollection(this, type).then((ref:firestore.CollectionReference) => {
             const queryOrRef = queryRecordOptionsToQueryFn(options)(ref);
             if (isQuery(queryOrRef)) {
                 if (queryOrRef.limit) { throw "Dont specify limit on queryRecord" }
                 return queryOrRef.limit(1).get();
             } else {
-                return queryOrRef.get() as any; // TODO fix the types here, they're a little broken
+                (options as any).id = queryOrRef.id;
+                return includeRelationships(queryOrRef.get() as any, store, this, options, type); // TODO fix the types here, they're a little broken
             }
         }).then((snapshot:firestore.QuerySnapshot|firestore.DocumentSnapshot) => {
             if (isQuerySnapshot(snapshot)) {
-                return snapshot.docs[0];
+                return includeRelationships(resolve(snapshot.docs[0]), store, this, options, type);
             } else {
                 return snapshot;
             }
@@ -194,7 +199,6 @@ export default class FirestoreAdapter extends DS.Adapter.extend({
     }
 
 }
-
 
 export type CollectionReferenceOrQuery = firestore.CollectionReference | firestore.Query;
 export type QueryFn = (ref: CollectionReferenceOrQuery) => CollectionReferenceOrQuery;
@@ -301,6 +305,77 @@ const getFirestore = (adapter: FirestoreAdapter) => {
     }
     return cachedFirestoreInstance!;
 };
+
+const includeCollectionRelationships = (collection: firestore.QuerySnapshot, store: DS.Store, adapter: FirestoreAdapter, snapshot: any, type: any): Promise<firestore.QuerySnapshot> => {
+    if (snapshot && snapshot.include) {
+        const includes = snapshot.include.split(',') as Array<string>;
+        const relationshipsToInclude = includes.map(e => type.relationshipsByName.get(e) as {[key:string]: any}).filter(r => !!r && !r.options.embedded);
+        return Promise.all(
+            relationshipsToInclude.map(r => {
+                if (r.meta.kind == 'hasMany') {
+                    return Promise.all(collection.docs.map(d => adapter.findHasMany(store, { id: d.id } as any, '', r)))
+                } else {
+                    const belongsToIds = [...new Set(collection.docs.map(d => d.data()[r.meta.key]).filter(id => !!id))]
+                    return Promise.all(belongsToIds.map(id => adapter.findBelongsTo(store, { id } as any, '', r)))
+                }
+            })
+        ).then(allIncludes => {
+            relationshipsToInclude.forEach((r: any, i:number) => {
+                const relationship = r.meta;
+                const pluralKey = pluralize(relationship.key);
+                const key = relationship.kind == 'belongsTo' ? relationship.key : pluralKey;
+                const includes = allIncludes[i];
+                collection.docs.forEach(doc => {
+                    if (relationship.kind == 'belongsTo') {
+                        const result = includes.find((r:any) => r.id == doc.data()[key]);
+                        if (result) {
+                            if (!(doc as any)._document._included) { (doc as any)._document._included = {} }
+                            (doc as any)._document._included[key] = result;
+                        }
+                    } else {
+                        if (!(doc as any)._document._included) { (doc as any)._document._included = {} }
+                        (doc as any)._document._included[pluralKey] = includes;
+                    }
+                });
+            });
+            return collection;
+        });
+    } else {
+        return resolve(collection);
+    }
+}
+
+const includeRelationships = <T=any>(promise: Promise<T>, store: DS.Store, adapter: FirestoreAdapter, snapshot: any, type: any): Promise<T> => {
+    if (snapshot && snapshot.include) {
+        const includes = snapshot.include.split(',') as Array<string>;
+        const relationshipsToInclude = includes.map(e => type.relationshipsByName.get(e) as {[key:string]: any}).filter(r => !!r && !r.options.embedded);
+        const hasManyRelationships = relationshipsToInclude.filter(r => r.meta.kind == 'hasMany');
+        const belongsToRelationships = relationshipsToInclude.filter(r => r.meta.kind == 'belongsTo');
+        return Promise.all([
+            promise,
+            ...hasManyRelationships.map(r => adapter.findHasMany(store, snapshot, '', r))
+        ]).then(([doc, ...includes]) => {
+            doc._document._included = hasManyRelationships.reduce((c, e, i) => {
+                c[pluralize(e.key)] = includes[i];
+                return c;
+            }, {});
+            return Promise.all([
+                resolve(doc),
+                ...belongsToRelationships.filter(r => !!doc.data()[r.meta.key]).map(r => {
+                    return adapter.findBelongsTo(store, { id: doc.data()[r.meta.key] } as any, '', r)
+                })
+            ]);
+        }).then(([doc, ...includes]) => {
+            doc._document._included = { ...doc._document._included, ...belongsToRelationships.reduce((c, e, i) => {
+                c[e.key] = includes[i];
+                return c;
+            }, {})};
+            return doc;
+        });
+    } else {
+        return promise;
+    }
+}
 
 declare module 'ember-data' {
     interface AdapterRegistry {
