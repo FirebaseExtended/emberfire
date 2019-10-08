@@ -1,17 +1,13 @@
 <p>{{#link-to 'somethings'}}Back to all{{/link-to}}</p>
 
-<h3>{{ model.title }}</h3>
-{{#if model.user }}
-    <h2>{{#link-to 'user' model.user.id }}{{ model.user.name }}{{/link-to}}</h2>
-{{/if}}
-
-<p>{{ model.description }}</p>
-
 <ul>
-{{#each model.comments as |comment|}}
+{{#each model as |comment|}}
     <li>
         <p>{{ comment.body }}</p>
         {{#if comment.user}}<small>{{#link-to "user" comment.user.id}}{{comment.user.name}}{{/link-to}}</small>{{/if}}
+        <small>{{ comment.id }}</small>
     </li>
 {{/each}}
 </ul>
+
+<button {{action "createComment"}}>Add comment!</button>

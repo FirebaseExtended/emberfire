@@ -27,6 +27,10 @@ export default class RealtimeDatabaseSerializer extends DS.JSONSerializer {
     return { data, included, meta };
   }
 
+  normalizeCreateRecordResponse(_store: DS.Store, _primaryModelClass: DS.Model, payload: any, id: string | number, _requestType: string) {
+    return { data: { id: id || payload.ref.key, attributes: payload.data }};
+  }
+
 }
 
 declare module 'ember-data' {

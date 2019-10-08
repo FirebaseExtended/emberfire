@@ -141,14 +141,16 @@ export default class RealtimeDatabaseAdapter extends DS.Adapter.extend({
         return docReference(this, type, id).then(ref => ref.set(data));
     }
 
-    createRecord<K extends keyof ModelRegistry>(_: DS.Store, type: ModelRegistry[K], snapshot: DS.Snapshot<K>) {
+    createRecord<K extends keyof ModelRegistry>(_store: DS.Store, type: ModelRegistry[K], snapshot: DS.Snapshot<K>) {
         const id = snapshot.id;
         const data = this.serialize(snapshot, { includeId: false });
-        // TODO remove the unnecessary once('value'), handle in serializer if I can (noramlizeCreateResponse right?) also this fails if read permissions is denied
-        if (id == null) {
-            return rootCollection(this, type).then(ref => ref.push(data).then(ref => ref.once('value')));
+        if (id) {
+            return docReference(this, type, id).then(ref => ref.set(data).then(() => ({ref, data})));
         } else {
-            return docReference(this, type, id).then(ref => ref.set(data).then(() => ref.once('value')));
+            return rootCollection(this, type).then(ref => ref.push()).then(ref => {
+                (snapshot as any)._internalModel.setId(ref.key!);
+                return ref.set(data).then(() => ({ref, data}));
+            });
         }
     }
 

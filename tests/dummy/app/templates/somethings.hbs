@@ -3,6 +3,9 @@
         <li>
             <h3>{{#link-to 'something' something}}{{ something.title }}{{/link-to}}</h3>
             <p>{{ something.description }}</p>
+            <p>{{ something.user.name }}</p>
         </li>
     {{/each}}
 </ul>
+
+<button {{ action 'createSomething'}}>New something!</button>

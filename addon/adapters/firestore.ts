@@ -186,11 +186,14 @@ export default class FirestoreAdapter extends DS.Adapter.extend({
     createRecord<K extends keyof ModelRegistry>(_store: DS.Store, type: ModelRegistry[K], snapshot: DS.Snapshot<K>) {
         const id = snapshot.id;
         const data = this.serialize(snapshot, { includeId: false });
-        // TODO remove the unnecessary get(), handle in serializer if I can (noramlizeCreateResponse right?) also this fails if read permissions is denied
         if (id) {
-            return docReference(this, type, id).then(doc => doc.set(data).then(() => doc.get()));
+            return docReference(this, type, id).then(doc => doc.set(data).then(() => ({doc, data})));
         } else {
-            return rootCollection(this, type).then(collection => collection.add(data)).then(doc => doc.get());
+            return rootCollection(this, type).then(collection => {
+                const doc = collection.doc();
+                (snapshot as any)._internalModel.setId(doc.id);
+                return doc.set(data).then(() => ({doc, data}));
+            });
         }
     }
 
