@@ -51,8 +51,8 @@ export default Route.extend({
             return this.get('session').invalidate();
         },
         async login() {
-            const provider = new firebase.auth.GoogleAuthProvider();
             const auth = await this.get('firebaseApp').auth();
+            const provider = new firebase.auth.GoogleAuthProvider();
             return auth.signInWithPopup(provider);
         }
     }
