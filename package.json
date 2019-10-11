@@ -22,7 +22,7 @@
   },
   "scripts": {
     "build": "npm run ts:precompile && ember build",
-    "serve": "npm run build && node ./express.js",
+    "serve": "ember serve",
     "package": "npm run build && npm pack .",
     "test": "npm run ts:precompile && ember test",
     "ts:precompile": "ember ts:precompile",

@@ -5,5 +5,5 @@ const { attr, belongsTo } = DS;
 export default DS.Model.extend({
     body: attr('string'),
     something: belongsTo('something'),
-    user: belongsTo('user')
+    user: belongsTo('user', { async: false })
 });

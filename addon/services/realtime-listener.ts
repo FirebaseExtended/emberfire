@@ -60,10 +60,12 @@ type SubscribeArgs = {
     model: any;
     store: DS.Store;
     modelName: never;
-    modelClass: never;
+    modelClass: any;
     uniqueIdentifier: any;
     serializer: any;
     adapter: never;
+    parentModel: any;
+    relationshipName: string|undefined;
 }
 
 type FirestoreQueryArgs = {
@@ -80,16 +82,37 @@ export default class RealtimeListenerService extends Service.extend({
 
 }) {
 
-    subscribe(route: Object, model: any) {
+    subscribe(route: Object, model: any, parentModel?: any, relationshipName?:string) {
         const store = model.store as DS.Store;
         const modelName = (model.modelName || model.get('_internalModel.modelName')) as never
-        const modelClass = store.modelFor(modelName);
+        const modelClass = store.modelFor(modelName) as any;
         const query = model.get('meta.query') as firestore.Query|database.Reference|undefined;
         const ref = model.get('_internalModel._recordData._data._ref') as firestore.DocumentReference|database.Reference|undefined;
         const uniqueIdentifier = model.toString();
         const serializer = store.serializerFor(modelName) as any; // TODO type
         const adapter = store.adapterFor(modelName);
-        const args = { model, store, modelName, modelClass, uniqueIdentifier, serializer, adapter };
+        const args = { model, store, modelName, modelClass, uniqueIdentifier, serializer, adapter, parentModel, relationshipName };
+        const observeRelationships = (internalModel: any) => {
+            // HACK HACK HACK
+            internalModel._originalUpdatePromiseProxyFor = internalModel._updatePromiseProxyFor;
+            internalModel._updatePromiseProxyFor = (...args: any[]) => {
+                const proxy = internalModel._originalUpdatePromiseProxyFor(...args);
+                proxy.then((result:any) => {
+                    if (result) {
+                        // TODO what happens when the relationship changes?
+                        this.subscribe(route, result, model, args[1]);
+                    }
+                });
+                return proxy;
+            }
+        }
+        if (model._internalModel) {
+            observeRelationships(model);
+        } else {
+            model.content.forEach((internalModel:any) => {
+                observeRelationships(internalModel);
+            });
+        }
         if (query) {
             if (isFirestoreQuery(query)) {
                 // Firestore query

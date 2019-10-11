@@ -9,7 +9,7 @@ export default Route.extend(RealtimeRouteMixin, {
     store: service(),
     firebaseApp: service(),
     model(params) {
-        return this.store.query('comment', { filter: { something: params.id }, include: 'user,something'});
+        return this.store.query('comment', { filter: { something: params.id }, include: 'something'});
     },
     actions: {
         createComment() {

@@ -7,8 +7,8 @@ export default Route.extend(RealtimeRouteMixin, {
     model() {
         return this.firebaseApp.auth().then(({currentUser}) => 
             currentUser &&
-                this.store.query('comment', { filter: { user: currentUser.uid }, include: 'user' }) ||
-                this.store.query('comment', { include: 'user'} )
+                this.store.query('comment', { filter: { user: currentUser.uid } }) ||
+                this.store.query('comment', { } )
         );
     }
 })  
