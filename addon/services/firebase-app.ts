@@ -3,9 +3,7 @@ import { get, set } from '@ember/object';
 import { inject as service } from '@ember/service';
 import Ember from 'ember';
 import FirebaseService from './firebase';
-
-import RSVP from 'rsvp';
-const { resolve } = RSVP;
+import { resolve } from 'rsvp';
 
 const getApp = (service: FirebaseAppService) => {
     const firebase = get(service, 'firebase');

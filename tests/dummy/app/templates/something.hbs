@@ -1,7 +1,11 @@
 <p>{{#link-to 'somethings'}}Back to all{{/link-to}}</p>
 
+<h1>{{ model.title }}</h1>
+<p>{{#link-to "user" model.user.id }}{{ model.user.name }}{{/link-to}}</p>
+<em>{{ model.description }}</em>
+
 <ul>
-{{#each model as |comment|}}
+{{#each model.comments as |comment|}}
     <li>
         <p>{{ comment.body }}</p>
         {{#if comment.user}}<small>{{#link-to "user" comment.user.id}}{{comment.user.name}}{{/link-to}}</small>{{/if}}

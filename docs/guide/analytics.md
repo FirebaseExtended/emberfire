@@ -1,4 +1,4 @@
-# Authentication
+# Collect Analytics
 
 ## Collect Analytics data automatically with the `AnalyticsRouteMixin`
 
@@ -26,6 +26,34 @@ firebaseApp: service('firebase-app'),
 
 const analytics = await firebase.analytics();
 analytics.logEvent("some_event", { ... });
+```
+
+## Collect traces on route transistions automatically with `PerformanceRouteMixin`
+
+```js
+import PerformanceRouteMixin from 'emberfire/mixins/performance-route';
+import Route from '@ember/routing/route';
+
+export default Route.extend(PerformanceRouteMixin);
+```
+
+## Log traces with the `FirebaseApp` Service
+
+
+```js
+import { inject as service } from '@ember/service';
+
+...
+
+firebaseApp: service('firebase-app'),
+
+...
+
+const perf = await firebase.performance();
+const trace = perf.trace("some_event");
+trace.start();
+...
+trace.stop()
 ```
 
 ### Continue reading

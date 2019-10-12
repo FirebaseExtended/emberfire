@@ -2,8 +2,9 @@ import Route from '@ember/routing/route';
 import RealtimeRouteMixin from 'emberfire/mixins/realtime-route';
 import { get } from '@ember/object';
 import { inject as service } from '@ember/service';
+import PerformanceRouteMixin from 'emberfire/mixins/performance-route';
 
-export default Route.extend(RealtimeRouteMixin, {
+export default Route.extend(RealtimeRouteMixin, PerformanceRouteMixin, {
     store: service(),
     firebaseApp: service(),
     model() {
