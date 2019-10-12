@@ -1,15 +1,13 @@
 import Route from '@ember/routing/route';
 import RealtimeRouteMixin from 'emberfire/mixins/realtime-route';
-import { subscribe, unsubscribe } from 'emberfire/services/realtime-listener';
 import { inject as service } from '@ember/service';
 import { get } from '@ember/object';
-import { resolve } from 'rsvp';
 
 export default Route.extend(RealtimeRouteMixin, {
     store: service(),
     firebaseApp: service(),
     model(params) {
-        return this.store.findRecord('something', params.id);
+        return this.store.findRecord('something', params.id, { include: 'user' });
     },
     actions: {
         createComment() {

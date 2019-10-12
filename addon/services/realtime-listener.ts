@@ -49,10 +49,6 @@ const unsubscribeRoute = (service: RealtimeListenerService, route: Object, uniqu
     }
 }
 
-function isFirestoreQuery(arg: any): arg is firestore.Query {
-    return arg.onSnapshot !== undefined;
-}
-
 function isFirestoreDocumentRefernce(arg: any): arg is firestore.DocumentReference {
     return arg.onSnapshot !== undefined;
 }
@@ -95,7 +91,7 @@ export default class RealtimeListenerService extends Service.extend({
             }
             internalModel[proxyPromiseListenersKey] = [
                 ...internalModel[proxyPromiseListenersKey],
-                ((kind: string, key: string, args: Object, result: any) => {
+                ((_kind: string, key: string, _args: Object, result: any) => {
                     const triggerdRelationship = modelClass.relationshipsObject[key];
                     this.subscribe(route, result, model, triggerdRelationship);
                 })
