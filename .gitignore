@@ -28,6 +28,7 @@ package.json.ember-try
 addon/**/*.js
 app/**/*.js
 adapters/*.d.ts
+mixins/*.d.ts
 authenticators/*.d.ts
 authorizers/*.d.ts
 serializers/*.d.ts

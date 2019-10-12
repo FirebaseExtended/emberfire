@@ -1,7 +1,7 @@
 import { inject as service } from '@ember/service';
 import Mixin from '@ember/object/mixin';
 import { performance } from 'firebase';
-import { Promise, reject } from 'rsvp';
+import { reject } from 'rsvp';
 
 export default Mixin.create({
     firebaseApp: service('firebase-app'),
@@ -15,28 +15,26 @@ export default Mixin.create({
         if (this.toString().indexOf("@route:application::") > 0) { throw "PerformanceRouteMixin does not work correctly in the application route" }
     },
     beforeModel() {
-        // TODO promise proxy
         this.set('trace', this.get('firebaseApp').performance().then(perf => {
             const trace = perf.trace(`${this.toString()}:didTransition`);
             trace.start();
             return trace;
         }));
     },
-    afterModel() {
-        const tracePromise = this.get('trace')!;
+    routeDidChange() {
         const router = this.get('router');
-        tracePromise.then((trace:performance.Trace|undefined) => {
-            // TODO figure out how to disconnect the routeDidChange listener
-            router.on('routeDidChange', () => {
-                if (trace) {
-                    const screen_name = router.currentRouteName;
-                    trace.putAttribute('url', router.currentURL);
-                    (trace as any).name = `${screen_name}:didTransition`;
-                    trace.stop();
-                    this.set('trace', reject());
-                    trace = undefined;
-                }
-            });
-        })
+        router.removeObserver('currentRoute', this, this.routeDidChange);
+        const screen_name = router.currentRoute.name;
+        this.get('trace').then(trace => {
+            trace.putAttribute('url', router.currentURL);
+            // TODO allow name to be set
+            (trace as any).name = `${screen_name}:didTransition`;
+            trace.stop();
+            this.set('trace', reject());
+        });
+    },
+    afterModel() {
+        const router = this.get('router');
+        router.addObserver('currentRoute', this, this.routeDidChange);
     }
 });
