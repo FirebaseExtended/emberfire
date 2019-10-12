@@ -9,17 +9,14 @@ export default Route.extend(RealtimeRouteMixin, {
     store: service(),
     firebaseApp: service(),
     model(params) {
-        return this.store.query('comment', { filter: { something: params.id }, include: 'something'});
+        return this.store.findRecord('something', params.id);
     },
     actions: {
         createComment() {
             const store = get(this, 'store');
-            const somethingId = get(this, 'context.query.filter.something');
+            const something = get(this, 'context');
             const profile = get(this, 'firebaseApp').auth().then(({currentUser}) => currentUser && store.findRecord('user', currentUser.uid) || null);
-            Promise.all([
-                profile,
-                store.findRecord('something', somethingId),
-            ]).then(([user, something]) => {
+            profile.then((user) => {
                 return store.createRecord('comment', {
                     body: 'test',
                     user,
