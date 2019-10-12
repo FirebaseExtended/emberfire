@@ -1,15 +1,10 @@
 import Evented from '@ember/object/evented';
 import EmberObject from '@ember/object';
-
 import { get, set } from '@ember/object';
-import RSVP from 'rsvp';
-
+import { Promise, resolve } from 'rsvp';
 import Ember from 'ember';
 import FirebaseAppService from '../services/firebase-app';
-
-const { Promise, resolve } = RSVP;
 import { run } from '@ember/runloop';
-
 import { inject as service } from '@ember/service';
 
 export default class FirebaseSessionStore extends EmberObject.extend(Evented, {

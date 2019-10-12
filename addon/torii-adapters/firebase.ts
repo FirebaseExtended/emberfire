@@ -1,15 +1,10 @@
 import EmberObject from '@ember/object';
 import { inject as service } from '@ember/service';
-
 import { get } from '@ember/object';
-import RSVP from 'rsvp';
-
+import { Promise, reject, resolve } from 'rsvp';
 import Ember from 'ember';
 import FirebaseAppService from '../services/firebase-app';
-
-const { Promise, reject } = RSVP;
 import { run } from '@ember/runloop';
-import { resolve } from 'path';
 
 export default class FirebaseToriiAdapter extends EmberObject.extend({
     firebaseApp: service('firebase-app')

@@ -1,7 +1,5 @@
 import EmberObject from '@ember/object';
-
-import RSVP from 'rsvp';
-const { reject } = RSVP;
+import { reject } from 'rsvp';
 
 export default class FirebaseToriiProvider extends EmberObject.extend({
 
