@@ -30,7 +30,7 @@ $ ember install ember-simple-auth
 In order to use Ember Simple Auth, we need to create a `app/session-stores/application.js` file with the following command:
 
 ```
-$ ember generate firebase-session-store session-store
+$ ember generate firebase-session-store application
 ```
 
 The next step is to enable an authentication provider in the Firebase Authentication panel, and enter the API key and secret for that provider. Details on enabling third-party providers can be found in our docs e.g. [Enabling Google Sign-In](https://firebase.google.com/docs/auth/web/google-signin).
