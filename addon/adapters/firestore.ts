@@ -134,7 +134,13 @@ export default class FirestoreAdapter extends DS.Adapter.extend({
         } else if (relationship.options.subcollection) {
             return docReference(this, relationship.parentModelName, snapshot.id).then(doc => queryDocs(doc.collection(collectionNameForType(relationship.type)), relationship.options.query));
         } else {
-            return rootCollection(this, relationship.type).then(collection => queryDocs(collection.where(relationship.parentModelName, '==', snapshot.id), relationship.options.query));
+            return rootCollection(this, relationship.type).then(collection => {
+							if (relationship.__inverseKey.slice(-1) === 's') {
+								return queryDocs(collection.where(relationship.__inverseKey, 'array-contains', snapshot.id), relationship.options.query);
+							} else {
+								return queryDocs(collection.where(relationship.parentModelName, '==', snapshot.id), relationship.options.query);
+							}
+            });
         }
     }
 
