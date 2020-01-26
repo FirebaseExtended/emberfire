@@ -28,7 +28,7 @@ export default class RealtimeDatabaseSerializer extends DS.JSONSerializer {
   }
 
   normalizeCreateRecordResponse(_store: DS.Store, _primaryModelClass: DS.Model, payload: any, id: string | number, _requestType: string) {
-    return { data: { id: id || payload.ref.key, attributes: payload.data }};
+    return { data: { id: id || payload.ref.key, attributes: payload.data, type: _primaryModelClass.modelName }};
   }
 
 }
@@ -96,5 +96,5 @@ const normalizeEmbedded = (store: DS.Store, attribute: any, relationship: any, i
   }
 }
 
-const normalizeHasMany = (_store: DS.Store, _attribute: any, _relationship: any, _included: any[]) => 
+const normalizeHasMany = (_store: DS.Store, _attribute: any, _relationship: any, _included: any[]) =>
   ({ links: { related: 'emberfire' } })
