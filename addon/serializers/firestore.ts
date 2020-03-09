@@ -76,12 +76,12 @@ const normalizeRelationships = (store: DS.Store, modelClass: DS.Model, attribute
         included.splice(-1, 0, { links: { self: 'emberfire' }, ...data });
       }
     }
-    relationships[key] = normalizeRealtionship(relationship)(store, attribute, relationship, included);
+    relationships[key] = normalizeRelationship(relationship)(store, attribute, relationship, included);
   }, null);
   return {relationships, included};
 }
 
-const normalizeRealtionship = (relationship: any) => {
+const normalizeRelationship = (relationship: any) => {
   if (relationship.kind == 'belongsTo') {
     return normalizeBelongsTo;
   } else if (relationship.options.subcollection) {
