@@ -157,7 +157,6 @@ export default class FirestoreAdapter extends DS.Adapter.extend({
         return rootCollection(this, type).then((ref:firestore.CollectionReference) => {
             const queryOrRef = queryRecordOptionsToQueryFn(options)(ref);
             if (isQuery(queryOrRef)) {
-                if (queryOrRef.limit) { throw "Dont specify limit on queryRecord" }
                 return queryOrRef.limit(1).get();
             } else {
                 (options as any).id = queryOrRef.id;
