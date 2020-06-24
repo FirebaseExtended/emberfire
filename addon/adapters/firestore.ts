@@ -362,7 +362,7 @@ const includeRelationships = <T=any>(promise: Promise<T>, store: DS.Store, adapt
         ]).then(([doc, ...includes]) => {
             if (!(doc as any)._document) { (doc as any)._document = {} }
             doc._document._included = hasManyRelationships.reduce((c, e, i) => {
-                c[pluralize(e.key)] = includes[i];
+                c[e.key] = includes[i];
                 return c;
             }, {});
             return Promise.all([
