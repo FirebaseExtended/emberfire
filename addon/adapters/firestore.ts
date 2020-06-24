@@ -332,10 +332,12 @@ const includeCollectionRelationships = (collection: firestore.QuerySnapshot, sto
                     if (relationship.kind == 'belongsTo') {
                         const result = includes.find((r:any) => r.id == doc.data()[key]);
                         if (result) {
+                            if (!(doc as any)._document) { (doc as any)._document = {} }
                             if (!(doc as any)._document._included) { (doc as any)._document._included = {} }
                             (doc as any)._document._included[key] = result;
                         }
                     } else {
+                        if (!(doc as any)._document) { (doc as any)._document = {} }
                         if (!(doc as any)._document._included) { (doc as any)._document._included = {} }
                         (doc as any)._document._included[pluralKey] = includes;
                     }
@@ -358,6 +360,7 @@ const includeRelationships = <T=any>(promise: Promise<T>, store: DS.Store, adapt
             promise,
             ...hasManyRelationships.map(r => adapter.findHasMany(store, snapshot, '', r))
         ]).then(([doc, ...includes]) => {
+            if (!(doc as any)._document) { (doc as any)._document = {} }
             doc._document._included = hasManyRelationships.reduce((c, e, i) => {
                 c[pluralize(e.key)] = includes[i];
                 return c;
