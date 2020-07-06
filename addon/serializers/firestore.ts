@@ -33,7 +33,8 @@ export default class FirestoreSerializer extends DS.JSONSerializer {
   }
 
   normalizeCreateRecordResponse(_store: DS.Store, primaryModelClass: DS.Model, payload: any, id: string | number, _requestType: string) {
-    return { data: { id: id || payload.doc.id, attributes: payload.data, type: primaryModelClass.modelName }};
+    const type = (primaryModelClass.constructor as typeof DS.Model).modelName;
+    return { data: { id: id || payload.doc.id, attributes: payload.data, type: type }};
   }
 
 }
