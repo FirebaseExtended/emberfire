@@ -96,5 +96,18 @@ const normalizeEmbedded = (store: DS.Store, attribute: any, relationship: any, i
   }
 }
 
-const normalizeHasMany = (_store: DS.Store, _attribute: any, _relationship: any, _included: any[]) => 
-  ({ links: { related: 'emberfire' } })
+const normalizeHasMany = (_store, _attribute, _relationship, _included) => {
+    //taken from firestore
+    var data = [];
+    if(_attribute) {
+        var idsForRelationships = Object.keys(_attribute);
+        data = idsForRelationships.map( (key) => ({id: key, type: _relationship.type}) )
+     }
+
+    if (data.length > 0) {
+        return { data };
+    } else {
+        data = [];
+        return { data };
+    }
+}
