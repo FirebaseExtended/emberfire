@@ -64,7 +64,7 @@ const normalizeRelationships = (store: DS.Store, modelClass: DS.Model, attribute
     const attribute = attributes.data()[key];
     const payload = attributes._document && attributes._document._included && attributes._document._included[key];
     if (payload) {
-      const modelName = singularize(relationship.key) as never;
+      const modelName = relationship.meta.type as never;
       const modelClass = store.modelFor(modelName);
       const serializer = store.serializerFor(modelName) as any;
       const { data } = relationship.kind === 'belongsTo' ? serializer.normalizeSingleResponse(store, modelClass, payload) : serializer.normalizeArrayResponse(store, modelClass, payload);
