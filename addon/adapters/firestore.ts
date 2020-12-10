@@ -271,10 +271,6 @@ const queryOptionsToQueryFn = (options?:QueryOptions) => (collectionRef:firestor
             const runWhereOp = ([field, op, value]:WhereOp) => ref = ref.where(field, op, value);
             if (isWhereOp(options.where)) { runWhereOp(options.where) } else { options.where.forEach(runWhereOp) }
         }
-        if (options.endAt)      { ref = ref.endAt(options.endAt) }
-        if (options.endBefore)  { ref = ref.endBefore(options.endBefore) }
-        if (options.startAt)    { ref = ref.startAt(options.startAt) }
-        if (options.startAfter) { ref = ref.startAt(options.startAfter) }
         if (options.orderBy) {
             if (typeof options.orderBy === "string") {
                 ref = ref.orderBy(options.orderBy)
@@ -284,6 +280,10 @@ const queryOptionsToQueryFn = (options?:QueryOptions) => (collectionRef:firestor
                 });
             }
         }
+        if (options.endAt)      { ref = ref.endAt(options.endAt) }
+        if (options.endBefore)  { ref = ref.endBefore(options.endBefore) }
+        if (options.startAt)    { ref = ref.startAt(options.startAt) }
+        if (options.startAfter) { ref = ref.startAfter(options.startAfter) }
         if (options.limit) { ref = ref.limit(options.limit) }
     }
     return ref;
