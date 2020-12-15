@@ -1,9 +1,10 @@
 # EmberFire [![Build Status](https://travis-ci.org/firebase/emberfire.svg?branch=master)](https://travis-ci.org/firebase/emberfire) [![Version](https://badge.fury.io/gh/firebase%2Femberfire.svg)](http://badge.fury.io/gh/firebase%2Femberfire) [![Monthly Downloads](http://img.shields.io/npm/dm/emberfire.svg?style=flat)](https://www.npmjs.org/package/emberfire) [![Ember Observer Score](http://emberobserver.com/badges/emberfire.svg)](http://emberobserver.com/addons/emberfire)
 
-EmberFire is the officially supported adapter for using Firebase with Ember
+## Status
 
-Join the [Firebase Google Group](https://groups.google.com/forum/#!forum/firebase-talk)
-to ask technical questions, share apps you've built, and chat with other developers in the community. You can also find us in the [Firebase Community Slack](https://firebase.community/) (look for the `#ember` room) or [Stack Overflow](https://stackoverflow.com/questions/tagged/emberfire).
+![Status: Experimental](https://img.shields.io/badge/Status-Experimental-blue)
+
+This repository is maintained by Googlers but is not a supported Firebase product. Issues here are answered by maintainers and other community members on GitHub on a best-effort basis.
 
 ---
 
@@ -13,7 +14,7 @@ to ask technical questions, share apps you've built, and chat with other develop
 
 ## Why EmberFire?
 
-- **Offically supported** - Maintained by the Firebase team
+- **Developed by experts** - Developed and maintained by the Firebase team
 - **Ember Data Adapters** - [Cloud Firestore](https://firebase.google.com/docs/firestore/) and [Realtime Database](https://firebase.google.com/docs/database/) adapters for Ember Data allow you to persist your models in Firebase
 - **Ember Services** - `firebase` and `firebase-app` services allow direct access to the underlying [Firebase SDK instance](https://firebase.google.com/docs/reference/js/)
 - **Realtime Bindings** - Listen for realtime updates to your Firebase backed Ember Data models using the provided `realtime-listener` service or the `RealtimeRouteMixin`
