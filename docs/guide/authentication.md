@@ -35,11 +35,11 @@ $ ember generate firebase-session-store application
 
 The next step is to enable an authentication provider in the Firebase Authentication panel, and enter the API key and secret for that provider. Details on enabling third-party providers can be found in our docs e.g. [Enabling Google Sign-In](https://firebase.google.com/docs/auth/web/google-signin).
 
-In this example we'll use Google authentication. To start, we'll define `login` and `logout` actions in our application route making use of the `session` and `firebaseApp` services:
+In this example we'll use Google authentication. To start, we'll define `login` and `logout` actions in our application controller making use of the `session` and `firebaseApp` services:
 
 ```js
-// app/routes/application.js
-import Route from '@ember/routing/route';
+// app/controlers/application.js
+import Controller from '@ember/controller';
 import { inject as service } from '@ember/service';
 import firebase from 'firebase/app';
 
