@@ -69,7 +69,7 @@
     "typedoc": "^0.14.2",
     "typedoc-plugin-markdown": "^1.2.1",
     "typescript": "^3.6.3",
-    "ws": "^6.2.1",
+    "ws": "^7.4.6",
     "xmlhttprequest": "^1.8.0"
   },
   "engines": {
