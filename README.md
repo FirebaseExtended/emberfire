@@ -6,7 +6,9 @@
 
 This repository is maintained by Googlers but is not a supported Firebase product. Issues here are answered by maintainers and other community members on GitHub on a best-effort basis.
 
----
+* Ember.js v3.20 or above
+* Ember CLI v3.20 or above
+* Node.js v12 or above
 
 > **WARNING**: Master branch is the work in progress for version 3 of Emberfire. [You can find version 2 here](https://github.com/firebase/emberfire/tree/v2), if you're looking for documentation or to contribute to stable. [Learn more about the rewrite effort here](https://github.com/firebase/emberfire/issues/542).
 

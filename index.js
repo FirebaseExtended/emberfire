@@ -8,7 +8,7 @@ const emberfire_version = require('./package.json').version;
 const firebase_version = require('firebase').SDK_VERSION;
 
 module.exports = {
-  name: 'emberfire',
+  name: require('./package').name,
 
   options: {
     autoImport:{

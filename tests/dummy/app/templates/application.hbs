@@ -1,8 +1,8 @@
-{{#if session.isAuthenticated }}
-    <button {{action 'logout'}}>Logout</button>
-    <p>Signed in as {{ session.data.authenticated.user.displayName }}</p>
+{{#if this.session.isAuthenticated }}
+    <button {{on "click" this.logout}}>Logout</button>
+    <p>Signed in as {{ this.session.data.authenticated.user.displayName }}</p>
 {{else}}
-    <button {{action 'login'}}>Login</button>
+    <button {{on "click" this.login}}>Login</button>
 {{/if}}
 
 <nav>
