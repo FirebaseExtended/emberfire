@@ -10,12 +10,12 @@ let fastboot = new FastBoot({
     XMLHttpRequest: require('xmlhttprequest').XMLHttpRequest,
     WebSocket: require('ws'),
     clearInterval: clearInterval,
-    setInterval: setInterval
-  }
+    setInterval: setInterval,
+  },
 });
 
 let middleware = fastbootMiddleware({
-  fastboot: fastboot
+  fastboot: fastboot,
 });
 
 app.use('/assets', express.static(`${__dirname}/dist/assets`));

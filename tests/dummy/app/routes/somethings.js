@@ -5,24 +5,36 @@ import { inject as service } from '@ember/service';
 import PerformanceRouteMixin from 'emberfire/mixins/performance-route';
 
 export default Route.extend(RealtimeRouteMixin, PerformanceRouteMixin, {
-    store: service(),
-    firebaseApp: service(),
-    model() {
-        return this.store.query('something', { orderBy: 'title', include: 'user' });
+  store: service(),
+  firebaseApp: service(),
+  model() {
+    return this.store.query('something', { orderBy: 'title', include: 'user' });
+  },
+  actions: {
+    createSomething() {
+      const store = this.store;
+      const profile = this.firebaseApp
+        .auth()
+        .then(
+          ({ currentUser }) =>
+            (currentUser && store.findRecord('user', currentUser.uid)) || null
+        );
+      profile
+        .then((user) =>
+          store.createRecord('something', {
+            title: 'test',
+            description: 'test',
+            user,
+          })
+        )
+        .then(
+          (it) => {
+            it.save();
+          },
+          (reason) => {
+            console.error(reason);
+          }
+        );
     },
-    actions: {
-        createSomething() {
-            const store = get(this, 'store');
-            const profile = get(this, 'firebaseApp').auth().then(({currentUser}) => currentUser && store.findRecord('user', currentUser.uid) || null);
-            profile.then(user => store.createRecord('something', {
-                title: 'test',
-                description: 'test',
-                user
-            })).then(it => {
-                it.save();
-            }, reason => {
-                console.error(reason);
-            });
-        }
-    }
-})
+  },
+});

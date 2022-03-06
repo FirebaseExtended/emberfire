@@ -1,5 +1,3 @@
-import RealtimeDatabaseAdapter from 'emberfire/adapters/realtime-database';
+import StockRealtimeDatabaseAdapter from 'emberfire/adapters/realtime-database';
 
-export default RealtimeDatabaseAdapter.extend({
-    
-});
+export default class RealtimeDatabaseAdapter extends RealtimeDatabaseAdapter {}

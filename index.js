@@ -1,23 +1,21 @@
 /* eslint-env node */
 'use strict';
 const MergeTrees = require('broccoli-merge-trees');
-const Funnel = require('broccoli-funnel');
-const path = require('path');
 const writeFile = require('broccoli-file-creator');
 const emberfire_version = require('./package.json').version;
 const firebase_version = require('firebase').SDK_VERSION;
 
 module.exports = {
-  name: require('./package').name,
+  name: 'emberfire',
 
   options: {
-    autoImport:{
+    autoImport: {
       exclude: [],
-      webpack: {}
+      webpack: {},
     },
     babel: {
-      plugins: [ require.resolve('ember-auto-import/babel-plugin') ]
-    }
+      plugins: [require.resolve('ember-auto-import/babel-plugin')],
+    },
   },
 
   included(app) {
@@ -32,6 +30,5 @@ module.exports = {
       content
     );
     return MergeTrees([registerVersionTree]);
-  }
-
+  },
 };

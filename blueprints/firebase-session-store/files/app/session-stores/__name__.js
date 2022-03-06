@@ -1,3 +1,3 @@
-import FirebaseSessionStore from 'emberfire/session-stores/firebase';
+import StockFirebaseSessionStore from 'emberfire/session-stores/firebase';
 
-export default FirebaseSessionStore.extend();
+export default class FirebaseSessionStore extends StockFirebaseSessionStore {}

@@ -4,18 +4,20 @@ import firebase from 'firebase/app';
 import { action } from '@ember/object';
 
 export default class ApplicationController extends Controller {
-    @service session;
-    @service firebaseApp;
-    @service firebaseSecondApp;
- 
-    @action
-    logout() {
-        return this.get('session').invalidate();
-    }
+  @service session;
+  @service firebaseApp;
+  @service firebaseSecondApp;
 
-    @action
-    login() {
-        const provider = new firebase.auth.GoogleAuthProvider();
-        return this.get('firebaseApp').auth().then(auth => auth.signInWithPopup(provider));
-    }
+  @action
+  logout() {
+    return this.session.invalidate();
+  }
+
+  @action
+  login() {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    return this.firebaseApp
+      .auth()
+      .then((auth) => auth.signInWithPopup(provider));
+  }
 }

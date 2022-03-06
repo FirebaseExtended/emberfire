@@ -5,11 +5,10 @@ import Service from '@ember/service';
 const firebase = _firebase as typeof import('firebase/app');
 
 export default class FirebaseService extends Service {
-
   app = (name?: string) => firebase.app(name);
   apps = firebase.apps;
-  initializeApp = (options: Object, nameOrConfig?: string|Object) => firebase.initializeApp(options, nameOrConfig as string | undefined);
-
+  initializeApp = (options: Object, nameOrConfig?: string | Object) =>
+    firebase.initializeApp(options, nameOrConfig as string | undefined);
 }
 
 declare module '@ember/service' {

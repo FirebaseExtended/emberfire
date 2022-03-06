@@ -1,3 +1,3 @@
 module.exports = {
-    description: 'Generates a Cloud Firestore adapter.',
+  description: 'Generates a Cloud Firestore adapter.',
 };

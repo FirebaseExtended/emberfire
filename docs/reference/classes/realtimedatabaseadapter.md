@@ -58,9 +58,9 @@ Override the default database used by the RealtimeDatabaseAdapter
 // app/adapters/application.js
 import RealtimeDatabaseAdapter from 'emberfire/adapters/realtime-database';
 
-export default RealtimeDatabaseAdapter.extend({
-  databaseURL: 'https://DIFFERENT_DATABASE.firebaseio.com'
-});
+export default ApplicationAdapter extends RealtimeDatabaseAdapter{
+  databaseURL = 'https://DIFFERENT_DATABASE.firebaseio.com';
+};
 ```
 
 ___
@@ -79,9 +79,9 @@ Override the default FirebaseApp Service used by the RealtimeDatabaseAdapter: `s
 import RealtimeDatabaseAdapter from 'emberfire/adapters/realtime-database';
 import { inject as service } from '@ember/service';
 
-export default RealtimeDatabaseAdapter.extend({
-  firebaseApp: service('firebase-different-app')
-});
+export default class ApplicationAdapter extends RealtimeDatabaseAdapter {
+  @service('firebase-different-app') firebaseApp;
+};
 ```
 
 ___

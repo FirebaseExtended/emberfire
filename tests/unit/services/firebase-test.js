@@ -2,8 +2,7 @@ import { moduleFor, test } from 'ember-qunit';
 
 moduleFor('service:firebase', 'Unit | Service | firebase');
 
-test('should expose Firebase as a service', function(assert) {
-
+test('should expose Firebase as a service', function (assert) {
   assert.expect(3);
 
   const result = this.subject();

@@ -1,4 +1,5 @@
-import ToriiFirebaseAdapter from 'emberfire/torii-adapters/firebase';
+import StockToriiFirebaseAdapter from 'emberfire/torii-adapters/firebase';
 
-export default ToriiFirebaseAdapter.extend({
-});
+export default class ToriiFirebaseAdapter extends StockToriiFirebaseAdapter {
+
+}

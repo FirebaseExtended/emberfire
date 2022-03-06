@@ -81,9 +81,9 @@ Override the default FirebaseApp Service used by the FirestoreAdapter: `service(
 import FirestoreAdapter from 'emberfire/adapters/firestore';
 import { inject as service } from '@ember/service';
 
-export default FirestoreAdapter.extend({
-  firebaseApp: service('firebase-different-app')
-});
+export default class ApplicationAdapter extends FirestoreAdapter {
+  @service('firebase-different-app') firebaseApp;
+};
 ```
 
 ___

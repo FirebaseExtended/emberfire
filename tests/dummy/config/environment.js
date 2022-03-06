@@ -24,44 +24,45 @@ module.exports = function (environment) {
     },
 
     contentSecurityPolicy: {
-      'script-src': '\'self\' \'unsafe-eval\'',
-      'style-src': '\'self\' \'unsafe-inline\'',
-      'font-src': '\'self\'',
-      'frame-src': '\'self\' https://*.firebaseapp.com',
-      'img-src': '\'self\'',
-      'connect-src': '\'self\' wss://*.firebaseio.com https://*.googleapis.com'
+      'script-src': "'self' 'unsafe-eval'",
+      'style-src': "'self' 'unsafe-inline'",
+      'font-src': "'self'",
+      'frame-src': "'self' https://*.firebaseapp.com",
+      'img-src': "'self'",
+      'connect-src': "'self' wss://*.firebaseio.com https://*.googleapis.com",
     },
 
     firebase: [
       {
-        apiKey: "AIzaSyAWIMkDzUu4b0nD60BrglQX5Sq0_8hnT5Y",
-        authDomain: "ember-test-69699.firebaseapp.com",
-        databaseURL: "https://ember-test-69699.firebaseio.com",
-        projectId: "ember-test-69699",
-        storageBucket: "ember-test-69699.appspot.com",
-        messagingSenderId: "39112982274",
-        appId: "1:39112982274:web:acf53ad9e778bfd079cc1b",
-        measurementId: "G-YRDCZ1HFCQ"
-      }, {
-        apiKey: "AIzaSyAWIMkDzUu4b0nD60BrglQX5Sq0_8hnT5Y",
-        authDomain: "ember-test-69699.firebaseapp.com",
-        databaseURL: "https://ember-test-69699.firebaseio.com",
-        projectId: "ember-test-69699",
-        storageBucket: "ember-test-69699.appspot.com",
-        messagingSenderId: "39112982274",
-        appId: "1:39112982274:web:acf53ad9e778bfd079cc1b",
-        measurementId: "G-YRDCZ1HFCQ",
-        name: "second-app"
-      }
+        apiKey: 'AIzaSyAWIMkDzUu4b0nD60BrglQX5Sq0_8hnT5Y',
+        authDomain: 'ember-test-69699.firebaseapp.com',
+        databaseURL: 'https://ember-test-69699.firebaseio.com',
+        projectId: 'ember-test-69699',
+        storageBucket: 'ember-test-69699.appspot.com',
+        messagingSenderId: '39112982274',
+        appId: '1:39112982274:web:acf53ad9e778bfd079cc1b',
+        measurementId: 'G-YRDCZ1HFCQ',
+      },
+      {
+        apiKey: 'AIzaSyAWIMkDzUu4b0nD60BrglQX5Sq0_8hnT5Y',
+        authDomain: 'ember-test-69699.firebaseapp.com',
+        databaseURL: 'https://ember-test-69699.firebaseio.com',
+        projectId: 'ember-test-69699',
+        storageBucket: 'ember-test-69699.appspot.com',
+        messagingSenderId: '39112982274',
+        appId: '1:39112982274:web:acf53ad9e778bfd079cc1b',
+        measurementId: 'G-YRDCZ1HFCQ',
+        name: 'second-app',
+      },
     ],
 
     firestore: {
-      enablePersistence: true
+      enablePersistence: true,
     },
 
     fastboot: {
-      hostWhitelist: [/.+/]
-    }
+      hostWhitelist: [/.+/],
+    },
   };
 
   if (environment === 'development') {
@@ -84,7 +85,6 @@ module.exports = function (environment) {
   }
 
   if (environment === 'production') {
-
   }
 
   return ENV;

@@ -1,23 +1,24 @@
 import DS from 'ember-data';
-
+import JSONSerializer from '@ember-data/serializer/json';
 import { database } from 'firebase/app';
+import Model from '@ember-data/model';
+import Store from '@ember-data/store';
 
-export default class RealtimeDatabaseSerializer extends DS.JSONSerializer {
+export default class RealtimeDatabaseSerializer extends JSONSerializer {
 
-  // @ts-ignore TODO update the types to support
-  applyTransforms: (a: DS.Model, b: any) => void;
-
-  normalizeSingleResponse(store: DS.Store, primaryModelClass: DS.Model, payload: database.DataSnapshot, _id: string | number, _requestType: string) {
+  normalizeSingleResponse(store: Store, primaryModelClass: Model, payload: database.DataSnapshot, _id: string | number, _requestType: string) {
     if (!payload.exists) { throw  new DS.NotFoundError(); }
     let normalized = normalize(store, primaryModelClass, payload);
+    //@ts-ignore
     this.applyTransforms(primaryModelClass, normalized.data.attributes);
     return normalized;
   }
 
-  normalizeArrayResponse(store: DS.Store, primaryModelClass: DS.Model, payload: database.DataSnapshot, _id: string | number, _requestType: string) {
+  normalizeArrayResponse(store: Store, primaryModelClass: Model, payload: database.DataSnapshot, _id: string | number, _requestType: string) {
     const normalizedPayload: any[] = []
     payload.forEach(snapshot => {
       let normalized = normalize(store, primaryModelClass, snapshot);
+      //@ts-ignore
       this.applyTransforms(primaryModelClass, normalized.data.attributes);
       normalizedPayload.push(normalized);
     });
@@ -27,7 +28,7 @@ export default class RealtimeDatabaseSerializer extends DS.JSONSerializer {
     return { data, included, meta };
   }
 
-  normalizeCreateRecordResponse(_store: DS.Store, _primaryModelClass: DS.Model, payload: any, id: string | number, _requestType: string) {
+  normalizeCreateRecordResponse(_store: Store, _primaryModelClass: Model, payload: any, id: string | number, _requestType: string) {
     return { data: { id: id || payload.ref.key, attributes: payload.data }};
   }
 
@@ -39,7 +40,7 @@ declare module 'ember-data' {
   }
 }
 
-export const normalize = (store: DS.Store, modelClass: DS.Model, snapshot: database.DataSnapshot) => {
+export const normalize = (store: Store, modelClass: Model, snapshot: database.DataSnapshot) => {
   const id = snapshot.key;
   const type = (<any>modelClass).modelName;
   const attributes = { ...snapshot.val(), _ref: snapshot.ref };
@@ -48,7 +49,7 @@ export const normalize = (store: DS.Store, modelClass: DS.Model, snapshot: datab
   return { data, included };
 }
 
-const normalizeRelationships = (store: DS.Store, modelClass: DS.Model, attributes: any) => {
+const normalizeRelationships = (store: Store, modelClass: Model, attributes: any) => {
   const relationships: {[field:string]: any} = {};
   const included: any[] = [];
   modelClass.eachRelationship((key: string, relationship: any) => {
@@ -69,7 +70,7 @@ const normalizeRealtionship = (relationship: any) => {
   }
 }
 
-const normalizeBelongsTo = (_store: DS.Store, attribute: any, relationship: any, _included: any[]) => {
+const normalizeBelongsTo = (_store: Store, attribute: any, relationship: any, _included: any[]) => {
   if (attribute) {
     return { data: { id: attribute, type: relationship.type } };
   } else {
@@ -77,7 +78,7 @@ const normalizeBelongsTo = (_store: DS.Store, attribute: any, relationship: any,
   }
 }
 
-const normalizeEmbedded = (store: DS.Store, attribute: any, relationship: any, included: any[]) => {
+const normalizeEmbedded = (store: Store, attribute: any, relationship: any, included: any[]) => {
   if (attribute) {
     Object.keys(attribute).forEach(key => {
       const val = attribute[key];
@@ -96,5 +97,5 @@ const normalizeEmbedded = (store: DS.Store, attribute: any, relationship: any, i
   }
 }
 
-const normalizeHasMany = (_store: DS.Store, _attribute: any, _relationship: any, _included: any[]) => 
+const normalizeHasMany = (_store: Store, _attribute: any, _relationship: any, _included: any[]) => 
   ({ links: { related: 'emberfire' } })

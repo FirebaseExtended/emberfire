@@ -1,11 +1,9 @@
 {
   "compilerOptions": {
-    "target": "es6", 
+    "target": "es2020",
     "allowJs": true,
-    "module": "esnext",
     "moduleResolution": "node",
-    "sourceMap": true,
-    "baseUrl": ".",
+    "allowSyntheticDefaultImports": true,
     "noImplicitAny": true,
     "noImplicitThis": true,
     "alwaysStrict": true,
@@ -15,21 +13,33 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitReturns": true,
-    "skipLibCheck": true,
+    "noEmitOnError": true,
+    "noEmit": true,
+    "inlineSourceMap": true,
+    "inlineSources": true,
+    "baseUrl": ".",
+    "module": "esnext",
+    "experimentalDecorators": true,
     "paths": {
+      "dummy/tests/*": ["tests/*"],
+      "dummy/*": ["tests/dummy/app/*", "app/*"],
+      "emberfire/test-support": ["addon-test-support"],
+      "emberfire/test-support/*": ["addon-test-support/*"],
       "firebase/*": ["node_modules/firebase/*/index"],
       "ws": ["node_modules/ws/index"],
       "xmlhttprequest": ["node_modules/xmlhttprequest/lib/XMLHttpRequest"],
-      "emberfire": [ "addon" ],
-      "emberfire/*": [ "addon/* "],
-      "emberfire/authorizers/firebase": ["addon/authorizers/firebase"],
-      "emberfire/authenticators/firebase": [ "addon/authenticators/firebase"],
-      "emberfire/initializers/emberfire": [ "addon/initializers/emberfire"],
-      "emberfire/services/firebase": [ "addon/services/firebase"],
-      "emberfire/services/firebase-app": [ "addon/services/firebase-app"],
-      "*": [ "types/*" ]
+      "emberfire": ["addon"],
+      "emberfire/*": ["addon/* "],
+      
+      "*": ["types/*"]
     }
   },
-  "include": [ "addon", "app", "types" ],
-  "exclude": [ "node_modules", "**/*.spec.ts" ]
+  "include": [
+    "app/**/*",
+    "addon/**/*",
+    "tests/**/*",
+    "types/**/*",
+    "test-support/**/*",
+    "addon-test-support/**/*"
+  ]
 }
