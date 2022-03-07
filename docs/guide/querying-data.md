@@ -3,21 +3,31 @@
 In our posts template, let's say we want to display the ten most recent blog posts. We can do this with by adding the following parameter to our posts route:
 
 ```js
-export default Ember.Route.extend({
-  model: function() {
+import Route from '@ember/routing/route';
+import { inject as service } from '@ember/service';
+
+export default class SomeRoute extends Route {
+  @service store;
+
+  model() {
     return this.store.query('post', { orderBy: { publishedAt: 'desc' }, limit: 10 });
   }
-});
+}
 ```
 
 Alternatively we can directly modify the the assumed Firestore reference, [learn more about what query options are available in the Firestore documentation](https://firebase.google.com/docs/firestore/query-data/queries#simple_queries):
 
 ```js
-export default Ember.Route.extend({
-  model: function() {
+import Route from '@ember/routing/route';
+import { inject as service } from '@ember/service';
+
+export default class SomeRoute extends Route {
+  @service store;
+
+  model() {
     return this.store.query('post', { query: ref => ref.orderBy('publishedAt', 'desc').limit(10) });
   }
-});
+}
 ```
 
 This is useful for more advanced use cases.
@@ -27,13 +37,17 @@ This is useful for more advanced use cases.
 Use the `RealtimeRouteMixin` to get updates to records in your query while your route is in view.
 
 ```js
+import Route from '@ember/routing/route';
+import { inject as service } from '@ember/service';
 import RealtimeRouteMixin from 'emberfire/mixins/realtime-route';
 
-export default Route.extend(RealtimeRouteMixin, {
-  model: function() {
+export default class SomeRoute extends Route(RealtimeRouteMixin) {
+  @service store;
+  
+  model() {
     return this.store.query('post', { orderBy: { publishedAt: 'desc' }, limit: 10 });
   }
-});
+};
 ```
 
 ## Query Options

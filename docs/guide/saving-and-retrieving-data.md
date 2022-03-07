@@ -8,11 +8,13 @@ $ ember generate model post title:string body:string timestamp:number
 
 ```js
 // app/models/post.js
-export default DS.Model.extend({
-  title: DS.attr('string'),
-  body: DS.attr('string'),
-  timestamp: DS.attr('number')
-});
+import Model, { attr } from '@ember-data/model';
+
+export default class PostModel extends Model {
+  @attr('string') title;
+  @attr('string') body;
+  @attr('number' timestamp;
+}
 ```
 
 To add blog posts to our app, we'll need a route and a template with a form for submitting blog posts:
@@ -20,20 +22,21 @@ To add blog posts to our app, we'll need a route and a template with a form for 
 ```
 $ ember generate route posts
 ```
+
 This will generate a route and template for posts
 
 ```handlebars
 <!-- app/templates/posts.hbs -->
 <h2>New Post</h2>
-<ul class="post-publish">
+<ul class='post-publish'>
   <li>
-    {{input value=title placeholder="Title"}}
+    {{input value=title placeholder='Title'}}
   </li>
   <li>
-    {{textarea value=body placeholder="Body"}}
+    {{textarea value=body placeholder='Body'}}
   </li>
   <li>
-    <button {{action "publishPost"}}>Publish</button>
+    <button {{action 'publishPost'}}>Publish</button>
   </li>
 </ul>
 ```
@@ -46,20 +49,26 @@ $ ember generate controller posts
 
 ```js
 // app/controllers/posts.js
-export default Ember.Controller.extend({
-  sortProperties: ['timestamp'],
-  sortAscending: false, // sorts post by timestamp
-  actions: {
-    publishPost: function() {
-      var newPost = this.store.createRecord('post', {
-        title: this.get('title'),
-        body: this.get('body'),
-        timestamp: new Date().getTime()
-      });
-      newPost.save();
-    }
+import Controller from '@ember/controller';
+import { action } from '@embe/object';
+import { inject as service } from '@ember/service';
+
+export default class PostsController extends Controller {
+  @service store;
+
+  sortProperties = ['timestamp'];
+  sortAscending = false; // sorts post by timestamp
+
+  @action
+  publishPost() {
+    const newPost = this.store.createRecord('post', {
+      title = this.get('title'),
+      body = this.get('body'),
+      timestamp = new Date().getTime()
+    });
+    newPost.save();
   }
-});
+}
 ```
 
 In our `publishPost` action, we create a new post in the data store with the title and body entered in our Handlebars template. Simply calling `newPost.save()` will save our post to the data store and automatically create a record in the database.
@@ -86,11 +95,16 @@ To retrieve the post data from the database, we just need to add a model hook to
 
 ```js
 // app/routes/posts.js
-export default Ember.Route.extend({
-  model: function() {
+import Route from '@ember/routing/route';
+import { inject as service } from '@ember/service';
+
+export default class PostsRoute extends Route {
+  @service store;
+
+  model() {
     return this.store.findAll('post');
-  }
-});
+  },
+}
 ```
 
 Now we have access to all of our posts, and can display them in our template:
@@ -99,13 +113,12 @@ Now we have access to all of our posts, and can display them in our template:
 <!-- app/templates/posts.hbs from above -->
 
 <section>
-{{#each model as |post|}}
-  <div>{{post.title}}</div>
-  <div>{{post.body}}</div>
-{{/each}}
+  {{#each @model as |post|}}
+    <div>{{post.title}}</div>
+    <div>{{post.body}}</div>
+  {{/each}}
 </section>
 ```
-
 
 ### Continue reading
 

@@ -1,8 +1,6 @@
-import DS from 'ember-data';
+import Model, { attr, belongsTo } from '@ember-data/model';
 
-const { attr, belongsTo } = DS;
-
-export default DS.Model.extend({
-  name: attr('string'),
-  comment: belongsTo('comment'),
-});
+export default class TagModel extends Model {
+  @attr('string') name;
+  @belongsTo('comment') comment;
+}

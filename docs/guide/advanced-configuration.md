@@ -30,10 +30,11 @@ var ENV = {
 
 ```js
 import FirebaseSessionStore from 'emberfire/session-stores/firebase';
+import { inject as service } from '@ember/service';
 
-export default FirebaseSessionStore.extend({
-    firebaseApp: service('firebase-app-for-auth')
-});
+export default class FirebaseSessionStoreSession extends FirebaseSessionStore {
+    @service('firebase-app-for-auth') firebaseApp;
+}
 ```
 
 ### Run-time configuration
@@ -47,10 +48,10 @@ export default FirebaseSessionStore.extend({
 ```js
 import FirestoreAdapter from 'emberfire/adapters/firestore';
 
-export default FirestoreAdapter.extend({
-    enablePersistence: true,
-    settings: { timestampsInSnapshots: true }
-});
+export default class ApplicationAdapter extends FirestoreAdapter {
+    enablePersistence = true;
+    settings = { timestampsInSnapshots: true };
+};
 ```
 
 ## RealtimeDatabaseAdapter Options
@@ -60,7 +61,7 @@ export default FirestoreAdapter.extend({
 ```js
 import RealtimeDatabaseAdapter from 'emberfire/adapters/realtime-database';
 
-export default RealtimeDatabaseAdapter.extend({
-    databaseURL: 'https://SECOND-DATABSE.firebaseio.com'
-});
+export default class ApplicationAdapter extends RealtimeDatabaseAdapter {
+    databaseURL = 'https://SECOND-DATABSE.firebaseio.com'
+};
 ```

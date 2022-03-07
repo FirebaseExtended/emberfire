@@ -25,10 +25,10 @@ This will add Firebase as a dependency in our `package.json` and will generate `
 ```js
 import FirestoreAdapter from 'emberfire/adapters/firestore';
 
-export default FirestoreAdapter.extend({
+export default class ApplicationAdapter extends FirestoreAdapter {
   // Uncomment the following lines to enable offline persistence and multi-tab support
-  // enablePersistence: true,
-  // persistenceSettings: { synchronizeTabs: true }
+  // enablePersistence = true;
+  // persistenceSettings = { synchronizeTabs: true };
 });
 ```
 
@@ -72,10 +72,12 @@ $ ember generate model post title:string body:string
 This will generate `app/models/post.js`:
 
 ```js
-export default DS.Model.extend({
-  title: DS.attr('string'),
-  body: DS.attr('string')
-});
+import Model, { attr } from '@ember-data/model';
+
+export default Model {
+  @attr('string') title;
+  @attr('string' body;
+}
 ```
 
 To save our post to our database, we'll do the following:
@@ -96,11 +98,11 @@ Now that we have some post data stored in our database, we need to set up a mode
 
 ```js
 //app/routes/posts/index.js
-export default Ember.Route.extend({
-  model: function() {
+export default class PostsIndexRoute extends Route {
+  model() {
     return this.store.findAll('post');
   }
-});
+}
 ```
 
 To display our posts, we can loop through them in our template:

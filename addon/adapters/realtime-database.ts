@@ -2,12 +2,13 @@ import Adapter from '@ember-data/adapter';
 import { pluralize } from 'ember-inflector';
 import { camelize } from '@ember/string';
 import RSVP from 'rsvp';
-import DS from 'ember-data';
+import type DS from 'ember-data';
 import FirebaseAppService from '../services/firebase-app';
 import ModelRegistry from 'ember-data/types/registries/model';
 import { inject as service } from '@ember/service';
 import { get, set } from '@ember/object';
 import { database } from 'firebase/app';
+import { NotFoundError } from '@ember-data/adapter/error';
 
 /**
  * Persist your Ember Data models in the Firebase Realtime Database
@@ -16,7 +17,7 @@ import { database } from 'firebase/app';
  * // app/adapters/application.js
  * import RealtimeDatabaseAdapter from 'emberfire/adapters/realtime-database';
  *
- * export default RealtimeDatabaseAdapter.extend({
+ * export default class ApplicationAdapter extends FirestoreAdapter {
  *   // configuration goes here
  * });
  * ```
@@ -47,7 +48,7 @@ export default class RealtimeDatabaseAdapter extends Adapter {
    * // app/adapters/application.js
    * import RealtimeDatabaseAdapter from 'emberfire/adapters/realtime-database';
    *
-   * export default RealtimeDatabaseAdapter.extend({
+   * export default class ApplicationAdapter extends FirestoreAdapter {
    *   namespace: 'environments/production'
    * });
    * ```
@@ -159,7 +160,7 @@ export default class RealtimeDatabaseAdapter extends Adapter {
       if (snapshot) {
         return snapshot;
       } else {
-        throw new DS.NotFoundError();
+        throw new NotFoundError();
       }
     });
   }

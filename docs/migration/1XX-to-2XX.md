@@ -27,9 +27,9 @@ Ensure you're using a `3.x.x` version of the Firebase SDK in your `bower.json`.
 Version `2.x.x` of the Firebase SDK is no longer supported with EmberFire version `2.x.x`.
 
 | SDK Version | EmberFire Version Supported |
-|-------------|-------------------------------|
-| 3.x.x | 2.x.x |
-| 2.x.x | 1.x.x |
+| ----------- | --------------------------- |
+| 3.x.x       | 2.x.x                       |
+| 2.x.x       | 1.x.x                       |
 
 Consult the Firebase [web / Node.js migration guide](https://firebase.google.com/support/guides/firebase-web)
 for more details on what has changed in the Firebase `3.x.x` SDK.
@@ -92,19 +92,16 @@ export default FirebaseAdapter.extend({
 });
 ```
 
-
 After:
 
 ```js
 // adapters/application.js
 import FirebaseAdapter from 'emberfire/adapters/firebase';
 
-export default FirebaseAdapter.extend({
-});
+export default class ApplicationAdapter extends FirebaseAdapter {}
 ```
 
 If you need per-type adapter overrides, for example you want to use a different firebase DB entirely for a specific model, you can still override the `firebase` property when extending the adapter.
-
 
 ## Torii auth response payload changes
 
@@ -115,8 +112,9 @@ Please familiarize yourself with the changes to Firebase Authentication in the [
 Opening sessions **remains the same**:
 
 ```js
-this.get('session').open('firebase', {provider: 'twitter'}).then((result) => {
-});
+this.get('session')
+  .open('firebase', { provider: 'twitter' })
+  .then((result) => {});
 ```
 
 Payload before:
@@ -128,9 +126,9 @@ let result = {
   currentUser: {
     uid: '2425352',
     email: 'email@email.com',
-    displayName: 'Tim'
-  }
-}
+    displayName: 'Tim',
+  },
+};
 ```
 
 Payload after:
@@ -147,8 +145,8 @@ let result = {
     isAnonymous: false,
     refreshToken: '234234',
     // ...
-  }
-}
+  },
+};
 ```
 
 ## Update auth methods

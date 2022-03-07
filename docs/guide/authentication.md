@@ -9,14 +9,18 @@ firebaseApp.auth().then(auth => /* Firebase SDK calls */)
 Getting at the current user:
 
 ```js
-export default Ember.Route.extend({
-  firebaseApp: service(),
-  model: function() {
-    return this.firebaseApp.auth().then(({currentUser}) =>
-        currentUser ? this.store.query('comment', { filter: { user: currentUser.uid} }) : reject()
-    );
+export default class SomeRoute extends Route {
+  @service firebaseApp;
+  model() {
+    return this.firebaseApp
+      .auth()
+      .then(({ currentUser }) =>
+        currentUser
+          ? this.store.query('comment', { filter: { user: currentUser.uid } })
+          : reject()
+      );
   }
-});
+}
 ```
 
 ## Ember Simple Auth
@@ -42,21 +46,23 @@ In this example we'll use Google authentication. To start, we'll define `login` 
 import Route from '@ember/routing/route';
 import { inject as service } from '@ember/service';
 import firebase from 'firebase/app';
+import { action } from '@ember/object';
 
-export default Route.extend({
-    session: service(),
-    firebaseApp: service(),
-    actions: {
-        logout() {
-            return this.get('session').invalidate();
-        },
-        async login() {
-            const auth = await this.get('firebaseApp').auth();
-            const provider = new firebase.auth.GoogleAuthProvider();
-            return auth.signInWithPopup(provider);
-        }
-    }
-});
+export default class ApplicationRoute extends Route {
+  @service session;
+  @service firebaseApp;
+  @action
+  logout() {
+    return this.get('session').invalidate();
+  }
+
+  @action
+  async login() {
+    const auth = await this.get('firebaseApp').auth();
+    const provider = new firebase.auth.GoogleAuthProvider();
+    return auth.signInWithPopup(provider);
+  }
+}
 ```
 
 In the `login` action we pass Firebase the provider we're using; note we're calling Firebase Authentication methods directly rather than calling into Ember Simple Auth. The Ember Simple Auth session store in emberfire will listen for success and will update the session itself; no need for you to worry about it.
@@ -65,12 +71,13 @@ In `app/templates/application.hbs` we'll call our `login` action when a user cli
 
 ```handlebars
 // app/templates/application.hbs
-{{#if session.isAuthenticated}}
-  Logged in as {{ session.data.authenticated.user.displayName }}
-  <button {{action "logout"}}>Sign out</button>
+{{#if this.session.isAuthenticated}}
+  Logged in as
+  {{this.session.data.authenticated.user.displayName}}
+  <button {{action 'logout'}}>Sign out</button>
   {{outlet}}
 {{else}}
-  <button {{action "login"}}>Sign in with Google</button>
+  <button {{action 'login'}}>Sign in with Google</button>
 {{/if}}
 ```
 
@@ -106,31 +113,33 @@ In this example we'll use Google authentication. To start, we'll define `login` 
 
 ```js
 // app/routes/application.js
-import { get } from '@ember/object';
+import { action } from '@ember/object';
 import Route from '@ember/routing/route';
 import { inject as service } from '@ember/service';
 import firebase from 'firebase/app';
 
-export default Route.extend({
-    session: service(),
-    firebaseApp: service(),
-    beforeModel: function() {
-      return get(this, 'session').fetch().catch(() => {});
-    },
-    actions: {
-        logout() {
-            return get(this, 'session').close();
-        },
-        async login() {
-            const provider = new firebase.auth.GoogleAuthProvider();
-            const auth = await get(this, 'firebaseApp').auth();
-            return auth.signInWithPopup(provider);
-        }
-    }
-});
+export default class ApplicationRoute extends Route {
+  @service session;
+  @service firebaseApp;
+  beforeModel() {
+    return this.session.fetch().catch(() => {});
+  }
+
+  @action
+  logout() {
+    return get(this, 'session').close();
+  }
+
+  @action
+  async login() {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    const auth = await get(this, 'firebaseApp').auth();
+    return auth.signInWithPopup(provider);
+  }
+}
 ```
 
-In our `beforeModel` hook we call `fetch`, which fetches the current user's session if it exists. 
+In our `beforeModel` hook we call `fetch`, which fetches the current user's session if it exists.
 
 Then in the `login` action we pass Firebase the provider we're using; note we're calling Firebase Authentication methods directly rather than calling into Torii. The Torii adapter in emberfire will listen for success and open a Torii session itself; no need for you to worry about it.
 
@@ -138,12 +147,13 @@ In `app/templates/application.hbs` we'll call our `login` action when a user cli
 
 ```handlebars
 // app/templates/application.hbs
-{{#if session.isAuthenticated}}
-  Logged in as {{session.currentUser.displayName}}
-  <button {{action "logout"}}>Sign out</button>
+{{#if this.session.isAuthenticated}}
+  Logged in as
+  {{this.session.currentUser.displayName}}
+  <button {{action 'logout'}}>Sign out</button>
   {{outlet}}
 {{else}}
-  <button {{action "login"}}>Sign in with Google</button>
+  <button {{action 'login'}}>Sign in with Google</button>
 {{/if}}
 ```
 

@@ -6,9 +6,9 @@
 
 This repository is maintained by Googlers but is not a supported Firebase product. Issues here are answered by maintainers and other community members on GitHub on a best-effort basis.
 
-* Ember.js v3.20 or above
-* Ember CLI v3.20 or above
-* Node.js v12 or above
+- Ember.js v3.20 or above
+- Ember CLI v3.20 or above
+- Node.js v12 or above
 
 > **WARNING**: Master branch is the work in progress for version 3 of Emberfire. [You can find version 2 here](https://github.com/firebase/emberfire/tree/v2), if you're looking for documentation or to contribute to stable. [Learn more about the rewrite effort here](https://github.com/firebase/emberfire/issues/542).
 
@@ -37,24 +37,23 @@ $ ember install emberfire@next
 // app/adapters/application.js
 import FirestoreAdapter from 'emberfire/adapters/firestore';
 
-export default FirestoreAdapter.extend({
+export default class ApplicationAdapter extends  FirestoreAdapter {
     enablePersistence: true,
     persistenceSettings: { synchronizeTabs: true }
-});
+}
 ```
 
 ```js
 // app/models/article.js
-import DS from 'ember-data';
-const { attr, belongsTo, hasMany } = DS;
+import Model, { attr, belongsTo, hasMany } from '@ember-data/model';
 
-export default DS.Model.extend({
+export default class ArticleModel extends Model {
     title: attr('string'),
     body: attr('string'),
     publishedAt: attr('date'),
     author: belongsTo('user'),
     comments: hasMany('comments', { subcollection: true }),
-});
+};
 ```
 
 ```js
@@ -63,11 +62,11 @@ import Route from '@ember/routing/route';
 import RealtimeRouteMixin from 'emberfire/mixins/realtime-route';
 import PerformanceRouteMixin from 'emberfire/mixins/performance-route';
 
-export default Route.extend(RealtimeRouteMixin, PerformanceRouteMixin, {
+export default class ArticlesRoute extends Route.extend(RealtimeRouteMixin, PerformanceRouteMixin) {
     model() {
         return this.store.query('article', { orderBy: 'publishedAt' });
     }
-});
+};
 ```
 
 ```js
@@ -75,30 +74,30 @@ export default Route.extend(RealtimeRouteMixin, PerformanceRouteMixin, {
 import AnalyticsRouteMixin from 'emberfire/mixins/analytics-route';
 import Route from '@ember/routing/route';
 
-export default Route.extend(AnalyticsRouteMixin);
+export default class ApplicationRoute extends Route.extend(AnalyticsRouteMixin);
 ```
 
 ## Documentation
 
-* [Quickstart](docs/quickstart.md)
-* [Guide](docs/guide/README.md)
-* [API Reference](docs/reference/README.md)
+- [Quickstart](docs/quickstart.md)
+- [Guide](docs/guide/README.md)
+- [API Reference](docs/reference/README.md)
 
 ## Compatibility
 
 Please consult this table when selecting your version of EmberFire and Firebase SDK:
 
-| Ember Data        | EmberFire | Firebase SDK |
-| ------------------| ----------|--------------|
-| 3.0+              | 3.x       | 5.x          |
-| 2.3+              | 2.x       | 3.x          |
-| 2.0 - 2.2         | 1.6.x     | 2.x          |
-| 1.13              | 1.5.x     | 2.x          |
+| Ember Data | EmberFire | Firebase SDK |
+| ---------- | --------- | ------------ |
+| 3.0+       | 3.x       | 5.x          |
+| 2.3+       | 2.x       | 3.x          |
+| 2.0 - 2.2  | 1.6.x     | 2.x          |
+| 1.13       | 1.5.x     | 2.x          |
 
 ## Migration Guides
 
-* [Migrating from EmberFire `2.x` to `3.x`](docs/migration/2XX-to-3XX.md)
-* [Migrating from EmberFire `1.x` to `2.x`](docs/migration/1XX-to-2XX.md)
+- [Migrating from EmberFire `2.x` to `3.x`](docs/migration/2XX-to-3XX.md)
+- [Migrating from EmberFire `1.x` to `2.x`](docs/migration/1XX-to-2XX.md)
 
 ## Contributing
 

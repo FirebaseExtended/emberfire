@@ -1,9 +1,7 @@
-import DS from 'ember-data';
+import Model, { attr, belongsTo, hasMany } from '@ember-data/model';
 
-const { attr, hasMany, belongsTo } = DS;
-
-export default DS.Model.extend({
-  musing: attr('string'),
-  user: belongsTo('user'),
-  tags: hasMany('tag', { embedded: true }),
-});
+export default class ThoughtModel extends Model {
+  @attr('string') musing;
+  @belongsTo('user') user;
+  @hasMany('tag', { embedded: true }) tags;
+}

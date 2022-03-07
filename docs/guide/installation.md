@@ -25,11 +25,11 @@ This will add Firebase to your `package.json` file and generate `app/adapters/ap
 // app/adapters/application.js
 import FirestoreAdapter from 'emberfire/adapters/firestore';
 
-export default FirestoreAdapter.extend({
+export default class ApplicationAdapter extends FirestoreAdapter {
   // Uncomment the following lines to enable offline persistence and multi-tab support
-  // enablePersistence: true,
-  // persistenceSettings: { synchronizeTabs: true }
-});
+  // enablePersistence = true;
+  // persistenceSettings = { synchronizeTabs: true };
+}
 ```
 
 If you prefer to use the Firebase Realtime Database, you can run the following command `$ ember generate realtime-database-adapter`.

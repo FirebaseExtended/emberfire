@@ -1,10 +1,8 @@
-import DS from 'ember-data';
+import Model, { attr, hasMany } from '@ember-data/model';
 
-const { attr, hasMany } = DS;
-
-export default DS.Model.extend({
-  name: attr('string'),
-  somethings: hasMany('something', { query: (ref) => ref.orderBy('title') }),
-  thoughts: hasMany('thought', { subcollection: true }),
-  comments: hasMany('comments'),
-});
+export default class UserModel extends Model {
+  @attr('string') name;
+  @hasMany('something', { query: (ref) => ref.orderBy('title') }) somethings;
+  @hasMany('thought', { subcollection: true }) thoughts;
+  @hasMany('comments') comments;
+}

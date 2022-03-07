@@ -1,13 +1,13 @@
-import DS from 'ember-data';
 import JSONSerializer from '@ember-data/serializer/json';
 import { database } from 'firebase/app';
 import Model from '@ember-data/model';
 import Store from '@ember-data/store';
+import { NotFoundError } from '@ember-data/adapter/error';
 
 export default class RealtimeDatabaseSerializer extends JSONSerializer {
 
   normalizeSingleResponse(store: Store, primaryModelClass: Model, payload: database.DataSnapshot, _id: string | number, _requestType: string) {
-    if (!payload.exists) { throw  new DS.NotFoundError(); }
+    if (!payload.exists) { throw  new NotFoundError(); }
     let normalized = normalize(store, primaryModelClass, payload);
     //@ts-ignore
     this.applyTransforms(primaryModelClass, normalized.data.attributes);

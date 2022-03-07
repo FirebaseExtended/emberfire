@@ -1,9 +1,10 @@
 import Service from '@ember/service';
 import { getOwner } from '@ember/application';
-import DS from 'ember-data';
+import Model from '@ember-data/model';
 import { get } from '@ember/object';
 import { run } from '@ember/runloop';
 import { firestore, database } from 'firebase/app';
+import Store from '@ember-data/store';
 
 // TODO don't hardcode these, but having trouble otherwise
 import { rootCollection as firestoreRootCollection } from '../adapters/firestore';
@@ -21,9 +22,9 @@ const isFastboot = (object: Object) => {
   return fastboot && fastboot.isFastBoot;
 };
 
-export const subscribe = (route: Object, model: DS.Model) =>
+export const subscribe = (route: Object, model: Model) =>
   !isFastboot(route) && getService(route).subscribe(route, model);
-export const unsubscribe = (route: Object, model?: DS.Model) =>
+export const unsubscribe = (route: Object, model?: Model) =>
   !isFastboot(route) && getService(route).unsubscribe(route, model);
 
 const setRouteSubscription = (
@@ -80,7 +81,7 @@ export default class RealtimeListenerService extends Service.extend({
     if (!model) {
       return;
     }
-    const store = model.store as DS.Store;
+    const store = model.store as Store;
     const modelName = (model.get('type.modelName') ||
       model.get('_internalModel.modelName') ||
       model.modelName) as never;
@@ -333,7 +334,7 @@ export default class RealtimeListenerService extends Service.extend({
     }
   }
 
-  unsubscribe(route: Object, model?: DS.Model) {
+  unsubscribe(route: Object, model?: Model) {
     unsubscribeRoute(this, route, model && model.toString());
   }
 }

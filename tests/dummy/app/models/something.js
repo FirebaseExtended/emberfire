@@ -1,10 +1,9 @@
-import DS from 'ember-data';
 
-const { attr, belongsTo, hasMany } = DS;
+import Model, { attr, belongsTo, hasMany } from '@ember-data/model';
 
-export default DS.Model.extend({
-  title: attr('string'),
-  description: attr('string'),
-  user: belongsTo('user'),
-  comments: hasMany('comment'),
-});
+export default class SomethingModel extends Model {
+  @attr('string') title;
+  @attr('string') description;
+  @belongsTo('user') user;
+  @hasMany('comment') comments;
+}

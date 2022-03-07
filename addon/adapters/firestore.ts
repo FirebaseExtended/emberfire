@@ -9,7 +9,7 @@ import RSVP, { resolve } from 'rsvp';
 import FirebaseAppService from '../services/firebase-app';
 import ModelRegistry from 'ember-data/types/registries/model';
 import { firestore } from 'firebase/app';
-import DS from 'ember-data';
+import type DS from 'ember-data';
 
 /**
  * Persist your Ember Data models in Cloud Firestore
@@ -18,9 +18,9 @@ import DS from 'ember-data';
  * // app/adapters/application.js
  * import FirestoreAdapter from 'emberfire/adapters/firestore';
  *
- * export default FirestoreAdapter.extend({
+ * export default class ApplicationAdapter extends FirestoreAdapter {
  *   // configuration goes here
- * });
+ * }
  * ```
  *
  */
@@ -49,9 +49,9 @@ export default class FirestoreAdapter extends Adapter {
    * // app/adapters/application.js
    * import FirestoreAdapter from 'emberfire/adapters/firestore';
    *
-   * export default FirestoreAdapter.extend({
-   *   namespace: 'environments/production'
-   * });
+   * export default class ApplicationAdapter extends FirestoreAdapter {
+   *   namespace = 'environments/production'
+   * }
    * ```
    *
    */
@@ -65,9 +65,9 @@ export default class FirestoreAdapter extends Adapter {
    * // app/adapters/application.js
    * import FirestoreAdapter from 'emberfire/adapters/firestore';
    *
-   * export default FirestoreAdapter.extend({
-   *   settings: { timestampsInSnapshots: true }
-   * });
+   * export default class ApplicationAdapter extends FirestoreAdapter {
+   *   settings = { timestampsInSnapshots: true }
+   * }
    * ```
    *
    */
@@ -80,9 +80,9 @@ export default class FirestoreAdapter extends Adapter {
    * // app/adapters/application.js
    * import FirestoreAdapter from 'emberfire/adapters/firestore';
    *
-   * export default FirestoreAdapter.extend({
-   *   enablePersistence: true
-   * });
+   * export default class ApplicationAdapter extends FirestoreAdapter {
+   *   enablePersistence = true
+   * }
    * ```
    *
    */
@@ -95,10 +95,10 @@ export default class FirestoreAdapter extends Adapter {
    * // app/adapters/application.js
    * import FirestoreAdapter from 'emberfire/adapters/firestore';
    *
-   * export default FirestoreAdapter.extend({
-   *   enablePersistence: true,
-   *   persistenceSettings: { synchronizeTabs: true }
-   * });
+   * export default class ApplicationAdapter extends FirestoreAdapter {
+   *   enablePersistence = true;
+   *   persistenceSettings = { synchronizeTabs: true }
+   * }
    * ```
    *
    */
